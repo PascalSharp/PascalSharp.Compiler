@@ -8,6 +8,10 @@ bin/*.dll
 bin/*.pdb
 bin/*.config
 bin/*.xml
+bin/**/*.dll
+bin/**/*.pdb
+bin/**/*.config
+bin/**/*.xml
 
 TestSuite/CompilationSamples/*.pcu
 TestSuite/CompilationSamples/*.pdb
@@ -45,3 +49,6 @@ bin/System.dll.txt
 bin/mscorlib.txt
 bin/pabcnetc.exe
 bin/pabcnetcclear.exe
+bin/**/PascalABCNET.exe
+bin/**/pabcnetc.exe
+bin/**/pabcnetcclear.exe

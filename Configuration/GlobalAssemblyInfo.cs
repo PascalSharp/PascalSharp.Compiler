@@ -3,12 +3,9 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 
 [assembly: AssemblyDelaySign(false)]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("PascalABC.NET Compiler")]
 [assembly: AssemblyCopyright("Copyright © 2005-2018 by Ivan Bondarev, Stanislav Mihalkovich")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]		
-[assembly: AssemblyVersion(RevisionClass.FullVersion)]
 
 internal static class RevisionClass
 {

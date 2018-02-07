@@ -30,6 +30,3 @@ using System.Windows;
 
 [assembly: AssemblyTitle("SharpDevelopBase")]
 [assembly: AssemblyDescription("The base add-in of SharpDevelop")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]

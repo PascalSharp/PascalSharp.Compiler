@@ -15,6 +15,3 @@ using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("ICSharpCode.Core.WinForms")]
 [assembly: AssemblyDescription("Windows Forms binding for ICSharpCode.Core")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]

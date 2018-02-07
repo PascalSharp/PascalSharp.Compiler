@@ -8,13 +8,8 @@ using System.Runtime.InteropServices;
 // набора атрибутов. Измените значения этих атрибутов, чтобы изменить сведения,
 // связанные со сборкой.
 [assembly: AssemblyTitle("SyntaxVisitors")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("SyntaxVisitors")]
 [assembly: AssemblyCopyright("Copyright © 2005-2018 by Ivan Bondarev, Stanislav Mihalkovich")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 // Параметр ComVisible со значением FALSE делает типы в сборке невидимыми 
 // для COM-компонентов.  Если требуется обратиться к типу в этой сборке через 

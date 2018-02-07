@@ -5,4 +5,3 @@ using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("PascalABCNET.NetGenerator")]
 [assembly: AssemblyDescription(".NET code generator")]
-[assembly: AssemblyConfiguration("")]

@@ -1,25 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <ProjectGuid>{6222A3A1-83CE-47A3-A4E4-A018F82D44D8}</ProjectGuid>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <OutputType>Library</OutputType>
+    <TargetFramework>net40</TargetFramework>
     <RootNamespace>ICSharpCode.AvalonEdit</RootNamespace>
-    <AssemblyName>ICSharpCode.AvalonEdit.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <SourceAnalysisOverrideSettingsFile>"C:\Program Files\SharpDevelop\3.0\bin\..\AddIns\AddIns\Misc\SourceAnalysis\Settings.SourceAnalysis"</SourceAnalysisOverrideSettingsFile>
-    <SignAssembly>True</SignAssembly>
+    <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\ICSharpCode.AvalonEdit\ICSharpCode.AvalonEdit.snk</AssemblyOriginatorKeyFile>
-    <DelaySign>False</DelaySign>
-    <AssemblyOriginatorKeyMode>File</AssemblyOriginatorKeyMode>
-    <AllowUnsafeBlocks>False</AllowUnsafeBlocks>
-    <NoStdLib>False</NoStdLib>
-    <WarningLevel>4</WarningLevel>
-    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
-    <OutputPath>..\..\..\..\bin\UnitTests\</OutputPath>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,7 +29,9 @@
     <PlatformTarget>x86</PlatformTarget>
     <FileAlignment>4096</FileAlignment>
   </PropertyGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.Targets" />
+  <ItemGroup>
+    <ProjectReference Include="..\ICSharpCode.AvalonEdit\ICSharpCode.AvalonEdit.csproj" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\..\AddIns\Misc\AddInManager\RequiredLibraries\ICSharpCode.SharpZipLib.dll</HintPath>
@@ -51,60 +40,14 @@
       <HintPath>..\..\..\Tools\NUnit\nunit.framework.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="PresentationCore">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="PresentationFramework">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Xaml">
-      <RequiredTargetFramework>4.0</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="WindowsBase">
-      <RequiredTargetFramework>3.0</RequiredTargetFramework>
-    </Reference>
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Xaml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Document\ChangeTrackingTest.cs" />
-    <Compile Include="Document\TextAnchorTest.cs" />
-    <Compile Include="Document\TextSegmentTreeTest.cs" />
-    <Compile Include="Document\TextUtilitiesTests.cs" />
-    <Compile Include="Editing\ChangeDocumentTests.cs" />
-    <Compile Include="Editing\TextSegmentReadOnlySectionTests.cs" />
-    <Compile Include="Highlighting\HtmlClipboardTests.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Document\CollapsingTests.cs" />
-    <Compile Include="Document\HeightTests.cs" />
-    <Compile Include="Document\RandomizedLineManagerTest.cs" />
-    <Compile Include="Document\LineManagerTests.cs" />
-    <Compile Include="Search\FindTests.cs" />
-    <Compile Include="Utils\CaretNavigationTests.cs" />
-    <Compile Include="Utils\CompressingTreeListTests.cs" />
-    <Compile Include="Utils\ExtensionMethodsTests.cs" />
-    <Compile Include="Utils\IndentationStringTests.cs" />
-    <Compile Include="Utils\RopeTests.cs" />
-    <Compile Include="WeakReferenceTests.cs" />
-    <Compile Include="XmlParser\ParserTests.cs" />
-    <Compile Include="XmlParser\TextReplacementTests.cs" />
     <None Include="XmlParser\W3C.zip">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ICSharpCode.AvalonEdit\ICSharpCode.AvalonEdit.csproj">
-      <Project>{6C55B776-26D4-4DB3-A6AB-87E783B2F3D1}</Project>
-      <Name>ICSharpCode.AvalonEdit</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Search" />
   </ItemGroup>
 </Project>

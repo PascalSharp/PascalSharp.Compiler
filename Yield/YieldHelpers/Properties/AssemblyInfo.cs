@@ -7,7 +7,6 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("YieldHelpers")]
 [assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Hewlett-Packard")]
 [assembly: AssemblyProduct("YieldHelpers")]
 [assembly: AssemblyCopyright("Copyright © Hewlett-Packard 2016")]

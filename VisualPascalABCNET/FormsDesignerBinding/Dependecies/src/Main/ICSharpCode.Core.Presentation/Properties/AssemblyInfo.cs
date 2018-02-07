@@ -12,9 +12,6 @@ using System.Windows.Markup;
 
 [assembly: AssemblyTitle("ICSharpCode.Core.Presentation")]
 [assembly: AssemblyDescription("ICSharpCode.Core, Windows Presentation Foundation implementation")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.SourceAssembly, //where theme specific resource dictionaries are located

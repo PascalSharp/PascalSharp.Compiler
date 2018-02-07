@@ -1,17 +1,13 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.50727</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{40793A27-478B-4357-B4C3-FC8943131F3D}</ProjectGuid>
+    <TargetFramework>net40</TargetFramework>
     <OutputType>WinExe</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DockSample</RootNamespace>
-    <AssemblyName>DockSample</AssemblyName>
-    <TargetFrameworkProfile />
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -31,20 +27,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Data.DataSetExtensions">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Drawing" />
+    <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml" />
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AboutDialog.cs">
@@ -95,8 +82,6 @@
     <Compile Include="DummyToolbox.Designer.cs">
       <DependentUpon>DummyToolbox.cs</DependentUpon>
     </Compile>
-    <Compile Include="Customization\DockHelper.cs" />
-    <Compile Include="Customization\Extender.cs" />
     <Compile Include="Customization\InertButton.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -115,69 +100,19 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <EmbeddedResource Include="AboutDialog.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>AboutDialog.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DummyDoc.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DummyDoc.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DummyOutputWindow.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DummyOutputWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DummyPropertyWindow.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DummyPropertyWindow.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DummySolutionExplorer.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DummySolutionExplorer.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DummyTaskList.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DummyTaskList.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="DummyToolbox.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>DummyToolbox.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="MainForm.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>MainForm.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
+    <Compile Update="Properties\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
     </Compile>
-    <None Include="app.config" />
-    <None Include="Properties\Settings.settings">
-      <Generator>SettingsSingleFileGenerator</Generator>
-      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
-    </None>
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Compile Include="Customization\Resources.Designer.cs">
+    <Compile Update="Customization\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
     </Compile>
-    <Compile Include="Customization\Strings.Designer.cs">
+    <Compile Update="Customization\Strings.Designer.cs">
       <DependentUpon>Strings.resx</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
     </Compile>
     <Compile Include="ToolWindow.cs">
       <SubType>Form</SubType>
@@ -185,14 +120,11 @@
     <Compile Include="ToolWindow.Designer.cs">
       <DependentUpon>ToolWindow.cs</DependentUpon>
     </Compile>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\WinFormsUI\WinFormsUI.csproj">
-      <Project>{C75532C4-765B-418E-B09B-46D36B2ABDB1}</Project>
-      <Name>WinFormsUI</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
     <None Include="Images\ArrowDown.bmp" />
     <None Include="Images\ArrowUp.bmp" />
     <None Include="Images\Bitmap.ico" />
@@ -215,123 +147,36 @@
     <None Include="Images\TaskListWindow.ico" />
     <None Include="Images\ToolboxWindow.ico" />
     <None Include="Images\XmlFile.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="MainForm2.resx">
-      <DependentUpon>MainForm2.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Customization\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Resources\DockPanel.xml" />
-    <EmbeddedResource Include="Customization\Strings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-    <EmbeddedResource Include="ToolWindow.resx">
-      <SubType>Designer</SubType>
-      <DependentUpon>ToolWindow.cs</DependentUpon>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PaneDiamond.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockPaneStrip_ScrollRightEnabled.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PaneDiamond_Bottom.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\Dockindicator_PaneDiamond_Fill.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PaneDiamond_Hotspot.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PaneDiamond_HotspotIndex.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PaneDiamond_Left.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PaneDiamond_Right.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PaneDiamond_Top.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PanelBottom.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PanelBottom_Active.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PanelFill.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PanelFill_Active.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PanelLeft.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PanelLeft_Active.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PanelRight.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PanelRight_Active.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PanelTop.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockIndicator_PanelTop_Active.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockPaneCaption_AutoHideNo.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockPaneCaption_AutoHideYes.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockPaneCaption_CloseDisabled.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockPaneCaption_CloseEnabled.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockPaneStrip_CloseDisabled.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockPaneStrip_CloseEnabled.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockPaneStrip_ScrollLeftDisabled.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockPaneStrip_ScrollLeftEnabled.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="Customization\Resources\DockPaneStrip_ScrollRightDisabled.bmp" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="license.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

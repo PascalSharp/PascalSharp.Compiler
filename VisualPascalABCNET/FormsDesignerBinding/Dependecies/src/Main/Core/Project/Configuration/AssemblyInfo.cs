@@ -12,7 +12,6 @@ using System.Runtime.CompilerServices;
 
 [assembly: AssemblyTitle("ICSharpCode.Core")]
 [assembly: AssemblyDescription("The ICSharpCode Core containing the AddInTree and service Subsystem")]
-[assembly: AssemblyConfiguration("")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
