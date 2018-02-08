@@ -13,6 +13,3 @@ using System.Security.Permissions;
 
 [assembly: AssemblyTitle("ICSharpCode.SharpDevelop.Dom")]
 [assembly: AssemblyDescription("Code-completion library")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]

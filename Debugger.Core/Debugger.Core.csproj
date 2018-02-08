@@ -1,24 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net40</TargetFramework>
+    <TargetFrameworks>net461;net471</TargetFrameworks>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputPath>..\bin\</OutputPath>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>Full</DebugType>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <Optimize>False</Optimize>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>PdbOnly</DebugType>
-    <Optimize>true</Optimize>
-    <DefineConstants>TRACE</DefineConstants>
-    <NoWarn>108</NoWarn>
-    <DebugSymbols>false</DebugSymbols>
-    <OutputPath>..\bin\</OutputPath>
-  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Src\RemotingSinks\TestClient\**" />
+    <Compile Remove="Src\RemotingSinks\TestCommonTypes\**" />
+    <Compile Remove="Src\RemotingSinks\TestServer\**" />
+    <EmbeddedResource Remove="Src\RemotingSinks\TestClient\**" />
+    <EmbeddedResource Remove="Src\RemotingSinks\TestCommonTypes\**" />
+    <EmbeddedResource Remove="Src\RemotingSinks\TestServer\**" />
+    <None Remove="Src\RemotingSinks\TestClient\**" />
+    <None Remove="Src\RemotingSinks\TestCommonTypes\**" />
+    <None Remove="Src\RemotingSinks\TestServer\**" />
+  </ItemGroup>
   <ItemGroup>
     <Reference Include="ISymWrapper" />
     <Reference Include="System.Data.DataSetExtensions" />

@@ -12,9 +12,6 @@ using System.Windows.Markup;
 
 [assembly: AssemblyTitle("ICSharpCode.SharpDevelop.Widgets")]
 [assembly: AssemblyDescription("UI Widgets for SharpDevelop")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 [assembly: ThemeInfo(
     ResourceDictionaryLocation.SourceAssembly, //where theme specific resource dictionaries are located

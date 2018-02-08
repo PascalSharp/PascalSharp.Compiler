@@ -14,6 +14,3 @@ using System.Reflection;
 //
 [assembly: AssemblyTitle("Debugger Library")]
 [assembly: AssemblyDescription("Library for debugging .NET applications")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]

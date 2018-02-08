@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net40</TargetFramework>
+    <TargetFrameworks>net461;net471</TargetFrameworks>
     <AssemblyName>ICSharpCode.SharpDevelop.BuildWorker40</AssemblyName>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\ICSharpCode.SharpDevelop.snk</AssemblyOriginatorKeyFile>
