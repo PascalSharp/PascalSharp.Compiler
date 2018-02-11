@@ -105,6 +105,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICSharpCode.SharpDevelop.Do
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ICSharpCode.SharpDevelop.Widgets", "VisualPascalABCNET\FormsDesignerBinding\Dependecies\src\Main\ICSharpCode.SharpDevelop.Widgets\Project\ICSharpCode.SharpDevelop.Widgets.csproj", "{7E89AA9E-997E-4885-911D-4C6D58ED9768}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NRefactory", "Libraries\NRefactory\NRefactory.csproj", "{436EF7B5-FB1E-4AEF-8566-C950C08748EE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -255,6 +257,10 @@ Global
 		{7E89AA9E-997E-4885-911D-4C6D58ED9768}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E89AA9E-997E-4885-911D-4C6D58ED9768}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E89AA9E-997E-4885-911D-4C6D58ED9768}.Release|Any CPU.Build.0 = Release|Any CPU
+		{436EF7B5-FB1E-4AEF-8566-C950C08748EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{436EF7B5-FB1E-4AEF-8566-C950C08748EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{436EF7B5-FB1E-4AEF-8566-C950C08748EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{436EF7B5-FB1E-4AEF-8566-C950C08748EE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

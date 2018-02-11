@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using CodeCompletion;
 using System.Threading;
 using PascalABCCompiler.Parsers;
+using VisualPascalABC.DockContent;
 
 namespace VisualPascalABC
 {

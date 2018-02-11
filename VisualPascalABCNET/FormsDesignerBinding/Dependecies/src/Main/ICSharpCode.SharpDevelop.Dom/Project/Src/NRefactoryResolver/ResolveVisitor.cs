@@ -691,13 +691,16 @@ namespace ICSharpCode.SharpDevelop.Dom.NRefactoryResolver
 					} else {
 						return null;
 					}
-				case UnaryOperatorType.Await:
+                // todo: andrew.boyarshin: fix await
+#if false
+                case UnaryOperatorType.Await:
 					var crt = type.CastToConstructedReturnType();
 					if (crt != null && crt.Name == "Task" && crt.TypeArguments.Count == 1) {
 						return CreateResolveResult(crt.TypeArguments[0]);
 					} else {
 						return null;
 					}
+#endif
 				default:
 					return CreateResolveResult(type);
 			}
@@ -708,7 +711,7 @@ namespace ICSharpCode.SharpDevelop.Dom.NRefactoryResolver
 			return CreateResolveResult(uncheckedExpression.Expression);
 		}
 		
-		#region XML Literal resolver
+#region XML Literal resolver
 		public override object VisitXmlContentExpression(XmlContentExpression xmlContentExpression, object data)
 		{
 			switch (xmlContentExpression.Type) {
@@ -753,6 +756,6 @@ namespace ICSharpCode.SharpDevelop.Dom.NRefactoryResolver
 					throw new Exception("Invalid value for XmlAxisType");
 			}
 		}
-		#endregion
+#endregion
 	}
 }

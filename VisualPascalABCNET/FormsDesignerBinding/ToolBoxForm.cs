@@ -12,7 +12,7 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace VisualPascalABC
 {
-    public partial class ToolBoxForm : DockContent
+    public partial class ToolBoxForm : WeifenLuo.WinFormsUI.Docking.DockContent
     {
         public ToolBoxForm()
         {

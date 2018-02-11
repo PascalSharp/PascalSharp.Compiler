@@ -15,21 +15,10 @@
     <ProjectReference Include="..\SyntaxTreeConverters\SyntaxTreeConverters.csproj" />
     <ProjectReference Include="..\SyntaxTree\SyntaxTree.csproj" />
     <ProjectReference Include="..\TreeConverter\TreeConverter.csproj" />
+    <ProjectReference Include="$(SolutionDir)Libraries\NRefactory\NRefactory.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DynamicLanguageRuntime" Version="1.2.1" />
-    <Reference Include="ICSharpCode.NRefactory">
-      <HintPath>..\Libraries\ICSharpCode.NRefactory.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <!-- <Reference Include="Microsoft.Dynamic, Version=1.1.0.20, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
-      <HintPath>..\bin\Microsoft.Dynamic.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Microsoft.Scripting, Version=1.1.0.20, Culture=neutral, PublicKeyToken=7f709c5b713576e1, processorArchitecture=MSIL">
-      <HintPath>..\Libraries\Microsoft.Scripting.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference> -->
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Configuration\GlobalAssemblyInfo.cs">

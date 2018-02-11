@@ -17,6 +17,7 @@ using System.Drawing;
 using Microsoft.CSharp;
 using Microsoft.VisualBasic;
 using ICSharpCode.FormsDesigner.Services;
+using VisualPascalABC.Projects;
 
 namespace ICSharpCode.FormsDesigner
 {
@@ -207,7 +208,7 @@ namespace ICSharpCode.FormsDesigner
             abc.GenerateCodeFromCompileUnit(codeCompileUnit, sw, options);
             PABCCodeGenerator inc_abc = new PABCCodeGenerator();
             inc_abc.own_output = true;
-            StreamWriter inc_sw = new StreamWriter(Path.Combine(Path.GetDirectoryName(VisualPascalABC.ProjectFactory.Instance.CurrentProject.Path),/*codeCompileUnit.Namespaces[0].Types[0].Name+".inc"*/pabc.UnitName + "." + getFormName() + ".inc"));
+            StreamWriter inc_sw = new StreamWriter(Path.Combine(Path.GetDirectoryName(ProjectFactory.Instance.CurrentProject.Path),/*codeCompileUnit.Namespaces[0].Types[0].Name+".inc"*/pabc.UnitName + "." + getFormName() + ".inc"));
             (inc_abc as ICodeGenerator).GenerateCodeFromCompileUnit(codeCompileUnit, inc_sw, options);
             inc_sw.Flush();
             inc_sw.Close();

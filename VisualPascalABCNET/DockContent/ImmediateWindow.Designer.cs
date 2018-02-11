@@ -6,7 +6,7 @@
  * 
  * Sie können diese Vorlage unter Extras > Optionen > Codeerstellung > Standardheader ändern.
  */
-namespace VisualPascalABC
+namespace VisualPascalABC.DockContent
 {
 	partial class ImmediateWindow
 	{
@@ -37,7 +37,7 @@ namespace VisualPascalABC
 		private void InitializeComponent()
 		{
 			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImmediateWindow));
-			this.ImmediateConsole = new VisualPascalABC.CodeFileDocumentTextEditorControl();
+			this.ImmediateConsole = new CodeFileDocumentTextEditorControl();
 			this.SuspendLayout();
 			// 
 			// ImmediateConsole
@@ -64,7 +64,7 @@ namespace VisualPascalABC
 			this.Text = "TP_IMMEDIATE_WINDOW";
 			this.ResumeLayout(false);
 		}
-		private VisualPascalABC.CodeFileDocumentTextEditorControl ImmediateConsole;
+		private CodeFileDocumentTextEditorControl ImmediateConsole;
 		
 	}
 }

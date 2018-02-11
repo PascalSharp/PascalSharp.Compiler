@@ -9,7 +9,9 @@ using System.Windows.Forms;
 using ICSharpCode.FormsDesigner;
 using ICSharpCode.SharpDevelop.Gui;
 using ICSharpCode.TextEditor;
+using VisualPascalABC.DockContent;
 using VisualPascalABC.OptionsContent;
+using VisualPascalABC.Projects;
 using VisualPascalABCPlugins;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -125,7 +127,7 @@ namespace VisualPascalABC
             optionsContentEngine.AddContent(new IntelliseseOptionsContent(this));
         }
 
-        void AddWindowToDockPanel(DockContent dc, DockPanel dp, DockStyle dockStyle, DockState dockState, bool isFloat, DockPane dockToPane, int ind)
+        void AddWindowToDockPanel(WeifenLuo.WinFormsUI.Docking.DockContent dc, DockPanel dp, DockStyle dockStyle, DockState dockState, bool isFloat, DockPane dockToPane, int ind)
         {
             if (dc.Visible && dc.Pane != null)
                 return;
@@ -351,13 +353,13 @@ namespace VisualPascalABC
             return TabStack.Contains(tab as CodeFileDocumentControl);
         }
 
-        internal void HideContent(DockContent dc)
+        internal void HideContent(WeifenLuo.WinFormsUI.Docking.DockContent dc)
         {
             if (!dc.IsDisposed)
                 dc.Hide();
         }
 
-        internal void ShowContent(DockContent dc, bool activate)
+        internal void ShowContent(WeifenLuo.WinFormsUI.Docking.DockContent dc, bool activate)
         {
             if (activate || dc.Pane == null)
                 dc.Show();
@@ -370,7 +372,7 @@ namespace VisualPascalABC
             }
         }
 
-        internal void SelectContent(DockContent dc, bool Activate)
+        internal void SelectContent(WeifenLuo.WinFormsUI.Docking.DockContent dc, bool Activate)
         {
             dc.Activate();
         }

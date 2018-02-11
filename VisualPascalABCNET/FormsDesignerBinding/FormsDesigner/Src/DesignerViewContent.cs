@@ -22,6 +22,8 @@ using ICSharpCode.SharpDevelop.Dom;
 using ICSharpCode.SharpDevelop.Editor; 
 using ICSharpCode.SharpDevelop.Gui;
 using ICSharpCode.SharpDevelop.Refactoring;
+using VisualPascalABC.DockContent;
+
 namespace ICSharpCode.FormsDesigner
 {
     public class FormsDesignerViewContent : IDisposable, IServiceProvider, IClipboardHandler, IUndoHandler, IHasPropertyContainer, IContextHelpProvider, IToolsHost
@@ -34,7 +36,7 @@ namespace ICSharpCode.FormsDesigner
         DesignerResourceService designerResourceService;
 		TypeResolutionService typeResolutionService;
         string generatedCode = null;
-        VisualPascalABC.CodeFileDocumentControl codeFileDocument; //roman//
+        CodeFileDocumentControl codeFileDocument; //roman//
         public delegate void ModifyDelegate();
         public ModifyDelegate Modify;
 
@@ -42,7 +44,7 @@ namespace ICSharpCode.FormsDesigner
         //roman//
         static FormsDesignerViewContent()
         {
-            ICSharpCode.Core.WinForms.WinFormsResourceService.AddToBitmapCache("Icons.16x16.SideBarDocument", global::VisualPascalABC.Properties.Resources.Pointer);
+            ICSharpCode.Core.WinForms.WinFormsResourceService.AddToBitmapCache("Icons.16x16.SideBarDocument", global::VisualPascalABC.Resources.Pointer);
         }
 
         private void PropertyPadEditorKeyPress(object sender, KeyPressEventArgs e)
@@ -151,7 +153,7 @@ namespace ICSharpCode.FormsDesigner
 			}
 		}
 		
-		public FormsDesignerViewContent(VisualPascalABC.CodeFileDocumentControl documentControl) //roman//
+		public FormsDesignerViewContent(CodeFileDocumentControl documentControl) //roman//
 			: base()
 		{
             if (documentControl == null)

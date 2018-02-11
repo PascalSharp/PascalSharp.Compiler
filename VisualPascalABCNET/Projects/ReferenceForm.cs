@@ -2,13 +2,11 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
-namespace VisualPascalABC
+namespace VisualPascalABC.Projects
 {
 	/// <summary>
 	/// Description of ReferenceForm.

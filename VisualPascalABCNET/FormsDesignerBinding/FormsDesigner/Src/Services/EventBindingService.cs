@@ -8,6 +8,9 @@
 ///
 /// </copyright>
 //------------------------------------------------------------------------------
+
+using VisualPascalABC.DockContent;
+
 namespace ICSharpCode.FormsDesigner.Services
 {
 	using System;
@@ -30,7 +33,7 @@ namespace ICSharpCode.FormsDesigner.Services
         public int line_num = 0;
         public int column_num = 0;
 
-        public VisualPascalABC.CodeFileDocumentTextEditorControl editor = null;
+        public CodeFileDocumentTextEditorControl editor = null;
 
         public EventDescription(string event_name, EventDescriptor descriptor)
         {
@@ -143,7 +146,7 @@ namespace ICSharpCode.FormsDesigner.Services
 		protected bool ShowCode(object component, EventDescriptor e, string methodName)
         {
             EventDescription ev = new EventDescription(methodName, e);
-            VisualPascalABC.CodeFileDocumentControl cfdc = VisualPascalABC.VisualPABCSingleton.MainForm._currentCodeFileDocument;
+            CodeFileDocumentControl cfdc = VisualPascalABC.VisualPABCSingleton.MainForm._currentCodeFileDocument;
             cfdc.GenerateDesignerCode(ev);
             if (ev.editor != null)
             {

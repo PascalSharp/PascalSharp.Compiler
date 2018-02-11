@@ -1,4 +1,4 @@
-﻿namespace VisualPascalABC
+﻿namespace VisualPascalABC.DockContent
 {
     partial class DisassemblyWindow
     {
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ImmediateWindow));
-            this.DisassemblyEditor = new VisualPascalABC.CodeFileDocumentTextEditorControl();
+            this.DisassemblyEditor = new CodeFileDocumentTextEditorControl();
             this.SuspendLayout();
             // 
             // DisassemblyEditor
@@ -60,6 +60,6 @@
 
         #endregion
 
-        private VisualPascalABC.CodeFileDocumentTextEditorControl DisassemblyEditor;
+        private CodeFileDocumentTextEditorControl DisassemblyEditor;
     }
 }

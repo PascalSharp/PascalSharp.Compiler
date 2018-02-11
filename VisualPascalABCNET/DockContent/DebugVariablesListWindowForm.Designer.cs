@@ -1,4 +1,4 @@
-namespace VisualPascalABC
+namespace VisualPascalABC.DockContent
 {
     partial class DebugVariablesListWindowForm
     {

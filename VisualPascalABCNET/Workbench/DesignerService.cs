@@ -9,6 +9,7 @@ using System.Text;
 using System.Windows.Forms;
 using ICSharpCode.FormsDesigner;
 using ICSharpCode.SharpDevelop.Gui;
+using VisualPascalABC.DockContent;
 using VisualPascalABCPlugins;
 using WeifenLuo.WinFormsUI.Docking;
 

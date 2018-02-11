@@ -15,6 +15,8 @@ using Debugger;
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Document;
 using System.Runtime.ExceptionServices;
+using VisualPascalABC.DockContent;
+using VisualPascalABC.Projects;
 
 namespace VisualPascalABC
 {

@@ -35,9 +35,9 @@ namespace VisualPascalABC
         {
             imageList = new ImageList();
             //System.Resources.ResourceManager rm = new System.Resources.ResourceManager("VisualPascalABCNET.BitmapResources", System.Reflection.Assembly.GetExecutingAssembly());
-            imageList.Images.Add(new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Class.png")));
-            imageList.Images.Add(new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Field.png")));
-            imageList.Images.Add(new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Property.png")));
+            imageList.Images.Add(VisualPascalABC.Resources.Icons_16x16_Class);
+            imageList.Images.Add(VisualPascalABC.Resources.Icons_16x16_Field);
+            imageList.Images.Add(VisualPascalABC.Resources.Icons_16x16_Property);
 
         }
 

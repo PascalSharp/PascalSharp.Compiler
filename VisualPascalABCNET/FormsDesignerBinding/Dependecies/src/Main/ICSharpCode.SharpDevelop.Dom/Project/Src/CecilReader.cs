@@ -35,6 +35,11 @@ namespace ICSharpCode.SharpDevelop.Dom
 			{
 				return null;
 			}
+
+		    /// <inheritdoc />
+		    public void Dispose()
+		    {
+		    }
 		}
 		
 		public static ReflectionProjectContent LoadAssembly(string fileName, ProjectContentRegistry registry)
@@ -305,8 +310,8 @@ namespace ICSharpCode.SharpDevelop.Dom
 					BaseTypes.Add(CreateType(this.ProjectContent, this, td.BaseType));
 				}
 				
-				foreach (TypeReference iface in td.Interfaces) {
-					BaseTypes.Add(CreateType(this.ProjectContent, this, iface));
+				foreach (var iface in td.Interfaces) {
+					BaseTypes.Add(CreateType(this.ProjectContent, this, iface.InterfaceType));
 				}
 				
 				ReflectionClass.ApplySpecialsFromAttributes(this);

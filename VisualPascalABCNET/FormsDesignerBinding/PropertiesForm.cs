@@ -12,7 +12,7 @@ using WeifenLuo.WinFormsUI.Docking;
 
 namespace VisualPascalABC
 {
-    public partial class PropertiesForm : DockContent
+    public partial class PropertiesForm : WeifenLuo.WinFormsUI.Docking.DockContent
     {
         public PropertiesForm()
         {

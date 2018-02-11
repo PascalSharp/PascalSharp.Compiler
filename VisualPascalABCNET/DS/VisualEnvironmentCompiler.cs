@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.IO;
 using VisualPascalABCPlugins;
 using System.Threading;
+using VisualPascalABC.DockContent;
 
 namespace VisualPascalABC
 {

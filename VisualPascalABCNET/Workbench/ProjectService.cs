@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using VisualPascalABC.DockContent;
+using VisualPascalABC.Projects;
 using VisualPascalABCPlugins;
 
 namespace VisualPascalABC

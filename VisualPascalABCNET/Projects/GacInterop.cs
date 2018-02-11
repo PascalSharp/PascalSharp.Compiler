@@ -1,14 +1,11 @@
 ﻿// Copyright (c) AlphaSierraPapa for the SharpDevelop Team (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Text;
 
-using MSjogren.GacTool.FusionNative;
-
-namespace VisualPascalABC
+namespace VisualPascalABC.Projects
 {
 	/// <summary>
 	/// Class with static members to access the content of the global assembly

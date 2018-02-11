@@ -1,16 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Windows.Forms;
-using VisualPascalABCPlugins;
-using ICSharpCode.TextEditor.Document;
-using ICSharpCode.TextEditor;
+﻿using VisualPascalABCPlugins;
 
-namespace VisualPascalABC
+namespace VisualPascalABC.DockContent
 {
     public partial class DisassemblyWindow : BottomDockContentForm, IDisassemblyWindow
     {

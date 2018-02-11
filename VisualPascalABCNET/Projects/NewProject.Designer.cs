@@ -1,5 +1,5 @@
 ﻿
-namespace VisualPascalABC
+namespace VisualPascalABC.Projects
 {
 	partial class NewProjectForm
 	{

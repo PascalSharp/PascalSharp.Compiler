@@ -1,15 +1,12 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Drawing;
-using System.Xml;
-using System.Xml.Serialization;
-using System.Runtime.Serialization;
-using System.Windows.Forms;
+using VisualPascalABC.DockContent;
 
-namespace VisualPascalABC
+namespace VisualPascalABC.Projects
 {
 	[Serializable]
 	public class OpenedFileInfo

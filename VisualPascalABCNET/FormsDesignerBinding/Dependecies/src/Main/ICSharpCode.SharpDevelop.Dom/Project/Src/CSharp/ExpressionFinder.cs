@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using ICSharpCode.NRefactory;
-using Mono.CSharp;
+using ICSharpCode.NRefactory.Parser;
+using ICSharpCode.NRefactory.Parser.CSharp;
 
 namespace ICSharpCode.SharpDevelop.Dom.CSharp
 {

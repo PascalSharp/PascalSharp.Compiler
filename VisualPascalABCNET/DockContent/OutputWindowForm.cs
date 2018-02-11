@@ -1,15 +1,10 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Text;
-using System.Windows.Forms;
-using WeifenLuo.WinFormsUI.Docking;
 
-namespace VisualPascalABC
+using System;
+using System.Windows.Forms;
+
+namespace VisualPascalABC.DockContent
 {
     public partial class OutputWindowForm : BottomDockContentForm, VisualPascalABCPlugins.IOutputWindow
     {

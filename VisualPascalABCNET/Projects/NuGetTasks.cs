@@ -2,15 +2,11 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace VisualPascalABC
+namespace VisualPascalABC.Projects
 {
     delegate void NugetPackageInstallHandler(bool result, string[] dlls, string[] xmls);
     delegate void NugetPackageOutputHandler(string output);

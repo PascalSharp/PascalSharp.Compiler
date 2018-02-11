@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net461;net471</TargetFrameworks>
+    <OutputPath>..\..\..\..\bin\</OutputPath>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -18,24 +19,6 @@
   <ItemGroup>
     <Compile Include="..\..\GlobalAssemblyInfo.cs">
       <Link>Configuration\GlobalAssemblyInfo.cs</Link>
-    </Compile>
-    <Compile Include="ColorPicker.xaml.cs">
-      <DependentUpon>ColorPicker.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="NumericUpDown.cs">
-      <DependentUpon>NumericUpDown.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="SideBar\SideBar.cs">
-      <SubType>UserControl</SubType>
-    </Compile>
-    <Compile Include="DesignTimeSupport\DropDownEditorListBox.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="ZoomButtons.cs">
-      <DependentUpon>ZoomScrollViewer.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="ZoomScrollViewer.cs">
-      <DependentUpon>ZoomScrollViewer.xaml</DependentUpon>
     </Compile>
     <Page Include="ColorPicker.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -1,16 +1,14 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
-using System.Collections;
+
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using System.Windows.Forms;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 using ICSharpCode.FormsDesigner;
 using PascalABCCompiler;
 
-namespace VisualPascalABC
+namespace VisualPascalABC.Projects
 {
 	public class ProjectTask
 	{

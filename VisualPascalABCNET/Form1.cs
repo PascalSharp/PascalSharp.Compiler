@@ -4,32 +4,21 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using System.IO;
 using VisualPascalABCPlugins;
-using VisualPascalABC.Utils;
 using System.Threading;
 using System.Runtime.InteropServices;
-using WeifenLuo.WinFormsUI.Docking;
 using VisualPascalABC.OptionsContent;
 using System.Security.Permissions;
 using System.ComponentModel.Design;
-
-using ICSharpCode.FormsDesigner;
-using ICSharpCode.SharpDevelop.Gui;
-using ICSharpCode.Core;
-using ICSharpCode.SharpDevelop;
+using VisualPascalABC.DockContent;
+using VisualPascalABC.Projects;
 
 namespace VisualPascalABC
 {
-    delegate void SetTextDelegate(string Text);
-    delegate void SetFileNameAndTextDelegate(string ExeFileName, string Text);
-
     [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-    
     public partial class Form1 : Form, VisualPascalABCPlugins.IWorkbench, VisualPascalABCPlugins.IWorkbenchDocumentService
     {
         private const string MainFormTitle = "PascalABC.NET";
@@ -229,10 +218,10 @@ namespace VisualPascalABC
             VisualPABCSingleton.MainForm = this;
             WorkbenchStorage.MainProgramThread = System.Threading.Thread.CurrentThread;
             //images init
-            this.miNewProject.Image = new System.Drawing.Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.NewProjectIcon.png"));
+            this.miNewProject.Image = Resources.Icons_16x16_NewProjectIcon;
             this.mADDFILEToolStripMenuItem.Image = miNew.Image;
             this.mADDEXISTFILEToolStripMenuItem.Image = miOpen.Image;
-            this.mADDFORMToolStripMenuItem.Image = new System.Drawing.Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Form.png"));
+            this.mADDFORMToolStripMenuItem.Image = Resources.Icons_16x16_Form;
             toolStripPanel.Size = new Size(toolStripPanel.Size.Width, toolStrip1.Height);
             var gr = Graphics.FromHwnd(Handle);
             if (gr.DpiX >= 96*2)
@@ -1540,5 +1529,7 @@ namespace VisualPascalABC
         }
 
     }
+    delegate void SetTextDelegate(string Text);
 
+    delegate void SetFileNameAndTextDelegate(string ExeFileName, string Text);
 }

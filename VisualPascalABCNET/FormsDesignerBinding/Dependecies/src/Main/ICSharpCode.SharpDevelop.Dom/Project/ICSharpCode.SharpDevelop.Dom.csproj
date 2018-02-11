@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net461;net471</TargetFrameworks>
+    <OutputPath>..\..\..\..\bin\</OutputPath>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
     <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
@@ -17,8 +18,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="ICSharpCode.NRefactory" Version="5.5.1" />
+    <ProjectReference Include="$(SolutionDir)Libraries\NRefactory\NRefactory.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="log4net" Version="2.0.8" />
-    <PackageReference Include="Mono.Cecil" Version="0.9.6.4" />
+    <PackageReference Include="Mono.Cecil" Version="0.10.0-beta7" />
   </ItemGroup>
 </Project>

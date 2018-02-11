@@ -1,4 +1,4 @@
-namespace VisualPascalABC
+namespace VisualPascalABC.DockContent
 {
     partial class CodeFileDocumentControl
     {
@@ -31,7 +31,7 @@ namespace VisualPascalABC
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CodeFileDocumentControl));
             this.basePanel = new System.Windows.Forms.Panel();
             this.editorPanel = new System.Windows.Forms.Panel();
-            this.TextEditor = new VisualPascalABC.CodeFileDocumentTextEditorControl();
+            this.TextEditor = new CodeFileDocumentTextEditorControl();
             this.basePanel.SuspendLayout();
             this.editorPanel.SuspendLayout();
             this.SuspendLayout();

@@ -14,6 +14,8 @@ using VisualPascalABC.Utils;
 using Debugger;
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Document;
+using VisualPascalABC.DockContent;
+
 //using Aga.Controls.Tree;
 //using Aga.Controls.Tree.NodeControls;
 
@@ -294,7 +296,7 @@ namespace VisualPascalABC
             this.mDEBUGSTARTToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.mDEBUGSTARTToolStripMenuItem.Text = "M_DEBUGSTART";
             this.mDEBUGSTARTToolStripMenuItem.Click += new System.EventHandler(this.mDEBUGSTARTToolStripMenuItem_Click);
-            this.mDEBUGSTARTToolStripMenuItem.Image = new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Debug.Continue.png"));
+            this.mDEBUGSTARTToolStripMenuItem.Image = Resources.Icons_16x16_Debug_Continue;
             // 
             // mDEBUGSTOPToolStripMenuItem
             // 
@@ -304,7 +306,7 @@ namespace VisualPascalABC
             this.mDEBUGSTOPToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.mDEBUGSTOPToolStripMenuItem.Text = "M_DEBUGSTOP";
             this.mDEBUGSTOPToolStripMenuItem.Click += new System.EventHandler(this.mDEBUGSTOPToolStripMenuItem_Click);
-            this.mDEBUGSTOPToolStripMenuItem.Image = new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Debug.Break.png"));
+            this.mDEBUGSTOPToolStripMenuItem.Image = Resources.Icons_16x16_Debug_Break;
 
             this.mDEBUGENDToolStripMenuItem.Enabled = false;
             this.mDEBUGENDToolStripMenuItem.Visible = false;
@@ -312,7 +314,7 @@ namespace VisualPascalABC
             this.mDEBUGENDToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.mDEBUGENDToolStripMenuItem.Text = "M_ENDDEBUG";
             this.mDEBUGENDToolStripMenuItem.Click += new System.EventHandler(this.mDEBUGENDToolStripMenuItem_Click);
-            this.mDEBUGENDToolStripMenuItem.Image = global::VisualPascalABC.Properties.Resources.stop;
+            this.mDEBUGENDToolStripMenuItem.Image = global::VisualPascalABC.Resources.stop;
             this.mDEBUGENDToolStripMenuItem.ImageTransparentColor = System.Drawing.Color.Maroon;
             // 
             // toolStripMenuItem10
@@ -327,7 +329,7 @@ namespace VisualPascalABC
             this.mSTEPOVERToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.mSTEPOVERToolStripMenuItem.Text = "M_STEPOVER";
             this.mSTEPOVERToolStripMenuItem.Click += new System.EventHandler(this.mSTEPOVERToolStripMenuItem_Click);
-            this.mSTEPOVERToolStripMenuItem.Image = new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Debug.StepOver.png"));
+            this.mSTEPOVERToolStripMenuItem.Image = Resources.Icons_16x16_Debug_StepOver;
             // 
             // mSTEPToolStripMenuItem
             // 
@@ -337,7 +339,7 @@ namespace VisualPascalABC
             this.mSTEPToolStripMenuItem.Text = "M_STEPOUT";
             this.mSTEPToolStripMenuItem.Click += new System.EventHandler(this.mSTEPToolStripMenuItem_Click);
             this.mSTEPToolStripMenuItem.Enabled = false;
-            this.mSTEPToolStripMenuItem.Image = new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Debug.StepOut.png"));
+            this.mSTEPToolStripMenuItem.Image = Resources.Icons_16x16_Debug_StepOut;
             // 
             // mSTEPINToolStripMenuItem
             // 
@@ -346,7 +348,7 @@ namespace VisualPascalABC
             this.mSTEPINToolStripMenuItem.Size = new System.Drawing.Size(200, 22);
             this.mSTEPINToolStripMenuItem.Text = "M_STEPIN";
             this.mSTEPINToolStripMenuItem.Click += new System.EventHandler(this.mSTEPINToolStripMenuItem_Click);
-            this.mSTEPINToolStripMenuItem.Image = new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Debug.StepInto.png"));
+            this.mSTEPINToolStripMenuItem.Image = Resources.Icons_16x16_Debug_StepInto;
             // 
             // mRUNTOCURToolStripMenuItem
             // 
@@ -363,7 +365,7 @@ namespace VisualPascalABC
             this.StartDebugButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.StartDebugButton.Visible = true;
             this.StartDebugButton.Enabled = true;
-            this.StartDebugButton.Image = new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Debug.Continue.png"));
+            this.StartDebugButton.Image = Resources.Icons_16x16_Debug_Continue;
             this.StartDebugButton.ImageTransparentColor = System.Drawing.Color.Red;
             this.StartDebugButton.Name = "StartDebugButton";
             this.StartDebugButton.Size = new System.Drawing.Size(23, 22);
@@ -376,7 +378,7 @@ namespace VisualPascalABC
             this.StopDebugButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.StopDebugButton.Enabled = false;
             this.StopDebugButton.Visible = false;
-            this.StopDebugButton.Image = new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Debug.Break.png"));
+            this.StopDebugButton.Image = Resources.Icons_16x16_Debug_Break;
             this.StopDebugButton.ImageTransparentColor = System.Drawing.Color.Red;
             this.StopDebugButton.Name = "StopDebugButton";
             this.StopDebugButton.Size = new System.Drawing.Size(23, 22);
@@ -389,7 +391,7 @@ namespace VisualPascalABC
             this.StepOverButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.StepOverButton.Enabled = true;
             this.StepOverButton.Visible = true;
-            this.StepOverButton.Image = new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Debug.StepOver.png"));
+            this.StepOverButton.Image = Resources.Icons_16x16_Debug_StepOver;
             this.StepOverButton.ImageTransparentColor = System.Drawing.Color.Red;
             this.StepOverButton.Name = "StepOverButton";
             this.StepOverButton.Size = new System.Drawing.Size(23, 22);
@@ -402,7 +404,7 @@ namespace VisualPascalABC
             this.StepIntoButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.StepIntoButton.Enabled = true;
             this.StepIntoButton.Visible = true;
-            this.StepIntoButton.Image = new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Debug.StepInto.png"));
+            this.StepIntoButton.Image = Resources.Icons_16x16_Debug_StepInto;
             this.StepIntoButton.ImageTransparentColor = System.Drawing.Color.Red;
             this.StepIntoButton.Name = "StepIntoButton";
             this.StepIntoButton.Size = new System.Drawing.Size(23, 22);
@@ -415,7 +417,7 @@ namespace VisualPascalABC
             this.StepOutButton.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.StepOutButton.Enabled = false;
             this.StepOutButton.Visible = false;
-            this.StepOutButton.Image = new Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.Icons.16x16.Debug.StepOut.png"));
+            this.StepOutButton.Image = Resources.Icons_16x16_Debug_StepOut;
             this.StepOutButton.ImageTransparentColor = System.Drawing.Color.Red;
             this.StepOutButton.Name = "StepOutButton";
             this.StepOutButton.Size = new System.Drawing.Size(23, 22);

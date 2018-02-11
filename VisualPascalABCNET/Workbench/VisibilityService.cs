@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using VisualPascalABC.DockContent;
 using VisualPascalABCPlugins;
 using WeifenLuo.WinFormsUI.Docking;
 
@@ -19,8 +20,8 @@ namespace VisualPascalABC
             }
         }
 
-        internal List<DockContent> BottomDockContent = new List<DockContent>();
-        List<DockContent> VisibleBottomContent = new List<DockContent>();
+        internal List<WeifenLuo.WinFormsUI.Docking.DockContent> BottomDockContent = new List<WeifenLuo.WinFormsUI.Docking.DockContent>();
+        List<WeifenLuo.WinFormsUI.Docking.DockContent> VisibleBottomContent = new List<WeifenLuo.WinFormsUI.Docking.DockContent>();
 
         public bool CompilingButtonsEnabled
         {
@@ -112,7 +113,7 @@ namespace VisualPascalABC
         {
             get
             {
-                foreach (DockContent dc in BottomDockContent)
+                foreach (var dc in BottomDockContent)
                     if (!dc.IsHidden)
                         return true;
                 return false;
@@ -147,7 +148,7 @@ namespace VisualPascalABC
                 {
                     if (VisibleBottomContent.Count > 0)
                     {
-                        foreach (DockContent dc in VisibleBottomContent)
+                        foreach (var dc in VisibleBottomContent)
                         {
                             dc.Show();
                         }
@@ -161,8 +162,8 @@ namespace VisualPascalABC
                 else
                 {
                     VisibleBottomContent.Clear();
-                    DockContent dca = BottomDockContent[0].Pane.ActiveContent as DockContent;
-                    foreach (DockContent dc in BottomDockContent)
+                    var dca = BottomDockContent[0].Pane.ActiveContent as WeifenLuo.WinFormsUI.Docking.DockContent;
+                    foreach (var dc in BottomDockContent)
                         if (!dc.IsHidden && !BottomPane.IsAutoHide)
                         {
                             if (dc != dca)

@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using ICSharpCode.TextEditor;
 using ICSharpCode.TextEditor.Gui.CompletionWindow;
 using ICSharpCode.TextEditor.Document;
+using VisualPascalABC.Projects;
 
 namespace VisualPascalABC
 {

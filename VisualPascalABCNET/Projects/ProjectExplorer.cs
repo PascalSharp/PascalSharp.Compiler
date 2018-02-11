@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Drawing;
 using System.Windows.Forms;
-using Microsoft.Build.BuildEngine;
 
-namespace VisualPascalABC
+namespace VisualPascalABC.Projects
 {
 	/// <summary>
 	/// Description of ProjectExplorer.
@@ -23,7 +22,7 @@ namespace VisualPascalABC
 			InitializeComponent();
             this.tvProjectExplorer.LabelEdit = true;
             this.tvProjectExplorer.BeforeLabelEdit += tvProjectExplorer_BeforeLabelEdit;
-			this.Icon = new System.Drawing.Icon(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources.PadIcons.ProjectBrowser.ico"));
+			this.Icon = VisualPascalABC.Resources.PadIcons_ProjectBrowser;
 			pRJBUILDToolStripMenuItem.Image = VisualPABCSingleton.MainForm.BuildImage;
 			pRJBUILDALLToolStripMenuItem.Image = VisualPABCSingleton.MainForm.RebuildImage;
 			pRJRUNToolStripMenuItem.Image = VisualPABCSingleton.MainForm.RunImage;

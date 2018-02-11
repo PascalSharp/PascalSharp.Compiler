@@ -4,10 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Drawing;
 using System.Windows.Forms;
 
-namespace VisualPascalABC
+namespace VisualPascalABC.Projects
 {
 	/// <summary>
 	/// Description of NewProject.

@@ -1,3 +1,5 @@
+using WeifenLuo.WinFormsUI.Docking;
+
 namespace VisualPascalABC
 {
     partial class Form1
@@ -312,7 +314,7 @@ namespace VisualPascalABC
             // tbNew
             // 
             this.tbNew.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tbNew.Image = global::VisualPascalABC.Properties.Resources.new_file;
+            this.tbNew.Image = global::VisualPascalABC.Resources.new_file;
             this.tbNew.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.tbNew.Name = "tbNew";
             this.tbNew.Size = new System.Drawing.Size(23, 22);
@@ -528,7 +530,7 @@ namespace VisualPascalABC
             // tsFormat
             // 
             this.tsFormat.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.tsFormat.Image = global::VisualPascalABC.Properties.Resources.format;
+            this.tsFormat.Image = global::VisualPascalABC.Resources.format;
             this.tsFormat.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsFormat.Name = "tsFormat";
             this.tsFormat.Size = new System.Drawing.Size(23, 22);
@@ -668,7 +670,7 @@ namespace VisualPascalABC
             // 
             // miNew
             // 
-            this.miNew.Image = global::VisualPascalABC.Properties.Resources.new_file1;
+            this.miNew.Image = global::VisualPascalABC.Resources.new_file1;
             this.miNew.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.miNew.Name = "miNew";
             this.miNew.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
@@ -715,7 +717,7 @@ namespace VisualPascalABC
             // 
             // miOpen
             // 
-            this.miOpen.Image = global::VisualPascalABC.Properties.Resources.open;
+            this.miOpen.Image = global::VisualPascalABC.Resources.open;
             this.miOpen.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.miOpen.Name = "miOpen";
             this.miOpen.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
@@ -739,7 +741,7 @@ namespace VisualPascalABC
             // miSave
             // 
             this.miSave.Enabled = false;
-            this.miSave.Image = global::VisualPascalABC.Properties.Resources.save;
+            this.miSave.Image = global::VisualPascalABC.Resources.save;
             this.miSave.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.miSave.Name = "miSave";
             this.miSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
@@ -759,7 +761,7 @@ namespace VisualPascalABC
             // miSaveAll
             // 
             this.miSaveAll.Enabled = false;
-            this.miSaveAll.Image = global::VisualPascalABC.Properties.Resources.save_all;
+            this.miSaveAll.Image = global::VisualPascalABC.Resources.save_all;
             this.miSaveAll.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.miSaveAll.Name = "miSaveAll";
             this.miSaveAll.Size = new System.Drawing.Size(194, 22);
@@ -802,7 +804,7 @@ namespace VisualPascalABC
             // 
             // miPrint
             // 
-            this.miPrint.Image = global::VisualPascalABC.Properties.Resources.PrintHS;
+            this.miPrint.Image = global::VisualPascalABC.Resources.PrintHS;
             this.miPrint.Name = "miPrint";
             this.miPrint.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
             this.miPrint.Size = new System.Drawing.Size(194, 22);
@@ -862,7 +864,7 @@ namespace VisualPascalABC
             // 
             // miUndo
             // 
-            this.miUndo.Image = global::VisualPascalABC.Properties.Resources.undo;
+            this.miUndo.Image = global::VisualPascalABC.Resources.undo;
             this.miUndo.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.miUndo.Name = "miUndo";
             this.miUndo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
@@ -872,7 +874,7 @@ namespace VisualPascalABC
             // 
             // miRedo
             // 
-            this.miRedo.Image = global::VisualPascalABC.Properties.Resources.redo;
+            this.miRedo.Image = global::VisualPascalABC.Resources.redo;
             this.miRedo.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.miRedo.Name = "miRedo";
             this.miRedo.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
@@ -888,7 +890,7 @@ namespace VisualPascalABC
             // 
             // miCut
             // 
-            this.miCut.Image = global::VisualPascalABC.Properties.Resources.cut;
+            this.miCut.Image = global::VisualPascalABC.Resources.cut;
             this.miCut.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.miCut.Name = "miCut";
             this.miCut.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
@@ -898,7 +900,7 @@ namespace VisualPascalABC
             // 
             // miCopy
             // 
-            this.miCopy.Image = global::VisualPascalABC.Properties.Resources.copy;
+            this.miCopy.Image = global::VisualPascalABC.Resources.copy;
             this.miCopy.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.miCopy.Name = "miCopy";
             this.miCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
@@ -908,7 +910,7 @@ namespace VisualPascalABC
             // 
             // miPaste
             // 
-            this.miPaste.Image = global::VisualPascalABC.Properties.Resources.paste;
+            this.miPaste.Image = global::VisualPascalABC.Resources.paste;
             this.miPaste.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.miPaste.Name = "miPaste";
             this.miPaste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
@@ -919,7 +921,7 @@ namespace VisualPascalABC
             // miDelete
             // 
             this.miDelete.Enabled = false;
-            this.miDelete.Image = global::VisualPascalABC.Properties.Resources.Delete3;
+            this.miDelete.Image = global::VisualPascalABC.Resources.Delete3;
             this.miDelete.ImageTransparentColor = System.Drawing.Color.White;
             this.miDelete.Name = "miDelete";
             this.miDelete.Size = new System.Drawing.Size(186, 22);
@@ -1090,7 +1092,7 @@ namespace VisualPascalABC
             // 
             // tsShowOutputWindow
             // 
-            this.tsShowOutputWindow.Image = global::VisualPascalABC.Properties.Resources.Icons_16x16_Window_Output;
+            this.tsShowOutputWindow.Image = global::VisualPascalABC.Resources.Icons_16x16_Window_Output.ToBitmap();
             this.tsShowOutputWindow.Name = "tsShowOutputWindow";
             this.tsShowOutputWindow.Size = new System.Drawing.Size(216, 22);
             this.tsShowOutputWindow.Text = "M_OUTPUTWINDOW";
@@ -1098,7 +1100,7 @@ namespace VisualPascalABC
             // 
             // tsShowErrorsListWindow
             // 
-            this.tsShowErrorsListWindow.Image = global::VisualPascalABC.Properties.Resources.Icons_16x16_Window_ErrorList;
+            this.tsShowErrorsListWindow.Image = global::VisualPascalABC.Resources.Icons_16x16_Window_ErrorList.ToBitmap();
             this.tsShowErrorsListWindow.Name = "tsShowErrorsListWindow";
             this.tsShowErrorsListWindow.Size = new System.Drawing.Size(216, 22);
             this.tsShowErrorsListWindow.Text = "TP_ERRORSLIST";
@@ -1106,7 +1108,7 @@ namespace VisualPascalABC
             // 
             // tsShowCompilerConsoleWindow
             // 
-            this.tsShowCompilerConsoleWindow.Image = global::VisualPascalABC.Properties.Resources.Icons_16x16_Window_CompilerConsole;
+            this.tsShowCompilerConsoleWindow.Image = global::VisualPascalABC.Resources.Icons_16x16_Window_CompilerConsole.ToBitmap();
             this.tsShowCompilerConsoleWindow.Name = "tsShowCompilerConsoleWindow";
             this.tsShowCompilerConsoleWindow.Size = new System.Drawing.Size(216, 22);
             this.tsShowCompilerConsoleWindow.Text = "TP_COMPILERMESSAGES";
@@ -1114,7 +1116,7 @@ namespace VisualPascalABC
             // 
             // tsShowFindSymbolsResultWindow
             // 
-            this.tsShowFindSymbolsResultWindow.Image = global::VisualPascalABC.Properties.Resources.Icons_16x16_Window_FindSymbolResult;
+            this.tsShowFindSymbolsResultWindow.Image = global::VisualPascalABC.Resources.Icons_16x16_Window_FindSymbolResult.ToBitmap();
             this.tsShowFindSymbolsResultWindow.Name = "tsShowFindSymbolsResultWindow";
             this.tsShowFindSymbolsResultWindow.Size = new System.Drawing.Size(216, 22);
             this.tsShowFindSymbolsResultWindow.Text = "TP_FIND_SYMBOL_RESULTS";
@@ -1122,7 +1124,7 @@ namespace VisualPascalABC
             // 
             // tsShowDebugVariablesListWindow
             // 
-            this.tsShowDebugVariablesListWindow.Image = global::VisualPascalABC.Properties.Resources.Icons_16x16_Window_DebugVariablesList;
+            this.tsShowDebugVariablesListWindow.Image = global::VisualPascalABC.Resources.Icons_16x16_Window_DebugVariablesList.ToBitmap();
             this.tsShowDebugVariablesListWindow.Name = "tsShowDebugVariablesListWindow";
             this.tsShowDebugVariablesListWindow.Size = new System.Drawing.Size(216, 22);
             this.tsShowDebugVariablesListWindow.Text = "TP_VARLIST";
@@ -1130,7 +1132,7 @@ namespace VisualPascalABC
             // 
             // tsShowDebugWatchListWindow
             // 
-            this.tsShowDebugWatchListWindow.Image = global::VisualPascalABC.Properties.Resources.Icons_16x16_Window_DebugWatches;
+            this.tsShowDebugWatchListWindow.Image = global::VisualPascalABC.Resources.Icons_16x16_Window_DebugWatches.ToBitmap();
             this.tsShowDebugWatchListWindow.Name = "tsShowDebugWatchListWindow";
             this.tsShowDebugWatchListWindow.Size = new System.Drawing.Size(216, 22);
             this.tsShowDebugWatchListWindow.Text = "TP_WATCHLIST";
@@ -1147,7 +1149,7 @@ namespace VisualPascalABC
             // 
             // tsImmediateWindow
             // 
-            this.tsImmediateWindow.Image = global::VisualPascalABC.Properties.Resources.Icons_16x16_Window_Immediate;
+            this.tsImmediateWindow.Image = global::VisualPascalABC.Resources.Icons_16x16_Window_Immediate;
             this.tsImmediateWindow.Name = "tsImmediateWindow";
             this.tsImmediateWindow.Size = new System.Drawing.Size(216, 22);
             this.tsImmediateWindow.Text = "TP_IMMEDIATE_WINDOW";
@@ -1289,7 +1291,7 @@ namespace VisualPascalABC
             // 
             // miRun
             // 
-            this.miRun.Image = global::VisualPascalABC.Properties.Resources.start;
+            this.miRun.Image = global::VisualPascalABC.Resources.start;
             this.miRun.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.miRun.Name = "miRun";
             this.miRun.ShortcutKeys = System.Windows.Forms.Keys.F9;
@@ -1316,7 +1318,7 @@ namespace VisualPascalABC
             // 
             // miStop
             // 
-            this.miStop.Image = global::VisualPascalABC.Properties.Resources.stop;
+            this.miStop.Image = global::VisualPascalABC.Resources.stop;
             this.miStop.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.miStop.Name = "miStop";
             this.miStop.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F2)));
@@ -1563,7 +1565,7 @@ namespace VisualPascalABC
             // 
             // mOPTIONSToolStripMenuItem
             // 
-            this.mOPTIONSToolStripMenuItem.Image = global::VisualPascalABC.Properties.Resources.Icons_16x16_Options;
+            this.mOPTIONSToolStripMenuItem.Image = global::VisualPascalABC.Resources.Icons_16x16_Options.ToBitmap();
             this.mOPTIONSToolStripMenuItem.Name = "mOPTIONSToolStripMenuItem";
             this.mOPTIONSToolStripMenuItem.Size = new System.Drawing.Size(282, 22);
             this.mOPTIONSToolStripMenuItem.Text = "M_OPTIONS";
@@ -1810,7 +1812,7 @@ namespace VisualPascalABC
             // 
             // cmSave
             // 
-            this.cmSave.Image = global::VisualPascalABC.Properties.Resources.save;
+            this.cmSave.Image = global::VisualPascalABC.Resources.save;
             this.cmSave.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.cmSave.Name = "cmSave";
             this.cmSave.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
@@ -1915,7 +1917,7 @@ namespace VisualPascalABC
             // 
             // cmCut
             // 
-            this.cmCut.Image = global::VisualPascalABC.Properties.Resources.cut;
+            this.cmCut.Image = global::VisualPascalABC.Resources.cut;
             this.cmCut.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.cmCut.Name = "cmCut";
             this.cmCut.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
@@ -1925,7 +1927,7 @@ namespace VisualPascalABC
             // 
             // cmCopy
             // 
-            this.cmCopy.Image = global::VisualPascalABC.Properties.Resources.copy;
+            this.cmCopy.Image = global::VisualPascalABC.Resources.copy;
             this.cmCopy.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.cmCopy.Name = "cmCopy";
             this.cmCopy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
@@ -1935,7 +1937,7 @@ namespace VisualPascalABC
             // 
             // cmPaste
             // 
-            this.cmPaste.Image = global::VisualPascalABC.Properties.Resources.paste;
+            this.cmPaste.Image = global::VisualPascalABC.Resources.paste;
             this.cmPaste.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.cmPaste.Name = "cmPaste";
             this.cmPaste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
@@ -1950,7 +1952,7 @@ namespace VisualPascalABC
             // 
             // cmRun
             // 
-            this.cmRun.Image = global::VisualPascalABC.Properties.Resources.start;
+            this.cmRun.Image = global::VisualPascalABC.Resources.start;
             this.cmRun.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.cmRun.Name = "cmRun";
             this.cmRun.ShortcutKeys = System.Windows.Forms.Keys.F9;
@@ -2028,6 +2030,7 @@ namespace VisualPascalABC
             this.MainDockPanel.RightToLeftLayout = true;
             this.MainDockPanel.Size = new System.Drawing.Size(1156, 738);
             this.MainDockPanel.TabIndex = 10;
+            this.MainDockPanel.Theme = new VS2015LightTheme();
             // 
             // toolStripPanel
             // 
@@ -2099,7 +2102,7 @@ namespace VisualPascalABC
             // 
             // cmiDelete
             // 
-            this.cmiDelete.Image = global::VisualPascalABC.Properties.Resources.Delete3;
+            this.cmiDelete.Image = global::VisualPascalABC.Resources.Delete3;
             this.cmiDelete.ImageTransparentColor = System.Drawing.Color.White;
             this.cmiDelete.Name = "cmiDelete";
             this.cmiDelete.Size = new System.Drawing.Size(194, 22);
@@ -2108,7 +2111,7 @@ namespace VisualPascalABC
             // 
             // cmiCopy
             // 
-            this.cmiCopy.Image = global::VisualPascalABC.Properties.Resources.copy;
+            this.cmiCopy.Image = global::VisualPascalABC.Resources.copy;
             this.cmiCopy.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.cmiCopy.Name = "cmiCopy";
             this.cmiCopy.Size = new System.Drawing.Size(194, 22);
@@ -2117,7 +2120,7 @@ namespace VisualPascalABC
             // 
             // cmiCut
             // 
-            this.cmiCut.Image = global::VisualPascalABC.Properties.Resources.cut;
+            this.cmiCut.Image = global::VisualPascalABC.Resources.cut;
             this.cmiCut.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.cmiCut.Name = "cmiCut";
             this.cmiCut.Size = new System.Drawing.Size(194, 22);
@@ -2126,7 +2129,7 @@ namespace VisualPascalABC
             // 
             // cmiPaste
             // 
-            this.cmiPaste.Image = global::VisualPascalABC.Properties.Resources.paste;
+            this.cmiPaste.Image = global::VisualPascalABC.Resources.paste;
             this.cmiPaste.ImageTransparentColor = System.Drawing.Color.Maroon;
             this.cmiPaste.Name = "cmiPaste";
             this.cmiPaste.Size = new System.Drawing.Size(194, 22);
@@ -2149,7 +2152,7 @@ namespace VisualPascalABC
             // 
             // cmiAlignLefts
             // 
-            this.cmiAlignLefts.Image = global::VisualPascalABC.Properties.Resources.AlignObjectsLeftHS;
+            this.cmiAlignLefts.Image = global::VisualPascalABC.Resources.AlignObjectsLeftHS;
             this.cmiAlignLefts.Name = "cmiAlignLefts";
             this.cmiAlignLefts.Size = new System.Drawing.Size(183, 22);
             this.cmiAlignLefts.Text = "M_ALIGN_LEFTS";
@@ -2157,7 +2160,7 @@ namespace VisualPascalABC
             // 
             // cmiAlignRights
             // 
-            this.cmiAlignRights.Image = global::VisualPascalABC.Properties.Resources.AlignObjectsRightHS;
+            this.cmiAlignRights.Image = global::VisualPascalABC.Resources.AlignObjectsRightHS;
             this.cmiAlignRights.Name = "cmiAlignRights";
             this.cmiAlignRights.Size = new System.Drawing.Size(183, 22);
             this.cmiAlignRights.Text = "M_ALIGN_RIGHTS";
@@ -2165,7 +2168,7 @@ namespace VisualPascalABC
             // 
             // cmiAlignTops
             // 
-            this.cmiAlignTops.Image = global::VisualPascalABC.Properties.Resources.AlignObjectsTopHS;
+            this.cmiAlignTops.Image = global::VisualPascalABC.Resources.AlignObjectsTopHS;
             this.cmiAlignTops.Name = "cmiAlignTops";
             this.cmiAlignTops.Size = new System.Drawing.Size(183, 22);
             this.cmiAlignTops.Text = "M_ALIGN_TOPS";
@@ -2173,7 +2176,7 @@ namespace VisualPascalABC
             // 
             // cmiAlignBottoms
             // 
-            this.cmiAlignBottoms.Image = global::VisualPascalABC.Properties.Resources.AlignObjectsBottomHS;
+            this.cmiAlignBottoms.Image = global::VisualPascalABC.Resources.AlignObjectsBottomHS;
             this.cmiAlignBottoms.Name = "cmiAlignBottoms";
             this.cmiAlignBottoms.Size = new System.Drawing.Size(183, 22);
             this.cmiAlignBottoms.Text = "M_ALIGN_BOTTOMS";
@@ -2181,7 +2184,7 @@ namespace VisualPascalABC
             // 
             // cmiAlignMiddles
             // 
-            this.cmiAlignMiddles.Image = global::VisualPascalABC.Properties.Resources.AlignObjectsCenteredHorizontalHS;
+            this.cmiAlignMiddles.Image = global::VisualPascalABC.Resources.AlignObjectsCenteredHorizontalHS;
             this.cmiAlignMiddles.Name = "cmiAlignMiddles";
             this.cmiAlignMiddles.Size = new System.Drawing.Size(183, 22);
             this.cmiAlignMiddles.Text = "M_ALIGN_MIDDLES";
@@ -2189,7 +2192,7 @@ namespace VisualPascalABC
             // 
             // cmiAlignCenters
             // 
-            this.cmiAlignCenters.Image = global::VisualPascalABC.Properties.Resources.AlignObjectsCenteredVerticalHS;
+            this.cmiAlignCenters.Image = global::VisualPascalABC.Resources.AlignObjectsCenteredVerticalHS;
             this.cmiAlignCenters.Name = "cmiAlignCenters";
             this.cmiAlignCenters.Size = new System.Drawing.Size(183, 22);
             this.cmiAlignCenters.Text = "M_ALIGN_CENTERS";
@@ -2197,7 +2200,7 @@ namespace VisualPascalABC
             // 
             // cmiAlignToGrid
             // 
-            this.cmiAlignToGrid.Image = global::VisualPascalABC.Properties.Resources.AlignToGridHS;
+            this.cmiAlignToGrid.Image = global::VisualPascalABC.Resources.AlignToGridHS;
             this.cmiAlignToGrid.Name = "cmiAlignToGrid";
             this.cmiAlignToGrid.Size = new System.Drawing.Size(183, 22);
             this.cmiAlignToGrid.Text = "M_ALIGN_TO_GRID";
@@ -2275,7 +2278,7 @@ namespace VisualPascalABC
             // 
             // cmiBringToFront
             // 
-            this.cmiBringToFront.Image = global::VisualPascalABC.Properties.Resources.BringToFrontHS;
+            this.cmiBringToFront.Image = global::VisualPascalABC.Resources.BringToFrontHS;
             this.cmiBringToFront.Name = "cmiBringToFront";
             this.cmiBringToFront.Size = new System.Drawing.Size(187, 22);
             this.cmiBringToFront.Text = "M_BRING_TO_FRONT";
@@ -2283,7 +2286,7 @@ namespace VisualPascalABC
             // 
             // cmiSendToBack
             // 
-            this.cmiSendToBack.Image = global::VisualPascalABC.Properties.Resources.SendToBackHS;
+            this.cmiSendToBack.Image = global::VisualPascalABC.Resources.SendToBackHS;
             this.cmiSendToBack.Name = "cmiSendToBack";
             this.cmiSendToBack.Size = new System.Drawing.Size(187, 22);
             this.cmiSendToBack.Text = "M_SEND_TO_BACK";

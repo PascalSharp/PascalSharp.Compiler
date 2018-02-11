@@ -1,4 +1,4 @@
-﻿namespace VisualPascalABC
+﻿namespace VisualPascalABC.DockContent
 {
     partial class WebBrowserControl
     {
@@ -79,7 +79,7 @@
             // 
             this.btnPrev.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnPrev.BackColor = System.Drawing.Color.White;
-            this.btnPrev.BackgroundImage = global::VisualPascalABC.Properties.Resources.browserNavigBack_Image;
+            this.btnPrev.BackgroundImage = global::VisualPascalABC.Resources.browserNavigBack_Image;
             this.btnPrev.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
             this.btnPrev.FlatAppearance.BorderColor = System.Drawing.Color.Silver;
             this.btnPrev.FlatStyle = System.Windows.Forms.FlatStyle.Flat;

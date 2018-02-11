@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using ICSharpCode.FormsDesigner;
+using VisualPascalABC.DockContent;
+using VisualPascalABC.Projects;
 using VisualPascalABCPlugins;
 using WeifenLuo.WinFormsUI.Docking;
 

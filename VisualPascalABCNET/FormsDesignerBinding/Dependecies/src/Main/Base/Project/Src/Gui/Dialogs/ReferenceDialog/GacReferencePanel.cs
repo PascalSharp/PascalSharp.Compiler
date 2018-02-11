@@ -202,7 +202,7 @@ namespace ICSharpCode.SharpDevelop.Gui
 					AssemblyDefinition currentAssembly;
 					if(!assembliesCache.ContainsKey(asm.FullName)) {	
 						try {
-							currentAssembly = resolver.Resolve(asm.FullName);
+							currentAssembly = resolver.Resolve(AssemblyNameReference.Parse(asm.FullName));
 						}
 						catch {
 							continue;

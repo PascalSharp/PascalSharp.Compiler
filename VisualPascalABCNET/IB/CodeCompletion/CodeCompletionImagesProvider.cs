@@ -2,6 +2,7 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 
@@ -48,7 +49,23 @@ namespace VisualPascalABC
 
         int AddImageFromManifestResource(string ResName)
         {
-            images.Images.Add(new System.Drawing.Bitmap(System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceStream("VisualPascalABC.Resources." + ResName)));
+            var obj = VisualPascalABC.Resources.ResourceManager.GetObject(ResName, VisualPascalABC.Resources.Culture) ?? throw new ArgumentNullException($@"ResourceManager.GetObject(""{ResName}"")");
+            switch (obj)
+            {
+                case Image img: {
+                    images.Images.Add(img);
+                    break;
+                }
+                case Icon ico: {
+                    images.Images.Add(ico);
+                    break;
+                }
+                default:
+                {
+                    throw new ArgumentException($@"ResourceManager.GetObject(""{ResName}"")");
+                }
+            }
+
             return images.Images.Count - 1;
         }
 
@@ -63,41 +80,41 @@ namespace VisualPascalABC
         public CodeCompletionImagesProvider()
         {
             images.ColorDepth = ColorDepth.Depth32Bit;
-            IconNumberMethod = AddImageFromManifestResource("Icons.16x16.Method.png");
-            IconNumberField = AddImageFromManifestResource("Icons.16x16.Field.png");
-            IconNumberProperty = AddImageFromManifestResource("Icons.16x16.Property.png");
-            IconNumberEvent = AddImageFromManifestResource("Icons.16x16.Event.png");
-            IconNumberClass = AddImageFromManifestResource("Icons.16x16.Class.png");
-            IconNumberNamespace = AddImageFromManifestResource("Icons.16x16.NameSpace.png");
-            IconNumberInterface = AddImageFromManifestResource("Icons.16x16.Interface.png");
-            IconNumberStruct = AddImageFromManifestResource("Icons.16x16.Struct.png");
-            IconNumberDelegate = AddImageFromManifestResource("Icons.16x16.Delegate.png");
-            IconNumberEnum = AddImageFromManifestResource("Icons.16x16.Enum.png");
-            IconNumberLocal = AddImageFromManifestResource("Icons.16x16.Local.png");
-            IconNumberConstant = AddImageFromManifestResource("Icons.16x16.Literal.png");
-            IconNumberPrivateField = AddImageFromManifestResource("Icons.16x16.PrivateField.png");
-            IconNumberPrivateMethod = AddImageFromManifestResource("Icons.16x16.PrivateMethod.png");
-            IconNumberPrivateProperty = AddImageFromManifestResource("Icons.16x16.PrivateProperty.png");
-            IconNumberProtectedField = AddImageFromManifestResource("Icons.16x16.ProtectedField.png");
-            IconNumberProtectedMethod = AddImageFromManifestResource("Icons.16x16.ProtectedMethod.png");
-            IconNumberProtectedProperty = AddImageFromManifestResource("Icons.16x16.ProtectedProperty.png");
-            IconNumberPrivateEvent = AddImageFromManifestResource("Icons.16x16.PrivateEvent.png");
-            IconNumberProtectedEvent = AddImageFromManifestResource("Icons.16x16.ProtectedEvent.png");
-            IconNumberPrivateDelegate = AddImageFromManifestResource("Icons.16x16.PrivateDelegate.png");
-            IconNumberProtectedDelegate = AddImageFromManifestResource("Icons.16x16.ProtectedDelegate.png");
-            IconNumberUnitNamespace = AddImageFromManifestResource("Icons.16x16.UnitNamespace.png");
-            IconNumberInternalField = AddImageFromManifestResource("Icons.16x16.InternalField.png");
-            IconNumberInternalMethod = AddImageFromManifestResource("Icons.16x16.InternalMethod.png");
-            IconNumberInternalProperty = AddImageFromManifestResource("Icons.16x16.InternalProperty.png");
-            IconNumberInternalEvent = AddImageFromManifestResource("Icons.16x16.InternalEvent.png");
-            IconNumberInternalDelegate = AddImageFromManifestResource("Icons.16x16.InternalDelegate.png");
-            IconNumberGotoText = AddImageFromManifestResource("Icons.16x16.GotoText.png");
-            IconNumberInternalConstant = AddImageFromManifestResource("Icons.16x16.InternalConstant.png");
-            IconNumberPrivateConstant = AddImageFromManifestResource("Icons.16x16.PrivateConstant.png");
-            IconNumberProtectedConstant = AddImageFromManifestResource("Icons.16x16.ProtectedConstant.png");
-            IconNumberKeyword = AddImageFromManifestResource("Icons.16x16.Keyword.png");
-            IconNumberEvalError = AddImageFromManifestResource("Icons.16x16.ErrorInWatch.png");
-            IconNumberExtensionMethod = AddImageFromManifestResource("Icons.16x16.ExtensionMethod.png");
+            IconNumberMethod = AddImageFromManifestResource("Icons_16x16_Method");
+            IconNumberField = AddImageFromManifestResource("Icons_16x16_Field");
+            IconNumberProperty = AddImageFromManifestResource("Icons_16x16_Property");
+            IconNumberEvent = AddImageFromManifestResource("Icons_16x16_Event");
+            IconNumberClass = AddImageFromManifestResource("Icons_16x16_Class");
+            IconNumberNamespace = AddImageFromManifestResource("Icons_16x16_NameSpace");
+            IconNumberInterface = AddImageFromManifestResource("Icons_16x16_Interface");
+            IconNumberStruct = AddImageFromManifestResource("Icons_16x16_Struct");
+            IconNumberDelegate = AddImageFromManifestResource("Icons_16x16_Delegate");
+            IconNumberEnum = AddImageFromManifestResource("Icons_16x16_Enum");
+            IconNumberLocal = AddImageFromManifestResource("Icons_16x16_Local");
+            IconNumberConstant = AddImageFromManifestResource("Icons_16x16_Literal");
+            IconNumberPrivateField = AddImageFromManifestResource("Icons_16x16_PrivateField");
+            IconNumberPrivateMethod = AddImageFromManifestResource("Icons_16x16_PrivateMethod");
+            IconNumberPrivateProperty = AddImageFromManifestResource("Icons_16x16_PrivateProperty");
+            IconNumberProtectedField = AddImageFromManifestResource("Icons_16x16_ProtectedField");
+            IconNumberProtectedMethod = AddImageFromManifestResource("Icons_16x16_ProtectedMethod");
+            IconNumberProtectedProperty = AddImageFromManifestResource("Icons_16x16_ProtectedProperty");
+            IconNumberPrivateEvent = AddImageFromManifestResource("Icons_16x16_PrivateEvent");
+            IconNumberProtectedEvent = AddImageFromManifestResource("Icons_16x16_ProtectedEvent");
+            IconNumberPrivateDelegate = AddImageFromManifestResource("Icons_16x16_PrivateDelegate");
+            IconNumberProtectedDelegate = AddImageFromManifestResource("Icons_16x16_ProtectedDelegate");
+            IconNumberUnitNamespace = AddImageFromManifestResource("Icons_16x16_UnitNamespace");
+            IconNumberInternalField = AddImageFromManifestResource("Icons_16x16_InternalField");
+            IconNumberInternalMethod = AddImageFromManifestResource("Icons_16x16_InternalMethod");
+            IconNumberInternalProperty = AddImageFromManifestResource("Icons_16x16_InternalProperty");
+            IconNumberInternalEvent = AddImageFromManifestResource("Icons_16x16_InternalEvent");
+            IconNumberInternalDelegate = AddImageFromManifestResource("Icons_16x16_InternalDelegate");
+            IconNumberGotoText = AddImageFromManifestResource("Icons_16x16_GotoText");
+            IconNumberInternalConstant = AddImageFromManifestResource("Icons_16x16_InternalConstant");
+            IconNumberPrivateConstant = AddImageFromManifestResource("Icons_16x16_PrivateConstant");
+            IconNumberProtectedConstant = AddImageFromManifestResource("Icons_16x16_ProtectedConstant");
+            IconNumberKeyword = AddImageFromManifestResource("Icons_16x16_Keyword");
+            IconNumberEvalError = AddImageFromManifestResource("Icons_16x16_ErrorInWatch");
+            IconNumberExtensionMethod = AddImageFromManifestResource("Icons_16x16_ExtensionMethod");
         }
 
         public int GetPictureNum(PascalABCCompiler.Parsers.SymInfo si)

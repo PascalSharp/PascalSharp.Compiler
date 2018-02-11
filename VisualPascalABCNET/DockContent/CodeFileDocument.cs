@@ -1,26 +1,20 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Drawing;
-using System.Data;
-using System.Text;
-using System.Windows.Forms;
 using System.IO;
-using WeifenLuo.WinFormsUI.Docking;
 using System.Reflection;
 using System.Runtime.Serialization.Formatters.Binary;
-
-using ICSharpCode.FormsDesigner.Services; 
+using System.Windows.Forms;
 using ICSharpCode.FormsDesigner;
-using ICSharpCode.SharpDevelop.Gui;
-using ICSharpCode.Core;
-using ICSharpCode.SharpDevelop;
+using ICSharpCode.FormsDesigner.Services;
+using VisualPascalABC.Projects;
 
-namespace VisualPascalABC
+namespace VisualPascalABC.DockContent
 {
-    public partial class CodeFileDocumentControl : DockContent, VisualPascalABCPlugins.ICodeFileDocument
+    public partial class CodeFileDocumentControl : WeifenLuo.WinFormsUI.Docking.DockContent, VisualPascalABCPlugins.ICodeFileDocument
     {
         const string xml_extension = "xml";
 

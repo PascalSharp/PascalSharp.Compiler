@@ -15,6 +15,8 @@ using ICSharpCode.TextEditor.Gui.CompletionWindow;
 using ICSharpCode.TextEditor.Gui.InsightWindow;
 using PascalABCCompiler;
 using PascalABCCompiler.Parsers;
+using VisualPascalABC.DockContent;
+using VisualPascalABC.Projects;
 
 namespace VisualPascalABC
 {

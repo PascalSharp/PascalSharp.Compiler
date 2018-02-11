@@ -1,55 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net461;net471</TargetFrameworks>
+    <OutputPath>..\bin\</OutputPath>
     <RootNamespace>VisualPascalABC</RootNamespace>
     <AssemblyName>PascalABCNET</AssemblyName>
     <OutputType>WinExe</OutputType>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>..\bin\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <UseVSHostingProcess>false</UseVSHostingProcess>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>PdbOnly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>..\bin\</OutputPath>
     <DefineConstants>RELEASE;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DebugSymbols>false</DebugSymbols>
-    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <CheckForOverflowUnderflow>False</CheckForOverflowUnderflow>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Platform)' == 'AnyCPU' ">
-    <RegisterForComInterop>False</RegisterForComInterop>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
-    <BaseAddress>4194304</BaseAddress>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <FileAlignment>4096</FileAlignment>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="FormsDesignerBinding\Dependecies\**" />
     <Compile Remove="IB\TreeGridView\Samples\**" />
+    <Compile Remove="SSYY\**" />
     <EmbeddedResource Remove="FormsDesignerBinding\Dependecies\**" />
     <EmbeddedResource Remove="IB\TreeGridView\Samples\**" />
+    <EmbeddedResource Remove="SSYY\**" />
     <None Remove="FormsDesignerBinding\Dependecies\**" />
     <None Remove="IB\TreeGridView\Samples\**" />
+    <None Remove="SSYY\**" />
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="IB\Refactoring\Bookmarks.cs" />
+    <Compile Remove="Workbench\DebugService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CodeCompletion\CodeCompletion.csproj" />
@@ -72,18 +51,15 @@
     <ProjectReference Include="../Debugger.Core/Debugger.Core.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="DockPanelSuite" />
-    <PackageReference Include="SharpDisasm" />
+    <PackageReference Include="DockPanelSuite" Version="3.0.4" />
+    <PackageReference Include="DockPanelSuite.ThemeVS2015" Version="3.0.4" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="15.5.180" />
+    <PackageReference Include="Microsoft.Build.Engine" Version="15.5.180" />
+    <PackageReference Include="SharpDisasm" Version="1.1.9" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Engine" />
-    <Reference Include="Microsoft.Build.Framework" />
-    <Reference Include="Microsoft.Build.Tasks" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
-    <Reference Include="SharpDisasm">
-      <HintPath>..\Libraries\SharpDisasm.dll</HintPath>
-    </Reference>
     <Reference Include="System.Deployment" />
     <Reference Include="System.Design" />
     <Reference Include="System.Messaging" />
@@ -100,6 +76,8 @@
     </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
     </Compile>
     <Compile Update="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -113,46 +91,31 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Resources\ProjectBrowser.ReferenceFolder.Closed.png" />
-    <None Include="Resources\ProjectBrowser.ReferenceFolder.Open.png" />
-    <None Include="Resources\new_file.bmp" />
-    <None Include="Resources\new_file1.bmp" />
-    <None Include="Resources\open.bmp" />
-    <None Include="Resources\save.bmp" />
-    <None Include="Resources\save_all.bmp" />
-    <None Include="Resources\undo.bmp" />
-    <None Include="Resources\redo.bmp" />
-    <None Include="Resources\cut.bmp" />
-    <None Include="Resources\copy.bmp" />
-    <None Include="Resources\paste.bmp" />
-    <None Include="Resources\start.bmp" />
-    <None Include="Resources\stop.bmp" />
-    <None Include="Resources\AlignObjectsBottomHS.png" />
-    <None Include="Resources\AlignObjectsCenteredHorizontalHS.png" />
-    <None Include="Resources\AlignObjectsCenteredVerticalHS.png" />
-    <None Include="Resources\AlignObjectsLeftHS.png" />
-    <None Include="Resources\AlignObjectsRightHS.png" />
-    <None Include="Resources\AlignObjectsTopHS.png" />
-    <None Include="Resources\AlignToGridHS.png" />
-    <None Include="Resources\format.bmp" />
-    <None Include="Resources\format.png" />
-    <None Include="Resources\FormsDesignerPointerIcon.png" />
-    <None Include="Resources\browserNavigBack.Image.png" />
-    <None Include="Resources\PrintHS.bmp" />
-    <None Include="Resources\PrintHS.png" />
-    <None Include="Resources\Delete3.bmp" />
-    <None Include="Resources\Icons.16x16.Options.png" />
-    <None Include="Resources\Icons.16x16.Intellisense.png" />
-    <None Include="Resources\Icons.16x16.Window.Output.png" />
-    <None Include="Resources\Icons.16x16.Window.FindSymbolResult.png" />
-    <None Include="Resources\Icons.16x16.Window.ErrorList.png" />
-    <None Include="Resources\Icons.16x16.Window.DebugWatches.png" />
-    <None Include="Resources\Icons.16x16.Window.DebugVariablesList.png" />
-    <None Include="Resources\Icons.16x16.Window.CompilerConsole.png" />
     <Content Include="ABCNET32.ico" />
     <Content Include="Resources\BringToFrontHS.png" />
     <Content Include="Resources\FormsDesignerPointerIcon.bmp" />
     <Content Include="Resources\Pointer.bmp" />
     <Content Include="Resources\SendToBackHS.png" />
+    <Compile Update="Form1.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Form1.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Form1.cs</DependentUpon>
+    </Compile>
+    <Compile Update="CompilerForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="CompilerForm.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CompilerForm.cs</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <CustomToolNamespace>$(RootNamespace)</CustomToolNamespace>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
 </Project>
