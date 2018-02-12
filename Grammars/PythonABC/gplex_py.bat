@@ -1,1 +1,0 @@
-gplex.exe /out:python_gppg_lex.cs python_lex.lex

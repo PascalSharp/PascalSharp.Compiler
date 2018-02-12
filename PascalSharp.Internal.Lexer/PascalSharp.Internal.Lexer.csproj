@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net461;net471</TargetFrameworks>
+    <OutputPath>$(SolutionDir)bin\</OutputPath>
+    <RootNamespace>NewPascalParser</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.Errors\PascalSharp.Internal.Errors.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.Localization\PascalSharp.Internal.Localization.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.ParserTools\PascalSharp.Internal.ParserTools.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.SemanticTree\PascalSharp.Internal.SemanticTree.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.SyntaxTree\PascalSharp.Internal.SyntaxTree.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.TreeConverter\PascalSharp.Internal.TreeConverter.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+</Project>

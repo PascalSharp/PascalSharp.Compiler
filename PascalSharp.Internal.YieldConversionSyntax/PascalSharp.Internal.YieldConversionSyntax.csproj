@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net461;net471</TargetFrameworks>
+    <OutputPath>$(SolutionDir)bin\</OutputPath>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.Errors\PascalSharp.Internal.Errors.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.SyntaxTree.Converters\PascalSharp.Internal.SyntaxTree.Converters.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.SyntaxTree\PascalSharp.Internal.SyntaxTree.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.SyntaxTree.Visitors\PascalSharp.Internal.SyntaxTree.Visitors.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net461;net471</TargetFrameworks>
+    <OutputPath>$(SolutionDir)bin\</OutputPath>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.CompilerTools\PascalSharp.Internal.CompilerTools.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.Errors\PascalSharp.Internal.Errors.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.Localization\PascalSharp.Internal.Localization.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.SemanticTree\PascalSharp.Internal.SemanticTree.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.SyntaxTree\PascalSharp.Internal.SyntaxTree.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.YieldHelpers\PascalSharp.Internal.YieldHelpers.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Collections\returner.cs" />
+    <Compile Remove="SymbolTable\base_scopeArrayList.cs" />
+    <Compile Remove="SymbolTable\NVSymbolTable.cs" />
+    <Compile Remove="SymbolTable\scope_wrap.cs" />
+    <Compile Remove="SymbolTable\wrap_classes.cs" />
+    <Compile Remove="TreeConversion\block_info.cs" />
+    <Compile Remove="TreeConversion\SystemLibInitializer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Configuration\GlobalAssemblyInfo.cs">
+      <Link>Config\GlobalAssemblyInfo.cs</Link>
+    </Compile>
+  </ItemGroup>
+</Project>

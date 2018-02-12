@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net461;net471</TargetFrameworks>
+    <OutputPath>$(SolutionDir)bin\</OutputPath>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="YieldVisitors\JustTestVisitor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.Errors\PascalSharp.Internal.Errors.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.Localization\PascalSharp.Internal.Localization.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.ParserTools\PascalSharp.Internal.ParserTools.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.SyntaxTree\PascalSharp.Internal.SyntaxTree.csproj" />
+    <ProjectReference Include="$(SolutionDir)PascalSharp.Internal.YieldHelpers\PascalSharp.Internal.YieldHelpers.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Data.DataSetExtensions" />
+  </ItemGroup>
+</Project>

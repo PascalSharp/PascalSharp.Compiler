@@ -1,0 +1,34 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net461;net471</TargetFrameworks>
+    <RootNamespace>ICSharpCode.NRefactory</RootNamespace>
+    <OutputPath>$(SolutionDir)bin\</OutputPath>
+    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
+    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="Lexer\VBNet\ExpressionFinder.atg">
+      <Generator>CocoParserGenerator</Generator>
+      <CustomToolNamespace>ICSharpCode.NRefactory.Parser.VB</CustomToolNamespace>
+      <LastGenOutput>Parser.cs</LastGenOutput>
+    </None>
+    <None Include="Lexer\VBNet\PushParser.frame">
+      <DependentUpon>ExpressionFinder.atg</DependentUpon>
+    </None>
+    <None Include="Parser\Frames\Parser.frame" />
+    <None Include="Parser\CSharp\cs.ATG" />
+    <None Include="Parser\VBNet\VBNET.ATG">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CustomToolNamespace>ICSharpCode.NRefactory.Parser.VB</CustomToolNamespace>
+    </None>
+    <Content Include="Lexer\CSharp\KeywordList.txt" />
+    <Content Include="Lexer\VBNet\KeywordList.txt" />
+    <Content Include="Parser\Frames\Scanner.frame" />
+    <Content Include="Parser\Frames\SharpCoco.exe" />
+    <Content Include="Parser\gen.bat" />
+  </ItemGroup>
+</Project>

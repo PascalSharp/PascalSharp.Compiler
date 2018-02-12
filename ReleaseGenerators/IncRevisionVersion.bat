@@ -1,1 +1,0 @@
-..\Utils\IncrementVresion\IncrementVresion.exe ..\Configuration\Version.defs REVISION 1

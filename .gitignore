@@ -1,19 +1,6 @@
 .vs
 
-*/**/bin
-bin/Lib/*.pcu
-bin/Lib/*.xml
-bin/Lib/*.dll
-bin/*.dll
-bin/*.pdb
-bin/*.config
-bin/*.xml
-bin/**/*.dll
-bin/**/*.pdb
-bin/**/*.config
-bin/**/*.xml
-bin/net461
-bin/net471
+/bin
 
 TestSuite/CompilationSamples/*.pcu
 TestSuite/CompilationSamples/*.pdb
@@ -27,14 +14,8 @@ TestSuite/usesunits/*.pcu
 TestSuite/pabcrtl_tests/*.pdb
 TestSuite/pabcrtl_tests/*.exe
 
-ReleaseGenerators/*.pdb
-ReleaseGenerators/PABCRtl/*.dll
-ReleaseGenerators/PABCRtl/*.pcu
-ReleaseGenerators/PABCRtl/*.pdb
-
 **/obj
 
-ReleaseGenerators/RebuildStandartModules.exe
 TestSuite/CompilationSamples/ClientServer.pas
 TestSuite/CompilationSamples/PABCExtensions.pas
 TestSuite/CompilationSamples/PT4MakerNetX.pas
@@ -44,13 +25,3 @@ TestSuite/CompilationSamples/Чертежник.pas
 TestSuite/CompilationSamples/Controls.pas
 TestSuite/CompilationSamples/GraphWPF.pas
 TestSuite/CompilationSamples/NumLibABC.pas
-bin/PascalABCNET.exe
-bin/System.Data.dll.txt
-bin/System.Xml.dll.txt
-bin/System.dll.txt
-bin/mscorlib.txt
-bin/pabcnetc.exe
-bin/pabcnetcclear.exe
-bin/**/PascalABCNET.exe
-bin/**/pabcnetc.exe
-bin/**/pabcnetcclear.exe
