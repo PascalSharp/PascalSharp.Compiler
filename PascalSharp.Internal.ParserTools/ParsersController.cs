@@ -21,7 +21,7 @@ namespace PascalABCCompiler.Parsers
             LastParser = null;
             string dir = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().ManifestModule.FullyQualifiedName);
             DirectoryInfo di = new DirectoryInfo(dir);
-            FileInfo[] dllfiles = di.GetFiles("*Parser.dll");
+            FileInfo[] dllfiles = di.GetFiles("*Lexer.dll");
             System.Reflection.Assembly asssembly = null;
             Type constr = null;
             IParser pc = null;

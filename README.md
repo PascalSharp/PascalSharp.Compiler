@@ -13,9 +13,9 @@ This project has started since there was no real progress in the original Pascal
 * Rename output assemblies for consistency
 
 ## Building
-PascalABC is being developed in Visual Studio Community 2017. Use IDE or MSBuild command line to build PascalABC.NET solution. Do not forget to add `/restore` command line key to MSBuild.
+Pascal# is being developed in Visual Studio Community 2017. Use IDE or MSBuild command line to build Pascal# solution. Do not forget to add `/restore` command line key to MSBuild.
 
-Use any modern (5.4+) [Mono](http://www.mono-project.com/download/) MSBuild (not xbuild) to build PascalABC.NET on non-Windows platforms.
+Use any modern (5.4+) [Mono](http://www.mono-project.com/download/) MSBuild (not xbuild) to build Pascal# on non-Windows platforms.
 
 ## Architecture
 * Lite IDE (PascalSharp.IDE.Lite, Windows-only)

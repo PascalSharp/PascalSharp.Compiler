@@ -43,7 +43,7 @@ namespace PascalABCCompiler
     public class RemoteCompilerInternalError : CompilerInternalError
     {
         public RemoteCompilerInternalError(string msg)
-            : base("[pabcnetc.exe]",new Exception(msg))
+            : base("[PascalSharp.Console]",new Exception(msg))
         {
         }
     }
@@ -83,7 +83,7 @@ namespace PascalABCCompiler
         Process pabcnetcProcess=null;
         EventedStreamReaderList pabcnetcStreamReader;
         string inputId = "pabcnetc_input";
-        string pabcnetcFileName = "pabcnetc.exe";
+        string pabcnetcFileName = "PascalSharp.Console.exe";
         public const int sendCommandStartNumber = 100;
         CompilerState compilerState = CompilerState.Reloading;
         Encoding inputEncoding = System.Text.Encoding.UTF8;
