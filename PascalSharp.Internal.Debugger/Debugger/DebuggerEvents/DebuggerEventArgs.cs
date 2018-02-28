@@ -7,7 +7,7 @@
 
 using System;
 
-namespace Debugger 
+namespace PascalSharp.Internal.Debugger.Debugger.DebuggerEvents 
 {	
 	[Serializable]
 	public class DebuggerEventArgs : EventArgs 

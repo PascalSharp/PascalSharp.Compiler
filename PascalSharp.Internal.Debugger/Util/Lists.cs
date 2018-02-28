@@ -5,10 +5,9 @@
 //     <version>$Revision: 2210 $</version>
 // </file>
 
-using System;
 using System.Collections.Generic;
 
-namespace Debugger.Util
+namespace PascalSharp.Internal.Debugger.Util
 {
 	public class Lists
 	{

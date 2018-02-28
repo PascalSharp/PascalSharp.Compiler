@@ -8,7 +8,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Debugger.Util
+namespace PascalSharp.Internal.Debugger.Util
 {
 	/// <summary>
 	/// HighPrecisionTimer can obtain much more accurate time measurement

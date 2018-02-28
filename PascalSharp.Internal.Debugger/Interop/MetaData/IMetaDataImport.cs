@@ -5,14 +5,14 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
 #pragma warning disable 108, 1591 
 
-namespace Debugger.Interop.MetaData
+namespace PascalSharp.Internal.Debugger.Interop.MetaData
 {
-    using System;
-    using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-
     [ComImport, InterfaceType((short) 1), Guid("7DAC8207-D3AE-4C75-9B67-92801A497D44"), ComConversionLoss]
     public interface IMetaDataImport
     {
@@ -25,7 +25,7 @@ namespace Debugger.Interop.MetaData
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
         void EnumTypeDefs(ref IntPtr phEnum, ref uint rTypeDefs, uint cMax, ref uint pcTypeDefs);
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-        void EnumInterfaceImpls(ref IntPtr phEnum, uint td, [Out, MarshalAsAttribute(UnmanagedType.LPArray)] uint[] rImpls, uint cMax, out uint pcImpls);
+        void EnumInterfaceImpls(ref IntPtr phEnum, uint td, [Out, MarshalAs(UnmanagedType.LPArray)] uint[] rImpls, uint cMax, out uint pcImpls);
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
         void EnumTypeRefs(ref IntPtr phEnum, ref uint rTypeRefs, uint cMax, ref uint pcTypeRefs);
         [MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
@@ -143,7 +143,7 @@ namespace Debugger.Interop.MetaData
         //[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
 		//void EnumGenericParams([In, Out] ref IntPtr hEnum, uint tk, out uint rGenericParams, uint cMax, out uint pcGenericParams);
 		[MethodImpl(MethodImplOptions.InternalCall, MethodCodeType=MethodCodeType.Runtime)]
-        void EnumGenericParams(ref IntPtr hEnum, uint tk, [Out, MarshalAsAttribute(UnmanagedType.LPArray)] uint[] rGenericParams, uint cMax, out uint pcGenericParams);
+        void EnumGenericParams(ref IntPtr hEnum, uint tk, [Out, MarshalAs(UnmanagedType.LPArray)] uint[] rGenericParams, uint cMax, out uint pcGenericParams);
     }
 }
 

@@ -5,12 +5,12 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System.Runtime.InteropServices;
+
 #pragma warning disable 108, 1591 
 
-namespace Debugger.Interop.CorSym
+namespace PascalSharp.Internal.Debugger.Interop.CorSym
 {
-    using System.Runtime.InteropServices;
-
     [ComImport, CoClass(typeof(CorSymBinder_deprecatedClass)), Guid("AA544D42-28CB-11D3-BD22-0000F80849BD")]
     public interface CorSymBinder_deprecated : ISymUnmanagedBinder
     {

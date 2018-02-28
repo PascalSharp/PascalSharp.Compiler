@@ -5,14 +5,15 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System;
+using System.Runtime.InteropServices;
+using PascalSharp.Internal.Debugger.Interop.Enums;
+
 #pragma warning disable 1591
 
-namespace Debugger.Wrappers.CorDebug
+namespace PascalSharp.Internal.Debugger.Wrappers.CorDebug
 {
-	using System;
-	using System.Runtime.InteropServices;
-	
-	public partial class ICorDebugGenericValue
+    public partial class ICorDebugGenericValue
 	{
 		public unsafe Byte[] RawValue {
 			get {

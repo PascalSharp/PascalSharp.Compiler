@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Windows.Forms;
 
-namespace Debugger.Interop
+namespace PascalSharp.Internal.Debugger.Debugger.Internal
 {
 	public delegate T MethodInvokerWithReturnValue<T>();
 	

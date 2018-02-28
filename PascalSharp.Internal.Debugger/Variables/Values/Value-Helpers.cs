@@ -5,12 +5,10 @@
 //     <version>$Revision: 2210 $</version>
 // </file>
 
-using System;
-using System.Collections.Generic;
+using PascalSharp.Internal.Debugger.Interop.Enums;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
 
-using Debugger.Wrappers.CorDebug;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Values
 {
 	public partial class Value
 	{

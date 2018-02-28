@@ -5,14 +5,14 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
 #pragma warning disable 108, 1591 
 
-namespace Debugger.Interop.CorSym
+namespace PascalSharp.Internal.Debugger.Interop.CorSym
 {
-    using System;
-    using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-
     [ComImport, ComConversionLoss, InterfaceType((short) 1), Guid("ED14AA72-78E2-4884-84E2-334293AE5214")]
     public interface ISymUnmanagedWriter
     {

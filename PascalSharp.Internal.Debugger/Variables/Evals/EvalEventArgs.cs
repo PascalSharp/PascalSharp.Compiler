@@ -6,8 +6,9 @@
 // </file>
 
 using System;
+using PascalSharp.Internal.Debugger.Threads;
 
-namespace Debugger 
+namespace PascalSharp.Internal.Debugger.Variables.Evals 
 {	
 	/// <summary>
 	/// Provides data related to evalution events

@@ -6,10 +6,11 @@
 // </file>
 
 using System;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
+using ICorDebugStepper = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugStepper;
 
-using Debugger.Wrappers.CorDebug;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Threads
 {
 	public class Stepper
 	{
@@ -23,7 +24,7 @@ namespace Debugger
 		
 		public event EventHandler<StepperEventArgs> StepComplete;
 		
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Process Process {
 			get {
 				return function.Process;

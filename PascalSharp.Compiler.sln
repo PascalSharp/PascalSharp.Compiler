@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalSharp.Compiler", "PascalSharp.Compiler\PascalSharp.Compiler.csproj", "{BB1D415E-2C49-4927-877C-CD8F33CE0051}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ICSharpCode.NRefactory", "ICSharpCode.NRefactory\ICSharpCode.NRefactory.csproj", "{FBABF5AE-A7FA-4964-8846-ABE4921E42A8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalSharp.Internal.CodeCompletion", "PascalSharp.Internal.CodeCompletion\PascalSharp.Internal.CodeCompletion.csproj", "{879D20DC-7F39-480F-85FD-58C2B7E99005}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalSharp.Internal.Compiler", "PascalSharp.Internal.Compiler\PascalSharp.Internal.Compiler.csproj", "{BB1D415E-2C49-4927-877C-CD8F33CE0051}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PascalSharp.Internal.CompilerTools", "PascalSharp.Internal.CompilerTools\PascalSharp.Internal.CompilerTools.csproj", "{C353C280-201D-4E1B-AA64-5EE414D49FBA}"
 EndProject

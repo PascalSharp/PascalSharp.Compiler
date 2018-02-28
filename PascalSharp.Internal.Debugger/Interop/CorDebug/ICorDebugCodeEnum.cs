@@ -5,14 +5,14 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
 #pragma warning disable 108, 1591 
 
-namespace Debugger.Interop.CorDebug
+namespace PascalSharp.Internal.Debugger.Interop.CorDebug
 {
-    using System;
-    using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-
     [ComImport, ComConversionLoss, InterfaceType((short) 1), Guid("55E96461-9645-45E4-A2FF-0367877ABCDE")]
     public interface ICorDebugCodeEnum : ICorDebugEnum
     {

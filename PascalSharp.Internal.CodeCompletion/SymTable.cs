@@ -1,16 +1,15 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
-using SymbolTable;
-using PascalABCCompiler.TreeRealization;
-using PascalABCCompiler.SyntaxTree;
 using PascalABCCompiler.Parsers;
+using PascalABCCompiler.SyntaxTree;
+using PascalABCCompiler.TreeRealization;
 
-namespace CodeCompletion
+namespace PascalSharp.Internal.CodeCompletion
 {
     public enum KeywordKind
     {
@@ -1010,6 +1009,8 @@ namespace CodeCompletion
         }
     }
 
+    
+
     public class InterfaceUnitScope : SymScope, IInterfaceUnitScope
     {
         public ImplementationUnitScope impl_scope;
@@ -1117,6 +1118,27 @@ namespace CodeCompletion
         public override string ToString()
         {
             return CodeCompletionController.CurrentParser.LanguageInformation.GetSimpleDescription(this);
+        }
+    }
+
+    public class NamespaceUnitScope : SymScope
+    {
+        public List<InterfaceUnitScope> units;
+
+        public NamespaceUnitScope(SymInfo si, SymScope topScope) : base(si, topScope)
+        {
+            units = new List<InterfaceUnitScope>();
+        }
+
+        public override SymScope FindName(string name)
+        {
+            foreach (InterfaceUnitScope unit in units)
+            {
+                SymScope ss = unit.FindName(name);
+                if (ss != null)
+                    return ss;
+            }
+            return null;
         }
     }
 

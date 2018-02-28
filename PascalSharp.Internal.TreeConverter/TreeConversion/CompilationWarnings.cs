@@ -6,6 +6,7 @@ using PascalABCCompiler.SemanticTree;
 
 using PascalABCCompiler.TreeRealization;
 using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.TreeConverter
 {
@@ -14,7 +15,7 @@ namespace PascalABCCompiler.TreeConverter
     {
         public static string Get(string key)
         {
-            return PascalABCCompiler.StringResources.Get("WARNING_" + key);
+            return PascalSharp.Internal.Localization.StringResources.Get("WARNING_" + key);
         }
 
         public static string Get(string key, params object[] values)
@@ -23,7 +24,7 @@ namespace PascalABCCompiler.TreeConverter
         }
     }
 
-    public class CompilerWarningWithLocation : Errors.CompilerWarning
+    public class CompilerWarningWithLocation : CompilerWarning
     {
         location loc;
         public CompilerWarningWithLocation(location loc)

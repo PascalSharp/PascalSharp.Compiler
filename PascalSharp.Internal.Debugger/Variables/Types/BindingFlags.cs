@@ -6,11 +6,8 @@
 // </file>
 
 using System;
-using System.Collections.Generic;
-using Debugger.Wrappers.CorDebug;
-using Debugger.Wrappers.MetaData;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Types
 {
 	/// <summary>
 	/// Binding flags specify which members should be returned.

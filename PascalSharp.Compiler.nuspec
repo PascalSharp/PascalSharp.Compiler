@@ -9,17 +9,20 @@
         <projectUrl>https://github.com/PascalSharp/PascalSharp.Compiler</projectUrl>
         <!-- <iconUrl>http://github.com/contoso/UsefulStuff/nuget_icon.png</iconUrl> -->
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <releaseNotes>NuGet feed packaging</releaseNotes>
+        <releaseNotes>Upstream sync, fix configuration files</releaseNotes>
         <description>Pascal# Compiler Core</description>
-        <copyright>Copyright ©2018 Pascal# Team</copyright>
+        <copyright>Copyright © 2018 Pascal# Team</copyright>
         <tags>pascal c# dotnet compiler</tags>
 
         <dependencies></dependencies>
     </metadata>
 
     <files>
-        <file src="bin\net461\*.dll" target="lib\net461" />
-        <file src="bin\net461\*.pdb" target="lib\net461" />
+        <file src="bin\net40\*.dll" target="lib\net40" />
+        <file src="bin\net40\*.pdb" target="lib\net40" />
+
+        <file src="bin\net45\*.dll" target="lib\net45" />
+        <file src="bin\net45\*.pdb" target="lib\net45" />
 
         <file src="bin\net471\*.dll" target="lib\net471" />
         <file src="bin\net471\*.pdb" target="lib\net471" />

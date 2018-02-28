@@ -7,6 +7,7 @@ using QUT.Gppg;
 using GPPGParserScanner;
 using System;
 using System.Linq;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCSavParser
 {
@@ -26,7 +27,7 @@ namespace PascalABCSavParser
         private static string prefix = "PASCALABCPARSER_";
         public static string Get(string Id)
         {
-            string ret = PascalABCCompiler.StringResources.Get(prefix + Id);
+            string ret = PascalSharp.Internal.Localization.StringResources.Get(prefix + Id);
             if (ret == prefix + Id)
                 return Id;
             else

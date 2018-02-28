@@ -7,6 +7,7 @@ using System.Text;
 using System.IO;
 using PascalABCCompiler.SyntaxTree;
 using PascalABCCompiler.Errors;
+using PascalSharp.Internal.Errors;
 
 namespace SyntaxVisitors
 {
@@ -14,7 +15,7 @@ namespace SyntaxVisitors
     {
         public static string Get(string key)
         {
-            return PascalABCCompiler.StringResources.Get("SYNTAXTREEVISITORSERROR_" + key);
+            return PascalSharp.Internal.Localization.StringResources.Get("SYNTAXTREEVISITORSERROR_" + key);
         }
 
         public static string Get(string key, params object[] values)

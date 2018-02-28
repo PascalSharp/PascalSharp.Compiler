@@ -1,18 +1,19 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using PascalABCCompiler.SyntaxTree;
 using System.Reflection;
+using System.Text;
 using PascalABCCompiler;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
 using PascalABCCompiler.Parsers;
+using PascalABCCompiler.SyntaxTree;
+using PascalABCCompiler.TreeRealization;
+using PascalSharp.Compiler;
 
-namespace CodeCompletion
+namespace PascalSharp.Internal.CodeCompletion
 {
 	public class SemanticOptions
 	{
@@ -22,7 +23,7 @@ namespace CodeCompletion
 	public class DomSyntaxTreeVisitor : AbstractVisitor
     {
 		private SymScope returned_scope;//vozvrashaemyj scope posle vyzova visit
-        private SymScope saved_returned_scope;//nuzhen dlja lambd
+        private Stack<SymScope> saved_returned_scopes = new Stack<SymScope>();//nuzhen dlja lambd
 		private List<SymScope> returned_scopes = new List<SymScope>();//hranit spisok scopov (metodov) posle vyzova visit, esli search_all=true
         public SymScope entry_scope;//korenvoj scope unita
 		public SymScope impl_scope;
@@ -86,12 +87,12 @@ namespace CodeCompletion
 		
         private void save_return_value()
         {
-            saved_returned_scope = returned_scope;
+            saved_returned_scopes.Push(returned_scope);
         }
 
         private void restore_return_value()
         {
-            returned_scope = saved_returned_scope;
+            returned_scope = saved_returned_scopes.Pop();
         }
 
         public override void visit(syntax_tree_node _syntax_tree_node)
@@ -1967,6 +1968,7 @@ namespace CodeCompletion
                 		}
                 	}
                 }
+                
             }
             ns_cache = new Hashtable(StringComparer.CurrentCultureIgnoreCase);
             
@@ -2028,7 +2030,7 @@ namespace CodeCompletion
         	string fname = (string.Format("{0}\\{1}",System.IO.Path.GetDirectoryName(CompFile), name)).ToLower();
         	if (System.IO.File.Exists(fname))
             	return fname;
-        	return Compiler.get_assembly_path(name,true);
+        	return Compiler.Compiler.get_assembly_path(name,true);
         }
 
         PascalABCCompiler.TreeRealization.using_namespace_list unl = new PascalABCCompiler.TreeRealization.using_namespace_list();
@@ -2129,6 +2131,7 @@ namespace CodeCompletion
                         (new PascalABCCompiler.SyntaxTree.compiler_directive(new token_info("reference"), new token_info(ri.FullAssemblyName)));
                 }
             }
+            List<string> included_files = new List<string>();
             if (_program_module.compiler_directives != null)
                 foreach (PascalABCCompiler.SyntaxTree.compiler_directive dir in _program_module.compiler_directives)
                 {
@@ -2175,6 +2178,19 @@ namespace CodeCompletion
                             }
                         }
                     }
+                    else if (dir.Name.text.ToLower() == "includenamespace")
+                    {
+                        string directive = dir.Directive.text.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
+
+                        if (directive == "*.pas" || directive.EndsWith(Path.DirectorySeparatorChar + "*.pas"))
+                        {
+                            string udir = Path.Combine(Path.GetDirectoryName(_program_module.file_name), directive.Replace(Path.DirectorySeparatorChar + "*.pas", ""));
+                            foreach (string file in Directory.EnumerateFiles(udir, "*.pas"))
+                                included_files.Add(file);
+                        }
+                        else
+                            included_files.Add(Path.Combine(Path.GetDirectoryName(_program_module.file_name), directive));
+                    }
                 }
 
             doc = new document(_program_module.file_name);
@@ -2186,6 +2202,18 @@ namespace CodeCompletion
             Hashtable ns_cache = new Hashtable(StringComparer.CurrentCultureIgnoreCase);
             bool has_system_unit = false;
             bool has_extensions_unit = false;
+            foreach (string file in included_files)
+            {
+                DomConverter dc = CodeCompletionController.comp_modules[file] as DomConverter;
+                if (dc == null)
+                {
+                    dc = new CodeCompletionController().CompileAllIfNeed(file, true);
+                }
+                if (dc.visitor != null)
+                {
+                    
+                }
+            }
             if (_program_module.used_units != null)
             {
                 unit_scope.uses_source_range = get_location(_program_module.used_units);
@@ -2490,8 +2518,9 @@ namespace CodeCompletion
                         }
                         if (returned_scope != null && returned_scope is ProcScope && (returned_scope as ProcScope).return_type != null)
 						{
-							if ((returned_scope as ProcScope).parameters.Count == 0)
-                                returned_scope = (returned_scope as ProcScope).return_type;
+                            ProcScope ps = returned_scope as ProcScope;
+                            if (ps.parameters.Count == 0 || ps.is_extension || ps.parameters[0].param_kind == parametr_kind.params_parametr || ps.parameters[0].cnst_val != null)
+                                returned_scope = ps.return_type;
 							return;
 						}
 						else if (returned_scope is ElementScope)

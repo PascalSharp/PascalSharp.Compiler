@@ -5,9 +5,7 @@
 //     <version>$Revision: 1965 $</version>
 // </file>
 
-using System;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Threads
 {
 	/// <summary>
 	/// Identifies frame on thread callstack

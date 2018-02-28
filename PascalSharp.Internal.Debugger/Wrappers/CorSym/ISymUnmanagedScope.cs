@@ -7,12 +7,9 @@
 
 #pragma warning disable 1591
 
-namespace Debugger.Wrappers.CorSym
+namespace PascalSharp.Internal.Debugger.Wrappers.CorSym
 {
-	using System;
-	
-	
-	public partial class ISymUnmanagedScope
+    public partial class ISymUnmanagedScope
 	{
 		public ISymUnmanagedScope[] Children {
 			get {

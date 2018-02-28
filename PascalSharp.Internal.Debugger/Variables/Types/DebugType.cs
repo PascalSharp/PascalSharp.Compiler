@@ -7,10 +7,16 @@
 
 using System;
 using System.Collections.Generic;
-using Debugger.Wrappers.CorDebug;
-using Debugger.Wrappers.MetaData;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Interop.Enums;
+using PascalSharp.Internal.Debugger.Modules;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Variables.Values;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Wrappers.MetaData;
+using Process = PascalSharp.Internal.Debugger.Threads.Process;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Types
 {
 	/// <summary>
 	/// Represents a type in a debugee. That is, a class, array, value type or a primitive type.
@@ -61,7 +67,7 @@ namespace Debugger
 		}
 		
 		/// <summary> Gets the process in which the type was loaded </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Process Process {
 			get {
 				return process;
@@ -498,7 +504,7 @@ namespace Debugger
 		/// Gets the metadata token of the class or value type.
 		/// <para> Only applicable to class or value type! </para>
 		/// </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public uint Token {
 			get {
 				AssertClassOrValueType();

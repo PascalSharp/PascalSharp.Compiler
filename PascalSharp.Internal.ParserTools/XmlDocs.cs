@@ -9,6 +9,7 @@ using System.Xml;
 using System.Reflection;
 using System.Text;
 using System.Globalization;
+using PascalSharp.Internal.Localization;
 
 namespace CodeCompletionTools
 {
@@ -677,7 +678,7 @@ namespace CodeCompletionTools
 			string ru_localizedXmlDocFile = localizedXmlDocFile;
 			localizedXmlDocFile = Path.Combine(localizedXmlDocFile, Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName);
 			localizedXmlDocFile = Path.Combine(localizedXmlDocFile, Path.GetFileName(xmlFileName));
-			ru_localizedXmlDocFile = Path.Combine(ru_localizedXmlDocFile, /*"ru"*/PascalABCCompiler.StringResourcesLanguage.CurrentTwoLetterISO);
+			ru_localizedXmlDocFile = Path.Combine(ru_localizedXmlDocFile, /*"ru"*/StringResourcesLanguage.CurrentTwoLetterISO);
 			ru_localizedXmlDocFile = Path.Combine(ru_localizedXmlDocFile, Path.GetFileName(xmlFileName));
 			if (File.Exists(ru_localizedXmlDocFile))
 			{

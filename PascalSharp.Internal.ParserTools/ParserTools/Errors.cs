@@ -6,6 +6,8 @@ using System.Text;
 //using com.calitha.goldparser;
 using PascalABCCompiler.Errors;
 using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.Localization;
 
 namespace PascalABCCompiler.Errors
 {
@@ -13,7 +15,7 @@ namespace PascalABCCompiler.Errors
     {
         public static string Get(string Id)
         {
-            return PascalABCCompiler.StringResources.Get("PARSER_ERRORS_" + Id);
+            return StringResources.Get("PARSER_ERRORS_" + Id);
         }
     }
 

@@ -1,14 +1,11 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using PascalABCCompiler.SyntaxTree;
 using SyntaxVisitors;
 using SyntaxVisitors.SugarVisitors;
 
-namespace PascalABCCompiler.SyntaxTreeConverters
+namespace PascalSharp.Internal.SyntaxTree.Converters
 {
     public class StandardSyntaxTreeConverter: ISyntaxTreeConverter
     {

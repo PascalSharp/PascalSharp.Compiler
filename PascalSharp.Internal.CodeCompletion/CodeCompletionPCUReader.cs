@@ -1,21 +1,19 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using PascalABCCompiler.SyntaxTree;
-//using ICSharpCode.SharpDevelop.Dom;
 using System.Reflection;
 using PascalABCCompiler;
+using PascalABCCompiler.Parsers;
+using PascalABCCompiler.SyntaxTree;
 using PascalABCCompiler.TreeConverter;
 using PascalABCCompiler.TreeRealization;
-//using SymbolTable;
-using PascalABCCompiler.PCU;
-using PascalABCCompiler.Parsers;
+using PascalSharp.Compiler.PCU;
 
-namespace CodeCompletion
+namespace PascalSharp.Internal.CodeCompletion
 {
 	public class IntellisensePCUReader
 	{
@@ -758,7 +756,7 @@ namespace CodeCompletion
 			if (a == null)
 			{
                 string tmp = s.Substring(0, s.IndexOf(','));
-                string name_with_path = Compiler.GetReferenceFileName(tmp+".dll");
+                string name_with_path = Compiler.Compiler.GetReferenceFileName(tmp+".dll");
                     //a = Assembly.LoadFrom(name_with_path);
                 a = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(name_with_path);
                 PascalABCCompiler.NetHelper.NetHelper.init_namespaces(a);
@@ -788,7 +786,7 @@ namespace CodeCompletion
 			{
 				string s = pcu_file.ref_assemblies[i];
 				string tmp = s.Substring(0, s.IndexOf(','));
-				tmp = Compiler.GetReferenceFileName(tmp+".dll");
+				tmp = Compiler.Compiler.GetReferenceFileName(tmp+".dll");
 				System.Reflection.Assembly assm = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(tmp);
             	PascalABCCompiler.NetHelper.NetHelper.init_namespaces(assm);
             	AssemblyDocCache.Load(assm,tmp);

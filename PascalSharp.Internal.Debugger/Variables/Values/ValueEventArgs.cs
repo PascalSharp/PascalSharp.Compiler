@@ -6,11 +6,12 @@
 // </file>
 
 using System;
+using PascalSharp.Internal.Debugger.Threads;
 
-namespace Debugger 
+namespace PascalSharp.Internal.Debugger.Variables.Values 
 {	
 	/// <summary>
-	/// Provides data for events related to <see cref="Debugger.Value"/> class
+	/// Provides data for events related to <see cref="Values.Value"/> class
 	/// </summary>
 	[Serializable]
 	public class ValueEventArgs : ProcessEventArgs

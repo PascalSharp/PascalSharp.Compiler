@@ -6,11 +6,11 @@
 // </file>
 
 using System;
+using PascalSharp.Internal.Debugger.Modules;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Wrappers.CorSym;
 
-using Debugger.Wrappers.CorDebug;
-using Debugger.Wrappers.CorSym;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Threads
 {
 	[Serializable]
 	public class SourcecodeSegment

@@ -10,10 +10,17 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Variables.Values;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
+using ICorDebugChain = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugChain;
+using ICorDebugChainEnum = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugChainEnum;
+using ICorDebugFrame = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugFrame;
+using ICorDebugFrameEnum = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugFrameEnum;
+using ICorDebugStepper = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugStepper;
 
-using Debugger.Wrappers.CorDebug;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Threads
 {
 	public partial class Thread: DebuggerObject, IExpirable
 	{
@@ -45,7 +52,7 @@ namespace Debugger
 			}
 		}
 		
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Process Process {
 			get {
 				return process;
@@ -62,14 +69,14 @@ namespace Debugger
 			}
 		}
 		
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public uint ID { 
 			get{ 
 				return id; 
 			} 
 		}
 		
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public ExceptionType CurrentExceptionType {
 			get {
 				return currentExceptionType;
@@ -357,7 +364,7 @@ namespace Debugger
 			}
 		}
 		
-		[Debugger.Tests.SummaryOnly]
+		[SummaryOnly]
 		public Function SelectedFunction {
 			get {
 				return selectedFunction;
@@ -371,7 +378,7 @@ namespace Debugger
 			}
 		}
 		
-		[Debugger.Tests.SummaryOnly]
+		[SummaryOnly]
 		public Function LastFunctionWithLoadedSymbols {
 			get {
 				foreach (Function function in CallstackEnum) {
@@ -387,7 +394,7 @@ namespace Debugger
 		/// Returns the most recent function on callstack.
 		/// Returns null if callstack is empty.
 		/// </summary>
-		[Debugger.Tests.SummaryOnly]
+		[SummaryOnly]
 		public Function LastFunction {
 			get {
 				foreach(Function function in CallstackEnum) {
@@ -400,7 +407,7 @@ namespace Debugger
 		/// <summary>
 		/// Returns the first function that was called on thread
 		/// </summary>
-		[Debugger.Tests.SummaryOnly]
+		[SummaryOnly]
 		public Function FirstFunction {
 			get {
 				Function first = null;

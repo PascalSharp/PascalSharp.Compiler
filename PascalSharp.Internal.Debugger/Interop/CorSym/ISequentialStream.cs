@@ -5,14 +5,13 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+
 #pragma warning disable 108, 1591 
 
-namespace Debugger.Interop.CorSym
+namespace PascalSharp.Internal.Debugger.Interop.CorSym
 {
-    using System;
-    using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-
     [ComImport, Guid("0C733A30-2A1C-11CE-ADE5-00AA0044773D"), InterfaceType((short) 1)]
     public interface ISequentialStream
     {

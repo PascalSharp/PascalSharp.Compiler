@@ -5,10 +5,7 @@
 //     <version>$Revision: 2197 $</version>
 // </file>
 
-using System;
-using Debugger.Wrappers.CorDebug;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Values
 {
 	/// <summary>
 	/// Provides more specific access

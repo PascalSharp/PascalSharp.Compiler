@@ -7,7 +7,7 @@
 
 using System;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger
 {
 	public interface IExpirable
 	{

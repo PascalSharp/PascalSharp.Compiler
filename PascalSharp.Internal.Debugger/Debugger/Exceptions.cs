@@ -5,9 +5,7 @@
 //     <version>$Revision: 2185 $</version>
 // </file>
 
-using System;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger
 {
 	public class DebuggerException: System.Exception
 	{

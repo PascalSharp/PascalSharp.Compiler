@@ -5,13 +5,15 @@
 //     <version>$Revision: 2185 $</version>
 // </file>
 
-using System;
 using System.Collections.Generic;
-using Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Variables.Variables;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
+using ICorDebugArrayValue = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugArrayValue;
 
 //TODO: Support for lower bound
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Values
 {
 	// This part of the class provides support for arrays
 	public partial class Value

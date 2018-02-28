@@ -3,6 +3,7 @@
 using System;
 using PascalABCCompiler.SyntaxTree;
 using System.Collections.Generic;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.Errors
 {

@@ -8,6 +8,7 @@ using PascalABCCompiler.SyntaxTree;
 using PascalABCCompiler.Errors;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using PascalSharp.Internal.Localization;
 
 namespace PascalABCCompiler.Parsers
 {

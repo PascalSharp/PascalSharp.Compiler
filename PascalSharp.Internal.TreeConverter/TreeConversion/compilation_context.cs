@@ -6,6 +6,8 @@ using System.Linq;
 using PascalABCCompiler.TreeRealization;
 using System.Collections.Generic;
 using System.Collections;
+using PascalSharp.Internal.CompilerTools;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.TreeConverter
 {
@@ -270,7 +272,7 @@ namespace PascalABCCompiler.TreeConverter
 			}
 		}
 
-        internal void AddError(Errors.Error err)
+        internal void AddError(Error err)
         {
             syntax_tree_visitor.AddError(err);
         }

@@ -10,10 +10,10 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using PascalSharp.Internal.Debugger.Debugger.DebuggerEvents;
+using PascalSharp.Internal.Debugger.Debugger.Internal;
 
-using Debugger.Interop;
-
-namespace Debugger.Wrappers
+namespace PascalSharp.Internal.Debugger.Wrappers
 {
 	class TrackedObjectMetaData
 	{

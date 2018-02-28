@@ -5,14 +5,15 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using PascalSharp.Internal.Debugger.Threads;
+
 #pragma warning disable 108, 1591 
 
-namespace Debugger.Interop.CorDebug
+namespace PascalSharp.Internal.Debugger.Interop.CorDebug
 {
-    using System;
-    using System.Runtime.CompilerServices;
-    using System.Runtime.InteropServices;
-
     [ComImport, ClassInterface((short) 0), TypeLibType((short) 2), Guid("211F1254-BC7E-4AF5-B9AA-067308D83DD1")]
     public class EmbeddedCLRCorDebugClass : ICorDebug, EmbeddedCLRCorDebug
     {

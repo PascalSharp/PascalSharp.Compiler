@@ -10,6 +10,7 @@ using System.Reflection;
 using PascalABCCompiler.Errors;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using PascalSharp.Internal.Errors;
 
 
 namespace PascalABCCompiler.DocTagsParser

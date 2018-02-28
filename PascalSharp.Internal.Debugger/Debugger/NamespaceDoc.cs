@@ -5,13 +5,7 @@
 //     <version>$Revision: 2210 $</version>
 // </file>
 
-using System;
-using System.Text;
-using System.Threading;
-
-using Debugger.Wrappers.CorDebug;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger
 {
 	/// <summary>
 	/// <para> This library provides features for debugging managed applications. </para>

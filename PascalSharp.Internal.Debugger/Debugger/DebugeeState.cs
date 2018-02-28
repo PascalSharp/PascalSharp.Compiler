@@ -6,8 +6,10 @@
 // </file>
 
 using System;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Threads;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger
 {
 	/// <summary>
 	/// Unique identifier of the state of the debugee.
@@ -29,7 +31,7 @@ namespace Debugger
 			}
 		}
 		
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Process Process {
 			get {
 				return process;

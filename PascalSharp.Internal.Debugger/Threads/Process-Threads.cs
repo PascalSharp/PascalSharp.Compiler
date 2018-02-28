@@ -7,10 +7,10 @@
 
 using System;
 using System.Collections.Generic;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
 
-using Debugger.Wrappers.CorDebug;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Threads
 {
 	public partial class Process
 	{

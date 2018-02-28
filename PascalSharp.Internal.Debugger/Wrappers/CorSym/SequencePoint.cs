@@ -7,12 +7,9 @@
 
 #pragma warning disable 1591
 
-namespace Debugger.Wrappers.CorSym
+namespace PascalSharp.Internal.Debugger.Wrappers.CorSym
 {
-	using System;
-	
-	
-	public class SequencePoint
+    public class SequencePoint
 	{
 		ISymUnmanagedDocument document;
 		uint offset;

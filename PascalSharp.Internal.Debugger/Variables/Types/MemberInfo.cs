@@ -5,12 +5,12 @@
 //     <version>$Revision: 2274 $</version>
 // </file>
 
-using System;
-using System.Collections.Generic;
-using Debugger.Wrappers.CorDebug;
-using Debugger.Wrappers.MetaData;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Modules;
+using PascalSharp.Internal.Debugger.Tests;
+using Process = PascalSharp.Internal.Debugger.Threads.Process;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Types
 {
 	/// <summary>
 	/// Provides information about a member of some class
@@ -21,7 +21,7 @@ namespace Debugger
 		DebugType declaringType;
 		
 		/// <summary> Gets the process in which the type was loaded </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Process Process {
 			get {
 				return declaringType.Process;
@@ -29,7 +29,7 @@ namespace Debugger
 		}
 		
 		/// <summary> Gets the type that declares this member element </summary>
-		[Debugger.Tests.SummaryOnly]
+		[SummaryOnly]
 		public DebugType DeclaringType {
 			get {
 				return declaringType;
@@ -46,14 +46,14 @@ namespace Debugger
 		public abstract bool IsStatic { get; }
 		
 		/// <summary> Gets the metadata token associated with this member </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public abstract uint MetadataToken { get; }
 		
 		/// <summary> Gets the name of this member </summary>
 		public abstract string Name { get; }
 		
 		/// <summary> Gets the module in which this member is defined </summary>
-		[Debugger.Tests.SummaryOnly]
+		[SummaryOnly]
 		public Module Module {
 			get {
 				return declaringType.Module;

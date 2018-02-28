@@ -13,6 +13,7 @@ using PascalABCCompiler.ParserTools;
 using PascalABCCompiler.Errors;
 
 using PascalABCCompiler.YieldHelpers;
+using PascalSharp.Internal.Errors;
 
 namespace SyntaxVisitors
 {

@@ -6,16 +6,8 @@
  * 
  * Sie können diese Vorlage unter Extras > Optionen > Codeerstellung > Standardheader ändern.
  */
-using System;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
-using Debugger;
-using Debugger.Wrappers.CorDebug;
-using Debugger.Wrappers.CorSym;
-using Debugger.Wrappers.MetaData;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger
 {
 	/// <summary>
 	/// A stack frame which is being executed on some thread.

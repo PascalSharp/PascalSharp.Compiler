@@ -14,9 +14,27 @@
 
 using System;
 using System.Runtime.InteropServices;
-using Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Debugger.DebuggerEvents;
+using PascalSharp.Internal.Debugger.Interop.CorDebug;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Threads;
+using PascalSharp.Internal.Debugger.Variables.Evals;
+using ICorDebugAppDomain = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugAppDomain;
+using ICorDebugAssembly = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugAssembly;
+using ICorDebugBreakpoint = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugBreakpoint;
+using ICorDebugClass = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugClass;
+using ICorDebugController = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugController;
+using ICorDebugEval = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugEval;
+using ICorDebugFrame = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugFrame;
+using ICorDebugFunction = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugFunction;
+using ICorDebugMDA = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugMDA;
+using ICorDebugModule = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugModule;
+using ICorDebugProcess = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugProcess;
+using ICorDebugStepper = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugStepper;
+using ICorDebugThread = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugThread;
+using IStream = PascalSharp.Internal.Debugger.Wrappers.CorDebug.IStream;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger.Internal
 {
 	/// <summary>
 	/// Handles all callbacks of a given process
@@ -26,7 +44,7 @@ namespace Debugger
 		Process process;
 		bool pauseProcessInsteadOfContinue;
 		
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Process Process {
 			get {
 				return process;

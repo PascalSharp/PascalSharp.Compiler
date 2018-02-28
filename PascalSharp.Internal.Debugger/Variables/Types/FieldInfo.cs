@@ -5,12 +5,15 @@
 //     <version>$Revision: 2274 $</version>
 // </file>
 
-using System;
-using System.Collections.Generic;
-using Debugger.Wrappers.CorDebug;
-using Debugger.Wrappers.MetaData;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Variables.Values;
+using PascalSharp.Internal.Debugger.Variables.Variables;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Wrappers.MetaData;
+using ICorDebugFrame = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugFrame;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Types
 {
 	/// <summary>
 	/// Provides information about a field of some class.
@@ -48,7 +51,7 @@ namespace Debugger
 		}
 		
 		/// <summary> Gets the metadata token associated with this field </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public override uint MetadataToken {
 			get {
 				return fieldProps.Token;

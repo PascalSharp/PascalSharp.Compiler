@@ -1,11 +1,11 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
+
 using System.Collections.Generic;
 using System.Linq;
 using PascalABCCompiler.SyntaxTree;
 
-namespace PascalABCCompiler.SyntaxTreeConverters
+namespace PascalSharp.Internal.SyntaxTree.Converters
 {
     public class StandOutExprWithLambdaInForeachSequenceVisitor : BaseChangeVisitor
     {
@@ -33,7 +33,8 @@ namespace PascalABCCompiler.SyntaxTreeConverters
                 var ass = new var_statement(id, fe.in_what, fe.in_what.source_context);
                 fe.in_what = id;
                 var l = new List<statement> { ass, fe };
-                ReplaceStatement(fe, l);
+                //ReplaceStatement(fe, l);
+                ReplaceStatementUsingParent(fe, l);
             }
 
             base.visit(fe);

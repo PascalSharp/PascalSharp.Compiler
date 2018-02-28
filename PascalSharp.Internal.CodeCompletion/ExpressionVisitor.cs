@@ -1,17 +1,13 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
-using System.Text;
-using PascalABCCompiler.SyntaxTree;
-using System.Reflection;
-using PascalABCCompiler;
-using PascalABCCompiler.TreeConverter;
-//using PascalABCCompiler.TreeRealization;
-using SymbolTable;
 using PascalABCCompiler.Parsers;
+using PascalABCCompiler.SyntaxTree;
+//using PascalABCCompiler.TreeRealization;
 
-namespace CodeCompletion
+namespace PascalSharp.Internal.CodeCompletion
 {
 
     /// <summary>

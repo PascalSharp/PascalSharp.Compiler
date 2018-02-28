@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Threading;
 using PascalABCCompiler.Errors;
 using System.IO.Compression;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.ParserTools
 {

@@ -7,7 +7,7 @@
 
 using System;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger
 {
 	/// <summary>
 	/// A base class for all classes declared by the debugger

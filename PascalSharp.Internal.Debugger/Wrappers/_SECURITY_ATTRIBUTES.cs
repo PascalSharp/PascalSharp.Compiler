@@ -5,22 +5,21 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System;
+
 #pragma warning disable 1591
 
-namespace Debugger.Wrappers.CorDebug
+namespace PascalSharp.Internal.Debugger.Wrappers
 {
-	using System;
-	
-	
-	public static class _SECURITY_ATTRIBUTES
+    public static class _SECURITY_ATTRIBUTES
 	{
-		public static Debugger.Interop.CorDebug._SECURITY_ATTRIBUTES Default;
+		public static Interop.CorDebug._SECURITY_ATTRIBUTES Default;
 		
 		static unsafe _SECURITY_ATTRIBUTES() {
-			Default = new Debugger.Interop.CorDebug._SECURITY_ATTRIBUTES();
+			Default = new Interop.CorDebug._SECURITY_ATTRIBUTES();
 			Default.bInheritHandle = 0;
 			Default.lpSecurityDescriptor = IntPtr.Zero;
-			Default.nLength = (uint)sizeof(Debugger.Interop.CorDebug._SECURITY_ATTRIBUTES);
+			Default.nLength = (uint)sizeof(Interop.CorDebug._SECURITY_ATTRIBUTES);
 		}
 	}
 }

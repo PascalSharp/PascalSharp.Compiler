@@ -9,11 +9,13 @@
 
 using System;
 using System.Collections.Generic;
-using Debugger.Interop.MetaData;
-using Debugger.Wrappers.CorDebug;
-using Debugger.Wrappers.CorSym;
+using PascalSharp.Internal.Debugger.Interop.CorSym;
+using PascalSharp.Internal.Debugger.Interop.MetaData;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
+using ISymUnmanagedBinder = PascalSharp.Internal.Debugger.Wrappers.CorSym.ISymUnmanagedBinder;
+using ISymUnmanagedReader = PascalSharp.Internal.Debugger.Wrappers.CorSym.ISymUnmanagedReader;
 
-namespace Debugger.Wrappers.MetaData
+namespace PascalSharp.Internal.Debugger.Wrappers.MetaData
 {
 	public class InterfaceImplProps
 	{
@@ -39,7 +41,7 @@ namespace Debugger.Wrappers.MetaData
 		public ISymUnmanagedReader GetSymReader(string fullname, string searchPath)
 		{
 			try {
-				ISymUnmanagedBinder symBinder = new ISymUnmanagedBinder(new Debugger.Interop.CorSym.CorSymBinder_SxSClass());
+				ISymUnmanagedBinder symBinder = new ISymUnmanagedBinder(new CorSymBinder_SxSClass());
 				return symBinder.GetReaderForFile(metaData, fullname, searchPath);
 			} catch {
 				return null;

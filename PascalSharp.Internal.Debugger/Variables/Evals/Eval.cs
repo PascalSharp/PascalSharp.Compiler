@@ -8,9 +8,15 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Interop.Enums;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Threads;
+using PascalSharp.Internal.Debugger.Variables.Types;
+using PascalSharp.Internal.Debugger.Variables.Values;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Evals
 {
 	public enum EvalState {EvaluationScheduled, Evaluating, EvaluatedSuccessfully, EvaluatedException, EvaluatedNoResult, EvaluatedError};
 	
@@ -37,7 +43,7 @@ namespace Debugger
 		ICorDebugEval  corEval;
 		string         errorMsg;
 		
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Process Process {
 			get {
 				return process;

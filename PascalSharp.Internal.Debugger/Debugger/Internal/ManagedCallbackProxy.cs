@@ -7,9 +7,22 @@
 
 using System;
 using System.Windows.Forms;
-
-using Debugger.Interop;
-using Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Interop.CorDebug;
+using PascalSharp.Internal.Debugger.Wrappers;
+using ICorDebugAppDomain = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugAppDomain;
+using ICorDebugAssembly = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugAssembly;
+using ICorDebugBreakpoint = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugBreakpoint;
+using ICorDebugClass = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugClass;
+using ICorDebugController = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugController;
+using ICorDebugEval = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugEval;
+using ICorDebugFrame = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugFrame;
+using ICorDebugFunction = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugFunction;
+using ICorDebugMDA = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugMDA;
+using ICorDebugModule = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugModule;
+using ICorDebugProcess = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugProcess;
+using ICorDebugStepper = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugStepper;
+using ICorDebugThread = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugThread;
+using IStream = PascalSharp.Internal.Debugger.Wrappers.CorDebug.IStream;
 
 // Regular expresion:
 // ^{\t*}{(:Ll| )*{:i} *\(((.# {:i}, |\))|())^6\)*}\n\t*\{(.|\n)@\t\}
@@ -19,7 +32,7 @@ using Debugger.Wrappers.CorDebug;
 // \1\2\n\1{\n\1\tCallbackReceived("\3", new object[] {\4, \5, \6, \7, \8, \9});\n\1}
 // \1\2\n\1{\n\1\tCall(delegate {\n\1\t     \trealCallback.\3(\n\1\t     \t\tMTA2STA.MarshalIntPtrTo(\4),\n\1\t     \t\tMTA2STA.MarshalIntPtrTo(\5),\n\1\t     \t\tMTA2STA.MarshalIntPtrTo(\6),\n\1\t     \t\tMTA2STA.MarshalIntPtrTo(\7),\n\1\t     \t\tMTA2STA.MarshalIntPtrTo(\8),\n\1\t     \t\tMTA2STA.MarshalIntPtrTo(\9),\n\1\t     \t);\n\1\t     });\n\1}
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger.Internal
 {
 	/// <summary>
 	/// This proxy marshals the callback to the appropriate thread

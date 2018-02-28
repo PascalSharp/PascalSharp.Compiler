@@ -7,10 +7,9 @@
  *
  ***************************************************************************/
 
-using System;
 using System.Collections;
 
-namespace PascalABCCompiler.CodeGenerators
+namespace PascalSharp.Internal.EmitPE
 {
 	/*public class CodeGeneratorOptions
 	{
@@ -19,12 +18,12 @@ namespace PascalABCCompiler.CodeGenerators
 
 	public class Controller
 	{
-		private NETGenerator.ILConverter il_converter;//=new NETGenerator.ILConverter();
+		private ILConverter il_converter;//=new NETGenerator.ILConverter();
 
-		public void Compile(SemanticTree.IProgramNode ProgramTree,string TargetFileName,string SourceFileName ,
-            NETGenerator.CompilerOptions options, Hashtable StandartDirectories, string[] ResourceFiles)
+		public void Compile(PascalABCCompiler.SemanticTree.IProgramNode ProgramTree,string TargetFileName,string SourceFileName ,
+            CompilerOptions options, Hashtable StandartDirectories, string[] ResourceFiles)
 		{
-            il_converter = new NETGenerator.ILConverter(StandartDirectories);
+            il_converter = new ILConverter(StandartDirectories);
             il_converter.ConvertFromTree(ProgramTree,TargetFileName,SourceFileName,options,ResourceFiles);
 		}
 

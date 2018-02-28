@@ -4,13 +4,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.TreeConverter
 {
 
     internal class CompilerDirectivesToSyntaxTreeNodesLinker
     {
-        public static Dictionary<syntax_tree_node, compiler_directive> BuildLinks(SyntaxTree.compilation_unit unit, List<Errors.Error> ErrorsList)
+        public static Dictionary<syntax_tree_node, compiler_directive> BuildLinks(SyntaxTree.compilation_unit unit, List<Error> ErrorsList)
         {
             Dictionary<syntax_tree_node, compiler_directive> links = new Dictionary<syntax_tree_node, compiler_directive>();
 
@@ -25,7 +26,7 @@ namespace PascalABCCompiler.TreeConverter
                             if (!links.ContainsKey(sn))
                                 links.Add(sn, cd);
                             else
-                                ErrorsList.Add(new PascalABCCompiler.Errors.CommonCompilerError("Повторное объявление директивы", unit.file_name, sn.source_context.begin_position.line_num, sn.source_context.begin_position.column_num));
+                                ErrorsList.Add(new CommonCompilerError("Повторное объявление директивы", unit.file_name, sn.source_context.begin_position.line_num, sn.source_context.begin_position.column_num));
                     }
             return links;
         }

@@ -7,9 +7,7 @@
 
 #pragma warning disable 1591
 
-using System;
-
-namespace Debugger.Wrappers.MetaData
+namespace PascalSharp.Internal.Debugger.Wrappers.MetaData
 {
 	public struct TypeRefProps
 	{

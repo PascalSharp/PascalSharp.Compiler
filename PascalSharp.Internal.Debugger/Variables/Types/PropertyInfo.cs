@@ -7,10 +7,11 @@
 
 using System;
 using System.Collections.Generic;
-using Debugger.Wrappers.CorDebug;
-using Debugger.Wrappers.MetaData;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Variables.Values;
+using PascalSharp.Internal.Debugger.Variables.Variables;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Types
 {
 	/// <summary>
 	/// Provides information about a property in a class
@@ -43,7 +44,7 @@ namespace Debugger
 		
 		/// <summary> Gets the metadata token associated with getter (or setter)
 		/// of this property </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public override uint MetadataToken {
 			get {
 				return (getMethod ?? setMethod).MetadataToken;

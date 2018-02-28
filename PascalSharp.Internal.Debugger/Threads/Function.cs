@@ -8,13 +8,18 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.IO;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Debugger.DebuggerEvents;
+using PascalSharp.Internal.Debugger.Modules;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Variables.Types;
+using PascalSharp.Internal.Debugger.Variables.Values;
+using PascalSharp.Internal.Debugger.Variables.Variables;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Wrappers.CorSym;
+using PascalSharp.Internal.Debugger.Wrappers.MetaData;
 
-using Debugger.Wrappers.CorDebug;
-using Debugger.Wrappers.CorSym;
-using Debugger.Wrappers.MetaData;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Threads
 {
 	/// <summary>
 	/// A function (or also a method or frame) which is being executed on
@@ -38,7 +43,7 @@ namespace Debugger
 		MethodProps methodProps;
 		
 		/// <summary> The process in which this function is executed </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Process Process {
 			get {
 				return process;
@@ -61,7 +66,7 @@ namespace Debugger
 		}
 		
 		/// <summary> Metadata token of the function </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public uint Token {
 			get {
 				return methodProps.Token;
@@ -69,7 +74,7 @@ namespace Debugger
 		}
 		
 		/// <summary> A module in which the function is defined </summary>
-		[Debugger.Tests.SummaryOnly]
+		[SummaryOnly]
 		public Module Module {
 			get { 
 				return module; 
@@ -77,7 +82,7 @@ namespace Debugger
 		}
 		
 		/// <summary> A thread in which the function is executed </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Thread Thread {
 			get {
 				return thread;
@@ -417,7 +422,7 @@ namespace Debugger
 		/// Gets all variables in the lexical scope of the function. 
 		/// That is, arguments, local variables and varables of the containing class.
 		/// </summary>
-		[Debugger.Tests.Ignore] // Accessible though others
+		[Ignore] // Accessible though others
 		public NamedValueCollection Variables {
 			get {
 				return new NamedValueCollection(GetVariables());

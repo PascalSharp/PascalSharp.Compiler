@@ -10,6 +10,7 @@
 
 using System;
 using System.Collections.Generic;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.TreeConverter
 {
@@ -72,7 +73,7 @@ namespace PascalABCCompiler.TreeConverter
 
         //TODO: Исправить коллекцию модулей.
         public PascalABCCompiler.TreeRealization.common_unit_node CompileInterface(SyntaxTree.compilation_unit SyntaxUnit,
-            PascalABCCompiler.TreeRealization.unit_node_list UsedUnits, List<Errors.Error> ErrorsList, List<Errors.CompilerWarning> WarningsList, PascalABCCompiler.Errors.SyntaxError parser_error,
+            PascalABCCompiler.TreeRealization.unit_node_list UsedUnits, List<Error> ErrorsList, List<CompilerWarning> WarningsList, SyntaxError parser_error,
             System.Collections.Hashtable bad_nodes, TreeRealization.using_namespace_list namespaces, Dictionary<SyntaxTree.syntax_tree_node,string> docs, bool debug, bool debugging)
 		{
             //convertion_data_and_alghoritms.__i = 0;
@@ -122,8 +123,8 @@ namespace PascalABCCompiler.TreeConverter
 		}
 
         public void CompileImplementation(PascalABCCompiler.TreeRealization.common_unit_node SemanticUnit,
-			SyntaxTree.compilation_unit SyntaxUnit,PascalABCCompiler.TreeRealization.unit_node_list UsedUnits,List<Errors.Error> ErrorsList,List<Errors.CompilerWarning> WarningsList,
-            PascalABCCompiler.Errors.SyntaxError parser_error, System.Collections.Hashtable bad_nodes, TreeRealization.using_namespace_list interface_namespaces, TreeRealization.using_namespace_list imlementation_namespaces,
+			SyntaxTree.compilation_unit SyntaxUnit,PascalABCCompiler.TreeRealization.unit_node_list UsedUnits,List<Error> ErrorsList,List<CompilerWarning> WarningsList,
+            SyntaxError parser_error, System.Collections.Hashtable bad_nodes, TreeRealization.using_namespace_list interface_namespaces, TreeRealization.using_namespace_list imlementation_namespaces,
            Dictionary<SyntaxTree.syntax_tree_node,string> docs, bool debug, bool debugging)
 		{
 			//if (ErrorsList.Count>0) throw ErrorsList[0];

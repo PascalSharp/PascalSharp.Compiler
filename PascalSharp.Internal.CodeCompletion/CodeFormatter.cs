@@ -10,14 +10,15 @@
  * takzhe znaki operacii, drugie simvoly, kotorye ne okajamlajut tekuchij token
  * zdes ochen vazhny source konteksty
 */
+
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Globalization;
-using PascalABCCompiler.SyntaxTree;
 using System.IO;
+using System.Text;
+using PascalABCCompiler.SyntaxTree;
 
-namespace CodeFormatters
+namespace PascalSharp.Internal.CodeCompletion
 {
     class FormatterOptions
     {

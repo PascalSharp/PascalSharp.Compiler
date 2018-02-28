@@ -6,8 +6,9 @@
 // </file>
 
 using System;
+using PascalSharp.Internal.Debugger.Threads;
 
-namespace Debugger 
+namespace PascalSharp.Internal.Debugger.Modules 
 {	
 	[Serializable]
 	public class ModuleEventArgs : ProcessEventArgs

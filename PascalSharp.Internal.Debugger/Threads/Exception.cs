@@ -6,9 +6,12 @@
 // </file>
 
 using System;
-using Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Variables.Values;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Threads
 {	
 	public class Exception: DebuggerObject
 	{
@@ -22,7 +25,7 @@ namespace Debugger
 		string            type;
 		string            message;
 		
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Process Process {
 			get {
 				return process;

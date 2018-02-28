@@ -5,13 +5,13 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using PascalSharp.Internal.Debugger.Interop.CorDebug;
+
 #pragma warning disable 1591
 
-namespace Debugger.Wrappers.CorDebug
+namespace PascalSharp.Internal.Debugger.Wrappers
 {
-	using System;
-	
-	public interface ICorDebugManagedCallbacks: Debugger.Interop.CorDebug.ICorDebugManagedCallback, Debugger.Interop.CorDebug.ICorDebugManagedCallback2
+    public interface ICorDebugManagedCallbacks: ICorDebugManagedCallback, ICorDebugManagedCallback2
 	{
 		
 	}

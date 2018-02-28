@@ -5,12 +5,17 @@
 //     <version>$Revision: 2274 $</version>
 // </file>
 
-using System;
-using System.Collections.Generic;
-using Debugger.Wrappers.CorDebug;
-using Debugger.Wrappers.MetaData;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Interop.Enums;
+using PascalSharp.Internal.Debugger.Modules;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Variables.Evals;
+using PascalSharp.Internal.Debugger.Variables.Values;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Wrappers.MetaData;
+using Process = PascalSharp.Internal.Debugger.Threads.Process;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Types
 {
 	/// <summary>
 	/// Provides information about a method in a class
@@ -50,7 +55,7 @@ namespace Debugger
 		}
 		
 		/// <summary> Gets the metadata token associated with this method </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public override uint MetadataToken {
 			get {
 				return methodProps.Token;
@@ -71,7 +76,7 @@ namespace Debugger
 		}
 		
 		/// <summary> Gets the number of paramters of this method </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public int ParameterCount {
 			get {
 				return this.Module.MetaData.GetParamCount(this.MetadataToken);

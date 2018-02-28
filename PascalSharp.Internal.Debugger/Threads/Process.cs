@@ -6,17 +6,20 @@
 // </file>
 
 using System;
-using System.Collections.Generic;
-using Microsoft.Win32.SafeHandles;
-using Debugger.Wrappers.CorDebug;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using System.ComponentModel;
-using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
+using Microsoft.Win32.SafeHandles;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Debugger.DebuggerEvents;
+using PascalSharp.Internal.Debugger.Debugger.Internal;
+using PascalSharp.Internal.Debugger.Variables.Values;
+using PascalSharp.Internal.Debugger.Wrappers;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Threads
 {
 			[StructLayout(LayoutKind.Sequential, CharSet=CharSet.Auto, Pack=8), ComVisible(false)]
 public class STARTUPINFO

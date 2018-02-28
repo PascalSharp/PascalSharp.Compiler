@@ -11,19 +11,20 @@ using PascalABCCompiler.Parsers;
 using GPPGParserScanner;
 using PascalABCCompiler.ParserTools;
 using GPPGPreprocessor3;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.PascalABCNewParser
 {
     // SSM: класс, являющийся обёрткой над GPPG парсером
     public class GPPGParserHelper
     {
-        private List<Errors.Error> Errs;
-        private List<Errors.CompilerWarning> Warnings;
+        private List<Error> Errs;
+        private List<CompilerWarning> Warnings;
         private string FileName;
         public bool build_tree_for_formatter = false;
         public List<string> DefinesList = null;
 
-        public GPPGParserHelper(List<Errors.Error> Errs, List<Errors.CompilerWarning> Warnings, string FileName)
+        public GPPGParserHelper(List<Error> Errs, List<CompilerWarning> Warnings, string FileName)
         {
             this.Errs = Errs;
             this.Warnings = Warnings;
@@ -70,11 +71,11 @@ namespace PascalABCCompiler.PascalABCNewParser
     // SSM: класс, являющийся обёрткой над парсером препроцессора
     public class PreprocessorParserHelper
     {
-        private List<Errors.Error> Errs;
+        private List<Error> Errs;
         private string FileName;
         public List<compiler_directive> compilerDirectives;
 
-        public PreprocessorParserHelper(List<Errors.Error> Errs, string FileName)
+        public PreprocessorParserHelper(List<Error> Errs, string FileName)
         {
             this.Errs = Errs;
             this.FileName = FileName;

@@ -5,14 +5,14 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System;
+using System.Runtime.InteropServices;
+
 #pragma warning disable 1591
 
-namespace Debugger.Wrappers.CorSym
+namespace PascalSharp.Internal.Debugger.Wrappers.CorSym
 {
-	using System;
-	using System.Runtime.InteropServices;
-	
-	public partial class ISymUnmanagedBinder
+    public partial class ISymUnmanagedBinder
 	{
 		public ISymUnmanagedReader GetReaderForFile(object importer, string filename, string searchPath)
 		{

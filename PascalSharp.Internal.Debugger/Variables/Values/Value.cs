@@ -6,11 +6,17 @@
 // </file>
 
 using System;
-using System.Collections.Generic;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Interop.Enums;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Threads;
+using PascalSharp.Internal.Debugger.Variables.Evals;
+using PascalSharp.Internal.Debugger.Variables.Types;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
+using ICorDebugGenericValue = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugGenericValue;
+using Process = PascalSharp.Internal.Debugger.Threads.Process;
 
-using Debugger.Wrappers.CorDebug;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Values
 {
 	/// <summary>
 	/// Delegate that is used to get value. This delegate may be called at any time and should never return null.
@@ -166,7 +172,7 @@ namespace Debugger
 		}
 		
 		/// <summary> The process that owns the value </summary>
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Process Process {
 			get {
 				return process;
@@ -361,8 +367,8 @@ namespace Debugger
 			}
 		}
 		
-		/// <summary> Returns the <see cref="Debugger.DebugType"/> of the value </summary>
-		[Debugger.Tests.SummaryOnly]
+		/// <summary> Returns the <see cref="DebugType"/> of the value </summary>
+		[SummaryOnly]
 		public DebugType Type {
 			get {
 				return Cache.Type;

@@ -37,7 +37,8 @@
 
 
 using System;
-namespace PascalABCCompiler
+
+namespace PascalSharp.Internal.CompilerTools
 {
     /// <summary>
     /// Generate a table for a byte-wise 32-bit CRC calculation on the polynomial:

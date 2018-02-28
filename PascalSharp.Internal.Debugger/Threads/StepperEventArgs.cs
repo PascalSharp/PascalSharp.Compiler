@@ -7,7 +7,7 @@
 
 using System;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Threads
 {
 	[Serializable]
 	public class StepperEventArgs: ProcessEventArgs

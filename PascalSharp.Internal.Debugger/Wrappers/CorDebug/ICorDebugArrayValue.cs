@@ -5,13 +5,13 @@
 //     <version>$Revision: 2210 $</version>
 // </file>
 
+using System;
+
 #pragma warning disable 1591
 
-namespace Debugger.Wrappers.CorDebug
+namespace PascalSharp.Internal.Debugger.Wrappers.CorDebug
 {
-	using System;
-
-	public partial class ICorDebugArrayValue
+    public partial class ICorDebugArrayValue
 	{
 		public unsafe uint[] Dimensions {
 			get {

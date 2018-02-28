@@ -6,15 +6,16 @@
 // </file>
 
 using System;
+using PascalSharp.Internal.Debugger.Tests;
 
-namespace Debugger 
+namespace PascalSharp.Internal.Debugger.Threads 
 {	
 	[Serializable]
 	public class ThreadEventArgs : ProcessEventArgs
 	{
 		Thread thread;
 		
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Thread Thread {
 			get {
 				return thread;

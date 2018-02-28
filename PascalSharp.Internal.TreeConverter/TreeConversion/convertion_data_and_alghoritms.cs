@@ -7,6 +7,7 @@ using System.Linq;
 
 using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.TreeConverter
 {
@@ -15,7 +16,7 @@ namespace PascalABCCompiler.TreeConverter
 	{
 		internal SymbolTable.TreeConverterSymbolTable symtab=SymbolTable.SymbolTableController.CurrentSymbolTable;
 
-		private PascalABCCompiler.Errors.SyntaxError _parser_error;
+		private SyntaxError _parser_error;
 
 		private syntax_tree_visitor _stv;
 
@@ -34,12 +35,12 @@ namespace PascalABCCompiler.TreeConverter
 		}
 
         
-        private void AddError(Errors.Error err)
+        private void AddError(Error err)
         {
             syntax_tree_visitor.AddError(err);
         }
 
-        private T AddError<T>(Errors.Error err)
+        private T AddError<T>(Error err)
         {
             syntax_tree_visitor.AddError(err, true);
             return default(T);
@@ -114,7 +115,7 @@ namespace PascalABCCompiler.TreeConverter
             }
         }
 
-		public PascalABCCompiler.Errors.SyntaxError parser_error
+		public SyntaxError parser_error
 		{
 			get
 			{
@@ -857,7 +858,7 @@ namespace PascalABCCompiler.TreeConverter
         /// <param name="is_alone_method_defined">Для единственного метода у которого типы параметров совпадают, но в качестве var параметра мы передаем константное значение мы можем сгенерировать более подробное сообщение об ошибке.</param>
         /// <returns>Список преобразований типов.</returns>
         internal possible_type_convertions_list get_conversions(expressions_list factparams,
-			parameter_list formalparams,bool is_alone_method_defined, location locg, out Errors.Error error)
+			parameter_list formalparams,bool is_alone_method_defined, location locg, out Error error)
 		{
 			//TODO:Явно указывать capacity при создании.
             possible_type_convertions_list tc = new possible_type_convertions_list();
@@ -1881,7 +1882,7 @@ namespace PascalABCCompiler.TreeConverter
 
             for (int i = 0; i < set_of_possible_functions.Count; i++)
             {
-                Errors.Error err = null;
+                Error err = null;
                 possible_type_convertions_list tc = get_conversions(parameters, set_of_possible_functions[i].parameters,
                     is_alone_method_defined, loc, out err);
                 if (err != null)
@@ -2113,7 +2114,7 @@ namespace PascalABCCompiler.TreeConverter
                 List<function_node> funcs = distances[dist];
                 if (funcs.Count == 1)
                 {
-                    Errors.Error err = null;
+                    Error err = null;
                     possible_type_convertions_list tcl = get_conversions(parameters, funcs[0].parameters, true, loc, out err);
                     if (err != null)
                         return AddError<function_node>(err);

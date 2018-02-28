@@ -5,15 +5,13 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System.Collections.Generic;
+
 #pragma warning disable 1591
 
-namespace Debugger.Wrappers.CorDebug
+namespace PascalSharp.Internal.Debugger.Wrappers.CorDebug
 {
-	using System;
-	using System.Collections.Generic;
-	
-	
-	public partial class ICorDebugChainEnum
+    public partial class ICorDebugChainEnum
 	{
 		public IEnumerable<ICorDebugChain> Enumerator {
 			get {

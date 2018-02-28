@@ -1,18 +1,20 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
-using PascalABCCompiler.SyntaxTree;
 using System.Reflection;
+using System.Text;
 using PascalABCCompiler;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
 using PascalABCCompiler.Parsers;
+using PascalABCCompiler.SyntaxTree;
+using PascalABCCompiler.TreeRealization;
+using PascalSharp.Compiler;
+using PascalSharp.Internal.Errors;
 
-namespace CodeCompletion
+namespace PascalSharp.Internal.CodeCompletion
 {
     public struct RetValue
     {
@@ -903,8 +905,8 @@ namespace CodeCompletion
             if (ss == null) return null;
             if (!header && ss.IsInScope(ss.head_loc, line + 1, col + 1))
             {
-                List<PascalABCCompiler.Errors.Error> Errors = new List<PascalABCCompiler.Errors.Error>();
-                List<PascalABCCompiler.Errors.CompilerWarning> Warnings = new List<PascalABCCompiler.Errors.CompilerWarning>();
+                List<Error> Errors = new List<Error>();
+                List<CompilerWarning> Warnings = new List<CompilerWarning>();
                 expr = parser.GetExpression("test" + Path.GetExtension(FileName), expr_without_brackets, Errors, Warnings);
                 if (expr == null || Errors.Count > 0)
                     return null;

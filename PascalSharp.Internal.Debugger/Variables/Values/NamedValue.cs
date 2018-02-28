@@ -5,12 +5,10 @@
 //     <version>$Revision: 2210 $</version>
 // </file>
 
-using System;
-using System.Collections.Generic;
+using PascalSharp.Internal.Debugger.Debugger;
+using Process = PascalSharp.Internal.Debugger.Threads.Process;
 
-using Debugger.Wrappers.CorDebug;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Values
 {
 	/// <summary>
 	/// NamedValue is a Value which has some name associated with it - 

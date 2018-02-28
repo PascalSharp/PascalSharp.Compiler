@@ -7,12 +7,9 @@
 
 #pragma warning disable 1591
 
-namespace Debugger.Wrappers.CorDebug
+namespace PascalSharp.Internal.Debugger.Wrappers.CorDebug
 {
-	using System;
-	
-	
-	public partial class ICorDebugModule
+    public partial class ICorDebugModule
 	{
 		public string Name {
 			get {

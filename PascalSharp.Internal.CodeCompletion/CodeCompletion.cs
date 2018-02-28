@@ -1,16 +1,18 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.Parsers;
-using PascalABCCompiler.Errors;
 using System.IO;
+using System.Text;
+using PascalABCCompiler.Parsers;
+using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.Errors;
+
 //using ICSharpCode.SharpDevelop.Dom;
 
-namespace CodeCompletion
+namespace PascalSharp.Internal.CodeCompletion
 {
     public class CodeCompletionController
     {
@@ -37,7 +39,7 @@ namespace CodeCompletion
         	//dconv = new DomConverter(this);
         }
 
-        public static PascalABCCompiler.Compiler comp;// = new PascalABCCompiler.Compiler();
+        public static Compiler.Compiler comp;// = new PascalABCCompiler.Compiler();
         public static Hashtable StandartDirectories = new Hashtable();
         public static Hashtable comp_modules = new Hashtable(StringComparer.OrdinalIgnoreCase);
         public static Hashtable parsers = new Hashtable(StringComparer.OrdinalIgnoreCase);
@@ -94,7 +96,7 @@ namespace CodeCompletion
         {
             this.Text = Text;
             this.FileName = FileName;
-            List<PascalABCCompiler.Errors.Error> ErrorsList = new List<PascalABCCompiler.Errors.Error>();
+            List<Error> ErrorsList = new List<Error>();
             List<CompilerWarning> Warnings = new List<CompilerWarning>();
             PascalABCCompiler.SyntaxTree.compilation_unit cu = null;
             string ext = Path.GetExtension(FileName);
@@ -193,7 +195,7 @@ namespace CodeCompletion
         
         public PascalABCCompiler.SyntaxTree.compilation_unit ParseOnlySyntaxTree(string FileName, string Text)
         {
-            List<PascalABCCompiler.Errors.Error> ErrorsList = new List<PascalABCCompiler.Errors.Error>();
+            List<Error> ErrorsList = new List<Error>();
             List<CompilerWarning> Warnings = new List<CompilerWarning>();
             PascalABCCompiler.SyntaxTree.compilation_unit cu = ParsersControllerGetCompilationUnit(FileName, Text, ErrorsList, Warnings);
             return cu;
@@ -206,7 +208,7 @@ namespace CodeCompletion
             this.Text = Text;
             this.FileName = FileName;
             string ext = Path.GetExtension(FileName);
-            List<PascalABCCompiler.Errors.Error> ErrorsList = new List<PascalABCCompiler.Errors.Error>();
+            List<Error> ErrorsList = new List<Error>();
             List<CompilerWarning> Warnings = new List<CompilerWarning>();
             PascalABCCompiler.SyntaxTree.compilation_unit cu = ParsersController.GetCompilationUnit(FileName, Text, ErrorsList, Warnings);
             Parser = ParsersController.selectParser(Path.GetExtension(FileName).ToLower());
@@ -266,7 +268,7 @@ namespace CodeCompletion
             this.FileName = FileName;
             this.Text = comp.GetSourceFileText(FileName);
             string ext = Path.GetExtension(FileName);
-            List<PascalABCCompiler.Errors.Error> ErrorsList = new List<PascalABCCompiler.Errors.Error>();
+            List<Error> ErrorsList = new List<Error>();
             List<CompilerWarning> Warnings = new List<CompilerWarning>();
             PascalABCCompiler.SyntaxTree.compilation_unit cu = null;
             if (Text != null)

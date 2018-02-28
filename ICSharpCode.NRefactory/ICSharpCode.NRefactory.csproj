@@ -1,14 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>net461;net471</TargetFrameworks>
+    <TargetFrameworks>net40;net45;net471</TargetFrameworks>
     <RootNamespace>ICSharpCode.NRefactory</RootNamespace>
     <OutputPath>$(SolutionDir)bin\</OutputPath>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyInformationalVersionAttribute>false</GenerateAssemblyInformationalVersionAttribute>
+    <Description>Parser and refactoring library for C# and VB.NET</Description>
+    <Product>SharpDevelop</Product>
+    <Company>ic#code</Company>
+    <Authors>SharpDevelop Team</Authors>
+    <Copyright>Copyright © 2000 SharpDevelop Team</Copyright>
+    <Version>4.2.1.0</Version>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Lexer\VBNet\ExpressionFinder.atg">

@@ -10,8 +10,9 @@
 #pragma warning disable 1591
 
 using System;
+using PascalSharp.Internal.Debugger.Interop.Enums;
 
-namespace Debugger.Wrappers.MetaData
+namespace PascalSharp.Internal.Debugger.Wrappers.MetaData
 {
 	public struct PropertyProps
 	{

@@ -7,7 +7,7 @@
 
 using System;
 
-namespace Debugger.Tests
+namespace PascalSharp.Internal.Debugger.Tests
 {
 	[AttributeUsage(AttributeTargets.Property)]
 	public class SummaryOnlyAttribute: Attribute

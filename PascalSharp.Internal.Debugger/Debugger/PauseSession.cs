@@ -6,8 +6,9 @@
 // </file>
 
 using System;
+using PascalSharp.Internal.Debugger.Debugger.DebuggerEvents;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger
 {
 	/// <summary>
 	/// Holds information about the state of paused debugger.

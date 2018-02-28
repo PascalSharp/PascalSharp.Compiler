@@ -6,9 +6,13 @@
 // </file>
 
 using System;
-using Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Modules;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Threads;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Breakpoints
 {
 	public class Breakpoint: DebuggerObject
 	{
@@ -20,14 +24,14 @@ namespace Debugger
 		bool enabled = true;
 		ICorDebugFunctionBreakpoint corBreakpoint;
 		
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public NDebugger Debugger {
 			get {
 				return debugger;
 			}
 		}
 		
-		[Debugger.Tests.SummaryOnly]
+		[SummaryOnly]
 		public SourcecodeSegment SourcecodeSegment {
 			get {
 				return sourcecodeSegment;

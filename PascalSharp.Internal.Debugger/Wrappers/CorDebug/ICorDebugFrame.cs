@@ -7,11 +7,9 @@
 
 #pragma warning disable 1591
 
-namespace Debugger.Wrappers.CorDebug
+namespace PascalSharp.Internal.Debugger.Wrappers.CorDebug
 {
-	using System;
-
-	public partial class ICorDebugFrame
+    public partial class ICorDebugFrame
 	{
 		uint index;
 		

@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using PascalABCCompiler.SyntaxTree;
 using PascalABCCompiler.TreeRealization;
-
+using PascalSharp.Internal.Errors;
 using SyntaxTreeBuilder = PascalABCCompiler.SyntaxTree.SyntaxTreeBuilder;
 using SymTable = SymbolTable;
 using array_const = PascalABCCompiler.TreeRealization.array_const;
@@ -68,8 +68,8 @@ namespace PascalABCCompiler.TreeConverter
         private common_unit_node _system_unit;
 		internal bool debug=true;
 		internal bool debugging=false;
-        internal List<Errors.Error> ErrorsList;
-        internal List<Errors.CompilerWarning> WarningsList;
+        internal List<Error> ErrorsList;
+        internal List<CompilerWarning> WarningsList;
 		internal Dictionary<SyntaxTree.syntax_tree_node,string> docs;
         public bool for_native_code = false;
         internal Dictionary<SyntaxTree.syntax_tree_node, SyntaxTree.compiler_directive> DirectivesToNodesLinks;
@@ -89,9 +89,9 @@ namespace PascalABCCompiler.TreeConverter
             return num.ToString();
         }
 
-        internal Errors.Error LastError()
+        internal Error LastError()
         {
-            Errors.Error err = ErrorsList[ErrorsList.Count-1];
+            Error err = ErrorsList[ErrorsList.Count-1];
             ErrorsList.RemoveAt(ErrorsList.Count - 1);
             return err;
         }
@@ -102,7 +102,7 @@ namespace PascalABCCompiler.TreeConverter
             ErrorsList.RemoveAt(ErrorsList.Count - 1);
         }
 
-        internal void AddError(Errors.Error err, bool shouldReturn=false)
+        internal void AddError(Error err, bool shouldReturn=false)
         {
             if (ThrowCompilationError || !shouldReturn /*|| err.MustThrow && !shouldReturn*/)
             {
@@ -116,7 +116,7 @@ namespace PascalABCCompiler.TreeConverter
 
         internal void AddError(location loc, string ErrResourceString, params object[] values)
         {
-            Errors.Error err = new SimpleSemanticError(loc, ErrResourceString, values);
+            Error err = new SimpleSemanticError(loc, ErrResourceString, values);
             if (ThrowCompilationError)
             {
                 throw err;
@@ -127,7 +127,7 @@ namespace PascalABCCompiler.TreeConverter
             }
         }
 
-        internal void AddWarning(Errors.CompilerWarning err)
+        internal void AddWarning(CompilerWarning err)
         {
             WarningsList.Add(err);
         }
@@ -580,7 +580,7 @@ namespace PascalABCCompiler.TreeConverter
             }
         }
 
-        public PascalABCCompiler.Errors.SyntaxError parser_error
+        public SyntaxError parser_error
         {
             get
             {
@@ -5290,7 +5290,7 @@ namespace PascalABCCompiler.TreeConverter
                                                         ThrowCompilationError = true;
                                                         throw LastError();
                                                     }
-                                                    RemoveLastError();
+                                                    Error last_err = LastError();
                                                     skip_first_parameter = false;
                                                     sil = tmp_sil;
                                                     exprs.remove_at(0);
@@ -5298,7 +5298,8 @@ namespace PascalABCCompiler.TreeConverter
                                                     if (fn == null)
                                                     {
                                                         ThrowCompilationError = true;
-                                                        throw LastError();
+                                                        RemoveLastError();
+                                                        throw last_err;
                                                     }
                                                 }
                                                 else if (fn != null && skip_first_parameter && sil.Count() > 1 && !sil.HasOnlyExtensionMethods())
@@ -16363,7 +16364,7 @@ namespace PascalABCCompiler.TreeConverter
                     }
                     context.allow_inherited_ctor_call = false;
                 }
-                catch (Errors.Error ex)
+                catch (Error ex)
                 {
                     if (ThrowCompilationError)
                         throw ex;
@@ -16431,6 +16432,8 @@ namespace PascalABCCompiler.TreeConverter
         {
             string module_name = "";
             string name = "";
+            if (context.converted_func_stack.top() is common_method_node && (context.converted_func_stack.top() as common_method_node).polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                AddError(context.top_function.loc, "EXTERNAL_METHOD_SHOULD_BE_STATIC");
             if (_external_directive.modulename == null)
             {
             	if (!has_dll_import_attribute(context.top_function))

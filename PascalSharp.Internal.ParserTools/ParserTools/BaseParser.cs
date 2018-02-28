@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using PascalABCCompiler.Errors;
 using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.Parsers
 {

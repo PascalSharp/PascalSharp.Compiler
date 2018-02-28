@@ -5,13 +5,12 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System.Runtime.InteropServices;
+
 #pragma warning disable 108, 1591 
 
-namespace Debugger.Interop.MetaData
+namespace PascalSharp.Internal.Debugger.Interop.MetaData
 {
-    using System;
-    using System.Runtime.InteropServices;
-
     [StructLayout(LayoutKind.Sequential, Pack=4)]
     public struct COR_FIELD_OFFSET
     {

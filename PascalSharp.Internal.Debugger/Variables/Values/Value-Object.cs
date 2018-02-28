@@ -5,11 +5,12 @@
 //     <version>$Revision: 2287 $</version>
 // </file>
 
-using System;
 using System.Collections.Generic;
-using Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Variables.Types;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Values
 {
 	// This part of the class provides support for classes and structures
 	public partial class Value

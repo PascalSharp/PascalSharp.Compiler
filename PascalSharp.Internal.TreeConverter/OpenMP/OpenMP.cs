@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using PascalABCCompiler.TreeRealization;
 using System.Collections;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.TreeConverter
 {
@@ -719,7 +720,7 @@ namespace PascalABCCompiler.TreeConverter
                         LocksFound = true;
                     else 
                     {
-                        visitor.AddWarning(new Errors.CommonWarning(PascalABCCompiler.StringResources.Get(dirInf.ErrorName), dir.Directive.source_context.FileName, dirInf.SC.begin_position.line_num, dirInf.SC.begin_position.column_num));
+                        visitor.AddWarning(new CommonWarning(PascalSharp.Internal.Localization.StringResources.Get(dirInf.ErrorName), dir.Directive.source_context.FileName, dirInf.SC.begin_position.line_num, dirInf.SC.begin_position.column_num));
                     }
                 }
             }
@@ -944,7 +945,7 @@ namespace PascalABCCompiler.TreeConverter
                
                 if (DirInfosTable[dir].ErrorName !=null)//== "ERROR_IN_CLAUSE")
                 {
-                    syntax_tree_visitor.AddWarning(new Errors.CommonWarning(PascalABCCompiler.StringResources.Get(DirInfosTable[dir].ErrorName), for_node.source_context.FileName, DirInfosTable[dir].SC.begin_position.line_num, DirInfosTable[dir].SC.begin_position.column_num));
+                    syntax_tree_visitor.AddWarning(new CommonWarning(PascalSharp.Internal.Localization.StringResources.Get(DirInfosTable[dir].ErrorName), for_node.source_context.FileName, DirInfosTable[dir].SC.begin_position.line_num, DirInfosTable[dir].SC.begin_position.column_num));
                 }
 
                 VarInfoContainer Vars = GetVarInfoContainer(VFvis, DirInfosTable[dir].Reductions, DirInfosTable[dir].Privates, syntax_tree_visitor, dir);
@@ -1057,7 +1058,7 @@ namespace PascalABCCompiler.TreeConverter
                     //else
                     if (DirInfosTable[dir].ErrorName != null)
                     {
-                        syntax_tree_visitor.AddWarning(new Errors.CommonWarning(PascalABCCompiler.StringResources.Get(DirInfosTable[dir].ErrorName), syntax_stmts.source_context.FileName, DirInfosTable[dir].SC.begin_position.line_num, DirInfosTable[dir].SC.begin_position.column_num));
+                        syntax_tree_visitor.AddWarning(new CommonWarning(PascalSharp.Internal.Localization.StringResources.Get(DirInfosTable[dir].ErrorName), syntax_stmts.source_context.FileName, DirInfosTable[dir].SC.begin_position.line_num, DirInfosTable[dir].SC.begin_position.column_num));
                     }
                     Vars.UnionWith(GetVarInfoContainer(VFvis, null, DirInfosTable[dir].Privates, syntax_tree_visitor, dir));
                     Sections.Add(syntax_statement);
@@ -2111,23 +2112,23 @@ namespace PascalABCCompiler.TreeConverter
                 {
                     if (LoopVariables.Contains(rdVarName))
                     {
-                        visitor.AddWarning(new PascalABCCompiler.Errors.CommonWarning(String.Format(PascalABCCompiler.StringResources.Get("OMPERROR_REDUCTION_WITH_LOOPVAR_{0}"), rdVarName), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
+                        visitor.AddWarning(new CommonWarning(String.Format(PascalSharp.Internal.Localization.StringResources.Get("OMPERROR_REDUCTION_WITH_LOOPVAR_{0}"), rdVarName), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
                         continue;
                     }
                     SymbolInfo si = visitor.context.find_first(rdVarName);
                     if (si == null)
                     {
-                        visitor.AddWarning(new PascalABCCompiler.Errors.CommonWarning(String.Format(PascalABCCompiler.StringResources.Get("OMPERROR_UNKNOWN_VARNAME_{0}"), rdVarName), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
+                        visitor.AddWarning(new CommonWarning(String.Format(PascalSharp.Internal.Localization.StringResources.Get("OMPERROR_UNKNOWN_VARNAME_{0}"), rdVarName), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
                         continue;
                     }
                     if (!(si.sym_info is SemanticTree.IVAriableDefinitionNode))
                     {
-                        visitor.AddWarning(new PascalABCCompiler.Errors.CommonWarning(String.Format(PascalABCCompiler.StringResources.Get("OMPERROR_NAME_IS_NOT_VAR_{0}"), rdVarName), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
+                        visitor.AddWarning(new CommonWarning(String.Format(PascalSharp.Internal.Localization.StringResources.Get("OMPERROR_NAME_IS_NOT_VAR_{0}"), rdVarName), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
                         continue;
                     }
                     if (!IsValidVarForReduction(si.sym_info as SemanticTree.IVAriableDefinitionNode))
                     {
-                        visitor.AddWarning(new PascalABCCompiler.Errors.CommonWarning(String.Format(PascalABCCompiler.StringResources.Get("OMPERROR_IS_NOT_POSSIBLE_REDUCTION_WITH_THIS_VAR_{0}"), rdVarName), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
+                        visitor.AddWarning(new CommonWarning(String.Format(PascalSharp.Internal.Localization.StringResources.Get("OMPERROR_IS_NOT_POSSIBLE_REDUCTION_WITH_THIS_VAR_{0}"), rdVarName), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
                         continue;
                     }
                     Result.ReductionVariables.Add(si.sym_info as SemanticTree.IVAriableDefinitionNode);
@@ -2147,12 +2148,12 @@ namespace PascalABCCompiler.TreeConverter
                 SymbolInfo si = visitor.context.find_first(privateVar);
                 if (si == null)
                 {
-                    visitor.AddWarning(new PascalABCCompiler.Errors.CommonWarning(String.Format(PascalABCCompiler.StringResources.Get("OMPERROR_UNKNOWN_VARNAME_{0}"), privateVar), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
+                    visitor.AddWarning(new CommonWarning(String.Format(PascalSharp.Internal.Localization.StringResources.Get("OMPERROR_UNKNOWN_VARNAME_{0}"), privateVar), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
                     continue;
                 }
                 if (!(si.sym_info is SemanticTree.IVAriableDefinitionNode))
                 {
-                    visitor.AddWarning(new PascalABCCompiler.Errors.CommonWarning(String.Format(PascalABCCompiler.StringResources.Get("OMPERROR_NAME_IS_NOT_VAR_{0}"), privateVar), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
+                    visitor.AddWarning(new CommonWarning(String.Format(PascalSharp.Internal.Localization.StringResources.Get("OMPERROR_NAME_IS_NOT_VAR_{0}"), privateVar), visitor.CurrentDocument.file_name, dir.source_context.begin_position.line_num, dir.source_context.begin_position.column_num));
                     continue;
                 }
                 Result.PrivateVariables.Add(si.sym_info as SemanticTree.IVAriableDefinitionNode);

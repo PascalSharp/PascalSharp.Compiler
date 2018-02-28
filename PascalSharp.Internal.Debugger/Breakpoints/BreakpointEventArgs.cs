@@ -6,8 +6,9 @@
 // </file>
 
 using System;
+using PascalSharp.Internal.Debugger.Debugger.DebuggerEvents;
 
-namespace Debugger 
+namespace PascalSharp.Internal.Debugger.Breakpoints 
 {	
 	[Serializable]
 	public class BreakpointEventArgs : DebuggerEventArgs

@@ -5,13 +5,12 @@
 //     <version>$Revision: 2077 $</version>
 // </file>
 
+using System.Runtime.InteropServices;
+
 #pragma warning disable 108, 1591 
 
-namespace Debugger.Interop.CorSym
+namespace PascalSharp.Internal.Debugger.Interop.CorSym
 {
-    using System;
-    using System.Runtime.InteropServices;
-
     [StructLayout(LayoutKind.Sequential, Pack=8)]
     public struct _ULARGE_INTEGER
     {

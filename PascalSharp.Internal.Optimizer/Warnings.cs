@@ -1,20 +1,18 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
-using System.Collections.Generic;
-using System.Text;
-using PascalABCCompiler.TreeRealization;
-using System.Collections;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.Errors;
 
-namespace PascalABCCompiler
+using System;
+using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.Localization;
+
+namespace PascalSharp.Internal.Optimizer
 {
     public class WarningStringResources
     {
         public static string Get(string key)
         {
-            return PascalABCCompiler.StringResources.Get("WARNING_" + key);
+            return StringResources.Get("WARNING_" + key);
         }
 
         public static string Get(string key, params object[] values)
@@ -27,7 +25,7 @@ namespace PascalABCCompiler
     {
         public static string Get(string key)
         {
-            return PascalABCCompiler.StringResources.Get("HINT_" + key);
+            return StringResources.Get("HINT_" + key);
         }
 
         public static string Get(string key, params object[] values)

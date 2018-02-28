@@ -7,9 +7,11 @@
 
 using System;
 using System.ComponentModel;
-using Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Interop.Enums;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Values
 {
 	// This part of the class provides support for primitive types
 	// eg int, bool, string

@@ -4,10 +4,8 @@ using System.Linq;
 using System.Text;
 
 using PascalABCCompiler.SyntaxTree;
-
+using PascalSharp.Internal.SyntaxTree.Converters;
 using SyntaxVisitors;
-
-using PascalABCCompiler.SyntaxTreeConverters;
 
 namespace YieldDesugarSyntaxTreeConverter
 {

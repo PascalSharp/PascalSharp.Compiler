@@ -7,10 +7,8 @@
 
 #pragma warning disable 108, 1591 
 
-namespace Debugger.Interop.CorDebug
+namespace PascalSharp.Internal.Debugger.Interop.CorDebug
 {
-    using System;
-
     public enum CorDebugMDAFlags
     {
         // Fields

@@ -10,7 +10,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace Debugger.Wrappers
+namespace PascalSharp.Internal.Debugger.Wrappers
 {
 	public delegate void UnmanagedStringGetter(uint pStringLenght, out uint stringLenght, System.IntPtr pString);
 	

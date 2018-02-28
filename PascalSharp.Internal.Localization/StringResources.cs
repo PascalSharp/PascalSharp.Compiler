@@ -1,16 +1,17 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Xml;
-using System.Resources;
-using System.Reflection;
 using System.ComponentModel;
+using System.IO;
+using System.Reflection;
+using System.Resources;
+using System.Text;
+using System.Xml;
 
-namespace PascalABCCompiler
+namespace PascalSharp.Internal.Localization
 {
     public class StringResourcesObject
     {

@@ -1,20 +1,22 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
-using PascalABCCompiler.SemanticTree;
-using System.Threading;
-using System.Reflection;
-using System.Reflection.Emit;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Diagnostics.SymbolStore;
+using System.IO;
+using System.Reflection;
+using System.Reflection.Emit;
 using System.Runtime.InteropServices;
-using System.Runtime.Remoting;
-using System.Security;
 using System.Runtime.Versioning;
+using System.Security;
+using System.Threading;
+using PascalABCCompiler;
+using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.CompilerTools;
 
-namespace PascalABCCompiler.NETGenerator
+namespace PascalSharp.Internal.EmitPE
 {
 
     public enum TargetType
@@ -131,7 +133,7 @@ namespace PascalABCCompiler.NETGenerator
         protected bool save_debug_info = false;
         protected bool add_special_debug_variables = false;
         protected bool make_next_spoint = true;
-        protected SemanticTree.ILocation EntryPointLocation;
+        protected PascalABCCompiler.SemanticTree.ILocation EntryPointLocation;
         protected Label ExitLabel;//метка для выхода из процедуры
         protected bool ExitProcedureCall = false; //призна того что всертиласть exit и надо пометиь коней процедуры
         protected Dictionary<IConstantNode, FieldBuilder> ConvertedConstants = new Dictionary<IConstantNode, FieldBuilder>();
@@ -157,7 +159,7 @@ namespace PascalABCCompiler.NETGenerator
         private ISymbolDocumentWriter new_doc;
         private List<LocalBuilder> pinned_variables = new List<LocalBuilder>();
 
-        private void CheckLocation(SemanticTree.ILocation Location)
+        private void CheckLocation(PascalABCCompiler.SemanticTree.ILocation Location)
         {
             if (Location != null)
             {
@@ -205,7 +207,7 @@ namespace PascalABCCompiler.NETGenerator
             safe_block = value;
         }
 
-        protected void MarkSequencePoint(SemanticTree.ILocation Location)
+        protected void MarkSequencePoint(PascalABCCompiler.SemanticTree.ILocation Location)
         {
             CheckLocation(Location);
             if (Location != null && OnNextLine(Location))
@@ -217,7 +219,7 @@ namespace PascalABCCompiler.NETGenerator
             MarkSequencePoint(ilg, EntryPointLocation);
         }
 
-        protected void MarkSequencePoint(ILGenerator ilg, SemanticTree.ILocation Location)
+        protected void MarkSequencePoint(ILGenerator ilg, PascalABCCompiler.SemanticTree.ILocation Location)
         {
             if (Location != null)
             {
@@ -419,7 +421,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //Метод, переводящий семантическое дерево в сборку .NET
-        public void ConvertFromTree(SemanticTree.IProgramNode p, string TargetFileName, string SourceFileName, CompilerOptions options, string[] ResourceFiles)
+        public void ConvertFromTree(PascalABCCompiler.SemanticTree.IProgramNode p, string TargetFileName, string SourceFileName, CompilerOptions options, string[] ResourceFiles)
         {
             //SystemLibrary.SystemLibInitializer.RestoreStandardFunctions();
             bool RunOnly = false;
@@ -473,7 +475,7 @@ namespace PascalABCCompiler.NETGenerator
                 }
                 catch
                 {
-                    throw new TreeConverter.SourceFileError(options.MainResourceFileName);
+                    throw new PascalABCCompiler.TreeConverter.SourceFileError(options.MainResourceFileName);
                 }
             }
             else if (options.MainResourceData != null)
@@ -484,7 +486,7 @@ namespace PascalABCCompiler.NETGenerator
                 }
                 catch
                 {
-                    throw new TreeConverter.SourceFileError("");
+                    throw new PascalABCCompiler.TreeConverter.SourceFileError("");
                 }
             }
             save_debug_info = comp_opt.dbg_attrs == DebugAttributes.Debug || comp_opt.dbg_attrs == DebugAttributes.ForDebugging;
@@ -685,7 +687,7 @@ namespace PascalABCCompiler.NETGenerator
                 cur_type = NamespacesTypes[cnns[iii]];
                 cur_unit_type = NamespacesTypes[cnns[iii]];
                 //генерим инциализацию для полей
-                foreach (SemanticTree.ICommonTypeNode ctn in cnns[iii].types)
+                foreach (PascalABCCompiler.SemanticTree.ICommonTypeNode ctn in cnns[iii].types)
                     GenerateInitCodeForFields(ctn);
             }
 
@@ -778,7 +780,7 @@ namespace PascalABCCompiler.NETGenerator
                 cur_type = NamespacesTypes[cnns[iii]];
                 cur_unit_type = NamespacesTypes[cnns[iii]];
                 //вставляем ret в int_meth
-                foreach (SemanticTree.ICommonTypeNode ctn in cnns[iii].types)
+                foreach (PascalABCCompiler.SemanticTree.ICommonTypeNode ctn in cnns[iii].types)
                     GenerateRetForInitMeth(ctn);
                 ModulesInitILGenerators[cur_type].Emit(OpCodes.Ret);
             }
@@ -907,7 +909,7 @@ namespace PascalABCCompiler.NETGenerator
                     {
                         if (comp_opt.target == TargetType.Exe || comp_opt.target == TargetType.WinExe)
                         {
-                            if (comp_opt.platformtarget == NETGenerator.CompilerOptions.PlatformTarget.x86)
+                            if (comp_opt.platformtarget == CompilerOptions.PlatformTarget.x86)
                                 ab.Save(an.Name + ".exe", PortableExecutableKinds.Required32Bit, ImageFileMachine.I386);
                             //else if (comp_opt.platformtarget == NETGenerator.CompilerOptions.PlatformTarget.x64)
                             //    ab.Save(an.Name + ".exe", PortableExecutableKinds.PE32Plus, ImageFileMachine.IA64);
@@ -916,7 +918,7 @@ namespace PascalABCCompiler.NETGenerator
                         }
                         else
                         {
-                            if (comp_opt.platformtarget == NETGenerator.CompilerOptions.PlatformTarget.x86)
+                            if (comp_opt.platformtarget == CompilerOptions.PlatformTarget.x86)
                                 ab.Save(an.Name + ".dll", PortableExecutableKinds.Required32Bit, ImageFileMachine.I386);
                             //else if (comp_opt.platformtarget == NETGenerator.CompilerOptions.PlatformTarget.x64)
                             //    ab.Save(an.Name + ".dll", PortableExecutableKinds.PE32Plus, ImageFileMachine.IA64);
@@ -926,14 +928,14 @@ namespace PascalABCCompiler.NETGenerator
                     }
                     catch (System.Runtime.InteropServices.COMException e)
                     {
-                        throw new TreeConverter.SaveAssemblyError(e.Message);
+                        throw new PascalABCCompiler.TreeConverter.SaveAssemblyError(e.Message);
                     }
                     catch (System.IO.IOException e)
                     {
                         if (tries < num_try_save)
                             tries++;
                         else
-                            throw new TreeConverter.SaveAssemblyError(e.Message);
+                            throw new PascalABCCompiler.TreeConverter.SaveAssemblyError(e.Message);
                     }
                 }
                 while (not_done);
@@ -1784,7 +1786,7 @@ namespace PascalABCCompiler.NETGenerator
         {
             IAttributeNode[] attrs = value.Attributes;
             foreach (IAttributeNode attr in attrs)
-                if (attr.AttributeType == SystemLibrary.SystemLibrary.comimport_type)
+                if (attr.AttributeType == PascalABCCompiler.SystemLibrary.SystemLibrary.comimport_type)
                     return true;
             return false;
         }
@@ -2021,8 +2023,8 @@ namespace PascalABCCompiler.NETGenerator
                     if (func.return_value_type == null)
                         ret_type = null;//typeof(void);
                     else
-                        ret_type = helper.GetTypeReference(funcs[i].return_value_type).tp;
-                    Type[] param_types = GetParamTypes(funcs[i]);//получаем параметры процедуры
+                        ret_type = helper.GetTypeReference(func.return_value_type).tp;
+                    Type[] param_types = GetParamTypes(func);//получаем параметры процедуры
 
                     IExternalStatementNode esn = (IExternalStatementNode)statements[0];
                     string module_name = Tools.ReplaceAllKeys(esn.module_name, StandartDirectories);
@@ -2031,8 +2033,8 @@ namespace PascalABCCompiler.NETGenerator
                                                                        CallingConventions.Standard, ret_type, param_types, CallingConvention.Winapi,
                                                                        CharSet.Ansi);//определяем PInvoke-метод
                     methb.SetImplementationFlags(MethodImplAttributes.PreserveSig);
-                    helper.AddMethod(funcs[i], methb);
-                    IParameterNode[] parameters = funcs[i].parameters;
+                    helper.AddMethod(func, methb);
+                    IParameterNode[] parameters = func.parameters;
                     //определяем параметры с указанием имени
                     for (int j = 0; j < parameters.Length; j++)
                     {
@@ -2436,7 +2438,7 @@ namespace PascalABCCompiler.NETGenerator
                 AddSpecialDebugVariables();
             }
             //\ivan for debug
-            if (func.return_value_type == null || func.return_value_type == SystemLibrary.SystemLibrary.void_type)
+            if (func.return_value_type == null || func.return_value_type == PascalABCCompiler.SystemLibrary.SystemLibrary.void_type)
                 il.Emit(OpCodes.Ret);
             cur_meth = tmp;
             cur_type = tmp_type;
@@ -2858,10 +2860,10 @@ namespace PascalABCCompiler.NETGenerator
             il.Emit(OpCodes.Ldloc, lb);
             il.Emit(OpCodes.Box, tinfo);
             MethodInfo rif = null;
-            if (SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
-                rif = (SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
+            if (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
+                rif = (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
             else
-                rif = helper.GetMethod(SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
+                rif = helper.GetMethod(PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
             il.EmitCall(OpCodes.Call, rif, null);
             il.Emit(OpCodes.Unbox_Any, tinfo);
             il.Emit(OpCodes.Stloc, lb);
@@ -2893,10 +2895,10 @@ namespace PascalABCCompiler.NETGenerator
             }
             il.Emit(OpCodes.Box, tinfo);
             MethodInfo rif = null;
-            if (SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
-                rif = (SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
+            if (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
+                rif = (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
             else
-                rif = helper.GetMethod(SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
+                rif = helper.GetMethod(PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
             il.EmitCall(OpCodes.Call, rif, null);
             il.Emit(OpCodes.Unbox_Any, tinfo);
             if (fb.IsStatic)
@@ -3453,10 +3455,10 @@ namespace PascalABCCompiler.NETGenerator
                 lab = il.DefineLabel();
                 il.Emit(OpCodes.Ldsfld, finfo);
                 il.Emit(OpCodes.Brfalse, lab);
-                if (SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
-                    rif = (SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
+                if (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
+                    rif = (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
                 else
-                    rif = helper.GetMethod(SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
+                    rif = helper.GetMethod(PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
             }
             if (ti.tp.IsValueType && ti.init_meth != null || ti.is_arr || ti.is_set || ti.is_typed_file || ti.is_text_file || ti.tp == TypeFactory.StringType ||
                 (generic_param))
@@ -4276,12 +4278,12 @@ namespace PascalABCCompiler.NETGenerator
             il = ilgn;
         }
 
-        public override void visit(SemanticTree.ICompiledPropertyNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICompiledPropertyNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IBasicPropertyNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IBasicPropertyNode value)
         {
 
         }
@@ -4290,7 +4292,7 @@ namespace PascalABCCompiler.NETGenerator
         private string cur_prop_name;
 
         //перевод свойства класса
-        public override void visit(SemanticTree.ICommonPropertyNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonPropertyNode value)
         {
             //получаем тип свойства
             Type ret_type = helper.GetTypeReference(value.property_type).tp;
@@ -4326,43 +4328,43 @@ namespace PascalABCCompiler.NETGenerator
             MakeAttribute(value);
         }
 
-        public override void visit(SemanticTree.IPropertyNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IPropertyNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IConstantDefinitionNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IConstantDefinitionNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ICompiledParameterNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICompiledParameterNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IBasicParameterNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IBasicParameterNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ICommonParameterNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonParameterNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IParameterNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IParameterNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ICompiledClassFieldNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICompiledClassFieldNode value)
         {
 
         }
 
         //добавление методов копирования и проч. в массив
-        private void AddSpecialMembersToArray(SemanticTree.ICommonClassFieldNode value, FieldAttributes fattr)
+        private void AddSpecialMembersToArray(PascalABCCompiler.SemanticTree.ICommonClassFieldNode value, FieldAttributes fattr)
         {
             TypeInfo aux_ti = helper.GetTypeReference(value.comperehensive_type);
             if (aux_ti.clone_meth != null) return;
@@ -4601,7 +4603,7 @@ namespace PascalABCCompiler.NETGenerator
 
 
         //перевод поля класса
-        public override void visit(SemanticTree.ICommonClassFieldNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonClassFieldNode value)
         {
             //if (is_in_unit && helper.IsUsed(value)==false) return;
             FieldAttributes fattr = ConvertFALToFieldAttributes(value.field_access_level);
@@ -4637,14 +4639,14 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        internal void GenerateInitCodeForFields(SemanticTree.ICommonTypeNode ctn)
+        internal void GenerateInitCodeForFields(PascalABCCompiler.SemanticTree.ICommonTypeNode ctn)
         {
             TypeInfo ti = helper.GetTypeReference(ctn);
             //(ssyy) 16.05.08 добавил проверку, это надо для ф-ций, зависящих от generic-параметров.
             if (ti == null) return;
             if (!ctn.IsInterface && ti.init_meth != null)
             {
-                foreach (SemanticTree.ICommonClassFieldNode ccf in ctn.fields)
+                foreach (PascalABCCompiler.SemanticTree.ICommonClassFieldNode ccf in ctn.fields)
                     if (ccf.polymorphic_state != polymorphic_state.ps_static)
                         GenerateInitCodeForField(ccf);
                     else
@@ -4652,7 +4654,7 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        internal void GenerateRetForInitMeth(SemanticTree.ICommonTypeNode ctn)
+        internal void GenerateRetForInitMeth(PascalABCCompiler.SemanticTree.ICommonTypeNode ctn)
         {
             TypeInfo ti = helper.GetTypeReference(ctn);
             if (ti == null)
@@ -4663,7 +4665,7 @@ namespace PascalABCCompiler.NETGenerator
                 (ti.init_meth as MethodBuilder).GetILGenerator().Emit(OpCodes.Ret);
         }
 
-        internal void GenerateInitCodeForStaticField(SemanticTree.ICommonClassFieldNode value)
+        internal void GenerateInitCodeForStaticField(PascalABCCompiler.SemanticTree.ICommonClassFieldNode value)
         {
             TypeInfo ti = helper.GetTypeReference(value.type), cur_ti = helper.GetTypeReference(value.comperehensive_type);
             FieldBuilder fb = helper.GetField(value).fi as FieldBuilder;
@@ -4690,7 +4692,7 @@ namespace PascalABCCompiler.NETGenerator
             in_var_init = false;
         }
 
-        internal void GenerateInitCodeForField(SemanticTree.ICommonClassFieldNode value)
+        internal void GenerateInitCodeForField(PascalABCCompiler.SemanticTree.ICommonClassFieldNode value)
         {
             TypeInfo ti = helper.GetTypeReference(value.type), cur_ti = helper.GetTypeReference(value.comperehensive_type);
             FieldBuilder fb = helper.GetField(value).fi as FieldBuilder;
@@ -4717,17 +4719,17 @@ namespace PascalABCCompiler.NETGenerator
             in_var_init = false;
         }
 
-        public override void visit(SemanticTree.ICommonNamespaceVariableNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonNamespaceVariableNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ILocalVariableNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ILocalVariableNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IVAriableDefinitionNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IVAriableDefinitionNode value)
         {
 
         }
@@ -4736,7 +4738,7 @@ namespace PascalABCCompiler.NETGenerator
         //команда ldc_i4_s
         //is_dot_expr - признак того, что после этого выражения
         //идет точка (например 'a'.ToString)
-        public override void visit(SemanticTree.ICharConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICharConstantNode value)
         {
             NETGeneratorTools.LdcIntConst(il, value.constant_value);
 
@@ -4751,14 +4753,14 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        public override void visit(SemanticTree.IFloatConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IFloatConstantNode value)
         {
             il.Emit(OpCodes.Ldc_R4, value.constant_value);
             if (is_dot_expr)
                 NETGeneratorTools.CreateLocalAndLdloca(il, TypeFactory.SingleType);
         }
 
-        public override void visit(SemanticTree.IDoubleConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IDoubleConstantNode value)
         {
             il.Emit(OpCodes.Ldc_R8, value.constant_value);
             if (is_dot_expr)
@@ -4854,14 +4856,14 @@ namespace PascalABCCompiler.NETGenerator
                 il.Emit(OpCodes.Ldc_I4_0);
         }
         //\ivan
-        public override void visit(SemanticTree.IIntConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IIntConstantNode value)
         {
             PushIntConst(value.constant_value);
         }
 
         //перевод long константы
         //команда ldc_i8
-        public override void visit(SemanticTree.ILongConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ILongConstantNode value)
         {
             il.Emit(OpCodes.Ldc_I8, (long)value.constant_value);
             if (is_dot_expr == true)
@@ -4874,7 +4876,7 @@ namespace PascalABCCompiler.NETGenerator
         }
         //перевод byte константы
         //команда ldc_i4_S
-        public override void visit(SemanticTree.IByteConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IByteConstantNode value)
         {
             NETGeneratorTools.LdcIntConst(il, value.constant_value);
             if (is_dot_expr == true)
@@ -4886,7 +4888,7 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        public override void visit(SemanticTree.IShortConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IShortConstantNode value)
         {
             NETGeneratorTools.LdcIntConst(il, value.constant_value);
             if (is_dot_expr == true)
@@ -4898,7 +4900,7 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        public override void visit(SemanticTree.IUShortConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IUShortConstantNode value)
         {
             NETGeneratorTools.LdcIntConst(il, value.constant_value);
             if (is_dot_expr == true)
@@ -4910,7 +4912,7 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        public override void visit(SemanticTree.IUIntConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IUIntConstantNode value)
         {
             NETGeneratorTools.LdcIntConst(il, (int)value.constant_value);
             if (is_dot_expr == true)
@@ -4922,7 +4924,7 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        public override void visit(SemanticTree.IULongConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IULongConstantNode value)
         {
             long l = (long)(value.constant_value & 0x7FFFFFFFFFFFFFFF);
             if ((value.constant_value & 0x8000000000000000) != 0)
@@ -4940,7 +4942,7 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        public override void visit(SemanticTree.ISByteConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ISByteConstantNode value)
         {
             //il.Emit(OpCodes.Ldc_I4, (int)value.constant_value);
             NETGeneratorTools.LdcIntConst(il, value.constant_value);
@@ -4955,7 +4957,7 @@ namespace PascalABCCompiler.NETGenerator
 
         //перевод булевской константы
         //команда ldc_i4_0/1
-        public override void visit(SemanticTree.IBoolConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IBoolConstantNode value)
         {
             if (value.constant_value == true)
                 il.Emit(OpCodes.Ldc_I4_1);
@@ -4969,7 +4971,7 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        public override void visit(SemanticTree.IConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IConstantNode value)
         {
 
         }
@@ -5001,7 +5003,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //перевод ссылки на параметр
-        public override void visit(SemanticTree.ICommonParameterReferenceNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonParameterReferenceNode value)
         {
             bool must_push_addr = false;//должен ли упаковываться, но это если после идет точка
             if (is_dot_expr == true)//если после идет точка
@@ -5082,7 +5084,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //доступ к статическому откомпилированному типу
-        public override void visit(SemanticTree.IStaticCompiledFieldReferenceNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IStaticCompiledFieldReferenceNode value)
         {
             //если у поля нет постоянное значение
             if (!value.static_field.compiled_field.IsLiteral)
@@ -5111,7 +5113,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //доступ к откомпилированному нестатическому полю
-        public override void visit(SemanticTree.ICompiledFieldReferenceNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICompiledFieldReferenceNode value)
         {
             bool tmp_dot = is_dot_expr;
             if (!tmp_dot)
@@ -5143,7 +5145,7 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        public override void visit(SemanticTree.IStaticCommonClassFieldReferenceNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IStaticCommonClassFieldReferenceNode value)
         {
             bool tmp_dot = is_dot_expr;
             FldInfo fi_info = helper.GetField(value.static_field);
@@ -5166,7 +5168,7 @@ namespace PascalABCCompiler.NETGenerator
                 il.Emit(OpCodes.Ldsflda, fi);
         }
 
-        public override void visit(SemanticTree.ICommonClassFieldReferenceNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonClassFieldReferenceNode value)
         {
             bool tmp_dot = is_dot_expr;
             if (!tmp_dot)
@@ -5201,7 +5203,7 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        public override void visit(SemanticTree.INamespaceVariableReferenceNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.INamespaceVariableReferenceNode value)
         {
             VarInfo vi = helper.GetVariable(value.variable);
             if (vi == null)
@@ -5229,7 +5231,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //чтобы перевести переменную, нужно до фига проверок
-        public override void visit(SemanticTree.ILocalVariableReferenceNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ILocalVariableReferenceNode value)
         {
             VarInfo vi = helper.GetVariable(value.variable);
             if (vi == null)
@@ -5292,37 +5294,37 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        public override void visit(SemanticTree.IAddressedExpressionNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IAddressedExpressionNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IProgramNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IProgramNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IDllNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IDllNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ICompiledNamespaceNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICompiledNamespaceNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ICommonNamespaceNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonNamespaceNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.INamespaceNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.INamespaceNode value)
         {
 
         }
 
-        private void ConvertStatementsListWithoutFirstStatement(SemanticTree.IStatementsListNode value)
+        private void ConvertStatementsListWithoutFirstStatement(PascalABCCompiler.SemanticTree.IStatementsListNode value)
         {
             if (save_debug_info)
             {
@@ -5352,7 +5354,7 @@ namespace PascalABCCompiler.NETGenerator
             }
 
             if (save_debug_info)
-                if (statements[statements.Length - 1] is SemanticTree.IReturnNode)
+                if (statements[statements.Length - 1] is PascalABCCompiler.SemanticTree.IReturnNode)
                     //если return не имеет location то метим точку на месте закрывающей логической скобки
                     if (statements[statements.Length - 1].Location == null)
                         MarkSequencePoint(value.RightLogicalBracketLocation);
@@ -5360,7 +5362,7 @@ namespace PascalABCCompiler.NETGenerator
             ConvertStatement(statements[statements.Length - 1]);
 
             //TODO: переделать. сдель функцию которая ложет ret и MarkSequencePoint
-            if (save_debug_info && !(statements[statements.Length - 1] is SemanticTree.IReturnNode))
+            if (save_debug_info && !(statements[statements.Length - 1] is PascalABCCompiler.SemanticTree.IReturnNode))
             {
                 //если почледний оператор не Return то пометить закрывающуюю логическую скобку
                 if (gen_right_brackets)
@@ -5369,7 +5371,7 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        public override void visit(SemanticTree.IStatementsListNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IStatementsListNode value)
         {
             IStatementNode[] statements = value.statements;
             if (save_debug_info)
@@ -5406,7 +5408,7 @@ namespace PascalABCCompiler.NETGenerator
             }
 
             if (save_debug_info)
-                if (statements[statements.Length - 1] is SemanticTree.IReturnNode)
+                if (statements[statements.Length - 1] is PascalABCCompiler.SemanticTree.IReturnNode)
                     //если return не имеет location то метим точку на месте закрывающей логической скобки
                     if (statements[statements.Length - 1].Location == null)
                         MarkSequencePoint(value.RightLogicalBracketLocation);
@@ -5414,7 +5416,7 @@ namespace PascalABCCompiler.NETGenerator
             ConvertStatement(statements[statements.Length - 1]);
 
             //TODO: переделать. сдель функцию которая ложет ret и MarkSequencePoint
-            if (save_debug_info && !(statements[statements.Length - 1] is SemanticTree.IReturnNode))
+            if (save_debug_info && !(statements[statements.Length - 1] is PascalABCCompiler.SemanticTree.IReturnNode))
             {
                 //если почледний оператор не Return то пометить закрывающуюю логическую скобку
                 if (gen_right_brackets)
@@ -5488,7 +5490,7 @@ namespace PascalABCCompiler.NETGenerator
 
         private bool gen_right_brackets = true;
         private bool gen_left_brackets = true;
-        public override void visit(SemanticTree.IForNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IForNode value)
         {
             Label l1 = il.DefineLabel();
             Label l2 = il.DefineLabel();
@@ -5548,7 +5550,7 @@ namespace PascalABCCompiler.NETGenerator
             clabels.Pop();
         }
 
-        public override void visit(SemanticTree.IRepeatNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IRepeatNode value)
         {
             Label TrueLabel, FalseLabel;
             TrueLabel = il.DefineLabel();
@@ -5571,7 +5573,7 @@ namespace PascalABCCompiler.NETGenerator
                 if (loc.begin_line_num == body_loc.end_line_num) MarkSequencePoint(il, body_loc);
         }
 
-        public override void visit(SemanticTree.IWhileNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IWhileNode value)
         {
             Label TrueLabel, FalseLabel;
             TrueLabel = il.DefineLabel();
@@ -5591,7 +5593,7 @@ namespace PascalABCCompiler.NETGenerator
             labels.Pop();
         }
 
-        public override void visit(SemanticTree.ITryBlockNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ITryBlockNode value)
         {
             Label exBl = il.BeginExceptionBlock();
             var safe_block = EnterSafeBlock();
@@ -5599,7 +5601,7 @@ namespace PascalABCCompiler.NETGenerator
             LeaveSafeBlock(safe_block);
             if (value.ExceptionFilters.Length != 0)
             {
-                foreach (SemanticTree.IExceptionFilterBlockNode iefbn in value.ExceptionFilters)
+                foreach (PascalABCCompiler.SemanticTree.IExceptionFilterBlockNode iefbn in value.ExceptionFilters)
                 {
                     Type typ;
                     if (iefbn.ExceptionType != null)
@@ -5659,7 +5661,7 @@ namespace PascalABCCompiler.NETGenerator
                 ((stmt as IStatementsListNode).statements[0] is IIfNode || (stmt as IStatementsListNode).statements[0] is ISwitchNode);
         }
 
-        public override void visit(SemanticTree.IIfNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IIfNode value)
         {
             Label FalseLabel, EndLabel;
             FalseLabel = il.DefineLabel();
@@ -5772,13 +5774,13 @@ namespace PascalABCCompiler.NETGenerator
                 il.Emit(OpCodes.Br, l);
         }
 
-        public override void visit(SemanticTree.ICompiledMethodNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICompiledMethodNode value)
         {
 
         }
 
         //перевод тела конструктора
-        private void ConvertConstructorBody(SemanticTree.ICommonMethodNode value)
+        private void ConvertConstructorBody(PascalABCCompiler.SemanticTree.ICommonMethodNode value)
         {
             num_scope++;
             //получаем билдер конструктора
@@ -5793,7 +5795,7 @@ namespace PascalABCCompiler.NETGenerator
             }
             if (value.functions_nodes.Length == 0)
             {
-                if (!(value.function_code is SemanticTree.IRuntimeManagedMethodBody))
+                if (!(value.function_code is PascalABCCompiler.SemanticTree.IRuntimeManagedMethodBody))
                 {
                     il = cnstr.GetILGenerator();
                     //переводим локальные переменные
@@ -5850,13 +5852,20 @@ namespace PascalABCCompiler.NETGenerator
             num_scope--;
         }
 
-        public override void visit(SemanticTree.ICommonMethodNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonMethodNode value)
         {
             if (value.is_constructor == true)
             {
                 ConvertConstructorBody(value);
                 return;
             }
+            if (value.function_code is IStatementsListNode)
+            {
+                IStatementNode[] statements = (value.function_code as IStatementsListNode).statements;
+                if (statements.Length > 0 && statements[0] is IExternalStatementNode)
+                    return;
+            }
+            
             num_scope++;
             MakeAttribute(value);
             MethodBuilder methb = helper.GetMethodBuilder(value);
@@ -5873,7 +5882,7 @@ namespace PascalABCCompiler.NETGenerator
             //если нет вложенных процедур
             if (value.functions_nodes.Length == 0)
             {
-                if (!(value.function_code is SemanticTree.IRuntimeManagedMethodBody))
+                if (!(value.function_code is PascalABCCompiler.SemanticTree.IRuntimeManagedMethodBody))
                 {
                     //ssyy!!! добавил условие для интерфейсов
                     if (value.function_code != null)
@@ -5917,7 +5926,7 @@ namespace PascalABCCompiler.NETGenerator
             num_scope--;
         }
 
-        private MethInfo ConvertMethodWithNested(SemanticTree.ICommonMethodNode meth, ConstructorBuilder methodb)
+        private MethInfo ConvertMethodWithNested(PascalABCCompiler.SemanticTree.ICommonMethodNode meth, ConstructorBuilder methodb)
         {
             num_scope++; //увеличиваем глубину обл. видимости
             TypeBuilder tb = null, tmp_type = cur_type;
@@ -6014,7 +6023,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //перевод метода с вложенными процедурами
-        private MethInfo ConvertMethodWithNested(SemanticTree.ICommonMethodNode meth, MethodBuilder methodb)
+        private MethInfo ConvertMethodWithNested(PascalABCCompiler.SemanticTree.ICommonMethodNode meth, MethodBuilder methodb)
         {
             num_scope++; //увеличиваем глубину обл. видимости
             TypeBuilder tb = null, tmp_type = cur_type;
@@ -6270,7 +6279,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //получение атрибутов метода
-        private MethodAttributes GetMethodAttributes(SemanticTree.ICommonMethodNode value, bool is_accessor)
+        private MethodAttributes GetMethodAttributes(PascalABCCompiler.SemanticTree.ICommonMethodNode value, bool is_accessor)
         {
             MethodAttributes attrs = ConvertFALToMethodAttributes(value.field_access_level);
             if (is_accessor)
@@ -6288,7 +6297,7 @@ namespace PascalABCCompiler.NETGenerator
             return attrs;
         }
 
-        private MethodAttributes GetConstructorAttributes(SemanticTree.ICommonMethodNode value)
+        private MethodAttributes GetConstructorAttributes(PascalABCCompiler.SemanticTree.ICommonMethodNode value)
         {
             MethodAttributes attrs = ConvertFALToMethodAttributes(value.field_access_level);
             switch (value.polymorphic_state)
@@ -6299,7 +6308,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //перевод заголовка конструктора
-        private void ConvertConstructorHeader(SemanticTree.ICommonMethodNode value)
+        private void ConvertConstructorHeader(PascalABCCompiler.SemanticTree.ICommonMethodNode value)
         {
             if (helper.GetConstructor(value) != null) return;
 
@@ -6319,7 +6328,7 @@ namespace PascalABCCompiler.NETGenerator
                 irmmb = value.function_code as IRuntimeManagedMethodBody;
                 if (irmmb != null)
                 {
-                    if (irmmb.runtime_statement_type == SemanticTree.runtime_statement_type.ctor_delegate)
+                    if (irmmb.runtime_statement_type == PascalABCCompiler.SemanticTree.runtime_statement_type.ctor_delegate)
                     {
                         attrs = MethodAttributes.Public | MethodAttributes.HideBySig;
                         param_types = new Type[2];
@@ -6357,8 +6366,40 @@ namespace PascalABCCompiler.NETGenerator
             return comp_opt.target == TargetType.Dll && prop_accessors.ContainsKey(value);
         }
 
+        private void ConvertExternalMethod(PascalABCCompiler.SemanticTree.ICommonMethodNode meth)
+        {
+            IStatementsListNode sl = (IStatementsListNode)meth.function_code;
+            IStatementNode[] statements = sl.statements;
+            //функция импортируется из dll
+            Type ret_type = null;
+            //получаем тип возвр. значения
+            if (meth.return_value_type == null)
+                ret_type = null;//typeof(void);
+            else
+                ret_type = helper.GetTypeReference(meth.return_value_type).tp;
+            Type[] param_types = GetParamTypes(meth);//получаем параметры процедуры
+
+            IExternalStatementNode esn = (IExternalStatementNode)statements[0];
+            string module_name = Tools.ReplaceAllKeys(esn.module_name, StandartDirectories);
+            MethodBuilder methb = cur_type.DefinePInvokeMethod(meth.name, module_name, esn.name,
+                                                               MethodAttributes.Public | MethodAttributes.Static | MethodAttributes.PinvokeImpl | MethodAttributes.HideBySig,
+                                                               CallingConventions.Standard, ret_type, param_types, CallingConvention.Winapi,
+                                                               CharSet.Ansi);//определяем PInvoke-метод
+            methb.SetImplementationFlags(MethodImplAttributes.PreserveSig);
+            helper.AddMethod(meth, methb);
+            IParameterNode[] parameters = meth.parameters;
+            //определяем параметры с указанием имени
+            for (int j = 0; j < parameters.Length; j++)
+            {
+                ParameterAttributes pars = ParameterAttributes.None;
+                //if (func.parameters[j].parameter_type == parameter_type.var)
+                //  pars = ParameterAttributes.Out;
+                methb.DefineParameter(j + 1, pars, parameters[j].name);
+            }
+        }
+
         //перевод заголовка метода
-        private void ConvertMethodHeader(SemanticTree.ICommonMethodNode value)
+        private void ConvertMethodHeader(PascalABCCompiler.SemanticTree.ICommonMethodNode value)
         {
             if (value.is_constructor == true)
             {
@@ -6366,17 +6407,27 @@ namespace PascalABCCompiler.NETGenerator
                 return;
             }
 
-            if (helper.GetMethod(value) != null) return;
-
+            if (helper.GetMethod(value) != null)
+                return;
+            if (value.function_code is IStatementsListNode)
+            {
+                IStatementsListNode sl = (IStatementsListNode)value.function_code;
+                IStatementNode[] statements = sl.statements;
+                if (statements.Length > 0 && statements[0] is IExternalStatementNode)
+                {
+                    ConvertExternalMethod(value);
+                    return;
+                }
+            }
             MethodBuilder methb = null;
             bool is_prop_acc = IsPropertyAccessor(value);
             MethodAttributes attrs = GetMethodAttributes(value, is_prop_acc);
             IRuntimeManagedMethodBody irmmb = value.function_code as IRuntimeManagedMethodBody;
             if (irmmb != null)
             {
-                if ((irmmb.runtime_statement_type == SemanticTree.runtime_statement_type.invoke_delegate) ||
-                    (irmmb.runtime_statement_type == SemanticTree.runtime_statement_type.begin_invoke_delegate) ||
-                    (irmmb.runtime_statement_type == SemanticTree.runtime_statement_type.end_invoke_delegate))
+                if ((irmmb.runtime_statement_type == PascalABCCompiler.SemanticTree.runtime_statement_type.invoke_delegate) ||
+                    (irmmb.runtime_statement_type == PascalABCCompiler.SemanticTree.runtime_statement_type.begin_invoke_delegate) ||
+                    (irmmb.runtime_statement_type == PascalABCCompiler.SemanticTree.runtime_statement_type.end_invoke_delegate))
                 {
                     attrs = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot |
                         MethodAttributes.Virtual;
@@ -6529,7 +6580,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //вызов откомпилированного статического метода
-        public override void visit(SemanticTree.ICompiledStaticMethodCallNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICompiledStaticMethodCallNode value)
         {
             if (comp_opt.dbg_attrs == DebugAttributes.Release && has_debug_conditional_attr(value.static_method.method_info))
                 return;
@@ -6630,9 +6681,9 @@ namespace PascalABCCompiler.NETGenerator
                 ICompiledTypeNode ctn2 = parameters[i].type as ICompiledTypeNode;
                 ITypeNode ctn3 = real_parameters[i].type;
                 ITypeNode ctn4 = real_parameters[i].conversion_type;
-                if (ctn2 != null && !(real_parameters[i] is SemanticTree.INullConstantNode) && (ctn3.is_value_type || ctn3.is_generic_parameter) && ctn2.compiled_type == TypeFactory.ObjectType)
+                if (ctn2 != null && !(real_parameters[i] is PascalABCCompiler.SemanticTree.INullConstantNode) && (ctn3.is_value_type || ctn3.is_generic_parameter) && ctn2.compiled_type == TypeFactory.ObjectType)
                     il.Emit(OpCodes.Box, helper.GetTypeReference(ctn3).tp);
-                else if (ctn2 != null && !(real_parameters[i] is SemanticTree.INullConstantNode) && ctn4 != null && (ctn4.is_value_type || ctn4.is_generic_parameter) && ctn2.compiled_type == TypeFactory.ObjectType)
+                else if (ctn2 != null && !(real_parameters[i] is PascalABCCompiler.SemanticTree.INullConstantNode) && ctn4 != null && (ctn4.is_value_type || ctn4.is_generic_parameter) && ctn2.compiled_type == TypeFactory.ObjectType)
                     il.Emit(OpCodes.Box, helper.GetTypeReference(ctn4).tp);
                 is_addr = false;
             }
@@ -6681,7 +6732,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //вызов откомпилированного метода
-        public override void visit(SemanticTree.ICompiledMethodCallNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICompiledMethodCallNode value)
         {
             IExpressionNode[] real_parameters = value.real_parameters;
             IParameterNode[] parameters = value.compiled_method.parameters;
@@ -6755,7 +6806,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //вызов статического метода
-        public override void visit(SemanticTree.ICommonStaticMethodCallNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonStaticMethodCallNode value)
         {
             //if (save_debug_info)
             //MarkSequencePoint(value.Location);
@@ -6844,7 +6895,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //вызов нестатического метода
-        public override void visit(SemanticTree.ICommonMethodCallNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonMethodCallNode value)
         {
             MethInfo meth = helper.GetMethod(value.method);
             MethodInfo mi = meth.mi;
@@ -6955,7 +7006,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //вызов вложенной процедуры
-        public override void visit(SemanticTree.ICommonNestedInFunctionFunctionCallNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonNestedInFunctionFunctionCallNode value)
         {
             IExpressionNode[] real_parameters = value.real_parameters;
             //if (save_debug_info)
@@ -7008,7 +7059,7 @@ namespace PascalABCCompiler.NETGenerator
                 //(ssyy) 07.12.2007 При боксировке нужно вызывать Ldsfld вместо Ldsflda.
                 //Дополнительная проверка введена именно для этого.
                 bool box_awaited =
-                    (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is SemanticTree.INullConstantNode) && (ctn3.is_value_type || ctn3.is_generic_parameter);
+                    (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is PascalABCCompiler.SemanticTree.INullConstantNode) && (ctn3.is_value_type || ctn3.is_generic_parameter);
 
                 if (ti != null && ti.clone_meth != null && ti.tp != null && ti.tp.IsValueType && !box_awaited && !parameters[i].is_const)
                     is_dot_expr = true;
@@ -7163,7 +7214,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //вызов глобальной процедуры
-        public override void visit(SemanticTree.ICommonNamespaceFunctionCallNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionCallNode value)
         {
             MethInfo meth = helper.GetMethod(value.namespace_function);
             IExpressionNode[] real_parameters = value.real_parameters;
@@ -7312,9 +7363,9 @@ namespace PascalABCCompiler.NETGenerator
                 //(ssyy) 07.12.2007 При боксировке нужно вызывать Ldsfld вместо Ldsflda.
                 //Дополнительная проверка введена именно для этого.
                 bool box_awaited =
-                    (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is SemanticTree.INullConstantNode) 
+                    (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is PascalABCCompiler.SemanticTree.INullConstantNode) 
                 	&& (ctn3.is_value_type || ctn3.is_generic_parameter);
-                if (!box_awaited && (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is SemanticTree.INullConstantNode) 
+                if (!box_awaited && (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is PascalABCCompiler.SemanticTree.INullConstantNode) 
                 	&& ctn4 != null && ctn4.is_value_type)
                 {
                 	box_awaited = true;
@@ -7423,12 +7474,12 @@ namespace PascalABCCompiler.NETGenerator
 
         private bool EmitBox(IExpressionNode from, Type LocalType)
         {
-            if ((from.type.is_value_type || from.type.is_generic_parameter) && !(from is SemanticTree.INullConstantNode) && (LocalType == TypeFactory.ObjectType || TypeIsInterface(LocalType)))
+            if ((from.type.is_value_type || from.type.is_generic_parameter) && !(from is PascalABCCompiler.SemanticTree.INullConstantNode) && (LocalType == TypeFactory.ObjectType || TypeIsInterface(LocalType)))
             {
                 il.Emit(OpCodes.Box, helper.GetTypeReference(from.type).tp);//упаковка
                 return true;
             }
-            if (from.conversion_type != null && from.conversion_type.is_value_type && !(from is SemanticTree.INullConstantNode) && (LocalType == TypeFactory.ObjectType || TypeIsInterface(LocalType)))
+            if (from.conversion_type != null && from.conversion_type.is_value_type && !(from is PascalABCCompiler.SemanticTree.INullConstantNode) && (LocalType == TypeFactory.ObjectType || TypeIsInterface(LocalType)))
             {
             	il.Emit(OpCodes.Box, helper.GetTypeReference(from.conversion_type).tp);
             }
@@ -8334,7 +8385,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //перевод бинарных, унарных и проч. выражений
-        public override void visit(SemanticTree.IBasicFunctionCallNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IBasicFunctionCallNode value)
         {
             make_next_spoint = true;
             bool tmp_dot = is_dot_expr;
@@ -8879,7 +8930,7 @@ namespace PascalABCCompiler.NETGenerator
                         //(ssyy) Вставил 15.05.08
                         Type from_val_type = null;
                         IExpressionNode par0 = fn.real_parameters[0];
-                        if (!(par0 is SemanticTree.INullConstantNode) && (par0.type.is_value_type || par0.type.is_generic_parameter))
+                        if (!(par0 is PascalABCCompiler.SemanticTree.INullConstantNode) && (par0.type.is_value_type || par0.type.is_generic_parameter))
                         {
                             from_val_type = helper.GetTypeReference(par0.type).tp;
                         }
@@ -8894,28 +8945,28 @@ namespace PascalABCCompiler.NETGenerator
 
 
 
-        public override void visit(SemanticTree.IFunctionCallNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IFunctionCallNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IExpressionNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IExpressionNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IStatementNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IStatementNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ICompiledTypeNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICompiledTypeNode value)
         {
 
         }
 
         //перевод оболочки для массива
-        public void ConvertArrayWrapperType(SemanticTree.ICommonTypeNode value)
+        public void ConvertArrayWrapperType(PascalABCCompiler.SemanticTree.ICommonTypeNode value)
         {
             ISimpleArrayNode arrt = value.fields[0].type as ISimpleArrayNode;
             TypeInfo elem_ti = helper.GetTypeReference(arrt.element_type);
@@ -8960,7 +9011,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //перевод реализации типа
-        public override void visit(SemanticTree.ICommonTypeNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonTypeNode value)
         {
             if (value is ISimpleArrayNode || value.type_special_kind == type_special_kind.array_kind) return;
             MakeAttribute(value);
@@ -8978,18 +9029,18 @@ namespace PascalABCCompiler.NETGenerator
             cur_ti = tmp_ti;
         }
 
-        public override void visit(SemanticTree.IBasicTypeNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IBasicTypeNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ISimpleArrayNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ISimpleArrayNode value)
         {
 
         }
 
         //доступ к элементам массива
-        public override void visit(SemanticTree.ISimpleArrayIndexingNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ISimpleArrayIndexingNode value)
         {
             //Console.WriteLine(value.array.type);
             bool temp_is_addr = is_addr;
@@ -9143,22 +9194,22 @@ namespace PascalABCCompiler.NETGenerator
 
         }
 
-        public override void visit(SemanticTree.ITypeNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ITypeNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IDefinitionNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IDefinitionNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ISemanticNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IReturnNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IReturnNode value)
         {
             if (save_debug_info)
                 MarkSequencePoint(value.Location);
@@ -9177,13 +9228,13 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //строковая константа
-        public override void visit(SemanticTree.IStringConstantNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IStringConstantNode value)
         {
             il.Emit(OpCodes.Ldstr, value.constant_value);
         }
 
         //реализация this
-        public override void visit(SemanticTree.IThisNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IThisNode value)
         {
             il.Emit(OpCodes.Ldarg_0);
             if (value.type.is_value_type && !is_dot_expr && !is_addr)
@@ -9192,15 +9243,15 @@ namespace PascalABCCompiler.NETGenerator
             }
         }
 
-        private void PushObjectCommand(SemanticTree.IFunctionCallNode ifc)
+        private void PushObjectCommand(PascalABCCompiler.SemanticTree.IFunctionCallNode ifc)
         {
-            SemanticTree.ICommonNamespaceFunctionCallNode cncall = ifc as SemanticTree.ICommonNamespaceFunctionCallNode;
+            PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionCallNode cncall = ifc as PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionCallNode;
             if (cncall != null)
             {
                 il.Emit(OpCodes.Ldnull);
                 return;
             }
-            SemanticTree.ICommonMethodCallNode cmcall = ifc as SemanticTree.ICommonMethodCallNode;
+            PascalABCCompiler.SemanticTree.ICommonMethodCallNode cmcall = ifc as PascalABCCompiler.SemanticTree.ICommonMethodCallNode;
             if (cmcall != null)
             {
                 cmcall.obj.visit(this);
@@ -9210,13 +9261,13 @@ namespace PascalABCCompiler.NETGenerator
                 	il.Emit(OpCodes.Box, helper.GetTypeReference(cmcall.obj.conversion_type).tp);
                 return;
             }
-            SemanticTree.ICommonStaticMethodCallNode csmcall = ifc as SemanticTree.ICommonStaticMethodCallNode;
+            PascalABCCompiler.SemanticTree.ICommonStaticMethodCallNode csmcall = ifc as PascalABCCompiler.SemanticTree.ICommonStaticMethodCallNode;
             if (csmcall != null)
             {
                 il.Emit(OpCodes.Ldnull);
                 return;
             }
-            SemanticTree.ICompiledMethodCallNode cmccall = ifc as SemanticTree.ICompiledMethodCallNode;
+            PascalABCCompiler.SemanticTree.ICompiledMethodCallNode cmccall = ifc as PascalABCCompiler.SemanticTree.ICompiledMethodCallNode;
             if (cmccall != null)
             {
                 cmccall.obj.visit(this);
@@ -9226,13 +9277,13 @@ namespace PascalABCCompiler.NETGenerator
                 	il.Emit(OpCodes.Box, helper.GetTypeReference(cmccall.obj.conversion_type).tp);
                 return;
             }
-            SemanticTree.ICompiledStaticMethodCallNode csmcall2 = ifc as SemanticTree.ICompiledStaticMethodCallNode;
+            PascalABCCompiler.SemanticTree.ICompiledStaticMethodCallNode csmcall2 = ifc as PascalABCCompiler.SemanticTree.ICompiledStaticMethodCallNode;
             if (csmcall2 != null)
             {
                 il.Emit(OpCodes.Ldnull);
                 return;
             }
-            SemanticTree.ICommonNestedInFunctionFunctionCallNode cnffcall = ifc as SemanticTree.ICommonNestedInFunctionFunctionCallNode;
+            PascalABCCompiler.SemanticTree.ICommonNestedInFunctionFunctionCallNode cnffcall = ifc as PascalABCCompiler.SemanticTree.ICommonNestedInFunctionFunctionCallNode;
             if (cnffcall != null)
             {
                 //cnffcall.
@@ -9251,7 +9302,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //вызов конструктора
-        public override void visit(SemanticTree.ICommonConstructorCall value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonConstructorCall value)
         {
             bool tmp_dot = is_dot_expr;
             //if (save_debug_info)
@@ -9266,12 +9317,12 @@ namespace PascalABCCompiler.NETGenerator
             MethInfo ci = helper.GetConstructor(value.static_method);
             ConstructorInfo cnstr = ci.cnstr;
 
-            SemanticTree.IRuntimeManagedMethodBody irmmb = value.static_method.function_code as SemanticTree.IRuntimeManagedMethodBody;
+            PascalABCCompiler.SemanticTree.IRuntimeManagedMethodBody irmmb = value.static_method.function_code as PascalABCCompiler.SemanticTree.IRuntimeManagedMethodBody;
             if (irmmb != null)
             {
-                if (irmmb.runtime_statement_type == SemanticTree.runtime_statement_type.ctor_delegate)
+                if (irmmb.runtime_statement_type == PascalABCCompiler.SemanticTree.runtime_statement_type.ctor_delegate)
                 {
-                    SemanticTree.IFunctionCallNode ifc = real_parameters[0] as SemanticTree.IFunctionCallNode;
+                    PascalABCCompiler.SemanticTree.IFunctionCallNode ifc = real_parameters[0] as PascalABCCompiler.SemanticTree.IFunctionCallNode;
                     MethodInfo mi = null;
                     ICompiledMethodCallNode icmcn = ifc as ICompiledMethodCallNode;
                     if (icmcn != null)
@@ -9380,7 +9431,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //вызов откомпилированного конструктора
-        public override void visit(SemanticTree.ICompiledConstructorCall value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICompiledConstructorCall value)
         {
             //if (save_debug_info) MarkSequencePoint(value.Location);
             bool tmp_dot = is_dot_expr;
@@ -9390,7 +9441,7 @@ namespace PascalABCCompiler.NETGenerator
             Type cons_type11 = value.constructor.comprehensive_type.compiled_type;
             if (cons_type11.BaseType == TypeFactory.MulticastDelegateType)
             {
-                SemanticTree.IFunctionCallNode ifc = real_parameters[0] as SemanticTree.IFunctionCallNode;
+                PascalABCCompiler.SemanticTree.IFunctionCallNode ifc = real_parameters[0] as PascalABCCompiler.SemanticTree.IFunctionCallNode;
                 ICompiledMethodCallNode icmcn = ifc as ICompiledMethodCallNode;
                 if (icmcn != null)
                 {
@@ -9483,7 +9534,7 @@ namespace PascalABCCompiler.NETGenerator
         }
 
         //перевод @
-        public override void visit(SemanticTree.IGetAddrNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IGetAddrNode value)
         {
             IExpressionNode to = value.addr_of_expr;
             if (to is INamespaceVariableReferenceNode)
@@ -9703,7 +9754,7 @@ namespace PascalABCCompiler.NETGenerator
             is_dot_expr = temp_is_dot_expr;
         }
 
-        public override void visit(SemanticTree.IDereferenceNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IDereferenceNode value)
         {
             bool tmp = false;
             if (is_addr == true)
@@ -10006,58 +10057,58 @@ namespace PascalABCCompiler.NETGenerator
             return ltfl.ToArray();
         }
 
-        public override void visit(SemanticTree.ICommonNestedInFunctionFunctionNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonNestedInFunctionFunctionNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ICommonNamespaceFunctionNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ICommonFunctionNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonFunctionNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IBasicFunctionNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IBasicFunctionNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.INamespaceMemberNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.INamespaceMemberNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IFunctionMemberNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IFunctionMemberNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ICommonClassMemberNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICommonClassMemberNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.ICompiledClassMemberNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ICompiledClassMemberNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IClassMemberNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IClassMemberNode value)
         {
 
         }
 
-        public override void visit(SemanticTree.IFunctionNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IFunctionNode value)
         {
 
         }
 
 
-        public override void visit(SemanticTree.IIsNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IIsNode value)
         {
             bool idexpr = is_dot_expr;
             is_dot_expr = false;
@@ -10074,14 +10125,14 @@ namespace PascalABCCompiler.NETGenerator
 
         }
 
-        public override void visit(SemanticTree.IAsNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.IAsNode value)
         {
             bool idexpr = is_dot_expr;
             is_dot_expr = false;
             value.left.visit(this);
             is_dot_expr = idexpr;
             Type right = helper.GetTypeReference(value.right).tp;
-            if (!(value.left is SemanticTree.INullConstantNode) && (value.left.type.is_value_type || value.left.type.is_generic_parameter))
+            if (!(value.left is PascalABCCompiler.SemanticTree.INullConstantNode) && (value.left.type.is_value_type || value.left.type.is_generic_parameter))
             {
                 il.Emit(OpCodes.Box, helper.GetTypeReference(value.left.type).tp);
             }
@@ -10564,11 +10615,11 @@ namespace PascalABCCompiler.NETGenerator
                 il.Emit(OpCodes.Ldsfld, helper.GetVariable((value.Event as ICommonNamespaceEventNode).Field).fb);
         }
 
-        public override void visit(SemanticTree.ILambdaFunctionNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ILambdaFunctionNode value)
         {
         }
 
-        public override void visit(SemanticTree.ILambdaFunctionCallNode value)
+        public override void visit(PascalABCCompiler.SemanticTree.ILambdaFunctionCallNode value)
         {
         }
     }

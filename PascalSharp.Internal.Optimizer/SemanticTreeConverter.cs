@@ -1,11 +1,11 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
-using System.Collections.Generic;
-using System.Text;
-using PascalABCCompiler.SemanticTreeConverters;
 
-namespace PascalABCCompiler
+using System;
+using PascalSharp.Compiler;
+using PascalSharp.Compiler.SemanticTreeConverters;
+
+namespace PascalSharp.Internal.Optimizer
 {
     public class Optimizer_SemanticTreeConverter : ISemanticTreeConverter
     {
@@ -32,20 +32,20 @@ namespace PascalABCCompiler
             get { return "Copyright © 2005-2018 by Ivan Bondarev, Stanislav Mihalkovich"; }
         }
 
-        public PascalABCCompiler.SemanticTreeConverters.ConverterType ConverterType
+        public ConverterType ConverterType
         {
             get { return ConverterType.Analysis; }
         }
 
-        public PascalABCCompiler.SemanticTreeConverters.ExecutionOrder ExecutionOrder
+        public ExecutionOrder ExecutionOrder
         {
             get { return ExecutionOrder.Undefined; }
         }
 
-        public SemanticTree.IProgramNode Convert(PascalABCCompiler.ICompiler Compiler, SemanticTree.IProgramNode ProgramNode)
+        public PascalABCCompiler.SemanticTree.IProgramNode Convert(ICompiler Compiler, PascalABCCompiler.SemanticTree.IProgramNode ProgramNode)
         {
             Optimizer Optimizer = new Optimizer();
-            Compiler.AddWarnings(Optimizer.Optimize(ProgramNode as TreeRealization.program_node));
+            Compiler.AddWarnings(Optimizer.Optimize(ProgramNode as PascalABCCompiler.TreeRealization.program_node));
             return ProgramNode;
         }
         public override string ToString()

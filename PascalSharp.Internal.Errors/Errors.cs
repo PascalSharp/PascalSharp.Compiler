@@ -1,10 +1,13 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.IO;
+using PascalABCCompiler;
 using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.Localization;
 
-namespace PascalABCCompiler.Errors
+namespace PascalSharp.Internal.Errors
 {
 	public class Error:Exception
 	{
@@ -93,7 +96,7 @@ namespace PascalABCCompiler.Errors
     	public CommonCompilerError(string mes, string fileName, int line, int col):base(mes,fileName)
     	{
     		this.sourceLocation = new SourceLocation(fileName,line,col,line,col);
-    		this.source_context = new SyntaxTree.SourceContext(line,col,line,col);
+    		this.source_context = new PascalABCCompiler.SyntaxTree.SourceContext(line,col,line,col);
     	}
         public override string ToString()
         {
@@ -130,7 +133,7 @@ namespace PascalABCCompiler.Errors
     	public CommonWarning(string mes, string fileName, int line, int col):base(mes,fileName)
     	{
     		this.sourceLocation = new SourceLocation(fileName,line,col,line,col);
-    		this.source_context = new SyntaxTree.SourceContext(line,col,line,col);
+    		this.source_context = new PascalABCCompiler.SyntaxTree.SourceContext(line,col,line,col);
     		_mes = mes;
     	}
     	

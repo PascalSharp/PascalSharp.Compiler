@@ -7,6 +7,8 @@ using PascalABCCompiler.SemanticTree;
 
 using PascalABCCompiler.TreeRealization;
 using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.CompilerTools.Errors;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.TreeConverter
 {
@@ -14,7 +16,7 @@ namespace PascalABCCompiler.TreeConverter
     {
         public static string Get(string key)
         {
-            return PascalABCCompiler.StringResources.Get("SEMANTICERROR_" + key);
+            return PascalSharp.Internal.Localization.StringResources.Get("SEMANTICERROR_" + key);
         }
 
         public static string Get(string key, params object[] values)
@@ -62,7 +64,7 @@ namespace PascalABCCompiler.TreeConverter
         }
     }*/
 
-    public class CompilationError : Errors.SemanticError
+    public class CompilationError : SemanticError
     {
         public CompilationError()
             : base("???", "Undefined FileName")
@@ -1568,21 +1570,21 @@ namespace PascalABCCompiler.TreeConverter
     */
     public class ParserError : CompilationError
     {
-        private PascalABCCompiler.Errors.Error _error;
+        private Error _error;
         private location _loc;
 
-        public ParserError(PascalABCCompiler.Errors.Error error)
+        public ParserError(Error error)
         {
             _error = error;
         }
 
-        public ParserError(PascalABCCompiler.Errors.Error error, location loc)
+        public ParserError(Error error, location loc)
         {
             _error = error;
             _loc = loc;
         }
 
-        public PascalABCCompiler.Errors.Error error
+        public Error error
         {
             get
             {
@@ -2560,7 +2562,7 @@ namespace PascalABCCompiler.TreeConverter
             }
         }
     }
-    public class NotSupportedError : Errors.SemanticNonSupportedError
+    public class NotSupportedError : SemanticNonSupportedError
     {
         private location _loc;
         string message = "NOT_SUPPORTED_BY_THIS_VERSION_OF_COMPILER";

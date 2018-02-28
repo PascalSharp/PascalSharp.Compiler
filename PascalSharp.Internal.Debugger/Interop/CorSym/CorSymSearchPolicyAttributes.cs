@@ -7,10 +7,8 @@
 
 #pragma warning disable 108, 1591 
 
-namespace Debugger.Interop.CorSym
+namespace PascalSharp.Internal.Debugger.Interop.CorSym
 {
-    using System;
-
     public enum CorSymSearchPolicyAttributes
     {
         // Fields

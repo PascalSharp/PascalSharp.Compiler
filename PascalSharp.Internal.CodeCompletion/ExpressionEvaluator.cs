@@ -1,18 +1,14 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using PascalABCCompiler.SyntaxTree;
 //using ICSharpCode.SharpDevelop.Dom;
-using System.Reflection;
-using PascalABCCompiler;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
+
 //using SymbolTable;
 
-namespace CodeCompletion
+namespace PascalSharp.Internal.CodeCompletion
 {
 	public class ExpressionEvaluator
     {

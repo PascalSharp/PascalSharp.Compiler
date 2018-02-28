@@ -5,7 +5,7 @@
 //     <version>$Revision: 1537 $</version>
 // </file>
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger.DebuggerEvents
 {
 	public enum PausedReason:int
 	{

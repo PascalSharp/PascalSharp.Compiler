@@ -5,7 +5,7 @@
 //     <version>$Revision: 2210 $</version>
 // </file>
 
-namespace Debugger.Wrappers.CorDebug
+namespace PascalSharp.Internal.Debugger.Interop.Enums
 {
 	enum CorElementType: uint
 	{

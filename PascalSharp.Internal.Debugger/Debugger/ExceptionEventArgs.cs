@@ -5,9 +5,10 @@
 //     <version>$Revision: 1687 $</version>
 // </file>
 
-using System;
+using PascalSharp.Internal.Debugger.Threads;
+using Exception = PascalSharp.Internal.Debugger.Threads.Exception;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger
 {
 	public class ExceptionEventArgs: ProcessEventArgs
 	{

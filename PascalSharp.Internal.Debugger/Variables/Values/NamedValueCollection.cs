@@ -5,11 +5,11 @@
 //     <version>$Revision: 2285 $</version>
 // </file>
 
-using System;
 using System.Collections;
 using System.Collections.Generic;
+using PascalSharp.Internal.Debugger.Debugger;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Values
 {
 	/// <summary>
 	/// An enumerable collection of values accessible by name.
@@ -58,7 +58,7 @@ namespace Debugger
 		}
 		
 		/// <summary>
-		/// Gets number of <see cref="Debugger.NamedValue">named values</see> contained in the collection
+		/// Gets number of <see cref="NamedValue">named values</see> contained in the collection
 		/// </summary>
 		public int Count {
 			get {

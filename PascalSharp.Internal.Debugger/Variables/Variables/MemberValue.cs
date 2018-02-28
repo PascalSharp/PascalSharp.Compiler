@@ -5,12 +5,12 @@
 //     <version>$Revision: 2210 $</version>
 // </file>
 
-using System;
-using System.Collections.Generic;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Variables.Types;
+using PascalSharp.Internal.Debugger.Variables.Values;
+using Process = PascalSharp.Internal.Debugger.Threads.Process;
 
-using Debugger.Wrappers.CorDebug;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Variables
 {
 	/// <summary>
 	/// Represents a member of class or value type - 

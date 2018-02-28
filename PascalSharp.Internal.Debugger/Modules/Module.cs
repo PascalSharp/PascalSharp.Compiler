@@ -6,11 +6,16 @@
 // </file>
 
 using System;
-using Debugger.Wrappers.CorDebug;
-using Debugger.Wrappers.CorSym;
-using Debugger.Wrappers.MetaData;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Tests;
+using PascalSharp.Internal.Debugger.Threads;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
+using PascalSharp.Internal.Debugger.Wrappers.CorSym;
+using PascalSharp.Internal.Debugger.Wrappers.MetaData;
+using ICorDebugModule = PascalSharp.Internal.Debugger.Wrappers.CorDebug.ICorDebugModule;
+using ISymUnmanagedReader = PascalSharp.Internal.Debugger.Wrappers.CorSym.ISymUnmanagedReader;
 
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Modules
 {
 	public class Module: DebuggerObject, IDisposable
 	{
@@ -24,7 +29,7 @@ namespace Debugger
 		ISymUnmanagedReader symReader;
 		MetaData metaData;
 		
-		[Debugger.Tests.Ignore]
+		[Ignore]
 		public Process Process {
 			get {
 				return process;

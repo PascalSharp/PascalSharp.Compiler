@@ -8,11 +8,14 @@
 using System;
 using System.Text;
 using System.Threading;
+using PascalSharp.Internal.Debugger.Breakpoints;
+using PascalSharp.Internal.Debugger.Debugger.DebuggerEvents;
+using PascalSharp.Internal.Debugger.Debugger.Internal;
+using PascalSharp.Internal.Debugger.Threads;
+using PascalSharp.Internal.Debugger.Wrappers;
+using PascalSharp.Internal.Debugger.Wrappers.CorDebug;
 
-using Debugger.Interop;
-using Debugger.Wrappers.CorDebug;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Debugger
 {
 	public partial class NDebugger: DebuggerObject
 	{
@@ -183,7 +186,7 @@ namespace Debugger
 		public Process Start(string filename, string workingDirectory, string arguments)		
 		{
 			InitDebugger(GetProgramVersion(filename));
-			Process process = Process.CreateProcess(this, filename, workingDirectory, arguments);
+			Process process = Threads.Process.CreateProcess(this, filename, workingDirectory, arguments);
 			AddProcess(process);
 			return process;
 		}

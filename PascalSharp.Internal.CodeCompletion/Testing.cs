@@ -1,16 +1,16 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.Parsers;
-using PascalABCCompiler.Errors;
-using System.IO;
+using PascalSharp.Internal.Errors;
+
 //using ICSharpCode.SharpDevelop.Dom;
 
-namespace CodeCompletion
+namespace PascalSharp.Internal.CodeCompletion
 {
 	//#if (DEBUG)
     public class CodeCompletionTester
@@ -26,7 +26,7 @@ namespace CodeCompletion
         public static void TestIntellisense(string dir)
         {
             //string dir = Path.Combine(@"c:\Work\Miks\_PABCNETGitHub\TestSuite", "intellisense_tests");
-            var comp = new PascalABCCompiler.Compiler();
+            var comp = new Compiler.Compiler();
             var controller = new CodeCompletion.CodeCompletionController();
             CodeCompletion.CodeCompletionController.comp = comp;
             CodeCompletion.CodeCompletionController.SetParser(".pas");
@@ -105,7 +105,7 @@ namespace CodeCompletion
             var expr = CodeCompletion.CodeCompletionController.CurrentParser.LanguageInformation.FindExpressionFromAnyPosition(pos, content, line, col, out keyw, out expr_without_brackets);
             if (expr == null)
               expr = expr_without_brackets;
-            var errors = new List<PascalABCCompiler.Errors.Error>();
+            var errors = new List<Error>();
             var warnings = new List<CompilerWarning>();
             var tree = controller.GetExpression("test" + Path.GetExtension(FileName), expr, errors, warnings);
             var desc = dc.GetDescription(tree, FileName, expr_without_brackets, controller, line, col, keyw, false);
@@ -792,7 +792,7 @@ namespace CodeCompletion
                 compilation_unit cu = CodeCompletionController.ParsersController.GetCompilationUnitForFormatter(s, Text, Errors, Warnings);
                 if (Errors.Count == 0)
                 {
-                    CodeFormatters.CodeFormatter cf = new CodeFormatters.CodeFormatter(2);
+                    CodeFormatter cf = new CodeFormatter(2);
                     Text = cf.FormatTree(Text, cu, 1, 1);
                     StreamWriter sw = new StreamWriter(Path.Combine(test_dir + @"\output", Path.GetFileName(s)), false, Encoding.GetEncoding(1251));
                     sw.Write(Text);
@@ -827,7 +827,7 @@ namespace CodeCompletion
                 List<Error> Errors = new List<Error>();
                 List<CompilerWarning> Warnings = new List<CompilerWarning>();
                 compilation_unit cu = CodeCompletionController.ParsersController.GetCompilationUnitForFormatter(s, Text, Errors, Warnings);
-                CodeFormatters.CodeFormatter cf = new CodeFormatters.CodeFormatter(2);
+                CodeFormatter cf = new CodeFormatter(2);
                 string Text2 = cf.FormatTree(Text, cu, 1, 1);
                 if (Text != Text2)
                     log.WriteLine("Inavlid formatting of File " + s);

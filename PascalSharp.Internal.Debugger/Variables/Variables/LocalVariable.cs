@@ -5,12 +5,11 @@
 //     <version>$Revision: 2185 $</version>
 // </file>
 
-using System;
-using System.Collections.Generic;
+using PascalSharp.Internal.Debugger.Debugger;
+using PascalSharp.Internal.Debugger.Variables.Values;
+using Process = PascalSharp.Internal.Debugger.Threads.Process;
 
-using Debugger.Wrappers.CorDebug;
-
-namespace Debugger
+namespace PascalSharp.Internal.Debugger.Variables.Variables
 {
 	/// <summary>
 	/// Represents a local variable in a function

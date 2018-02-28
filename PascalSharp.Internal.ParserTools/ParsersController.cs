@@ -4,7 +4,8 @@ using System;
 using System.IO;
 using PascalABCCompiler.ParserTools;
 using PascalABCCompiler.Errors;
-using System.Collections.Generic; 
+using System.Collections.Generic;
+using PascalSharp.Internal.Errors;
 
 namespace PascalABCCompiler.Parsers
 {
