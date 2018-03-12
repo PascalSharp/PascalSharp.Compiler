@@ -89,7 +89,7 @@ namespace PascalSharp.Compiler
         Process pabcnetcProcess=null;
         EventedStreamReaderList pabcnetcStreamReader;
         string inputId = "pabcnetc_input";
-        string pabcnetcFileName = "PascalSharp.Console.exe";
+        string pabcnetcFileName = "PascalSharp.Compiler.Host.exe";
         public const int sendCommandStartNumber = 100;
         CompilerState compilerState = CompilerState.Reloading;
         Encoding inputEncoding = System.Text.Encoding.UTF8;
@@ -199,7 +199,7 @@ namespace PascalSharp.Compiler
                     pabcnetcProcess.StandardInput.Flush();
                     break;
                 default:
-                    throw new CompilerInternalError("RemoteCompiler", new Exception(string.Format("Unkown command from pabcnetc.exe: {0}", command)));
+                    throw new CompilerInternalError("RemoteCompiler", new Exception(string.Format("Unknown command from Compiler Host: {0}", command)));
             }
         }
 
@@ -537,7 +537,7 @@ namespace PascalSharp.Compiler
             stopCompiler();
             pabcnetcProcess = new Process();
             pabcnetcProcess.StartInfo.FileName = Path.Combine(Tools.GetExecutablePath(), pabcnetcFileName);
-            pabcnetcProcess.StartInfo.Arguments = "commandmode";
+            pabcnetcProcess.StartInfo.Arguments = "";
             pabcnetcProcess.StartInfo.UseShellExecute = false;
             pabcnetcProcess.StartInfo.CreateNoWindow = true;
             pabcnetcProcess.StartInfo.RedirectStandardOutput = true;

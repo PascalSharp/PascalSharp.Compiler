@@ -608,7 +608,7 @@ namespace PascalSharp.Internal.Localization
              */
             if (Strings.Count == 0)
             {
-                ResourceManager ResourceManager = new ResourceManager("PascalABCCompiler.DefaultLang", System.Reflection.Assembly.GetExecutingAssembly());
+                ResourceManager ResourceManager = new ResourceManager("PascalSharp.Internal.Localization.DefaultLang", System.Reflection.Assembly.GetExecutingAssembly());
                 MemoryStream ms = new MemoryStream((byte[])ResourceManager.GetObject("DefaultLanguage", System.Threading.Thread.CurrentThread.CurrentCulture));
                 ms.Seek(0, SeekOrigin.Begin);
                 LoadFile(new StreamReader(ms,Encoding.GetEncoding(1251)));
