@@ -1,9 +1,9 @@
 // (see accompanying GPPGcopyright.rtf)
 
 // GPPG version 1.3.6
-// Machine:  IVAN-PC
-// DateTime: 19.02.2018 20:41:22
-// UserName: Ivan
+// Machine:  ANDREWPC
+// DateTime: 3/13/2018 21:24:48
+// UserName: boyar
 // Input file <ABCPascal.y>
 
 // options: no-lines gplex
@@ -13,14 +13,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using QUT.Gppg;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCSavParser;
-using PascalABCCompiler.ParserTools;
-using PascalABCCompiler.Errors;
-using System.Linq;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.ParserTools;
 using PascalSharp.Internal.Errors;
+using System.Linq;
 
-namespace GPPGParserScanner
+namespace PascalSharp.Internal.Lexer
 {
 public enum Tokens {
     error=1,EOF=2,tkDirectiveName=3,tkAmpersend=4,tkColon=5,tkDotDot=6,
@@ -50,13 +48,13 @@ public enum Tokens {
     tkHex=145};
 
 // Abstract base class for GPLEX scanners
-public abstract class ScanBase : AbstractScanner<PascalABCSavParser.Union,LexLocation> {
+public abstract class ScanBase : AbstractScanner<PascalSharp.Internal.Lexer.Union,LexLocation> {
   private LexLocation __yylloc = new LexLocation();
   public override LexLocation yylloc { get { return __yylloc; } set { __yylloc = value; } }
   protected virtual bool yywrap() { return true; }
 }
 
-public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, LexLocation>
+public partial class GPPGParser: ShiftReduceParser<PascalSharp.Internal.Lexer.Union, LexLocation>
 {
   // Verbatim content from ABCPascal.y
 // ��� ���������� ����������� � ����� GPPGParser, �������������� ����� ������, ������������ �������� gppg
@@ -69,7 +67,7 @@ public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, Lex
     public List<compiler_directive> CompilerDirectives;
 	public ParserLambdaHelper lambdaHelper = new ParserLambdaHelper();
 	
-    public GPPGParser(AbstractScanner<PascalABCSavParser.Union, LexLocation> scanner) : base(scanner) { }
+    public GPPGParser(AbstractScanner<PascalSharp.Internal.Lexer.Union, LexLocation> scanner) : base(scanner) { }
   // End verbatim content from ABCPascal.y
 
 #pragma warning disable 649
@@ -4049,8 +4047,8 @@ public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, Lex
       case 390: // typed_var_init_expression -> identifier, tkArrow, lambda_function_body
 {  
 			var idList = new ident_list(ValueStack[ValueStack.Depth-3].id, LocationStack[LocationStack.Depth-3]); 
-			var formalPars = new formal_parameters(new typed_parameters(idList, new lambda_inferred_type(new PascalABCCompiler.TreeRealization.lambda_any_type_node(), LocationStack[LocationStack.Depth-3]), parametr_kind.none, null, LocationStack[LocationStack.Depth-3]), LocationStack[LocationStack.Depth-3]);
-			CurrentSemanticValue.ex = new function_lambda_definition(lambdaHelper.CreateLambdaName(), formalPars, new lambda_inferred_type(new PascalABCCompiler.TreeRealization.lambda_any_type_node(), LocationStack[LocationStack.Depth-3]), ValueStack[ValueStack.Depth-1].stn as statement_list, CurrentLocationSpan);
+			var formalPars = new formal_parameters(new typed_parameters(idList, new lambda_inferred_type(new PascalSharp.Internal.TreeConverter.TreeRealization.lambda_any_type_node(), LocationStack[LocationStack.Depth-3]), parametr_kind.none, null, LocationStack[LocationStack.Depth-3]), LocationStack[LocationStack.Depth-3]);
+			CurrentSemanticValue.ex = new function_lambda_definition(lambdaHelper.CreateLambdaName(), formalPars, new lambda_inferred_type(new PascalSharp.Internal.TreeConverter.TreeRealization.lambda_any_type_node(), LocationStack[LocationStack.Depth-3]), ValueStack[ValueStack.Depth-1].stn as statement_list, CurrentLocationSpan);
 		}
         break;
       case 391: // typed_var_init_expression -> tkRoundOpen, tkRoundClose, lambda_type_ref, 
@@ -4075,7 +4073,7 @@ public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, Lex
 				idList.idents.Add(el.expressions[j] as ident);
 			}	
 				
-			var any = new lambda_inferred_type(new PascalABCCompiler.TreeRealization.lambda_any_type_node(), LocationStack[LocationStack.Depth-4]);	
+			var any = new lambda_inferred_type(new PascalSharp.Internal.TreeConverter.TreeRealization.lambda_any_type_node(), LocationStack[LocationStack.Depth-4]);	
 				
 			var formalPars = new formal_parameters(new typed_parameters(idList, any, parametr_kind.none, null, LocationStack[LocationStack.Depth-4]), LocationStack[LocationStack.Depth-4]);
 			CurrentSemanticValue.ex = new function_lambda_definition(lambdaHelper.CreateLambdaName(), formalPars, any, ValueStack[ValueStack.Depth-1].stn as statement_list, CurrentLocationSpan);
@@ -4173,7 +4171,9 @@ public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, Lex
 		}
         break;
       case 408: // inclass_proc_func_decl -> inclass_proc_func_decl_noclass
-{ CurrentSemanticValue.stn = ValueStack[ValueStack.Depth-1].stn; }
+{ 
+            CurrentSemanticValue.stn = ValueStack[ValueStack.Depth-1].stn; 
+        }
         break;
       case 409: // inclass_proc_func_decl -> tkClass, inclass_proc_func_decl_noclass
 { 
@@ -5805,8 +5805,8 @@ public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, Lex
       case 803: // func_decl_lambda -> identifier, tkArrow, lambda_function_body
 {
 			var idList = new ident_list(ValueStack[ValueStack.Depth-3].id, LocationStack[LocationStack.Depth-3]); 
-			var formalPars = new formal_parameters(new typed_parameters(idList, new lambda_inferred_type(new PascalABCCompiler.TreeRealization.lambda_any_type_node(), LocationStack[LocationStack.Depth-3]), parametr_kind.none, null, LocationStack[LocationStack.Depth-3]), LocationStack[LocationStack.Depth-3]);
-			CurrentSemanticValue.ex = new function_lambda_definition(lambdaHelper.CreateLambdaName(), formalPars, new lambda_inferred_type(new PascalABCCompiler.TreeRealization.lambda_any_type_node(), LocationStack[LocationStack.Depth-3]), ValueStack[ValueStack.Depth-1].stn as statement_list, CurrentLocationSpan);
+			var formalPars = new formal_parameters(new typed_parameters(idList, new lambda_inferred_type(new PascalSharp.Internal.TreeConverter.TreeRealization.lambda_any_type_node(), LocationStack[LocationStack.Depth-3]), parametr_kind.none, null, LocationStack[LocationStack.Depth-3]), LocationStack[LocationStack.Depth-3]);
+			CurrentSemanticValue.ex = new function_lambda_definition(lambdaHelper.CreateLambdaName(), formalPars, new lambda_inferred_type(new PascalSharp.Internal.TreeConverter.TreeRealization.lambda_any_type_node(), LocationStack[LocationStack.Depth-3]), ValueStack[ValueStack.Depth-1].stn as statement_list, CurrentLocationSpan);
 		}
         break;
       case 804: // func_decl_lambda -> tkRoundOpen, tkRoundClose, lambda_type_ref_noproctype, 
@@ -5829,7 +5829,7 @@ public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, Lex
                 //                     lambda_function_body
 {
 			var idList = new ident_list(ValueStack[ValueStack.Depth-7].id, LocationStack[LocationStack.Depth-7]);
-			var formalPars = new formal_parameters(new typed_parameters(idList, new lambda_inferred_type(new PascalABCCompiler.TreeRealization.lambda_any_type_node(), null), parametr_kind.none, null, LocationStack[LocationStack.Depth-7]), LexLocation.MergeAll(LocationStack[LocationStack.Depth-7],LocationStack[LocationStack.Depth-6],LocationStack[LocationStack.Depth-5]));
+			var formalPars = new formal_parameters(new typed_parameters(idList, new lambda_inferred_type(new PascalSharp.Internal.TreeConverter.TreeRealization.lambda_any_type_node(), null), parametr_kind.none, null, LocationStack[LocationStack.Depth-7]), LexLocation.MergeAll(LocationStack[LocationStack.Depth-7],LocationStack[LocationStack.Depth-6],LocationStack[LocationStack.Depth-5]));
 			for (int i = 0; i < (ValueStack[ValueStack.Depth-5].stn as formal_parameters).Count; i++)
 				formalPars.Add((ValueStack[ValueStack.Depth-5].stn as formal_parameters).params_list[i]);
 			CurrentSemanticValue.ex = new function_lambda_definition(lambdaHelper.CreateLambdaName(), formalPars, ValueStack[ValueStack.Depth-3].td, ValueStack[ValueStack.Depth-1].stn as statement_list, CurrentLocationSpan);
@@ -5859,7 +5859,7 @@ public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, Lex
 				var idd = ValueStack[ValueStack.Depth-7].ex as ident;
 				if (idd==null)
 					parsertools.AddErrorFromResource("ONE_TKIDENTIFIER",LocationStack[LocationStack.Depth-7]);
-				var lambda_inf_type = new lambda_inferred_type(new PascalABCCompiler.TreeRealization.lambda_any_type_node(), null);
+				var lambda_inf_type = new lambda_inferred_type(new PascalSharp.Internal.TreeConverter.TreeRealization.lambda_any_type_node(), null);
 				var new_typed_pars = new typed_parameters(new ident_list(idd, idd.source_context), lambda_inf_type, parametr_kind.none, null, idd.source_context);
 				formal_pars.Add(new_typed_pars);
 				foreach (var id in (ValueStack[ValueStack.Depth-5].stn as expression_list).expressions)
@@ -5868,7 +5868,7 @@ public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, Lex
 					if (idd1==null)
 						parsertools.AddErrorFromResource("ONE_TKIDENTIFIER",id.source_context);
 					
-					lambda_inf_type = new lambda_inferred_type(new PascalABCCompiler.TreeRealization.lambda_any_type_node(), null);
+					lambda_inf_type = new lambda_inferred_type(new PascalSharp.Internal.TreeConverter.TreeRealization.lambda_any_type_node(), null);
 					new_typed_pars = new typed_parameters(new ident_list(idd1, idd1.source_context), lambda_inf_type, parametr_kind.none, null, idd1.source_context);
 					formal_pars.Add(new_typed_pars);
 				}
@@ -5971,7 +5971,7 @@ public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, Lex
 				CurrentSemanticValue.stn = new formal_parameters();
 				foreach (var id in typed_pars.idents.idents)
 				{
-					var lambda_inf_type = new lambda_inferred_type(new PascalABCCompiler.TreeRealization.lambda_any_type_node(), null);
+					var lambda_inf_type = new lambda_inferred_type(new PascalSharp.Internal.TreeConverter.TreeRealization.lambda_any_type_node(), null);
 					var new_typed_pars = new typed_parameters(new ident_list(id, id.source_context), lambda_inf_type, parametr_kind.none, null, id.source_context);
 					(CurrentSemanticValue.stn as formal_parameters).Add(new_typed_pars);
 				}
@@ -5995,7 +5995,7 @@ public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, Lex
         break;
       case 822: // lambda_type_ref -> /* empty */
 {
-			CurrentSemanticValue.td = new lambda_inferred_type(new PascalABCCompiler.TreeRealization.lambda_any_type_node(), null);
+			CurrentSemanticValue.td = new lambda_inferred_type(new PascalSharp.Internal.TreeConverter.TreeRealization.lambda_any_type_node(), null);
 		}
         break;
       case 823: // lambda_type_ref -> tkColon, fptype
@@ -6005,7 +6005,7 @@ public partial class GPPGParser: ShiftReduceParser<PascalABCSavParser.Union, Lex
         break;
       case 824: // lambda_type_ref_noproctype -> /* empty */
 {
-			CurrentSemanticValue.td = new lambda_inferred_type(new PascalABCCompiler.TreeRealization.lambda_any_type_node(), null);
+			CurrentSemanticValue.td = new lambda_inferred_type(new PascalSharp.Internal.TreeConverter.TreeRealization.lambda_any_type_node(), null);
 		}
         break;
       case 825: // lambda_type_ref_noproctype -> tkColon, fptype_noproctype

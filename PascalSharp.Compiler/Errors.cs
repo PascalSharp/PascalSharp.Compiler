@@ -1,7 +1,7 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
-using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.TreeConverter;
 using StringResources = PascalSharp.Internal.Localization.StringResources;
 
 namespace PascalSharp.Compiler

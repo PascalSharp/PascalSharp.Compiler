@@ -5,15 +5,12 @@ using System.IO;
 using System.Text;
 using System.Reflection;
 using System.Collections.Generic;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCSavParser;
-using PascalABCCompiler.Parsers;
-using GPPGParserScanner;
-using PascalABCCompiler.ParserTools;
-using GPPGPreprocessor3;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.Parsers;
+using PascalSharp.Internal.ParserTools;
 using PascalSharp.Internal.Errors;
 
-namespace PascalABCCompiler.PascalABCNewParser
+namespace PascalSharp.Internal.Lexer
 {
     // SSM: класс, являющийся обёрткой над GPPG парсером
     public class GPPGParserHelper
@@ -142,7 +139,7 @@ namespace PascalABCCompiler.PascalABCNewParser
             //preprocessor2 = new Preprocessor2.Preprocessor2(SourceFilesProvider);
         }
 
-        public override PascalABCCompiler.SyntaxTree.syntax_tree_node BuildTree(string FileName, string Text, ParseMode ParseMode, List<string> DefinesList = null)
+        public override syntax_tree_node BuildTree(string FileName, string Text, ParseMode ParseMode, List<string> DefinesList = null)
         {
             syntax_tree_node root = null;
 

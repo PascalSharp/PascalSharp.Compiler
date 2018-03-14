@@ -7,8 +7,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.TreeConverter;
 
 namespace PascalABCCompiler.NetHelper 
 {
@@ -70,14 +69,14 @@ namespace PascalABCCompiler.NetHelper
 	public class NetScope : SymbolTable.DotNETScope {
 		//private base_scope _up_scope;
 
-        private PascalABCCompiler.TreeRealization.using_namespace_list _unar;
+        private PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace_list _unar;
 		internal System.Reflection.Assembly _assembly;
 
 		private SymbolTable.TreeConverterSymbolTable _tcst;
 		internal Type entry_type = null;
         private List<Type> UnitTypes = null;
 
-		public NetScope(PascalABCCompiler.TreeRealization.using_namespace_list unar,System.Reflection.Assembly assembly,
+		public NetScope(PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace_list unar,System.Reflection.Assembly assembly,
 			SymbolTable.TreeConverterSymbolTable tcst) : base(tcst)
 		{
 			_unar=unar;
@@ -116,7 +115,7 @@ namespace PascalABCCompiler.NetHelper
             }
         }
 
-        public PascalABCCompiler.TreeRealization.using_namespace_list used_namespaces
+        public PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace_list used_namespaces
 		{
 			get
 			{
@@ -183,7 +182,7 @@ namespace PascalABCCompiler.NetHelper
                         {
                             object[] attrs = entry_type.GetCustomAttributes(false);
                             for (int j = 0; j < attrs.Length; j++)
-                                if (attrs[j].GetType().Name == PascalABCCompiler.TreeConverter.compiler_string_consts.global_attr_name)
+                                if (attrs[j].GetType().Name == PascalSharp.Internal.TreeConverter.compiler_string_consts.global_attr_name)
                                 {
                                     sil = NetHelper.FindName(entry_type, name);
                                     if (sil != null) break;
@@ -596,7 +595,7 @@ namespace PascalABCCompiler.NetHelper
                         object[] attrs = t.GetCustomAttributes(false);
                         foreach (Attribute attr in attrs)
                         {
-                            if (attr.GetType().Name == PascalABCCompiler.TreeConverter.compiler_string_consts.global_attr_name)
+                            if (attr.GetType().Name == PascalSharp.Internal.TreeConverter.compiler_string_consts.global_attr_name)
                             {
                                 entry_type = t;
                                 unit_types.Insert(0, t);
@@ -604,7 +603,7 @@ namespace PascalABCCompiler.NetHelper
 
                                 break;
                             }
-                            else if (attr.GetType().Name == PascalABCCompiler.TreeConverter.compiler_string_consts.class_unit_attr_name)
+                            else if (attr.GetType().Name == PascalSharp.Internal.TreeConverter.compiler_string_consts.class_unit_attr_name)
                             {
                                 if (_assembly.ManifestModule.ScopeName == compiler_string_consts.pabc_rtl_dll_name)
                                 {
@@ -631,13 +630,13 @@ namespace PascalABCCompiler.NetHelper
                                     attr_t = o as Type;
                                 else
                                     attr_t = _assembly.GetType(o as string, false);
-                                if (PascalABCCompiler.TreeConverter.compilation_context.instance != null && PascalABCCompiler.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalABCCompiler.TreeConverter.compilation_context.instance.converted_namespace != null)
+                                if (PascalSharp.Internal.TreeConverter.compilation_context.instance != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.converted_namespace != null)
                                 {
                                     type_node tn = CreatePascalType(attr_t);
                                     if (tn != null)
-                                        tn = PascalABCCompiler.TreeConverter.compilation_context.instance.create_typed_file_type(tn, null);
+                                        tn = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_typed_file_type(tn, null);
                                     else
-                                        tn = PascalABCCompiler.TreeConverter.compilation_context.instance.create_typed_file_type(compiled_type_node.get_type_node(attr_t), null);
+                                        tn = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_typed_file_type(compiled_type_node.get_type_node(attr_t), null);
                                     compiled_pascal_types[t.Namespace + "." + t.Name.Substring(1)] = tn;
                                 }
                                 else
@@ -655,13 +654,13 @@ namespace PascalABCCompiler.NetHelper
                                     attr_t = t.Assembly.GetType(o as string, false);
 
                                 }
-                                if (PascalABCCompiler.TreeConverter.compilation_context.instance != null && PascalABCCompiler.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalABCCompiler.TreeConverter.compilation_context.instance.converted_namespace != null)
+                                if (PascalSharp.Internal.TreeConverter.compilation_context.instance != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.converted_namespace != null)
                                 {
                                     type_node tn = CreatePascalType(attr_t);
                                     if (tn != null)
-                                        tn = PascalABCCompiler.TreeConverter.compilation_context.instance.create_set_type(tn, null);
+                                        tn = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_set_type(tn, null);
                                     else
-                                        tn = PascalABCCompiler.TreeConverter.compilation_context.instance.create_set_type(compiled_type_node.get_type_node(attr_t), null);
+                                        tn = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_set_type(compiled_type_node.get_type_node(attr_t), null);
                                     compiled_pascal_types[t.Namespace + "." + t.Name.Substring(1)] = tn;
                                 }
                                 else
@@ -672,9 +671,9 @@ namespace PascalABCCompiler.NetHelper
                             else if (attr_t.FullName == compiler_string_consts.short_string_attr_name)
                             {
                                 int len = (int)attr_t.GetField("Length", BindingFlags.Public | BindingFlags.Instance).GetValue(attrs[0]);
-                                if (PascalABCCompiler.TreeConverter.compilation_context.instance != null && PascalABCCompiler.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalABCCompiler.TreeConverter.compilation_context.instance.converted_namespace != null)
+                                if (PascalSharp.Internal.TreeConverter.compilation_context.instance != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.converted_namespace != null)
                                 {
-                                    type_node tn = PascalABCCompiler.TreeConverter.compilation_context.instance.create_short_string_type(len, null);
+                                    type_node tn = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_short_string_type(len, null);
                                     compiled_pascal_types[t.Namespace + "." + t.Name.Substring(1)] = tn;
                                 }
                                 else
@@ -720,7 +719,7 @@ namespace PascalABCCompiler.NetHelper
             {
                 Type attr_t = attrs[0].GetType();
                 byte[] tree = (byte[])attr_t.GetField("Tree", BindingFlags.Public | BindingFlags.Instance).GetValue(attrs[0]);
-                return PascalABCCompiler.TreeConverter.compilation_context.instance.create_template_class(t.FullName, tree);
+                return PascalSharp.Internal.TreeConverter.compilation_context.instance.create_template_class(t.FullName, tree);
             }
             return null;
         }
@@ -746,10 +745,10 @@ namespace PascalABCCompiler.NetHelper
                         {
                             type_node tn = CreatePascalType(attr_t);
                             if (tn != null)
-                                return PascalABCCompiler.TreeConverter.compilation_context.instance.create_typed_file_type(tn, null);
+                                return PascalSharp.Internal.TreeConverter.compilation_context.instance.create_typed_file_type(tn, null);
                         }
                     }
-                    return PascalABCCompiler.TreeConverter.compilation_context.instance.create_typed_file_type(compiled_type_node.get_type_node(attr_t), null);
+                    return PascalSharp.Internal.TreeConverter.compilation_context.instance.create_typed_file_type(compiled_type_node.get_type_node(attr_t), null);
                 }
                 else if (attr_t.FullName == compiler_string_consts.set_of_attr_name)
                 {
@@ -763,15 +762,15 @@ namespace PascalABCCompiler.NetHelper
                         {
                             type_node tn = CreatePascalType(attr_t);
                             if (tn != null)
-                                return PascalABCCompiler.TreeConverter.compilation_context.instance.create_set_type(tn, null);
+                                return PascalSharp.Internal.TreeConverter.compilation_context.instance.create_set_type(tn, null);
                         }
                     }
-                    return PascalABCCompiler.TreeConverter.compilation_context.instance.create_set_type(compiled_type_node.get_type_node(attr_t), null);
+                    return PascalSharp.Internal.TreeConverter.compilation_context.instance.create_set_type(compiled_type_node.get_type_node(attr_t), null);
                 }
                 else if (attr_t.FullName == compiler_string_consts.short_string_attr_name)
                 {
                     int len = (int)attr_t.GetField("Length", BindingFlags.Public | BindingFlags.Instance).GetValue(attrs[0]);
-                    return PascalABCCompiler.TreeConverter.compilation_context.instance.create_short_string_type(len, null);
+                    return PascalSharp.Internal.TreeConverter.compilation_context.instance.create_short_string_type(len, null);
                 }
                 else if (attr_t.FullName == compiler_string_consts.template_class_attr_name)
                 {
@@ -805,8 +804,8 @@ namespace PascalABCCompiler.NetHelper
 		{
 			object[] attrs = t.GetCustomAttributes(false);
 			for (int j=0; j<attrs.Length; j++)
-			if (attrs[j].GetType().Name == PascalABCCompiler.TreeConverter.compiler_string_consts.global_attr_name
-                || attrs[j].GetType().Name == PascalABCCompiler.TreeConverter.compiler_string_consts.class_unit_attr_name)
+			if (attrs[j].GetType().Name == PascalSharp.Internal.TreeConverter.compiler_string_consts.global_attr_name
+                || attrs[j].GetType().Name == PascalSharp.Internal.TreeConverter.compiler_string_consts.class_unit_attr_name)
 			{
 				return true;
 			}
@@ -935,7 +934,7 @@ namespace PascalABCCompiler.NetHelper
         	return false;
 		}
 		
-		public static bool IsNetNamespace(string name,PascalABCCompiler.TreeRealization.using_namespace_list _unar, out string full_ns)
+		public static bool IsNetNamespace(string name,PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace_list _unar, out string full_ns)
 		{
 			Type t = namespaces[name] as Type;
 			full_ns = name;
@@ -1567,31 +1566,31 @@ namespace PascalABCCompiler.NetHelper
 			{
 				if (cpn.type is compiled_type_node)
 				return cpn;
-				if (PascalABCCompiler.TreeConverter.compilation_context.instance != null && PascalABCCompiler.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalABCCompiler.TreeConverter.compilation_context.instance.converted_namespace != null)
+				if (PascalSharp.Internal.TreeConverter.compilation_context.instance != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.converted_namespace != null)
 				{
 					if (cpn.type.type_special_kind == type_special_kind.typed_file &&
-				    (!PascalABCCompiler.TreeConverter.compilation_context.instance.TypedFiles.ContainsKey(cpn.type.element_type) || PascalABCCompiler.TreeConverter.compilation_context.instance.TypedFiles[cpn.type.element_type] != cpn.type))
+				    (!PascalSharp.Internal.TreeConverter.compilation_context.instance.TypedFiles.ContainsKey(cpn.type.element_type) || PascalSharp.Internal.TreeConverter.compilation_context.instance.TypedFiles[cpn.type.element_type] != cpn.type))
 					{
-						cpn.type = PascalABCCompiler.TreeConverter.compilation_context.instance.create_typed_file_type(cpn.type.element_type,null);
+						cpn.type = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_typed_file_type(cpn.type.element_type,null);
 						return cpn;
 					}
 					else if (cpn.type.type_special_kind == type_special_kind.set_type &&
-				    (!PascalABCCompiler.TreeConverter.compilation_context.instance.TypedSets.ContainsKey(cpn.type.element_type) || PascalABCCompiler.TreeConverter.compilation_context.instance.TypedSets[cpn.type.element_type] != cpn.type))
+				    (!PascalSharp.Internal.TreeConverter.compilation_context.instance.TypedSets.ContainsKey(cpn.type.element_type) || PascalSharp.Internal.TreeConverter.compilation_context.instance.TypedSets[cpn.type.element_type] != cpn.type))
 					{
-						cpn.type = PascalABCCompiler.TreeConverter.compilation_context.instance.create_set_type(cpn.type.element_type,null);
+						cpn.type = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_set_type(cpn.type.element_type,null);
 						return cpn;
 					}
 					else if (cpn.type.type_special_kind == type_special_kind.short_string &&
-					        (!PascalABCCompiler.TreeConverter.compilation_context.instance.ShortStringTypes.ContainsKey((cpn.type as short_string_type_node).Length) || PascalABCCompiler.TreeConverter.compilation_context.instance.ShortStringTypes[(cpn.type as short_string_type_node).Length] != cpn.type))
+					        (!PascalSharp.Internal.TreeConverter.compilation_context.instance.ShortStringTypes.ContainsKey((cpn.type as short_string_type_node).Length) || PascalSharp.Internal.TreeConverter.compilation_context.instance.ShortStringTypes[(cpn.type as short_string_type_node).Length] != cpn.type))
 					{
-						cpn.type = PascalABCCompiler.TreeConverter.compilation_context.instance.create_short_string_type((cpn.type as short_string_type_node).Length,null);
+						cpn.type = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_short_string_type((cpn.type as short_string_type_node).Length,null);
 						return cpn;
 					}
 				}
 			}
 			cpn = new compiled_variable_definition(pi);
 			
-			if (PascalABCCompiler.TreeConverter.compilation_context.instance != null && PascalABCCompiler.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalABCCompiler.TreeConverter.compilation_context.instance.converted_namespace != null)
+			if (PascalSharp.Internal.TreeConverter.compilation_context.instance != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.converted_namespace != null)
 			{
 				object[] attrs = pi.GetCustomAttributes(false);
 				for (int i=0; i<attrs.Length; i++)
@@ -1609,9 +1608,9 @@ namespace PascalABCCompiler.NetHelper
                     		tn = CreatePascalType(t);
                    		}
                     	if (tn != null)
-                    	cpn.type = PascalABCCompiler.TreeConverter.compilation_context.instance.create_typed_file_type(tn,null);
+                    	cpn.type = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_typed_file_type(tn,null);
                     	else
-						cpn.type = PascalABCCompiler.TreeConverter.compilation_context.instance.create_typed_file_type(compiled_type_node.get_type_node(t),null);
+						cpn.type = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_typed_file_type(compiled_type_node.get_type_node(t),null);
 					}
 					else if (t.FullName == compiler_string_consts.set_of_attr_name)
 					{
@@ -1625,14 +1624,14 @@ namespace PascalABCCompiler.NetHelper
                     		tn = CreatePascalType(t);
                    		}
                     	if (tn != null)
-                    	cpn.type = PascalABCCompiler.TreeConverter.compilation_context.instance.create_set_type(tn,null);
+                    	cpn.type = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_set_type(tn,null);
                     	else
-						cpn.type = PascalABCCompiler.TreeConverter.compilation_context.instance.create_set_type(compiled_type_node.get_type_node(t),null);
+						cpn.type = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_set_type(compiled_type_node.get_type_node(t),null);
 					}
 					else if (t.FullName == compiler_string_consts.short_string_attr_name)
 					{
 						int len = (int)t.GetField("Length",BindingFlags.Public|BindingFlags.Instance).GetValue(attrs[i]);
-						cpn.type = PascalABCCompiler.TreeConverter.compilation_context.instance.create_short_string_type(len,null);
+						cpn.type = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_short_string_type(len,null);
 					}
 				}
 			}
@@ -1830,7 +1829,7 @@ namespace PascalABCCompiler.NetHelper
             if (o != null)
             {
                 template_class tc = o as template_class;
-                if (tc == null && PascalABCCompiler.TreeConverter.compilation_context.instance != null && PascalABCCompiler.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalABCCompiler.TreeConverter.compilation_context.instance.converted_namespace != null)
+                if (tc == null && PascalSharp.Internal.TreeConverter.compilation_context.instance != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.converted_namespace != null)
                 {
                     Type t = o as Type;
                     if (t != null)
@@ -1852,7 +1851,7 @@ namespace PascalABCCompiler.NetHelper
             if (o != null)
             {
                 type_node tn = o as type_node;
-                if (tn == null && PascalABCCompiler.TreeConverter.compilation_context.instance != null && PascalABCCompiler.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalABCCompiler.TreeConverter.compilation_context.instance.converted_namespace != null)
+                if (tn == null && PascalSharp.Internal.TreeConverter.compilation_context.instance != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.converted_namespace != null)
                 {
                     Type t = o as Type;
                     if (t != null)
@@ -1868,24 +1867,24 @@ namespace PascalABCCompiler.NetHelper
                 }
                 else
                 {
-                    if (PascalABCCompiler.TreeConverter.compilation_context.instance != null && PascalABCCompiler.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalABCCompiler.TreeConverter.compilation_context.instance.converted_namespace != null)
+                    if (PascalSharp.Internal.TreeConverter.compilation_context.instance != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.syntax_tree_visitor.compiled_unit != null && PascalSharp.Internal.TreeConverter.compilation_context.instance.converted_namespace != null)
                     {
                         if (tn.type_special_kind == type_special_kind.typed_file &&
-                        (!PascalABCCompiler.TreeConverter.compilation_context.instance.TypedFiles.ContainsKey(tn.element_type) || PascalABCCompiler.TreeConverter.compilation_context.instance.TypedFiles[tn.element_type] != tn))
+                        (!PascalSharp.Internal.TreeConverter.compilation_context.instance.TypedFiles.ContainsKey(tn.element_type) || PascalSharp.Internal.TreeConverter.compilation_context.instance.TypedFiles[tn.element_type] != tn))
                         {
-                            tn = PascalABCCompiler.TreeConverter.compilation_context.instance.create_typed_file_type(tn.element_type, null);
+                            tn = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_typed_file_type(tn.element_type, null);
                             return tn;
                         }
                         else if (tn.type_special_kind == type_special_kind.set_type &&
-                            (!PascalABCCompiler.TreeConverter.compilation_context.instance.TypedSets.ContainsKey(tn.element_type) || PascalABCCompiler.TreeConverter.compilation_context.instance.TypedSets[tn.element_type] != tn))
+                            (!PascalSharp.Internal.TreeConverter.compilation_context.instance.TypedSets.ContainsKey(tn.element_type) || PascalSharp.Internal.TreeConverter.compilation_context.instance.TypedSets[tn.element_type] != tn))
                         {
-                            tn = PascalABCCompiler.TreeConverter.compilation_context.instance.create_set_type(tn.element_type, null);
+                            tn = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_set_type(tn.element_type, null);
                             return tn;
                         }
                         else if (tn.type_special_kind == type_special_kind.short_string &&
-                            (!PascalABCCompiler.TreeConverter.compilation_context.instance.ShortStringTypes.ContainsKey((tn as short_string_type_node).Length) || PascalABCCompiler.TreeConverter.compilation_context.instance.ShortStringTypes[(tn as short_string_type_node).Length] != tn))
+                            (!PascalSharp.Internal.TreeConverter.compilation_context.instance.ShortStringTypes.ContainsKey((tn as short_string_type_node).Length) || PascalSharp.Internal.TreeConverter.compilation_context.instance.ShortStringTypes[(tn as short_string_type_node).Length] != tn))
                         {
-                            tn = PascalABCCompiler.TreeConverter.compilation_context.instance.create_short_string_type((tn as short_string_type_node).Length, null);
+                            tn = PascalSharp.Internal.TreeConverter.compilation_context.instance.create_short_string_type((tn as short_string_type_node).Length, null);
                             return tn;
                         }
                     }
@@ -1895,7 +1894,7 @@ namespace PascalABCCompiler.NetHelper
             return null;
         }
 		
-		public static Type FindType(string name, PascalABCCompiler.TreeRealization.using_namespace_list _unar)
+		public static Type FindType(string name, PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace_list _unar)
         {
             FoundInfo fi = null;
             if (type_search_cache.TryGetValue(name, out fi))

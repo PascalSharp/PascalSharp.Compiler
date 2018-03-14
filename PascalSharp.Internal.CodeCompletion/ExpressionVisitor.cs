@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using PascalABCCompiler.Parsers;
 using PascalABCCompiler.SyntaxTree;
-//using PascalABCCompiler.TreeRealization;
+//using PascalSharp.Internal.TreeConverter;TreeRealization;
 
 namespace PascalSharp.Internal.CodeCompletion
 {
@@ -221,7 +221,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 if (tleft != null && tright != null)
                 {
                     List<SymScope> lst = tleft.FindOverloadNamesOnlyInType
-                        (PascalABCCompiler.TreeConverter.name_reflector.get_name(_bin_expr.operation_type));
+                        (PascalSharp.Internal.TreeConverter.name_reflector.get_name(_bin_expr.operation_type));
                     ProcScope ps = select_method(lst.ToArray(), tleft, tright, null, _bin_expr.left, _bin_expr.right);
                     if (ps != null)
                         returned_scope = new ElementScope(ps.return_type);
@@ -408,7 +408,7 @@ namespace PascalSharp.Internal.CodeCompletion
 
         public override void visit(string_const _string_const)
         {
-            returned_scope = new ElementScope(entry_scope.FindName(PascalABCCompiler.TreeConverter.compiler_string_consts.string_type_name));
+            returned_scope = new ElementScope(entry_scope.FindName(PascalSharp.Internal.TreeConverter.compiler_string_consts.string_type_name));
         }
 
         public override void visit(expression_list _expression_list)
@@ -1293,7 +1293,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 if (returned_scope != null) returned_scope = new ElementScope(returned_scope);
             }
             else if (_typecast_node.cast_op == op_typecast.is_op)
-                returned_scope = new ElementScope(entry_scope.FindName(PascalABCCompiler.TreeConverter.compiler_string_consts.bool_type_name));
+                returned_scope = new ElementScope(entry_scope.FindName(PascalSharp.Internal.TreeConverter.compiler_string_consts.bool_type_name));
         }
 
         public override void visit(interface_node _interface_node)
@@ -1383,7 +1383,7 @@ namespace PascalSharp.Internal.CodeCompletion
 
         public override void visit(format_expr _format_expr)
         {
-            returned_scope = entry_scope.FindName(PascalABCCompiler.TreeConverter.compiler_string_consts.string_type_name);
+            returned_scope = entry_scope.FindName(PascalSharp.Internal.TreeConverter.compiler_string_consts.string_type_name);
         }
 
         public override void visit(initfinal_part _initfinal_part)
@@ -1593,7 +1593,7 @@ namespace PascalSharp.Internal.CodeCompletion
 
         public override void visit(sizeof_operator _sizeof_operator)
         {
-            returned_scope = new ElementScope(entry_scope.FindName(PascalABCCompiler.TreeConverter.compiler_string_consts.integer_type_name));
+            returned_scope = new ElementScope(entry_scope.FindName(PascalSharp.Internal.TreeConverter.compiler_string_consts.integer_type_name));
         }
 
         public override void visit(typeof_operator _typeof_operator)

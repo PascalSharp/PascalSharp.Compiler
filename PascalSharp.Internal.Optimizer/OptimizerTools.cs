@@ -3,7 +3,6 @@
 
 using System.Collections;
 using System.Collections.Generic;
-using PascalABCCompiler.TreeRealization;
 
 namespace PascalSharp.Internal.Optimizer
 {

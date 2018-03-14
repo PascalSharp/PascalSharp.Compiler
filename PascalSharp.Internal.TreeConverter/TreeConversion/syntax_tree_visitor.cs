@@ -5,27 +5,27 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.TreeConverter;TreeConversion;
 using SyntaxTreeBuilder = PascalABCCompiler.SyntaxTree.SyntaxTreeBuilder;
 using SymTable = SymbolTable;
-using array_const = PascalABCCompiler.TreeRealization.array_const;
-using compiler_directive = PascalABCCompiler.TreeRealization.compiler_directive;
-using empty_statement = PascalABCCompiler.TreeRealization.empty_statement;
-using for_node = PascalABCCompiler.TreeRealization.for_node;
-using goto_statement = PascalABCCompiler.TreeRealization.goto_statement;
-using if_node = PascalABCCompiler.TreeRealization.if_node;
-using labeled_statement = PascalABCCompiler.TreeRealization.labeled_statement;
-using question_colon_expression = PascalABCCompiler.TreeRealization.question_colon_expression;
-using repeat_node = PascalABCCompiler.TreeRealization.repeat_node;
-using sizeof_operator = PascalABCCompiler.TreeRealization.sizeof_operator;
-using typeof_operator = PascalABCCompiler.TreeRealization.typeof_operator;
-using while_node = PascalABCCompiler.TreeRealization.while_node;
+using array_const = PascalSharp.Internal.TreeConverter.TreeRealization.array_const;
+using compiler_directive = PascalSharp.Internal.TreeConverter.TreeRealization.compiler_directive;
+using empty_statement = PascalSharp.Internal.TreeConverter.TreeRealization.empty_statement;
+using for_node = PascalSharp.Internal.TreeConverter.TreeRealization.for_node;
+using goto_statement = PascalSharp.Internal.TreeConverter.TreeRealization.goto_statement;
+using if_node = PascalSharp.Internal.TreeConverter.TreeRealization.if_node;
+using labeled_statement = PascalSharp.Internal.TreeConverter.TreeRealization.labeled_statement;
+using question_colon_expression = PascalSharp.Internal.TreeConverter.TreeRealization.question_colon_expression;
+using repeat_node = PascalSharp.Internal.TreeConverter.TreeRealization.repeat_node;
+using sizeof_operator = PascalSharp.Internal.TreeConverter.TreeRealization.sizeof_operator;
+using typeof_operator = PascalSharp.Internal.TreeConverter.TreeRealization.typeof_operator;
+using while_node = PascalSharp.Internal.TreeConverter.TreeRealization.while_node;
 using TreeConverter.LambdaExpressions.Closure;
 using TreeConverter.LambdaExpressions;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter
 {
     // Сахарный узел синтаксического дерева. Не генерируется автоматически, поскольку содержит ссылку на узел семантического дерева
     // Нужен только при генерации синтаксических узлов на семантическом уровне, т.е. для синтаксического сахара
@@ -61,7 +61,7 @@ namespace PascalABCCompiler.TreeConverter
         //TODO: Загнать в request.
         motivation_keeper motivation_keeper = new motivation_keeper();
 
-        private PascalABCCompiler.TreeRealization.unit_node_list _referenced_units;
+        private PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list _referenced_units;
 
         private common_unit_node _compiled_unit;
 
@@ -604,7 +604,7 @@ namespace PascalABCCompiler.TreeConverter
 
         }
 
-        public PascalABCCompiler.TreeRealization.document CurrentDocument
+        public PascalSharp.Internal.TreeConverter.TreeRealization.document CurrentDocument
         {
             get
             {
@@ -668,7 +668,7 @@ namespace PascalABCCompiler.TreeConverter
             }
         }
 
-        public PascalABCCompiler.TreeRealization.unit_node_list referenced_units
+        public PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list referenced_units
         {
             get
             {
@@ -951,7 +951,7 @@ namespace PascalABCCompiler.TreeConverter
         }
         
         //Последний параметер - выходной. Он слдержит список параметров с преобразованиями типов.
-        private function_node find_function(string name, location loc, PascalABCCompiler.TreeRealization.expressions_list parameters)
+        private function_node find_function(string name, location loc, PascalSharp.Internal.TreeConverter.TreeRealization.expressions_list parameters)
         {
             SymbolInfoList sil = context.find(name);
             if (sil == null)
@@ -16940,18 +16940,18 @@ namespace PascalABCCompiler.TreeConverter
             {
                 if (cl_def == null)
                 {
-                    throw new PascalABCCompiler.TreeConverter.CompilerInternalError("No body definition in template class.");
+                    throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("No body definition in template class.");
                 }
                 if (cl_def.template_args == null || cl_def.template_args.idents == null)
                 {
-                    throw new PascalABCCompiler.TreeConverter.CompilerInternalError("No template arguments in syntax tree.");
+                    throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("No template arguments in syntax tree.");
                 }
             }
             else
             {
                 if (ttn == null)
                 {
-                    throw new PascalABCCompiler.TreeConverter.CompilerInternalError("No template name.");
+                    throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("No template name.");
                 }
             }
 #endif

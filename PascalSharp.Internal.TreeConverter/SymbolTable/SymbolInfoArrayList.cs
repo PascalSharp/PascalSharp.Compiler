@@ -2,7 +2,7 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 using System;
 
-using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.TreeConverter;
 
 namespace TreeConverter
 {

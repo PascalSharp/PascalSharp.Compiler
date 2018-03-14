@@ -1,9 +1,10 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Linq;
 
-namespace PascalABCCompiler.Collections
+namespace PascalSharp.Internal.TreeConverter.Collections
 {
     [Serializable]
     public class stack<T>

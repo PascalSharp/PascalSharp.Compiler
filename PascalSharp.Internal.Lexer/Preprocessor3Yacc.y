@@ -7,9 +7,9 @@
 %partial
 %parsertype PreprocessorParser
 
-%namespace GPPGPreprocessor3
+%namespace PascalSharp.Internal.Lexer
 
-%using PascalABCCompiler.SyntaxTree;
+%using PascalSharp.Internal.SyntaxTree;
 
 %YYSTYPE Directive
 

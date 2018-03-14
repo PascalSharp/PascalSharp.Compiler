@@ -7,7 +7,7 @@ using System.IO;
 using PascalABCCompiler.Parsers;
 using PascalABCCompiler.SyntaxTree;
 //using ICSharpCode.SharpDevelop.Dom;
-//using PascalABCCompiler.TreeRealization;
+//using PascalSharp.Internal.TreeConverter;TreeRealization;
 
 namespace PascalSharp.Internal.CodeCompletion
 {

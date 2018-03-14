@@ -11,11 +11,10 @@
 	LexLocation currentLexLocation;
 %}
 
-%namespace GPPGParserScanner
+%namespace PascalSharp.Internal.Lexer
 
-%using PascalABCSavParser;
-%using PascalABCCompiler.SyntaxTree;
-%using PascalABCCompiler.ParserTools;
+%using PascalSharp.Internal.SyntaxTree;
+%using PascalSharp.Internal.ParserTools;
 %using QUT.Gppg;
 
 Letter [[:IsLetter:]_]

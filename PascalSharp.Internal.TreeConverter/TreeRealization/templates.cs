@@ -2,11 +2,12 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Здесь описана реализация неуправляемых шаблонов
 //Файлом владеет ssyy.
+
 using System;
 using System.Collections.Generic;
-using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.TreeConverter;
 
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     //Хранит информацию о методе, описанном вне класса
     public class procedure_definition_info
@@ -15,10 +16,10 @@ namespace PascalABCCompiler.TreeRealization
         public common_namespace_node nspace;
 
         //Сам метод в виде синтаксического дерева
-        public SyntaxTree.procedure_definition proc;
+        public PascalABCCompiler.SyntaxTree.procedure_definition proc;
 
         public procedure_definition_info(common_namespace_node _nspace,
-            SyntaxTree.procedure_definition _proc)
+            PascalABCCompiler.SyntaxTree.procedure_definition _proc)
         {
             nspace = _nspace;
             proc = _proc;
@@ -51,11 +52,11 @@ namespace PascalABCCompiler.TreeRealization
             return false;
         }
 
-        public static void AddUsingListToScope(SymbolTable.Scope scope, using_namespace_list unl)
+        public static void AddUsingListToScope(PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope, using_namespace_list unl)
         {
-            SymbolTable.UnitPartScope ups = scope as SymbolTable.UnitPartScope;
+            PascalSharp.Internal.TreeConverter.SymbolTable.UnitPartScope ups = scope as PascalSharp.Internal.TreeConverter.SymbolTable.UnitPartScope;
             if (ups == null) return;
-            foreach (SymbolTable.Scope sc in ups.TopScopeArray)
+            foreach (PascalSharp.Internal.TreeConverter.SymbolTable.Scope sc in ups.TopScopeArray)
             {
                 NetHelper.NetScope netsc = sc as NetHelper.NetScope;
                 if (netsc != null && netsc.used_namespaces.Count == 0)
@@ -144,7 +145,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        private SyntaxTree.type_declaration _type_decl; //Синтаксическое дерево шаблона
+        private PascalABCCompiler.SyntaxTree.type_declaration _type_decl; //Синтаксическое дерево шаблона
         private string _name;                           //Имя шаблона
         private common_namespace_node _cnn;             //Пространство, где описан шаблон
         private document _doc;                          //Документ, т.е. файл, где описан шаблон
@@ -168,27 +169,27 @@ namespace PascalABCCompiler.TreeRealization
 
         public string CreateTemplateInstance(List<type_node> instance_params, location loc)
         {
-            SyntaxTree.class_definition cl_def = _type_decl.type_def as SyntaxTree.class_definition;
-            SyntaxTree.template_type_name ttn = _type_decl.type_name as SyntaxTree.template_type_name;
+            PascalABCCompiler.SyntaxTree.class_definition cl_def = _type_decl.type_def as PascalABCCompiler.SyntaxTree.class_definition;
+            PascalABCCompiler.SyntaxTree.template_type_name ttn = _type_decl.type_name as PascalABCCompiler.SyntaxTree.template_type_name;
             //if (cl_def == null)
             //{
-            //    throw new PascalABCCompiler.TreeConverter.CompilerInternalError("No body definition in template class.");
+            //    throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("No body definition in template class.");
             //}
             //if (cl_def.template_args == null || cl_def.template_args.idents == null)
             //{
-            //    throw new PascalABCCompiler.TreeConverter.CompilerInternalError("No template arguments in syntax tree.");
+            //    throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("No template arguments in syntax tree.");
             //}
-            List<SyntaxTree.ident> template_formals = (_is_synonym) ?
+            List<PascalABCCompiler.SyntaxTree.ident> template_formals = (_is_synonym) ?
                 ttn.template_args.idents : cl_def.template_args.idents;
             if (instance_params.Count != template_formals.Count)
             {
-                throw new PascalABCCompiler.TreeConverter.SimpleSemanticError(loc, "TEMPLATE_ARGUMENTS_COUNT_MISMATCH");
+                throw new PascalSharp.Internal.TreeConverter.SimpleSemanticError(loc, "TEMPLATE_ARGUMENTS_COUNT_MISMATCH");
             }
             return GetTemplateInstanceName(instance_params);
              
         }
 
-        public SyntaxTree.type_declaration type_dec
+        public PascalABCCompiler.SyntaxTree.type_declaration type_dec
         {
             get
             {
@@ -276,7 +277,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public template_class(SyntaxTree.type_declaration type_decl, string name,common_namespace_node cnn,/*common_type_node ctn,location loc,*/document doc,using_namespace_list unl)
+        public template_class(PascalABCCompiler.SyntaxTree.type_declaration type_decl, string name,common_namespace_node cnn,/*common_type_node ctn,location loc,*/document doc,using_namespace_list unl)
         {
             _cnn = cnn;
             _type_decl = type_decl;
@@ -311,9 +312,9 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
-            throw new PascalABCCompiler.TreeConverter.CompilerInternalError("Template class can't be visit.");
+            throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("Template class can't be visit.");
         }
 
         private byte[] tree=null;
@@ -327,7 +328,7 @@ namespace PascalABCCompiler.TreeRealization
                 if (tree == null)
                 try
                 {
-                    SyntaxTree.SyntaxTreeStreamWriter stw = new SyntaxTree.SyntaxTreeStreamWriter();
+                    PascalABCCompiler.SyntaxTree.SyntaxTreeStreamWriter stw = new PascalABCCompiler.SyntaxTree.SyntaxTreeStreamWriter();
                     byte[] buf = new byte[10000];
                     stw.bw = new System.IO.BinaryWriter(new System.IO.MemoryStream(buf));
                     this.type_dec.visit(stw);
@@ -517,7 +518,7 @@ namespace PascalABCCompiler.TreeRealization
 
         public override type_node base_type
         {
-            get { return SystemLibrary.SystemLibrary.object_type; }
+            get { return PascalABCCompiler.SystemLibrary.SystemLibrary.object_type; }
         }
 
         public override string name
@@ -537,10 +538,10 @@ namespace PascalABCCompiler.TreeRealization
 
         public override PascalABCCompiler.SemanticTree.node_kind node_kind
         {
-            get { return SemanticTree.node_kind.indefinite; }
+            get { return PascalABCCompiler.SemanticTree.node_kind.indefinite; }
         }
 
-        public override SymbolTable.Scope Scope
+        public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
         {
             get { return null; }
         }

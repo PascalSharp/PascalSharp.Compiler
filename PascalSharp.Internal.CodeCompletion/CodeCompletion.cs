@@ -330,7 +330,7 @@ namespace PascalSharp.Internal.CodeCompletion
 
     public class CodeCompletionNameHelper
     {
-        public static readonly string system_unit_file_name = PascalABCCompiler.TreeConverter.compiler_string_consts.system_unit_file_name;
+        public static readonly string system_unit_file_name = PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_file_name;
         public static string system_unit_file_full_name;
         private static CodeCompletionNameHelper helper;
 

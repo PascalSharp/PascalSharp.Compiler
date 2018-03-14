@@ -4,10 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
-using PascalABCCompiler.TreeRealization;
 using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter;TreeConversion;
 
 namespace PascalABCCompiler.TreeConversion
 {
@@ -174,7 +173,7 @@ namespace PascalABCCompiler.TreeConversion
         // From LamdaHelper
         private procedure_definition InternalCreateProcedureDefinitionNode(string methName, formal_parameters formalPars, bool classKeyword, statement procBody, SourceContext sc)
         {
-            return PascalABCCompiler.TreeConverter.LambdaHelper.SyntaxTreeNodesConstructor.CreateProcedureDefinitionNode(new method_name(methName),
+            return LambdaHelper.SyntaxTreeNodesConstructor.CreateProcedureDefinitionNode(new method_name(methName),
                                                                                                                          formalPars,
                                                                                                                          false,
                                                                                                                          classKeyword,
@@ -194,7 +193,7 @@ namespace PascalABCCompiler.TreeConversion
 
         private procedure_definition InternalCreateFunctionDefinitionNode(string methName, formal_parameters formalPars, bool classKeyword, statement procBody, type_definition returnType, SourceContext sc)
         {
-            return PascalABCCompiler.TreeConverter.LambdaHelper.SyntaxTreeNodesConstructor.CreateFunctionDefinitionNode(new method_name(methName),
+            return LambdaHelper.SyntaxTreeNodesConstructor.CreateFunctionDefinitionNode(new method_name(methName),
                                                                                                                         formalPars,
                                                                                                                         false,
                                                                                                                         classKeyword,

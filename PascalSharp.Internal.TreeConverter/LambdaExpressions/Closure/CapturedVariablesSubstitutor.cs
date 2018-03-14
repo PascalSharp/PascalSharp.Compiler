@@ -6,8 +6,8 @@ using System.Linq;
 using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
 using PascalABCCompiler.SystemLibrary;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter;TreeConversion;
 using array_const = PascalABCCompiler.SyntaxTree.array_const;
 using for_node = PascalABCCompiler.SyntaxTree.for_node;
 

@@ -5,8 +5,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Xml;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.TreeConverter;
 
 namespace PascalSharp.Compiler
 {

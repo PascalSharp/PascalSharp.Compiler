@@ -6,10 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 
 using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.TreeRealization;
 using PascalSharp.Internal.Errors;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
 
 	public class convertion_data_and_alghoritms

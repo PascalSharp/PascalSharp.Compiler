@@ -1,14 +1,16 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
 
-namespace PascalABCCompiler.TreeRealization
+using System;
+using PascalABCCompiler.SemanticTree;
+
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
 
 	public enum concrete_parameter_type {cpt_var, cpt_const, cpt_none};
 
 	[Serializable]
-	public abstract class var_definition_node : definition_node, SemanticTree.IVAriableDefinitionNode
+	public abstract class var_definition_node : definition_node, IVAriableDefinitionNode
 	{
         public override string ToString() => name + ": "+ type.ToString();
 
@@ -17,9 +19,9 @@ namespace PascalABCCompiler.TreeRealization
         private expression_node _inital_value;
         private bool _is_ret_value;
         private bool _is_special_name;
-        private SemanticTree.polymorphic_state _polymorphic_state = PascalABCCompiler.SemanticTree.polymorphic_state.ps_common;
+        private PascalABCCompiler.SemanticTree.polymorphic_state _polymorphic_state = PascalABCCompiler.SemanticTree.polymorphic_state.ps_common;
 
-        public virtual SemanticTree.polymorphic_state polymorphic_state
+        public virtual PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
         {
             get
             {
@@ -128,7 +130,7 @@ namespace PascalABCCompiler.TreeRealization
                 _inital_value = value;
             }
         }
-        SemanticTree.IExpressionNode SemanticTree.IVAriableDefinitionNode.inital_value
+        PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IVAriableDefinitionNode.inital_value
         {
             get
             {
@@ -137,7 +139,7 @@ namespace PascalABCCompiler.TreeRealization
         }
 
 		//Раположение переменной.
-		public abstract SemanticTree.node_location_kind node_location_kind
+		public abstract PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get;
 		}
@@ -146,17 +148,17 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return general_node_type.variable_node;
+				return this.general_node_type.variable_node;
 			}
 		}
 
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ITypeNode SemanticTree.IVAriableDefinitionNode.type
+		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IVAriableDefinitionNode.type
 		{
 			get
 			{
@@ -166,7 +168,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-	public class local_variable : var_definition_node, SemanticTree.ILocalVariableNode
+	public class local_variable : var_definition_node, ILocalVariableNode
 	{
 		private common_function_node _cont_function;
 
@@ -208,7 +210,7 @@ namespace PascalABCCompiler.TreeRealization
             _is_used_as_unlocal = true;
         }
 
-		public SemanticTree.ILocation Location
+		public PascalABCCompiler.SemanticTree.ILocation Location
 		{
 			get
 			{
@@ -230,11 +232,11 @@ namespace PascalABCCompiler.TreeRealization
 		}
 
 		//Раположение переменной - переменная расположена в функции.
-		public override SemanticTree.node_location_kind node_location_kind
+		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get
 			{
-				return SemanticTree.node_location_kind.in_function_location;
+				return PascalABCCompiler.SemanticTree.node_location_kind.in_function_location;
 			}
 		}
 
@@ -242,16 +244,16 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.local_variable;
+				return this.semantic_node_type.local_variable;
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ICommonFunctionNode SemanticTree.IFunctionMemberNode.function
+		PascalABCCompiler.SemanticTree.ICommonFunctionNode PascalABCCompiler.SemanticTree.IFunctionMemberNode.function
 		{
 			get
 			{
@@ -261,7 +263,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
     [Serializable]
-    public class local_block_variable : var_definition_node, SemanticTree.ILocalBlockVariableNode
+    public class local_block_variable : var_definition_node, ILocalBlockVariableNode
     {
         private location _loc;
         statements_list stmt_list;
@@ -294,7 +296,7 @@ namespace PascalABCCompiler.TreeRealization
 
         
 
-        public SemanticTree.ILocation Location
+        public PascalABCCompiler.SemanticTree.ILocation Location
         {
             get
             {
@@ -316,11 +318,11 @@ namespace PascalABCCompiler.TreeRealization
         }
 
         //Раположение переменной - переменная расположена в функции.
-        public override SemanticTree.node_location_kind node_location_kind
+        public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
         {
             get
             {
-                return SemanticTree.node_location_kind.in_block_location;
+                return PascalABCCompiler.SemanticTree.node_location_kind.in_block_location;
             }
         }
 
@@ -328,16 +330,16 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return semantic_node_type.local_block_variable;
+                return this.semantic_node_type.local_block_variable;
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        SemanticTree.IStatementsListNode SemanticTree.ILocalBlockVariableNode.Block
+        PascalABCCompiler.SemanticTree.IStatementsListNode PascalABCCompiler.SemanticTree.ILocalBlockVariableNode.Block
         {
             get
             {
@@ -347,7 +349,7 @@ namespace PascalABCCompiler.TreeRealization
     }
     
     [Serializable]
-	public class namespace_variable : var_definition_node, SemanticTree.ICommonNamespaceVariableNode
+	public class namespace_variable : var_definition_node, ICommonNamespaceVariableNode
 	{
 		private common_namespace_node _cont_namespace;
 
@@ -378,7 +380,7 @@ namespace PascalABCCompiler.TreeRealization
             }
 		}
 
-		public SemanticTree.ILocation Location
+		public PascalABCCompiler.SemanticTree.ILocation Location
 		{
 			get
 			{
@@ -400,11 +402,11 @@ namespace PascalABCCompiler.TreeRealization
 		}
 
 		//Раположение переменной - переменная расположена непосредственно в пространстве имен.
-		public override SemanticTree.node_location_kind node_location_kind
+		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get
 			{
-				return SemanticTree.node_location_kind.in_namespace_location;
+				return PascalABCCompiler.SemanticTree.node_location_kind.in_namespace_location;
 			}
 		}
 
@@ -412,16 +414,16 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.namespace_variable;
+				return this.semantic_node_type.namespace_variable;
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		public SemanticTree.ICommonNamespaceNode comprehensive_namespace
+		public PascalABCCompiler.SemanticTree.ICommonNamespaceNode comprehensive_namespace
 		{
 			get
 			{
@@ -431,16 +433,16 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-	public class class_field : var_definition_node, SemanticTree.ICommonClassFieldNode
+	public class class_field : var_definition_node, ICommonClassFieldNode
 	{
 		private common_type_node _cont_class;
-		private SemanticTree.polymorphic_state _polymorphic_state;
-		private SemanticTree.field_access_level _field_access_level;
+		private PascalABCCompiler.SemanticTree.polymorphic_state _polymorphic_state;
+		private PascalABCCompiler.SemanticTree.field_access_level _field_access_level;
 
 		private location _loc;
 
         public class_field(string name, common_type_node cont_class,
-            SemanticTree.polymorphic_state polymorphic_state, SemanticTree.field_access_level field_access_level,
+            PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state, PascalABCCompiler.SemanticTree.field_access_level field_access_level,
             location loc) :
             base(name)
         {
@@ -452,7 +454,7 @@ namespace PascalABCCompiler.TreeRealization
 
 
 		public class_field(string name,type_node type,common_type_node cont_class,
-			SemanticTree.polymorphic_state polymorphic_state, SemanticTree.field_access_level field_access_level,
+			PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state, PascalABCCompiler.SemanticTree.field_access_level field_access_level,
             location loc):
 			base(name,type)
 		{
@@ -474,7 +476,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public SemanticTree.ILocation Location
+		public PascalABCCompiler.SemanticTree.ILocation Location
 		{
 			get
 			{
@@ -503,7 +505,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-        public override SemanticTree.polymorphic_state polymorphic_state
+        public override PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
 		{
 			get
 			{
@@ -515,7 +517,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public SemanticTree.field_access_level field_access_level
+		public PascalABCCompiler.SemanticTree.field_access_level field_access_level
 		{
 			get
 			{
@@ -528,11 +530,11 @@ namespace PascalABCCompiler.TreeRealization
 		}
 
 		//Раположение переменной - переменная расположена в классе.
-		public override SemanticTree.node_location_kind node_location_kind
+		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get
 			{
-				return SemanticTree.node_location_kind.in_class_location;
+				return PascalABCCompiler.SemanticTree.node_location_kind.in_class_location;
 			}
 		}
 
@@ -540,16 +542,16 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.class_field;
+				return this.semantic_node_type.class_field;
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		public SemanticTree.ICommonTypeNode common_comprehensive_type
+		public PascalABCCompiler.SemanticTree.ICommonTypeNode common_comprehensive_type
 		{
 			get
 			{
@@ -557,7 +559,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public SemanticTree.ITypeNode comperehensive_type
+		public PascalABCCompiler.SemanticTree.ITypeNode comperehensive_type
 		{
 			get
 			{
@@ -565,7 +567,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.polymorphic_state SemanticTree.IClassMemberNode.polymorphic_state
+		PascalABCCompiler.SemanticTree.polymorphic_state PascalABCCompiler.SemanticTree.IClassMemberNode.polymorphic_state
 		{
 			get
 			{
@@ -575,7 +577,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-	public class compiled_variable_definition : var_definition_node, SemanticTree.ICompiledClassFieldNode
+	public class compiled_variable_definition : var_definition_node, ICompiledClassFieldNode
 	{
 		private compiled_type_node _cont_type;
 		private System.Reflection.FieldInfo _fi;
@@ -588,11 +590,11 @@ namespace PascalABCCompiler.TreeRealization
 			_cont_type=compiled_type_node.get_type_node(fi.DeclaringType);
 		}
 
-		public override SemanticTree.node_location_kind node_location_kind
+		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get
 			{
-				return SemanticTree.node_location_kind.in_class_location;
+				return PascalABCCompiler.SemanticTree.node_location_kind.in_class_location;
 			}
 		}
 
@@ -613,15 +615,15 @@ namespace PascalABCCompiler.TreeRealization
 		}
 
         //TODO: Вынести в NetHelper.
-		public SemanticTree.polymorphic_state polymorphic_state
+		public PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
 		{
 			get
 			{
 				if (_fi.IsStatic)
 				{
-					return SemanticTree.polymorphic_state.ps_static;
+					return PascalABCCompiler.SemanticTree.polymorphic_state.ps_static;
 				}
-				return SemanticTree.polymorphic_state.ps_common;
+				return PascalABCCompiler.SemanticTree.polymorphic_state.ps_common;
 			}
 		}
 		
@@ -642,7 +644,7 @@ namespace PascalABCCompiler.TreeRealization
 		}
 		
         //TODO: Вынести в NetHelper.
-		public SemanticTree.field_access_level field_access_level
+		public PascalABCCompiler.SemanticTree.field_access_level field_access_level
 		{
 			get
 			{
@@ -654,16 +656,16 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.compiled_variable_definition;
+				return this.semantic_node_type.compiled_variable_definition;
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		public SemanticTree.ICompiledTypeNode comprehensive_type
+		public PascalABCCompiler.SemanticTree.ICompiledTypeNode comprehensive_type
 		{
 			get
 			{
@@ -671,7 +673,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public SemanticTree.ITypeNode comperehensive_type
+		public PascalABCCompiler.SemanticTree.ITypeNode comperehensive_type
 		{
 			get
 			{
@@ -681,9 +683,9 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-	public abstract class parameter : var_definition_node, SemanticTree.IParameterNode
+	public abstract class parameter : var_definition_node, IParameterNode
 	{
-		protected SemanticTree.parameter_type _par_type;
+		protected PascalABCCompiler.SemanticTree.parameter_type _par_type;
 
         public parameter(string name) : base(name)
         {
@@ -694,7 +696,7 @@ namespace PascalABCCompiler.TreeRealization
 		}
 
 		//Тип параметра.
-		public abstract SemanticTree.parameter_type parameter_type
+		public abstract PascalABCCompiler.SemanticTree.parameter_type parameter_type
 		{
 			get;
 		}
@@ -715,12 +717,12 @@ namespace PascalABCCompiler.TreeRealization
 			get;
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.IFunctionNode SemanticTree.IParameterNode.function
+		PascalABCCompiler.SemanticTree.IFunctionNode PascalABCCompiler.SemanticTree.IParameterNode.function
 		{
 			get
 			{
@@ -728,7 +730,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.parameter_type SemanticTree.IParameterNode.parameter_type
+		PascalABCCompiler.SemanticTree.parameter_type PascalABCCompiler.SemanticTree.IParameterNode.parameter_type
 		{
 			get
 			{
@@ -737,15 +739,15 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override SemanticTree.node_location_kind node_location_kind
+		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get
 			{
-				return SemanticTree.node_location_kind.in_function_location;
+				return PascalABCCompiler.SemanticTree.node_location_kind.in_function_location;
 			}
 		}
 
-        SemanticTree.IExpressionNode SemanticTree.IParameterNode.default_value
+        PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IParameterNode.default_value
         {
             get
             {
@@ -767,7 +769,7 @@ namespace PascalABCCompiler.TreeRealization
     }
 
 	[Serializable]
-	public class common_parameter : parameter, SemanticTree.ICommonParameterNode
+	public class common_parameter : parameter, ICommonParameterNode
 	{
 		private common_function_node _cont_function;
 		
@@ -781,7 +783,7 @@ namespace PascalABCCompiler.TreeRealization
 
         private bool _is_params;
 
-        public common_parameter(string name, SemanticTree.parameter_type pt,
+        public common_parameter(string name, PascalABCCompiler.SemanticTree.parameter_type pt,
             common_function_node cont_function, concrete_parameter_type conc_par_type, location loc) :
             base(name)
         {
@@ -791,7 +793,7 @@ namespace PascalABCCompiler.TreeRealization
             _loc = loc;
         }
 
-        public common_parameter(string name, SemanticTree.parameter_type pt,
+        public common_parameter(string name, PascalABCCompiler.SemanticTree.parameter_type pt,
             common_function_node cont_function, concrete_parameter_type conc_par_type, expression_node default_value,
             location loc) :
             base(name)
@@ -803,7 +805,7 @@ namespace PascalABCCompiler.TreeRealization
             _loc = loc;
         }
 
-		public common_parameter(string name,type_node tp,SemanticTree.parameter_type pt,
+		public common_parameter(string name,type_node tp,PascalABCCompiler.SemanticTree.parameter_type pt,
 			common_function_node cont_function, concrete_parameter_type conc_par_type,expression_node default_value,
             location loc):
 			base(name,tp)
@@ -891,7 +893,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public SemanticTree.ILocation Location
+		public PascalABCCompiler.SemanticTree.ILocation Location
 		{
 			get
 			{
@@ -900,7 +902,7 @@ namespace PascalABCCompiler.TreeRealization
 		}
 
 		//Тип параметра.
-		public override SemanticTree.parameter_type parameter_type
+		public override PascalABCCompiler.SemanticTree.parameter_type parameter_type
 		{
 			get
 			{
@@ -933,16 +935,16 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.common_parameter;
+				return this.semantic_node_type.common_parameter;
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ICommonFunctionNode SemanticTree.ICommonParameterNode.common_function
+		PascalABCCompiler.SemanticTree.ICommonFunctionNode PascalABCCompiler.SemanticTree.ICommonParameterNode.common_function
 		{
 			get
 			{
@@ -952,11 +954,11 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-	public class basic_parameter : parameter, SemanticTree.IBasicParameterNode
+	public class basic_parameter : parameter, IBasicParameterNode
 	{
 		private basic_function_node _cont_function;
 
-		public basic_parameter(string name,type_node type,SemanticTree.parameter_type par_type,
+		public basic_parameter(string name,type_node type,PascalABCCompiler.SemanticTree.parameter_type par_type,
 			basic_function_node cont_function) : base(name,type)
 		{
 			_cont_function=cont_function;
@@ -986,7 +988,7 @@ namespace PascalABCCompiler.TreeRealization
         }
 
 		//Тип параметра (по ссылке или по значению).
-		public override SemanticTree.parameter_type parameter_type
+		public override PascalABCCompiler.SemanticTree.parameter_type parameter_type
 		{
 			get
 			{
@@ -1006,18 +1008,18 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.basic_parameter;
+				return this.semantic_node_type.basic_parameter;
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 	}
 
 	[Serializable]
-	public class compiled_parameter : parameter, SemanticTree.ICompiledParameterNode
+	public class compiled_parameter : parameter, ICompiledParameterNode
 	{
 		private readonly System.Reflection.ParameterInfo _par;
         private expression_node _default_value;
@@ -1109,16 +1111,16 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.compiled_parameter;
+				return this.semantic_node_type.compiled_parameter;
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ICompiledMethodNode SemanticTree.ICompiledParameterNode.compiled_function
+		PascalABCCompiler.SemanticTree.ICompiledMethodNode PascalABCCompiler.SemanticTree.ICompiledParameterNode.compiled_function
 		{
 			get
 			{
@@ -1126,12 +1128,12 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-        public void SetParameterType(SemanticTree.parameter_type pt)
+        public void SetParameterType(PascalABCCompiler.SemanticTree.parameter_type pt)
         {
             _par_type = pt;
         }
 
-		public override SemanticTree.parameter_type parameter_type
+		public override PascalABCCompiler.SemanticTree.parameter_type parameter_type
 		{
 			get
 			{

@@ -12,11 +12,11 @@ using System;
 using System.Collections.Generic;
 using PascalSharp.Internal.Errors;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
 	public class SyntaxTreeToSemanticTreeConverter 
 	{
-        private PascalABCCompiler.TreeConverter.syntax_tree_visitor stv=new PascalABCCompiler.TreeConverter.syntax_tree_visitor();
+        private PascalSharp.Internal.TreeConverter.syntax_tree_visitor stv=new PascalSharp.Internal.TreeConverter.syntax_tree_visitor();
 
         public SyntaxTreeToSemanticTreeConverter()
         {
@@ -72,8 +72,8 @@ namespace PascalABCCompiler.TreeConverter
 
 
         //TODO: Исправить коллекцию модулей.
-        public PascalABCCompiler.TreeRealization.common_unit_node CompileInterface(SyntaxTree.compilation_unit SyntaxUnit,
-            PascalABCCompiler.TreeRealization.unit_node_list UsedUnits, List<Error> ErrorsList, List<CompilerWarning> WarningsList, SyntaxError parser_error,
+        public PascalSharp.Internal.TreeConverter.TreeRealization.common_unit_node CompileInterface(SyntaxTree.compilation_unit SyntaxUnit,
+            PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list UsedUnits, List<Error> ErrorsList, List<CompilerWarning> WarningsList, SyntaxError parser_error,
             System.Collections.Hashtable bad_nodes, TreeRealization.using_namespace_list namespaces, Dictionary<SyntaxTree.syntax_tree_node,string> docs, bool debug, bool debugging)
 		{
             //convertion_data_and_alghoritms.__i = 0;
@@ -113,7 +113,7 @@ namespace PascalABCCompiler.TreeConverter
 				SyntaxTree.unit_module umod=SyntaxUnit as SyntaxTree.unit_module;
 				if (umod==null)
 				{
-					throw new PascalABCCompiler.TreeConverter.CompilerInternalError("Undefined module type (not program and not unit)");
+					throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("Undefined module type (not program and not unit)");
 				}
 				stv.visit(umod);
 			}*/
@@ -122,8 +122,8 @@ namespace PascalABCCompiler.TreeConverter
 			return stv.compiled_unit;
 		}
 
-        public void CompileImplementation(PascalABCCompiler.TreeRealization.common_unit_node SemanticUnit,
-			SyntaxTree.compilation_unit SyntaxUnit,PascalABCCompiler.TreeRealization.unit_node_list UsedUnits,List<Error> ErrorsList,List<CompilerWarning> WarningsList,
+        public void CompileImplementation(PascalSharp.Internal.TreeConverter.TreeRealization.common_unit_node SemanticUnit,
+			SyntaxTree.compilation_unit SyntaxUnit,PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list UsedUnits,List<Error> ErrorsList,List<CompilerWarning> WarningsList,
             SyntaxError parser_error, System.Collections.Hashtable bad_nodes, TreeRealization.using_namespace_list interface_namespaces, TreeRealization.using_namespace_list imlementation_namespaces,
            Dictionary<SyntaxTree.syntax_tree_node,string> docs, bool debug, bool debugging)
 		{
@@ -149,10 +149,10 @@ namespace PascalABCCompiler.TreeConverter
 			SyntaxTree.unit_module umod = SyntaxUnit as SyntaxTree.unit_module;
 			if (umod==null)
 			{
-                throw new PascalABCCompiler.TreeConverter.CompilerInternalError("Program has not implementation part");
+                throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("Program has not implementation part");
 			}
             //TODO: Переделать, чтобы Сашин код работал с common_unit_node.
-			stv.compiled_unit=(PascalABCCompiler.TreeRealization.common_unit_node)SemanticUnit;
+			stv.compiled_unit=(PascalSharp.Internal.TreeConverter.TreeRealization.common_unit_node)SemanticUnit;
             stv.current_document = new TreeRealization.document(SyntaxUnit.file_name);
 
             foreach (SyntaxTree.compiler_directive cd in umod.compiler_directives)

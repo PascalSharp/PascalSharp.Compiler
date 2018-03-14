@@ -2,9 +2,7 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Интерпретатор константных выражений
 using System;
-
-using PascalABCCompiler.TreeRealization;
-using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.TreeConverter;
 
 namespace PascalABCCompiler.SystemLibrary
 {

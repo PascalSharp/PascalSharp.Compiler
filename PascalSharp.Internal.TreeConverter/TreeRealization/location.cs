@@ -1,14 +1,16 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
 
-namespace PascalABCCompiler.TreeRealization
+using System;
+using PascalABCCompiler.SemanticTree;
+
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     /// <summary>
     /// Класс для представления позиций частей кода в дереве.
     /// </summary>
 	[Serializable]
-	public class location : SemanticTree.ILocation
+	public class location : ILocation
 	{
         /// <summary>
         /// Номер строки начала фрагмента кода (нумерация начинается с 1).
@@ -130,7 +132,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Документ, в котором расположен этот фрагмент кода.
         /// </summary>
-		public SemanticTree.IDocument document
+		public PascalABCCompiler.SemanticTree.IDocument document
 		{
 			get
 			{

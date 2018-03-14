@@ -6,11 +6,9 @@
 //TODO Разобраться и избавиться от дублирования
 
 using System;
-
-using PascalABCCompiler.TreeRealization;
 using System.Collections.Generic;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
 	public class type_constructor
 	{
@@ -1703,7 +1701,7 @@ namespace PascalABCCompiler.TreeConverter
 			//this.convertion_data_and_alghoritms.syntax_tree_visitor.context.converted_namespace.functions.AddElement(cnfn);
 			// if (SystemLibrary.SystemLibrary.system_unit.namespaces.Count > 0)
 			// 	SystemLibrary.SystemLibrary.system_unit.namespaces[0].functions.AddElement(cnfn);
-			// (SystemLibrary.SystemLibrary.system_unit.scope.Find(PascalABCCompiler.TreeConverter.compiler_string_consts.system_unit_name).sym_info as common_namespace_node).functions.AddElement(cnfn);
+			// (SystemLibrary.SystemLibrary.system_unit.scope.Find(PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_name).sym_info as common_namespace_node).functions.AddElement(cnfn);
 			// else
 			// 	this.convertion_data_and_alghoritms.syntax_tree_visitor.context.converted_namespace.functions.AddElement(cnfn);
 			//            statements_list sl = new statements_list(null);

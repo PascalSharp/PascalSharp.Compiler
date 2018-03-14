@@ -3,10 +3,10 @@
 //Автор ssyy
 //Описывает метки и переходы.
 
-using System;
 using System.Collections.Generic;
+using PascalABCCompiler.SemanticTree;
 
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     //(ssyy) Характеризует блок кода, нужно для меток.
     public class code_block
@@ -27,7 +27,7 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
 
-    public class label_node : definition_node, SemanticTree.ILabelNode
+    public class label_node : definition_node, ILabelNode
     {
         //имя метки
         private string _name;
@@ -85,12 +85,12 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
-            visitor.visit((SemanticTree.ILabelNode)this);
+            visitor.visit((PascalABCCompiler.SemanticTree.ILabelNode)this);
         }
 
-        public SemanticTree.ILocation Location
+        public PascalABCCompiler.SemanticTree.ILocation Location
         {
             get
             {
@@ -141,7 +141,7 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
 
-    public class labeled_statement : statement_node, SemanticTree.ILabeledStatementNode
+    public class labeled_statement : statement_node, ILabeledStatementNode
     {
         private label_node _label;
 
@@ -163,7 +163,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ILabelNode SemanticTree.ILabeledStatementNode.label
+        PascalABCCompiler.SemanticTree.ILabelNode PascalABCCompiler.SemanticTree.ILabeledStatementNode.label
         {
             get
             {
@@ -171,7 +171,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.IStatementNode SemanticTree.ILabeledStatementNode.statement
+        PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.ILabeledStatementNode.statement
         {
             get
             {
@@ -197,13 +197,13 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
-            visitor.visit((SemanticTree.ILabeledStatementNode)this);
+            visitor.visit((PascalABCCompiler.SemanticTree.ILabeledStatementNode)this);
         }
     }
 
-    public class goto_statement : statement_node, SemanticTree.IGotoStatementNode
+    public class goto_statement : statement_node, IGotoStatementNode
     {
         private label_node _label;
 
@@ -215,7 +215,7 @@ namespace PascalABCCompiler.TreeRealization
             set { _comprehensive_code_block = value; }
         }
 
-        SemanticTree.ILabelNode SemanticTree.IGotoStatementNode.label
+        PascalABCCompiler.SemanticTree.ILabelNode PascalABCCompiler.SemanticTree.IGotoStatementNode.label
         {
             get
             {
@@ -242,9 +242,9 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
-            visitor.visit((SemanticTree.IGotoStatementNode)this);
+            visitor.visit((PascalABCCompiler.SemanticTree.IGotoStatementNode)this);
         }
 
         public goto_statement(label_node v_label, location v_location)

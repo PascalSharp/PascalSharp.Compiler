@@ -3,7 +3,7 @@
 //Причина обхода узла синтаксического дерева - получение выражения, адреса, типа узла.
 using System;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
     //TODO: Переименовать в request.
     /// <summary>

@@ -45,7 +45,7 @@ namespace PascalSharp.Internal.Optimizer
         public PascalABCCompiler.SemanticTree.IProgramNode Convert(ICompiler Compiler, PascalABCCompiler.SemanticTree.IProgramNode ProgramNode)
         {
             Optimizer Optimizer = new Optimizer();
-            Compiler.AddWarnings(Optimizer.Optimize(ProgramNode as PascalABCCompiler.TreeRealization.program_node));
+            Compiler.AddWarnings(Optimizer.Optimize(ProgramNode as PascalSharp.Internal.TreeConverter.TreeRealization.program_node));
             return ProgramNode;
         }
         public override string ToString()

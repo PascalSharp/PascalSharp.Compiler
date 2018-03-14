@@ -6,8 +6,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.TreeConverter;
 
 namespace PascalSharp.Compiler.PCU
 {
@@ -33,7 +32,7 @@ namespace PascalSharp.Compiler.PCU
     //класс, хранящий информацию об имени интерфейсной сущности и ее смещении в модуле
     public class NameRef {
 		public string name;//имя сущности
-        public PascalABCCompiler.TreeConverter.access_level access_level;//модификатор видимости
+        public PascalSharp.Internal.TreeConverter.access_level access_level;//модификатор видимости
         public symbol_kind symbol_kind = symbol_kind.sk_none;
 		public int offset;//смещение в модуле
         public byte special_scope=0;//говорит о том что этот символ добавляется не в пространсво имен модуля
@@ -41,7 +40,7 @@ namespace PascalSharp.Compiler.PCU
         public semantic_node_type semantic_node_type;
         public bool virtual_slot = false;
 
-        public NameRef(string name, int index, PascalABCCompiler.TreeConverter.access_level access_level, semantic_node_type semantic_node_type)
+        public NameRef(string name, int index, PascalSharp.Internal.TreeConverter.access_level access_level, semantic_node_type semantic_node_type)
 		{
 			this.name = name;
 			this.index = index;//4
@@ -52,7 +51,7 @@ namespace PascalSharp.Compiler.PCU
         {
             this.name = name;
             this.index = index;
-            this.access_level = PascalABCCompiler.TreeConverter.access_level.al_none;
+            this.access_level = PascalSharp.Internal.TreeConverter.access_level.al_none;
         }
         public int Size
         {
@@ -176,7 +175,7 @@ namespace PascalSharp.Compiler.PCU
         public DotNetNameRef[] dotnet_names;
 		//public AssemblyRef[] ref_assemblies;
 		public ImportedEntity[] imp_entitles; //список импортируемых сущностей
-        public List<PascalABCCompiler.TreeRealization.compiler_directive> compiler_directives; //список директив
+        public List<PascalSharp.Internal.TreeConverter.TreeRealization.compiler_directive> compiler_directives; //список директив
 
         //ssyy
         public NameRef[] implementation_names;
@@ -2409,7 +2408,7 @@ namespace PascalSharp.Compiler.PCU
             int interface_impl_off = (int)bw.BaseStream.Position;
             int seek_off = sizeof(int);
             for (int k=0; k<type.ImplementingInterfaces.Count; k++)
-            	seek_off += GetSizeOfReference(type.ImplementingInterfaces[k] as PascalABCCompiler.TreeRealization.type_node);
+            	seek_off += GetSizeOfReference(type.ImplementingInterfaces[k] as PascalSharp.Internal.TreeConverter.TreeRealization.type_node);
             bw.Seek(seek_off, SeekOrigin.Current);
             bw.Write((byte)type.type_access_level);
             bw.Write((byte)type.type_special_kind);

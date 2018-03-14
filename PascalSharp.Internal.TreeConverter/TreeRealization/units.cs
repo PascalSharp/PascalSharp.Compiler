@@ -1,15 +1,16 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
 
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
 
     [Serializable]
     public abstract class unit_node : definition_node
     {
-        public abstract PascalABCCompiler.TreeConverter.SymbolInfoList find_only_in_namespace(string name);
+        public abstract PascalSharp.Internal.TreeConverter.SymbolInfoList find_only_in_namespace(string name);
 
         public override general_node_type general_node_type
         {
@@ -24,12 +25,12 @@ namespace PascalABCCompiler.TreeRealization
     public class namespace_unit_node : unit_node
     {
         public using_namespace namespace_name;
-        public SymbolTable.Scope scope;
+        public PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope;
         public namespace_unit_node(using_namespace namespace_name)
         {
             this.namespace_name = namespace_name;
         }
-        public override PascalABCCompiler.TreeConverter.SymbolInfoList find_only_in_namespace(string name)
+        public override PascalSharp.Internal.TreeConverter.SymbolInfoList find_only_in_namespace(string name)
         {
             throw new NotSupportedException();
         }
@@ -69,7 +70,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override PascalABCCompiler.TreeConverter.SymbolInfoList find_only_in_namespace(string name)
+        public override PascalSharp.Internal.TreeConverter.SymbolInfoList find_only_in_namespace(string name)
         {
             return _dotNetScope.Find(name);
         }
@@ -80,8 +81,8 @@ namespace PascalABCCompiler.TreeRealization
 	{
         private readonly common_namespace_node_list _namespaces = new common_namespace_node_list();
 
-		private SymbolTable.UnitInterfaceScope _scope;
-		private SymbolTable.UnitImplementationScope _implementation_scope;
+		private PascalSharp.Internal.TreeConverter.SymbolTable.UnitInterfaceScope _scope;
+		private PascalSharp.Internal.TreeConverter.SymbolTable.UnitImplementationScope _implementation_scope;
 
         public System.Collections.Generic.List<compiler_directive> compiler_directives;
 
@@ -96,7 +97,7 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                TreeConverter.SymbolInfo si = namespaces[0].findFirstOnlyInNamespace(TreeConverter.compiler_string_consts.system_unit_marker);
+                PascalSharp.Internal.TreeConverter.SymbolInfo si = namespaces[0].findFirstOnlyInNamespace(PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_marker);
                 if (si == null)
                     return false;
                 if (si.sym_info is constant_definition_node)
@@ -124,8 +125,8 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public common_unit_node(SymbolTable.UnitInterfaceScope scope,
-            SymbolTable.UnitImplementationScope implementation_scope,
+        public common_unit_node(PascalSharp.Internal.TreeConverter.SymbolTable.UnitInterfaceScope scope,
+            PascalSharp.Internal.TreeConverter.SymbolTable.UnitImplementationScope implementation_scope,
             common_namespace_function_node main_function,
             common_namespace_function_node finalization_method)
         {
@@ -146,7 +147,7 @@ namespace PascalABCCompiler.TreeRealization
 
         public void add_unit_name_to_namespace()
         {
-            this.scope.AddSymbol(unit_name, new TreeConverter.SymbolInfo(this));
+            this.scope.AddSymbol(unit_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(this));
         }
 
         public string unit_name
@@ -193,7 +194,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public SymbolTable.UnitInterfaceScope scope
+		public PascalSharp.Internal.TreeConverter.SymbolTable.UnitInterfaceScope scope
 		{
 			get
 			{
@@ -215,7 +216,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SymbolTable.UnitImplementationScope implementation_scope
+		public PascalSharp.Internal.TreeConverter.SymbolTable.UnitImplementationScope implementation_scope
 		{
 			get
 			{
@@ -235,7 +236,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-        public override PascalABCCompiler.TreeConverter.SymbolInfoList find_only_in_namespace(string name)
+        public override PascalSharp.Internal.TreeConverter.SymbolInfoList find_only_in_namespace(string name)
 		{
 			return _scope.FindOnlyInScope(name);
 		}

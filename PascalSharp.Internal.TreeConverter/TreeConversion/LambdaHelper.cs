@@ -1,15 +1,12 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
+
 using System.Collections.Generic;
-using System.Text;
-using System.Linq;
-using PascalABCCompiler.TreeRealization;
-using System.Collections;
 using PascalABCCompiler.SyntaxTree;
+using PascalABCCompiler.TreeConverter;
 using TreeConverter.LambdaExpressions;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
     #region Визитор поиска имен переменных (для поиска захваченных переменных в теле лямбды)
     public class FindMainIdentsVisitor : WalkingVisitorNew  // SSM
@@ -38,7 +35,7 @@ namespace PascalABCCompiler.TreeConverter
             if (indef)
                 vars.Add(id.name);
         }
-        public override void visit(SyntaxTree.var_statement defs)
+        public override void visit(PascalABCCompiler.SyntaxTree.var_statement defs)
         {
             indef = true;
             ProcessNode(defs.var_def.vars); // исключаем типы - 
@@ -214,7 +211,7 @@ namespace PascalABCCompiler.TreeConverter
             // SSM 12/12/16 - сделал чтобы всегда эта функция возвращала true.
             // Посмотрю далее на её поведение. Мне кажется, что если мы попали сюда, то мы хотим присвоить процедурному типу, 
             // и в любом случае это надо интерпретировать как процедуру
-            var stl = lambdaDef.proc_body as SyntaxTree.statement_list;
+            var stl = lambdaDef.proc_body as PascalABCCompiler.SyntaxTree.statement_list;
             if (stl.expr_lambda_body)
             {
                 // Очищаем от Result := , который мы создали на предыдущем этапе
@@ -253,7 +250,7 @@ namespace PascalABCCompiler.TreeConverter
                     (delegate_internal_interface)leftType.get_internal_interface(internal_interface_kind.delegate_interface);
                 if (dii_left == null)
                 {
-                    if (leftType != SystemLibrary.SystemLibrary.system_delegate_type)
+                    if (leftType != PascalABCCompiler.SystemLibrary.SystemLibrary.system_delegate_type)
                         visitor.AddError(visitor.get_location(lambdaDef), "ILLEGAL_LAMBDA_VARIABLE_TYPE");
                     else
                         return;
@@ -268,11 +265,11 @@ namespace PascalABCCompiler.TreeConverter
                     if (lambdaDefParamsCount != leftTypeParamsNumber)
                         visitor.AddError(visitor.get_location(lambdaDef), "ILLEGAL_LAMBDA_PARAMETERS_NUMBER");
                     bool flag = true;
-                    SyntaxTree.formal_parameters lambdaDefParamsTypes = new formal_parameters();
+                    PascalABCCompiler.SyntaxTree.formal_parameters lambdaDefParamsTypes = new formal_parameters();
                     for (int i = 0; i < lambdaDef.formal_parameters.params_list.Count; i++)
                         for (int j = 0; j < lambdaDef.formal_parameters.params_list[i].idents.idents.Count; j++)
                         {
-                            var param = new SyntaxTree.typed_parameters();
+                            var param = new PascalABCCompiler.SyntaxTree.typed_parameters();
                             param.idents = new ident_list();
                             param.idents.Add(lambdaDef.formal_parameters.params_list[i].idents.idents[j]);
                             param.vars_type = lambdaDef.formal_parameters.params_list[i].vars_type;
@@ -280,13 +277,13 @@ namespace PascalABCCompiler.TreeConverter
                         }
                     for (int i = 0; i < leftTypeParamsNumber && flag; i++)
                     {
-                        if (lambdaDefParamsTypes.params_list[i].vars_type is SyntaxTree.lambda_inferred_type)
+                        if (lambdaDefParamsTypes.params_list[i].vars_type is PascalABCCompiler.SyntaxTree.lambda_inferred_type)
                         {
-                            if ((lambdaDefParamsTypes.params_list[i].vars_type as SyntaxTree.lambda_inferred_type).real_type is lambda_any_type_node)
+                            if ((lambdaDefParamsTypes.params_list[i].vars_type as PascalABCCompiler.SyntaxTree.lambda_inferred_type).real_type is lambda_any_type_node)
                             {
                                 var curLeftParType = dii_left.parameters[i].type;
-                                lambdaDefParamsTypes.params_list[i].vars_type = new SyntaxTree.lambda_inferred_type();
-                                (lambdaDefParamsTypes.params_list[i].vars_type as SyntaxTree.lambda_inferred_type).real_type = curLeftParType;
+                                lambdaDefParamsTypes.params_list[i].vars_type = new PascalABCCompiler.SyntaxTree.lambda_inferred_type();
+                                (lambdaDefParamsTypes.params_list[i].vars_type as PascalABCCompiler.SyntaxTree.lambda_inferred_type).real_type = curLeftParType;
                                 continue;
                             }
                         }
@@ -325,7 +322,7 @@ namespace PascalABCCompiler.TreeConverter
         /// <param name="def"></param>
         /// <param name="visitor"></param>
         /// <returns></returns>
-        public static typed_expression GetTempFunctionNodeForTypeInference(SyntaxTree.function_lambda_definition def, syntax_tree_visitor visitor)
+        public static typed_expression GetTempFunctionNodeForTypeInference(PascalABCCompiler.SyntaxTree.function_lambda_definition def, syntax_tree_visitor visitor)
         {
             var res = new common_namespace_function_node(def.lambda_name, visitor.get_location(def), null, null);
             if (def.return_type != null)
@@ -338,7 +335,7 @@ namespace PascalABCCompiler.TreeConverter
                 for (int i = 0; i < def.formal_parameters.params_list.Count; i++)
                     for (int j = 0; j < def.formal_parameters.params_list[i].idents.idents.Count; j++)
                     {
-                        var new_param = new common_parameter(null, SemanticTree.parameter_type.value, res, concrete_parameter_type.cpt_none, visitor.get_location(def.formal_parameters.params_list[i].idents.idents[0]));
+                        var new_param = new common_parameter(null, PascalABCCompiler.SemanticTree.parameter_type.value, res, concrete_parameter_type.cpt_none, visitor.get_location(def.formal_parameters.params_list[i].idents.idents[0]));
                         new_param.type = visitor.convert_strong(def.formal_parameters.params_list[i].vars_type);
                         res.parameters.AddElement(new_param);
                     }
@@ -372,7 +369,7 @@ namespace PascalABCCompiler.TreeConverter
         }
 
         #region Поиск всех result - ов 
-        public class ResultNodesSearcher : SyntaxTree.WalkingVisitorNew // Нигде в проекте не используется потому что expr могут использовать локальные переменные, тип которых неизвестен до семантического разбора
+        public class ResultNodesSearcher : WalkingVisitorNew // Нигде в проекте не используется потому что expr могут использовать локальные переменные, тип которых неизвестен до семантического разбора
         {
             public List<expression> exprList = new List<expression>();
             public ResultNodesSearcher(syntax_tree_node root)

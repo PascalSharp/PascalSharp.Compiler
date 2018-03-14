@@ -11,9 +11,7 @@
 //Внешне при этом работа с классом returner не изменилась.
 using System;
 
-using PascalABCCompiler.TreeRealization;
-
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
 	public class returner
 	{

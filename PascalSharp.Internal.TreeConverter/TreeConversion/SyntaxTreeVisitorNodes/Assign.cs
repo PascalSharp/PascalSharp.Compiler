@@ -1,10 +1,10 @@
 ﻿using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
 using PascalABCCompiler.SystemLibrary;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.TreeConverter;TreeConversion;
 using SymTable = SymbolTable;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
     public partial class syntax_tree_visitor
     {

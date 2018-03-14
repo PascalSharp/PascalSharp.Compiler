@@ -1,15 +1,17 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
+using PascalABCCompiler.SemanticTree;
 
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     /// <summary>
     /// Базовый класс для программ и dll.
     /// </summary>
     [Serializable]
-    public abstract class program_base : definition_node, SemanticTree.IProgramBase
+    public abstract class program_base : definition_node, IProgramBase
     {
         /// <summary>
         /// Расположение конструкции program имя_программы, или главного модуля dll.
@@ -181,7 +183,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Массив пространств имен, используемых в программе.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        public SemanticTree.ICommonNamespaceNode[] namespaces
+        public PascalABCCompiler.SemanticTree.ICommonNamespaceNode[] namespaces
         {
             get
             {
@@ -193,7 +195,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Расположение конструкции program имя_программы, или главного модуля dll.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        public SemanticTree.ILocation Location
+        public PascalABCCompiler.SemanticTree.ILocation Location
         {
             get
             {
@@ -205,7 +207,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -215,7 +217,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, представляющий всю программу.
     /// </summary>
 	[Serializable]
-	public class program_node : program_base, SemanticTree.IProgramNode
+	public class program_node : program_base, IProgramNode
 	{
         /// <summary>
         /// Главная процедура без параметров. Включает в себя вызовы процедур инициализации модулей (и финализации тоже).
@@ -268,16 +270,16 @@ namespace PascalABCCompiler.TreeRealization
             sl = new statements_list(null);
             common_namespace_function_node init_func = new common_namespace_function_node("$_Init_",null,null,(common_namespace_node)_main_function.comprehensive_namespace,null);
             ((common_namespace_node)_main_function.comprehensive_namespace).functions.AddElement(init_func);
-            namespace_variable init_var = new namespace_variable("$is_init",SystemLibrary.SystemLibrary.bool_type,(common_namespace_node)_main_function.comprehensive_namespace,null);
+            namespace_variable init_var = new namespace_variable("$is_init",PascalABCCompiler.SystemLibrary.SystemLibrary.bool_type,(common_namespace_node)_main_function.comprehensive_namespace,null);
             ((common_namespace_node)_main_function.comprehensive_namespace).variables.AddElement(init_var);
-            if (SystemLibrary.SystemLibInitializer.ConfigVariable != null && SystemLibrary.SystemLibInitializer.ConfigVariable.Found)
+            if (PascalABCCompiler.SystemLibrary.SystemLibInitializer.ConfigVariable != null && PascalABCCompiler.SystemLibrary.SystemLibInitializer.ConfigVariable.Found)
             {
                 namespace_variable conf_nv = null;
                 compiled_variable_definition conf_cf = null;
-                if (SystemLibrary.SystemLibInitializer.ConfigVariable.sym_info is namespace_variable)
-                    conf_nv = SystemLibrary.SystemLibInitializer.ConfigVariable.sym_info as namespace_variable;
+                if (PascalABCCompiler.SystemLibrary.SystemLibInitializer.ConfigVariable.sym_info is namespace_variable)
+                    conf_nv = PascalABCCompiler.SystemLibrary.SystemLibInitializer.ConfigVariable.sym_info as namespace_variable;
                 else
-                    conf_cf = SystemLibrary.SystemLibInitializer.ConfigVariable.sym_info as compiled_variable_definition;
+                    conf_cf = PascalABCCompiler.SystemLibrary.SystemLibInitializer.ConfigVariable.sym_info as compiled_variable_definition;
                 foreach (string config_var in config.Keys)
                 {
                     var config_value = config[config_var];
@@ -317,7 +319,7 @@ namespace PascalABCCompiler.TreeRealization
             {
                 if (units[i].main_function != null)
                 {
-                	if (units[i].main_function.name != TreeConverter.compiler_string_consts.temp_main_function_name)
+                	if (units[i].main_function.name != PascalSharp.Internal.TreeConverter.compiler_string_consts.temp_main_function_name)
                 	{
                 		common_namespace_function_call cnfc = new common_namespace_function_call(units[i].main_function, loc);
                     	sl.statements.AddElement(cnfc);
@@ -366,11 +368,11 @@ namespace PascalABCCompiler.TreeRealization
                 sl2.statements.AddElement(csmc);
             }
             sl2 = new statements_list(loc);
-            basic_function_call bfc = new basic_function_call(SystemLibrary.SystemLibrary.bool_assign as basic_function_node,null);
+            basic_function_call bfc = new basic_function_call(PascalABCCompiler.SystemLibrary.SystemLibrary.bool_assign as basic_function_node,null);
             bfc.parameters.AddElement(new namespace_variable_reference(init_var,null));
             bfc.parameters.AddElement(new bool_const_node(true,null));
             sl.statements.AddElementFirst(bfc);
-            bfc = new basic_function_call(SystemLibrary.SystemLibrary.bool_not as basic_function_node,null);
+            bfc = new basic_function_call(PascalABCCompiler.SystemLibrary.SystemLibrary.bool_not as basic_function_node,null);
             bfc.parameters.AddElement(new namespace_variable_reference(init_var,null));
             sl2.statements.AddElement(new if_node(bfc,sl,null,null));
             init_func.function_code = sl2;
@@ -395,7 +397,7 @@ namespace PascalABCCompiler.TreeRealization
             sl = new statements_list(null);
             common_namespace_function_node init_func = new common_namespace_function_node("$_Init_", null, null, common_namespaces[0], null);
             common_namespaces[0].functions.AddElement(init_func);
-            namespace_variable init_var = new namespace_variable("$is_init", SystemLibrary.SystemLibrary.bool_type, common_namespaces[0], null);
+            namespace_variable init_var = new namespace_variable("$is_init", PascalABCCompiler.SystemLibrary.SystemLibrary.bool_type, common_namespaces[0], null);
             common_namespaces[0].variables.AddElement(init_var);
             for (int i = 0; i < units.Count; i++)
             {
@@ -414,11 +416,11 @@ namespace PascalABCCompiler.TreeRealization
                 }
             }*/
             sl2 = new statements_list(loc);
-            basic_function_call bfc = new basic_function_call(SystemLibrary.SystemLibrary.bool_assign as basic_function_node, null);
+            basic_function_call bfc = new basic_function_call(PascalABCCompiler.SystemLibrary.SystemLibrary.bool_assign as basic_function_node, null);
             bfc.parameters.AddElement(new namespace_variable_reference(init_var, null));
             bfc.parameters.AddElement(new bool_const_node(true, null));
             sl.statements.AddElementFirst(bfc);
-            bfc = new basic_function_call(SystemLibrary.SystemLibrary.bool_not as basic_function_node, null);
+            bfc = new basic_function_call(PascalABCCompiler.SystemLibrary.SystemLibrary.bool_not as basic_function_node, null);
             bfc.parameters.AddElement(new namespace_variable_reference(init_var, null));
             sl2.statements.AddElement(new if_node(bfc, sl, null, null));
             init_func.function_code = sl2;
@@ -435,7 +437,7 @@ namespace PascalABCCompiler.TreeRealization
                 {
                     if (!ctn.IsInterface && ctn.static_constr == null)
                     {
-                        ctn.static_constr = new common_method_node(PascalABCCompiler.TreeConverter.compiler_string_consts.static_ctor_prefix + "Create", null, ctn, SemanticTree.polymorphic_state.ps_static, SemanticTree.field_access_level.fal_private, null);
+                        ctn.static_constr = new common_method_node(PascalSharp.Internal.TreeConverter.compiler_string_consts.static_ctor_prefix + "Create", null, ctn, PascalABCCompiler.SemanticTree.polymorphic_state.ps_static, PascalABCCompiler.SemanticTree.field_access_level.fal_private, null);
                         ctn.static_constr.is_constructor = true;
                         ctn.static_constr.function_code = new statements_list(null);
                         ctn.methods.AddElement(ctn.static_constr);
@@ -456,7 +458,7 @@ namespace PascalABCCompiler.TreeRealization
                     {
                         if (ctn.static_constr == null)
                         {
-                            ctn.static_constr = new common_method_node(PascalABCCompiler.TreeConverter.compiler_string_consts.static_ctor_prefix + "Create", null, ctn, SemanticTree.polymorphic_state.ps_static, SemanticTree.field_access_level.fal_private, null);
+                            ctn.static_constr = new common_method_node(PascalSharp.Internal.TreeConverter.compiler_string_consts.static_ctor_prefix + "Create", null, ctn, PascalABCCompiler.SemanticTree.polymorphic_state.ps_static, PascalABCCompiler.SemanticTree.field_access_level.fal_private, null);
                             ctn.static_constr.is_constructor = true;
                             ctn.static_constr.function_code = new statements_list(null);
                             ctn.methods.AddElement(ctn.static_constr);
@@ -482,7 +484,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
         
-        SemanticTree.IStatementNode SemanticTree.IProgramNode.InitializationCode
+        PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IProgramNode.InitializationCode
         {
         	get
         	{
@@ -522,12 +524,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ICommonNamespaceFunctionNode SemanticTree.IProgramNode.main_function
+		PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.IProgramNode.main_function
 		{
 			get
 			{
@@ -535,7 +537,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-        public System.Collections.Generic.List<SemanticTree.IGenericTypeInstance> generic_type_instances
+        public System.Collections.Generic.List<PascalABCCompiler.SemanticTree.IGenericTypeInstance> generic_type_instances
         {
             get
             {
@@ -543,7 +545,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public System.Collections.Generic.List<SemanticTree.IGenericFunctionInstance> generic_function_instances
+        public System.Collections.Generic.List<PascalABCCompiler.SemanticTree.IGenericFunctionInstance> generic_function_instances
         {
             get
             {
@@ -553,7 +555,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-	public class dll_node : program_base, SemanticTree.IDllNode
+	public class dll_node : program_base, IDllNode
 	{
         /// <summary>
         /// Метод инициализации dll. Он определен только здесь.
@@ -617,12 +619,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ICommonNamespaceFunctionNode SemanticTree.IDllNode.initialization_function
+		PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.IDllNode.initialization_function
 		{
 			get
 			{
@@ -630,7 +632,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.ICommonNamespaceFunctionNode SemanticTree.IDllNode.finalization_function
+		PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.IDllNode.finalization_function
 		{
 			get
 			{

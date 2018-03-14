@@ -1,15 +1,17 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
 
-namespace PascalABCCompiler.TreeRealization
+using System;
+using PascalABCCompiler.SemanticTree;
+
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     /// <summary>
     /// Класс, описывающий файл кода.
     /// Используется для указания позиции частей кода.
     /// </summary>
 	[Serializable]
-	public class document : SemanticTree.IDocument
+	public class document : IDocument
 	{
         /// <summary>
         /// Имя файла.

@@ -1,14 +1,16 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
 
-namespace PascalABCCompiler.TreeRealization
+using System;
+using PascalABCCompiler.SemanticTree;
+
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     /// <summary>
     /// Класс, представляющий определение константы.
     /// </summary>
     [Serializable]
-    public abstract class constant_definition_node : definition_node, SemanticTree.IConstantDefinitionNode
+    public abstract class constant_definition_node : definition_node, IConstantDefinitionNode
     {
         /// <summary>
         /// Имя константы.
@@ -65,7 +67,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Место, где определена константа.
         /// Это свойство используется при обходе дерева посетителем.
         /// </summary>
-        public SemanticTree.ILocation Location
+        public PascalABCCompiler.SemanticTree.ILocation Location
         {
             get
             {
@@ -125,7 +127,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -134,7 +136,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Тип константы.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        SemanticTree.ITypeNode SemanticTree.IConstantDefinitionNode.type
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IConstantDefinitionNode.type
         {
             get
             {
@@ -146,7 +148,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Значение константы.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        public SemanticTree.IConstantNode constant_value
+        public PascalABCCompiler.SemanticTree.IConstantNode constant_value
         {
             get
             {
@@ -160,7 +162,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, представляющий определение константы в пространстве имен.
     /// </summary>
     [Serializable]
-    public class namespace_constant_definition : constant_definition_node, SemanticTree.INamespaceConstantDefinitionNode
+    public class namespace_constant_definition : constant_definition_node, INamespaceConstantDefinitionNode
     {
         /// <summary>
         /// Пространство имен в котором определена константа.
@@ -201,7 +203,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -221,7 +223,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Пространство имен в котором определена константа.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        SemanticTree.ICommonNamespaceNode SemanticTree.INamespaceConstantDefinitionNode.comprehensive_namespace
+        PascalABCCompiler.SemanticTree.ICommonNamespaceNode PascalABCCompiler.SemanticTree.INamespaceConstantDefinitionNode.comprehensive_namespace
         {
             get
             {
@@ -234,16 +236,16 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, представляющий определение константы в классе.
     /// </summary>
     [Serializable]
-    public class class_constant_definition : constant_definition_node, SemanticTree.IClassConstantDefinitionNode
+    public class class_constant_definition : constant_definition_node, IClassConstantDefinitionNode
     {
         /// <summary>
         /// Тип, содержащий определение константы.
         /// </summary>
         private readonly common_type_node _comprehensive_type;
 
-        private SemanticTree.field_access_level _fal = SemanticTree.field_access_level.fal_internal;
+        private PascalABCCompiler.SemanticTree.field_access_level _fal = PascalABCCompiler.SemanticTree.field_access_level.fal_internal;
 
-        public class_constant_definition(string name, location loc, common_type_node comprehensive_type, SemanticTree.field_access_level field_access_level)
+        public class_constant_definition(string name, location loc, common_type_node comprehensive_type, PascalABCCompiler.SemanticTree.field_access_level field_access_level)
             :
             base(name, loc)
         {
@@ -258,7 +260,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="cn">Значение константы.</param>
         /// <param name="loc">Расположение константы.</param>
         /// <param name="comprehensive_type">Тип, содержащий константу.</param>
-        public class_constant_definition(string name, constant_node cn, location loc, common_type_node comprehensive_type, SemanticTree.field_access_level field_access_level) :
+        public class_constant_definition(string name, constant_node cn, location loc, common_type_node comprehensive_type, PascalABCCompiler.SemanticTree.field_access_level field_access_level) :
             base(name,cn,loc)
         {
             _comprehensive_type = comprehensive_type;
@@ -291,7 +293,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -300,7 +302,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Тип, содержащий константу.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        SemanticTree.ITypeNode SemanticTree.IClassMemberNode.comperehensive_type
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IClassMemberNode.comperehensive_type
         {
             get
             {
@@ -308,22 +310,22 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.polymorphic_state polymorphic_state
+        public PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
         {
             get 
             {
-                return SemanticTree.polymorphic_state.ps_static;     
+                return PascalABCCompiler.SemanticTree.polymorphic_state.ps_static;     
             }
         }
 
-        public SemanticTree.field_access_level field_access_level
+        public PascalABCCompiler.SemanticTree.field_access_level field_access_level
         {
             get 
             { 
                 return _fal; 
             }
         }
-        SemanticTree.ITypeNode SemanticTree.IConstantDefinitionNode.type
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IConstantDefinitionNode.type
         {
             get
             {
@@ -336,7 +338,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, представляющий определение константы в откомпилированном классе.
     /// </summary>
     [Serializable]
-    public class compiled_class_constant_definition : constant_definition_node, SemanticTree.ICompiledClassConstantDefinitionNode
+    public class compiled_class_constant_definition : constant_definition_node, ICompiledClassConstantDefinitionNode
     {
         /// <summary>
         /// Тип, содержащий определение константы.
@@ -365,7 +367,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Тип, содержащий константу.
         /// </summary>
-        SemanticTree.ITypeNode SemanticTree.IClassMemberNode.comperehensive_type
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IClassMemberNode.comperehensive_type
         {
             get
             {
@@ -388,7 +390,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -397,7 +399,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Тип, содержащий константу.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        SemanticTree.ICompiledTypeNode SemanticTree.ICompiledClassConstantDefinitionNode.comprehensive_type
+        PascalABCCompiler.SemanticTree.ICompiledTypeNode PascalABCCompiler.SemanticTree.ICompiledClassConstantDefinitionNode.comprehensive_type
         {
             get
             {
@@ -408,15 +410,15 @@ namespace PascalABCCompiler.TreeRealization
         #region IClassMemberNode Members
 
 
-        public SemanticTree.polymorphic_state polymorphic_state
+        public PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
         {
             get 
             { 
-                return SemanticTree.polymorphic_state.ps_static; 
+                return PascalABCCompiler.SemanticTree.polymorphic_state.ps_static; 
             }
         }
 
-        public SemanticTree.field_access_level field_access_level
+        public PascalABCCompiler.SemanticTree.field_access_level field_access_level
         {
             get 
             {
@@ -431,7 +433,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, представляющий определение константы в классе.
     /// </summary>
     [Serializable]
-    public class function_constant_definition : constant_definition_node, SemanticTree.ICommonFunctionConstantDefinitionNode
+    public class function_constant_definition : constant_definition_node, ICommonFunctionConstantDefinitionNode
     {
         /// <summary>
         /// Тип, содержащий определение константы.
@@ -483,7 +485,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -492,7 +494,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Функция, в которой определена константа.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        SemanticTree.ICommonFunctionNode SemanticTree.ICommonFunctionConstantDefinitionNode.comprehensive_function
+        PascalABCCompiler.SemanticTree.ICommonFunctionNode PascalABCCompiler.SemanticTree.ICommonFunctionConstantDefinitionNode.comprehensive_function
         {
             get 
             {

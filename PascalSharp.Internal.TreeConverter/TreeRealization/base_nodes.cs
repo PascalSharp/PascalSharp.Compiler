@@ -1,8 +1,10 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
 
-namespace PascalABCCompiler.TreeRealization
+using System;
+using PascalABCCompiler.SemanticTree;
+
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     /// <summary>
     /// Каждый узел семантического дерева должен уметь возвращать свой тип.
@@ -55,7 +57,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Базовый абстрактный класс для всех выражений.
     /// </summary>
 	[Serializable]
-	public abstract class semantic_node : SemanticTree.ISemanticNode
+	public abstract class semantic_node : ISemanticNode
 	{
         /// <summary>
         /// Обобщенный тип узла.
@@ -77,7 +79,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public virtual void visit(SemanticTree.ISemanticVisitor visitor)
+		public virtual void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -89,7 +91,7 @@ namespace PascalABCCompiler.TreeRealization
     /// сама программа или dll, типы и модули.
     /// </summary>
 	[Serializable]
-	public abstract class definition_node : semantic_node, SemanticTree.IDefinitionNode
+	public abstract class definition_node : semantic_node, IDefinitionNode
 	{
         public override string ToString() => this.GetType().Name;
 
@@ -101,7 +103,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -116,7 +118,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SemanticTree.IAttributeNode[] Attributes
+		public PascalABCCompiler.SemanticTree.IAttributeNode[] Attributes
 		{
 			get
 			{
@@ -136,7 +138,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		string SemanticTree.IDefinitionNode.Documentation
+		string PascalABCCompiler.SemanticTree.IDefinitionNode.Documentation
 		{
 			get
 			{
@@ -154,7 +156,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Базовый класс для всех statement-ов.
     /// </summary>
 	[Serializable]
-	public abstract class statement_node : semantic_node, SemanticTree.IStatementNode
+	public abstract class statement_node : semantic_node, IStatementNode
 	{
         /// <summary>
         /// Расположение statement-а в программе.
@@ -192,7 +194,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Расположение statement-а в программе.
         /// </summary>
-		SemanticTree.ILocation SemanticTree.ILocated.Location
+		PascalABCCompiler.SemanticTree.ILocation PascalABCCompiler.SemanticTree.ILocated.Location
 		{
 			get
 			{
@@ -215,7 +217,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -225,7 +227,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Базовый класс для всех выражений.
     /// </summary>
 	[Serializable]
-	public abstract class expression_node : statement_node, SemanticTree.IExpressionNode
+	public abstract class expression_node : statement_node, IExpressionNode
 	{
         /// <summary>
         /// Тип выражения.
@@ -304,7 +306,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -312,7 +314,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Тип выражения. Используется посетителем при обходе дерева.
         /// </summary>
-		SemanticTree.ITypeNode SemanticTree.IExpressionNode.type
+		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IExpressionNode.type
 		{
 			get
 			{
@@ -320,7 +322,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		SemanticTree.ITypeNode SemanticTree.IExpressionNode.conversion_type
+		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IExpressionNode.conversion_type
 		{
 			get
 			{
@@ -351,7 +353,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Т.е. тех, которые могут стоять в левой части оператора присваивания и передаваться по ссылке.
     /// </summary>
 	[Serializable]
-	public abstract class addressed_expression : expression_node, SemanticTree.IAddressedExpressionNode
+	public abstract class addressed_expression : expression_node, IAddressedExpressionNode
 	{
         /// <summary>
         /// Конструктор адресного выражения.
@@ -379,7 +381,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -390,7 +392,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, представляющий ссылку на объект внутри его метода.
     /// </summary>
 	[Serializable]
-	public class this_node : expression_node, SemanticTree.IThisNode
+	public class this_node : expression_node, IThisNode
 	{
         /// <summary>
         /// Конструктор this_node.
@@ -425,7 +427,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -435,7 +437,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, представляющий операцию получения адреса объекта.
     /// </summary>
 	[Serializable]
-	public class get_addr_node : expression_node, SemanticTree.IGetAddrNode
+	public class get_addr_node : expression_node, IGetAddrNode
 	{
         /// <summary>
         /// Выражение, адрес которого мы получаем.
@@ -480,7 +482,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Выражение, адрес которого мы получаем.
         /// Испоьзуется при обходе дерева посетителем.
         /// </summary>
-		SemanticTree.IExpressionNode SemanticTree.IGetAddrNode.addr_of_expr
+		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IGetAddrNode.addr_of_expr
 		{
 			get
 			{
@@ -492,7 +494,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -502,7 +504,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, представляющий операцию разыменования объекта.
     /// </summary>
 	[Serializable]
-	public class dereference_node : addressed_expression, SemanticTree.IDereferenceNode
+	public class dereference_node : addressed_expression, IDereferenceNode
 	{
         /// <summary>
         /// Выражение-указатель.
@@ -552,7 +554,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Выражение-указатель, которое мы разыменовываем.
         /// Это свойство используется при обходе дерева посетителем.
         /// </summary>
-		SemanticTree.IExpressionNode SemanticTree.IDereferenceNode.derefered_expr
+		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IDereferenceNode.derefered_expr
 		{
 			get
 			{
@@ -564,7 +566,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}

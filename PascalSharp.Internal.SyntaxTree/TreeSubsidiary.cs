@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace PascalABCCompiler.SyntaxTree
+namespace PascalSharp.Internal.SyntaxTree
 {
     public enum LanguageId { CommonLanguage=32, PascalABCNET=2, C=4, VBNET=8, Oberon00 = 16}
 

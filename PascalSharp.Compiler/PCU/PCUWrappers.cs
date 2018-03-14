@@ -1,8 +1,7 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.TreeConverter;
 using SymbolTable;
 
 namespace PascalSharp.Compiler.PCU

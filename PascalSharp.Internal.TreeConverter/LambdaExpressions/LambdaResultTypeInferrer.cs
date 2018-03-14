@@ -3,8 +3,7 @@
 using System;
 using System.Collections.Generic;
 using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.TreeConverter;
 
 namespace TreeConverter.LambdaExpressions
 {

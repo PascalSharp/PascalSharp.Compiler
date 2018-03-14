@@ -6,7 +6,7 @@ using System.Text;
 using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.Errors;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
 
     internal class CompilerDirectivesToSyntaxTreeNodesLinker

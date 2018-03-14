@@ -4,7 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter;TreeRealization;
+using for_node = PascalABCCompiler.SyntaxTree.for_node;
 
 //Визитор предназначен для обхода поддерева синтаксического дерева и поиска
 //обращений к константам и элементам массива - их не получится найти в семантическом дереве.
@@ -15,7 +17,7 @@ using PascalABCCompiler.TreeConverter;
 //- Список локальных блочных переменных. Если они есть - генерировать объект-функцию и включать в нее все локальные переменные,
 //      иначе можно обойтись просто локальной функцией и переменные не включать.
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
     class VarFinderSyntaxVisitor : SyntaxTree.WalkingVisitorNew
     {
@@ -68,8 +70,8 @@ namespace PascalABCCompiler.TreeConverter
             for (int i=0; i<Variables.Count; ++i)
                 if (Variables[i].name.StartsWith("$rv_"))
                 {
-                    TreeRealization.local_variable OldResult = Variables[i] as TreeRealization.local_variable;
-                    TreeRealization.local_variable NewResult = new PascalABCCompiler.TreeRealization.local_variable("result", OldResult.type, OldResult.function, OldResult.loc);
+                    local_variable OldResult = Variables[i] as local_variable;
+                    local_variable NewResult = new local_variable("result", OldResult.type, OldResult.function, OldResult.loc);
                     Variables[i] = NewResult;
                 }
         }

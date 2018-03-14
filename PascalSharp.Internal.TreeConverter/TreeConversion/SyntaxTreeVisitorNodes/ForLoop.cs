@@ -1,10 +1,9 @@
 ﻿using System;
 using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.TreeRealization;
 using for_node = PascalABCCompiler.SyntaxTree.for_node;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
     public partial class syntax_tree_visitor
     {

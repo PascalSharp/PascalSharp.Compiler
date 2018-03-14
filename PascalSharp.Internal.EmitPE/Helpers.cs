@@ -35,46 +35,46 @@ namespace PascalSharp.Internal.EmitPE {
         
         static OperatorsNameConvertor()
         {
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.plus_name]="op_Addition";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.minus_name]="op_Subtraction";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.mul_name]="op_Multiply";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.div_name]="op_Division";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.and_name]="op_BitwiseAnd";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.or_name]="op_BitwiseOr";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.eq_name]="op_Equality";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.gr_name]="op_GreaterThan";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.greq_name]="op_GreaterThanOrEqual";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.sm_name]="op_LessThan";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.smeq_name]="op_LessThanOrEqual";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.mod_name]="op_Modulus";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.not_name]="op_LogicalNot";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.noteq_name]="op_Inequality";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.plus_name]="op_Addition";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.minus_name]="op_Subtraction";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.mul_name]="op_Multiply";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.div_name]="op_Division";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.and_name]="op_BitwiseAnd";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.or_name]="op_BitwiseOr";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.eq_name]="op_Equality";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.gr_name]="op_GreaterThan";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.greq_name]="op_GreaterThanOrEqual";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.sm_name]="op_LessThan";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.smeq_name]="op_LessThanOrEqual";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.mod_name]="op_Modulus";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.not_name]="op_LogicalNot";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.noteq_name]="op_Inequality";
             
             //op_Implicit
             //op_Explicit
 
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.xor_name]="op_ExclusiveOr";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.and_name]="op_LogicalAnd";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.or_name]="op_LogicalOr";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.assign_name]="op_Assign";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.shl_name]="op_LeftShift";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.shr_name]="op_RightShift";
-            //names["op_SignedRightShift"]=PascalABCCompiler.TreeConverter.compiler_string_consts.shr_name;
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.shr_name]="op_UnsignedRightShift";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.eq_name]="op_Equality";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.multassign_name]="op_MultiplicationAssignment";
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.minusassign_name]="op_SubtractionAssignment";
-            //names[PascalABCCompiler.TreeConverter.compiler_string_consts.minusassign_name]="op_ExclusiveOrAssignment";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.xor_name]="op_ExclusiveOr";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.and_name]="op_LogicalAnd";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.or_name]="op_LogicalOr";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.assign_name]="op_Assign";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.shl_name]="op_LeftShift";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.shr_name]="op_RightShift";
+            //names["op_SignedRightShift"]=PascalSharp.Internal.TreeConverter.compiler_string_consts.shr_name;
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.shr_name]="op_UnsignedRightShift";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.eq_name]="op_Equality";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.multassign_name]="op_MultiplicationAssignment";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.minusassign_name]="op_SubtractionAssignment";
+            //names[PascalSharp.Internal.TreeConverter.compiler_string_consts.minusassign_name]="op_ExclusiveOrAssignment";
             //op_LeftShiftAssignment
             //op_ModulusAssignment
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.plusassign_name]="op_AdditionAssignment";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.plusassign_name]="op_AdditionAssignment";
             //op_BitwiseAndAssignment
             //op_BitwiseOrAssignment
             //op_Comma
-            names[PascalABCCompiler.TreeConverter.compiler_string_consts.divassign_name]="op_DivisionAssignment";
+            names[PascalSharp.Internal.TreeConverter.compiler_string_consts.divassign_name]="op_DivisionAssignment";
             //op_Decrement
             //op_Increment
-            //names[PascalABCCompiler.TreeConverter.compiler_string_consts.minus_name] ="op_UnaryNegation";
+            //names[PascalSharp.Internal.TreeConverter.compiler_string_consts.minus_name] ="op_UnaryNegation";
             //op_UnaryPlus
             //op_OnesComplement
 

@@ -2,12 +2,14 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 using System;
 using System.Linq;
-using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.TreeConverter;
 using System.Collections.Generic;
-using SymbolTable;
 using System.Reflection;
+using PascalSharp.Internal.TreeConverter;SymbolTable;
+using PascalSharp.Internal.TreeConverter;SymbolTable.DSST;
+using PascalSharp.Internal.TreeConverter;TreeRealization;
 
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     public abstract class BasePCUReader
     {
@@ -19,9 +21,9 @@ namespace PascalABCCompiler.TreeRealization
                 foreach (var si in sil.list)
                 {
                     if (si.sym_info != null)
-                        if (si.sym_info.semantic_node_type == PascalABCCompiler.TreeRealization.semantic_node_type.wrap_def)
+                        if (si.sym_info.semantic_node_type == PascalSharp.Internal.TreeConverter.TreeRealization.semantic_node_type.wrap_def)
                         {
-                            PascalABCCompiler.TreeRealization.wrapped_definition_node wdn = (PascalABCCompiler.TreeRealization.wrapped_definition_node)si.sym_info;
+                            wrapped_definition_node wdn = (wrapped_definition_node)si.sym_info;
                             si.sym_info = wdn.PCUReader.CreateInterfaceMember(wdn.offset, name);
                         }
                 }
@@ -87,12 +89,12 @@ namespace PascalABCCompiler.TreeRealization
             ht.Clear();
         }
 
-        public static BasePCUReader GetPCUReader(PascalABCCompiler.TreeRealization.wrapped_definition_node wdn)
+        public static BasePCUReader GetPCUReader(PascalSharp.Internal.TreeConverter.TreeRealization.wrapped_definition_node wdn)
         {
             return (BasePCUReader)ht[wdn];
         }
 
-        public static void AddPCUReader(PascalABCCompiler.TreeRealization.wrapped_definition_node wdn, BasePCUReader pr)
+        public static void AddPCUReader(PascalSharp.Internal.TreeConverter.TreeRealization.wrapped_definition_node wdn, BasePCUReader pr)
         {
             ht[wdn] = pr;
         }
@@ -129,7 +131,7 @@ namespace PascalABCCompiler.TreeRealization
     }
 }
 
-namespace SymbolTable
+namespace PascalSharp.Internal.TreeConverter.SymbolTable
 {
 
 	#region SymbolTableConstants набор констант определяющих поведение таблицы символов
@@ -222,7 +224,7 @@ namespace SymbolTable
         {
             SymbolInfoList sil = SymbolTable.Find(this, name, CurrentScope);
             if (sil == null) return sil;
-            PascalABCCompiler.TreeRealization.BasePCUReader.RestoreSymbols(sil, name);
+            PascalSharp.Internal.TreeConverter.TreeRealization.BasePCUReader.RestoreSymbols(sil, name);
             return sil;
         }
         public virtual SymbolInfoList FindOnlyInScopeAndBlocks(string name)
@@ -237,7 +239,7 @@ namespace SymbolTable
         {
             SymbolInfoList sil = SymbolTable.FindOnlyInType(this, name, CurrentScope);
             if (sil == null) return sil;
-            PascalABCCompiler.TreeRealization.BasePCUReader.RestoreSymbols(sil, name);
+            PascalSharp.Internal.TreeConverter.TreeRealization.BasePCUReader.RestoreSymbols(sil, name);
             return sil;
         }
         public void AddSymbol(string Name,SymbolInfo Inf)
@@ -359,7 +361,7 @@ namespace SymbolTable
                 }
             }
             if (si_list == null) return si_list;
-            PascalABCCompiler.TreeRealization.BasePCUReader.RestoreSymbols(si_list, name);
+            PascalSharp.Internal.TreeConverter.TreeRealization.BasePCUReader.RestoreSymbols(si_list, name);
             return si_list;
         }
 
@@ -376,17 +378,17 @@ namespace SymbolTable
                 }
             }
             if (sil == null) return sil;
-            PascalABCCompiler.TreeRealization.BasePCUReader.RestoreSymbols(sil, name);
+            PascalSharp.Internal.TreeConverter.TreeRealization.BasePCUReader.RestoreSymbols(sil, name);
             return sil;
         }
     }
 
     /*public class GenericTypeInstanceScope : ClassScope
     {
-        private PascalABCCompiler.TreeRealization.generic_instance_type_node _instance_type;
+        private PascalSharp.Internal.TreeConverter.TreeRealization.generic_instance_type_node _instance_type;
         private Scope _orig_scope;
 
-        public GenericTypeInstanceScope(PascalABCCompiler.TreeRealization.generic_instance_type_node instance_type,
+        public GenericTypeInstanceScope(PascalSharp.Internal.TreeConverter.TreeRealization.generic_instance_type_node instance_type,
             Scope orig_scope, Scope BaseClassScope)
             : base(orig_scope.SymbolTable, orig_scope.TopScope, BaseClassScope)
         {
@@ -789,7 +791,7 @@ namespace SymbolTable
 
             if (ar is DotNETScope)
             {
-                PascalABCCompiler.TreeRealization.BasePCUReader.RestoreSymbols(FirstInfo, name);
+                PascalSharp.Internal.TreeConverter.TreeRealization.BasePCUReader.RestoreSymbols(FirstInfo, name);
                 AddToSymbolInfo(FirstInfo, (DotNETScope)ar, name);
                 return;
             }

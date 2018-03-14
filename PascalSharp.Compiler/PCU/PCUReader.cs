@@ -6,10 +6,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.Errors;
-using CompilerInternalError = PascalABCCompiler.TreeConverter.CompilerInternalError;
+using CompilerInternalError = PascalSharp.Internal.TreeConverter.CompilerInternalError;
 
 namespace PascalSharp.Compiler.PCU
 {
@@ -252,8 +251,8 @@ namespace PascalSharp.Compiler.PCU
                 
                 //TODO сохранить в PCU
                 cun.scope.CaseSensitive = false;
-                if (string.Compare(unit_name,PascalABCCompiler.TreeConverter.compiler_string_consts.system_unit_file_name)==0)
-                	PascalABCCompiler.TreeConverter.syntax_tree_visitor.init_system_module(cun);
+                if (string.Compare(unit_name,PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_file_name)==0)
+                	PascalSharp.Internal.TreeConverter.syntax_tree_visitor.init_system_module(cun);
                 //ssyy
                 //Создаём область видимости для implementation - части
                 cun.implementation_scope = new WrappedUnitImplementationScope(this, cun.scope);
@@ -1472,7 +1471,7 @@ namespace PascalSharp.Compiler.PCU
 			br.ReadByte();
 			compiled_type_node ctn = GetNetExtType(br.ReadInt32());
             int handle = br.ReadInt32(); 
-			compiled_function_node cfn = PascalABCCompiler.TreeRealization.compiled_function_node.get_compiled_method(FindMethodByHandle(ctn.compiled_type,handle));
+			compiled_function_node cfn = PascalSharp.Internal.TreeConverter.TreeRealization.compiled_function_node.get_compiled_method(FindMethodByHandle(ctn.compiled_type,handle));
 			br.BaseStream.Seek(tmp,SeekOrigin.Begin);
 			return cfn;
 		}
@@ -2498,8 +2497,8 @@ namespace PascalSharp.Compiler.PCU
             {
                 if (ctn.fields[0].type is simple_array)
                 {
-                    ctn.find(PascalABCCompiler.TreeConverter.compiler_string_consts.upper_array_const_name);
-                    ctn.find(PascalABCCompiler.TreeConverter.compiler_string_consts.lower_array_const_name);
+                    ctn.find(PascalSharp.Internal.TreeConverter.compiler_string_consts.upper_array_const_name);
+                    ctn.find(PascalSharp.Internal.TreeConverter.compiler_string_consts.lower_array_const_name);
                     constant_node lower_bound = ctn.const_defs[1].const_value;
                     constant_node upper_bound = ctn.const_defs[0].const_value;
 

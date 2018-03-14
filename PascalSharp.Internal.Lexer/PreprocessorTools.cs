@@ -4,10 +4,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SyntaxTree;
 using QUT.Gppg;
 
-namespace GPPGPreprocessor3
+namespace PascalSharp.Internal.Lexer
 {
     public class Directive
     {

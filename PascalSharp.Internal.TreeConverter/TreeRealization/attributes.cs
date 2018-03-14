@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
+using PascalABCCompiler.SemanticTree;
 
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
 	[Serializable]
-	public class attribute_node : semantic_node, SemanticTree.IAttributeNode, SemanticTree.ILocated
+	public class attribute_node : semantic_node, IAttributeNode, ILocated
 	{
 		private function_node _attr_constr;
 		private type_node _attr_type;
@@ -16,7 +18,7 @@ namespace PascalABCCompiler.TreeRealization
 		private List<var_definition_node> _field_names = new List<var_definition_node>();
 		private List<constant_node> _field_initializers = new List<constant_node>();
 		private location _loc;
-		private SemanticTree.attribute_qualifier_kind _qualifier;
+		private PascalABCCompiler.SemanticTree.attribute_qualifier_kind _qualifier;
 		
 		public attribute_node(function_node _attr_constr, type_node _attr_type, location _loc)
 		{
@@ -37,7 +39,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SemanticTree.attribute_qualifier_kind qualifier
+		public PascalABCCompiler.SemanticTree.attribute_qualifier_kind qualifier
 		{
 			get
 			{
@@ -101,7 +103,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SemanticTree.IConstantNode[] Arguments
+		public PascalABCCompiler.SemanticTree.IConstantNode[] Arguments
 		{
 			get
 			{
@@ -109,7 +111,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SemanticTree.IPropertyNode[] PropertyNames
+		public PascalABCCompiler.SemanticTree.IPropertyNode[] PropertyNames
 		{
 			get
 			{
@@ -117,7 +119,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SemanticTree.IConstantNode[] PropertyInitializers
+		public PascalABCCompiler.SemanticTree.IConstantNode[] PropertyInitializers
 		{
 			get
 			{
@@ -125,7 +127,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SemanticTree.IVAriableDefinitionNode[] FieldNames
+		public PascalABCCompiler.SemanticTree.IVAriableDefinitionNode[] FieldNames
 		{
 			get
 			{
@@ -133,7 +135,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SemanticTree.IConstantNode[] FieldInitializers
+		public PascalABCCompiler.SemanticTree.IConstantNode[] FieldInitializers
 		{
 			get
 			{
@@ -141,7 +143,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SemanticTree.ITypeNode AttributeType
+		public PascalABCCompiler.SemanticTree.ITypeNode AttributeType
 		{
 			get
 			{
@@ -149,7 +151,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SemanticTree.IFunctionNode AttributeConstructor
+		public PascalABCCompiler.SemanticTree.IFunctionNode AttributeConstructor
 		{
 			get
 			{
@@ -169,7 +171,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 		
-		SemanticTree.ILocation SemanticTree.ILocated.Location
+		PascalABCCompiler.SemanticTree.ILocation PascalABCCompiler.SemanticTree.ILocated.Location
 		{
 			get
 			{

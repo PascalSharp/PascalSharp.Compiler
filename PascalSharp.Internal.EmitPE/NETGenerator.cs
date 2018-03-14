@@ -268,7 +268,7 @@ namespace PascalSharp.Internal.EmitPE
             get
             {
                 if (fileOfAttributeConstructor != null) return fileOfAttributeConstructor;
-                TypeBuilder tb = mb.DefineType(PascalABCCompiler.TreeConverter.compiler_string_consts.file_of_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
+                TypeBuilder tb = mb.DefineType(PascalSharp.Internal.TreeConverter.compiler_string_consts.file_of_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
                 types.Add(tb);
                 fileOfAttributeConstructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[1] { TypeFactory.ObjectType });
                 FieldBuilder fld = tb.DefineField("Type", TypeFactory.ObjectType, FieldAttributes.Public);
@@ -288,7 +288,7 @@ namespace PascalSharp.Internal.EmitPE
             get
             {
                 if (setOfAttributeConstructor != null) return setOfAttributeConstructor;
-                TypeBuilder tb = mb.DefineType(PascalABCCompiler.TreeConverter.compiler_string_consts.set_of_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
+                TypeBuilder tb = mb.DefineType(PascalSharp.Internal.TreeConverter.compiler_string_consts.set_of_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
                 types.Add(tb);
                 setOfAttributeConstructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[1] { TypeFactory.ObjectType });
                 FieldBuilder fld = tb.DefineField("Type", TypeFactory.ObjectType, FieldAttributes.Public);
@@ -309,7 +309,7 @@ namespace PascalSharp.Internal.EmitPE
             get
             {
                 if (templateClassAttributeConstructor != null) return templateClassAttributeConstructor;
-                TypeBuilder tb = mb.DefineType(PascalABCCompiler.TreeConverter.compiler_string_consts.template_class_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
+                TypeBuilder tb = mb.DefineType(PascalSharp.Internal.TreeConverter.compiler_string_consts.template_class_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
                 types.Add(tb);
                 templateClassAttributeConstructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[1] { TypeFactory.ByteType.MakeArrayType() });
                 FieldBuilder fld = tb.DefineField("Tree", TypeFactory.ByteType.MakeArrayType(), FieldAttributes.Public);
@@ -330,7 +330,7 @@ namespace PascalSharp.Internal.EmitPE
             get
             {
                 if (typeSynonimAttributeConstructor != null) return typeSynonimAttributeConstructor;
-                TypeBuilder tb = mb.DefineType(PascalABCCompiler.TreeConverter.compiler_string_consts.type_synonim_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
+                TypeBuilder tb = mb.DefineType(PascalSharp.Internal.TreeConverter.compiler_string_consts.type_synonim_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
                 types.Add(tb);
                 typeSynonimAttributeConstructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[1] { TypeFactory.ObjectType });
                 FieldBuilder fld = tb.DefineField("Type", TypeFactory.ObjectType, FieldAttributes.Public);
@@ -351,7 +351,7 @@ namespace PascalSharp.Internal.EmitPE
             get
             {
                 if (shortStringAttributeConstructor != null) return shortStringAttributeConstructor;
-                TypeBuilder tb = mb.DefineType(PascalABCCompiler.TreeConverter.compiler_string_consts.short_string_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
+                TypeBuilder tb = mb.DefineType(PascalSharp.Internal.TreeConverter.compiler_string_consts.short_string_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
                 types.Add(tb);
                 shortStringAttributeConstructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[1] { TypeFactory.Int32Type });
                 FieldBuilder fld = tb.DefineField("Length", TypeFactory.Int32Type, FieldAttributes.Public);
@@ -475,7 +475,7 @@ namespace PascalSharp.Internal.EmitPE
                 }
                 catch
                 {
-                    throw new PascalABCCompiler.TreeConverter.SourceFileError(options.MainResourceFileName);
+                    throw new PascalSharp.Internal.TreeConverter.SourceFileError(options.MainResourceFileName);
                 }
             }
             else if (options.MainResourceData != null)
@@ -486,7 +486,7 @@ namespace PascalSharp.Internal.EmitPE
                 }
                 catch
                 {
-                    throw new PascalABCCompiler.TreeConverter.SourceFileError("");
+                    throw new PascalSharp.Internal.TreeConverter.SourceFileError("");
                 }
             }
             save_debug_info = comp_opt.dbg_attrs == DebugAttributes.Debug || comp_opt.dbg_attrs == DebugAttributes.ForDebugging;
@@ -928,14 +928,14 @@ namespace PascalSharp.Internal.EmitPE
                     }
                     catch (System.Runtime.InteropServices.COMException e)
                     {
-                        throw new PascalABCCompiler.TreeConverter.SaveAssemblyError(e.Message);
+                        throw new PascalSharp.Internal.TreeConverter.SaveAssemblyError(e.Message);
                     }
                     catch (System.IO.IOException e)
                     {
                         if (tries < num_try_save)
                             tries++;
                         else
-                            throw new PascalABCCompiler.TreeConverter.SaveAssemblyError(e.Message);
+                            throw new PascalSharp.Internal.TreeConverter.SaveAssemblyError(e.Message);
                     }
                 }
                 while (not_done);

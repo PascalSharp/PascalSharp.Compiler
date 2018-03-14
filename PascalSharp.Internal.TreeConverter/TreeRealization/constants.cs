@@ -1,16 +1,18 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
+using PascalABCCompiler.SemanticTree;
 
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     /// <summary>
     /// Базовый класс для представления констант в выражениях.
     /// Этот класс представляет только неименованные константы.
     /// </summary>
 	[Serializable]
-	public abstract class constant_node : expression_node, SemanticTree.IConstantNode
+	public abstract class constant_node : expression_node, IConstantNode
 	{
         private type_node _type;
 
@@ -28,7 +30,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -38,7 +40,7 @@ namespace PascalABCCompiler.TreeRealization
             return null;
         }
 
-        object SemanticTree.IConstantNode.value
+        object PascalABCCompiler.SemanticTree.IConstantNode.value
         {
             get
             {
@@ -132,7 +134,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления булевских констант.
     /// </summary>
     [Serializable]
-    public class bool_const_node : concrete_constant<bool>, SemanticTree.IBoolConstantNode
+    public class bool_const_node : concrete_constant<bool>, IBoolConstantNode
     {
 
         /// <summary>
@@ -165,7 +167,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -176,7 +178,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления int констант.
     /// </summary>
 	[Serializable]
-	public class int_const_node : concrete_constant<int>, SemanticTree.IIntConstantNode
+	public class int_const_node : concrete_constant<int>, IIntConstantNode
 	{
         /// <summary>
         /// Конструктор узла.
@@ -207,7 +209,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -217,7 +219,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления long констант.
     /// </summary>
     [Serializable]
-    public class long_const_node : concrete_constant<long>, SemanticTree.ILongConstantNode
+    public class long_const_node : concrete_constant<long>, ILongConstantNode
     {
         /// <summary>
         /// Конструктор узла.
@@ -249,7 +251,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -259,7 +261,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления byte констант.
     /// </summary>
     [Serializable]
-    public class byte_const_node : concrete_constant<byte>, SemanticTree.IByteConstantNode
+    public class byte_const_node : concrete_constant<byte>, IByteConstantNode
     {
         /// <summary>
         /// Конструктор узла.
@@ -291,7 +293,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -301,7 +303,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления signed byte констант.
     /// </summary>
     [Serializable]
-    public class sbyte_const_node : concrete_constant<sbyte>, SemanticTree.ISByteConstantNode
+    public class sbyte_const_node : concrete_constant<sbyte>, ISByteConstantNode
     {
         /// <summary>
         /// Конструктор узла.
@@ -333,7 +335,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -343,7 +345,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления short констант.
     /// </summary>
     [Serializable]
-    public class short_const_node : concrete_constant<short>, SemanticTree.IShortConstantNode
+    public class short_const_node : concrete_constant<short>, IShortConstantNode
     {
         /// <summary>
         /// Конструктор узла.
@@ -375,7 +377,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -385,7 +387,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления unsigned short констант.
     /// </summary>
     [Serializable]
-    public class ushort_const_node : concrete_constant<ushort>, SemanticTree.IUShortConstantNode
+    public class ushort_const_node : concrete_constant<ushort>, IUShortConstantNode
     {
         /// <summary>
         /// Конструктор узла.
@@ -417,7 +419,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -427,7 +429,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления unsigned int констант.
     /// </summary>
     [Serializable]
-    public class uint_const_node : concrete_constant<uint>, SemanticTree.IUIntConstantNode
+    public class uint_const_node : concrete_constant<uint>, IUIntConstantNode
     {
         /// <summary>
         /// Конструктор узла.
@@ -459,7 +461,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -469,7 +471,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления unsigned long констант.
     /// </summary>
     [Serializable]
-    public class ulong_const_node : concrete_constant<ulong>, SemanticTree.IULongConstantNode
+    public class ulong_const_node : concrete_constant<ulong>, IULongConstantNode
     {
         /// <summary>
         /// Конструктор узла.
@@ -501,7 +503,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -511,7 +513,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления double констант.
     /// </summary>
 	[Serializable]
-	public class double_const_node : concrete_constant<double>, SemanticTree.IDoubleConstantNode
+	public class double_const_node : concrete_constant<double>, IDoubleConstantNode
 	{
         /// <summary>
         /// Конструктор узла.
@@ -542,7 +544,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -552,7 +554,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления float констант.
     /// </summary>
     [Serializable]
-    public class float_const_node : concrete_constant<float>, SemanticTree.IFloatConstantNode
+    public class float_const_node : concrete_constant<float>, IFloatConstantNode
     {
         /// <summary>
         /// Конструктор узла.
@@ -584,7 +586,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -594,7 +596,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления char констант (этот класс для 2-байтных char - widechar в delphi).
     /// </summary>
 	[Serializable]
-	public class char_const_node : concrete_constant<char>, SemanticTree.ICharConstantNode
+	public class char_const_node : concrete_constant<char>, ICharConstantNode
 	{
         /// <summary>
         /// Конструктор узла.
@@ -625,7 +627,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -634,7 +636,7 @@ namespace PascalABCCompiler.TreeRealization
     /// <summary>
     /// Класс для представления строковых констант.
     /// </summary>
-	public class string_const_node : concrete_constant<string>, SemanticTree.IStringConstantNode
+	public class string_const_node : concrete_constant<string>, IStringConstantNode
 	{
 
         /// <summary>
@@ -666,7 +668,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -675,7 +677,7 @@ namespace PascalABCCompiler.TreeRealization
     /// <summary>
     /// Класс для представления константы nil.
     /// </summary>
-    public class null_const_node : constant_node, SemanticTree.INullConstantNode
+    public class null_const_node : constant_node, INullConstantNode
     {
         /// <summary>
         /// Конструктор узла.
@@ -709,7 +711,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -720,7 +722,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления констaнтной записи
     /// </summary>
     [Serializable]
-    public class record_constant : constant_node, SemanticTree.IRecordConstantNode
+    public class record_constant : constant_node, IRecordConstantNode
     {
         private List<constant_node> _field_values = new List<constant_node>();
         
@@ -732,7 +734,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        internal List<SyntaxTree.record_const_definition> record_const_definition_list;
+        internal List<PascalABCCompiler.SyntaxTree.record_const_definition> record_const_definition_list;
 
         public record_constant(List<constant_node> field_values, location loc)
             :base(null, loc)
@@ -740,7 +742,7 @@ namespace PascalABCCompiler.TreeRealization
             _field_values = field_values;
         }
 
-        internal record_constant(List<SyntaxTree.record_const_definition> record_const_definition_list, location loc)
+        internal record_constant(List<PascalABCCompiler.SyntaxTree.record_const_definition> record_const_definition_list, location loc)
             : base(null, loc)
         {
             this.record_const_definition_list = record_const_definition_list;
@@ -753,7 +755,7 @@ namespace PascalABCCompiler.TreeRealization
 			return rc;
 		}
 		
-        public SemanticTree.IConstantNode[] FieldValues
+        public PascalABCCompiler.SemanticTree.IConstantNode[] FieldValues
         {
             get
             {
@@ -765,7 +767,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -783,7 +785,7 @@ namespace PascalABCCompiler.TreeRealization
 
     }
 
-    public class enum_const_node : constant_node, SemanticTree.IEnumConstNode
+    public class enum_const_node : constant_node, IEnumConstNode
     {
         private int _constant_value;
 
@@ -814,7 +816,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -835,7 +837,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс для представления константного массива
     /// </summary>
     [Serializable]
-    public class array_const : constant_node, SemanticTree.IArrayConstantNode
+    public class array_const : constant_node, IArrayConstantNode
     {
         private List<constant_node> _element_values;
 
@@ -848,7 +850,7 @@ namespace PascalABCCompiler.TreeRealization
         }
 
 
-        SemanticTree.IConstantNode[] SemanticTree.IArrayConstantNode.ElementValues
+        PascalABCCompiler.SemanticTree.IConstantNode[] PascalABCCompiler.SemanticTree.IArrayConstantNode.ElementValues
         {
             get
             {
@@ -856,7 +858,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ITypeNode SemanticTree.IArrayConstantNode.ElementType
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IArrayConstantNode.ElementType
         {
             get
             {
@@ -890,7 +892,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -907,7 +909,7 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
 
-    public class compiled_static_field_reference_as_constant : constant_node, SemanticTree.ICompiledStaticFieldReferenceNodeAsConstant
+    public class compiled_static_field_reference_as_constant : constant_node, ICompiledStaticFieldReferenceNodeAsConstant
     {
         private static_compiled_variable_reference _field_reference;
 
@@ -929,7 +931,7 @@ namespace PascalABCCompiler.TreeRealization
             _field_reference = field_reference;
         }
 
-        SemanticTree.IStaticCompiledFieldReferenceNode SemanticTree.ICompiledStaticFieldReferenceNodeAsConstant.FieldReference
+        PascalABCCompiler.SemanticTree.IStaticCompiledFieldReferenceNode PascalABCCompiler.SemanticTree.ICompiledStaticFieldReferenceNodeAsConstant.FieldReference
         {
             get
             {
@@ -946,7 +948,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -963,7 +965,7 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
 
-    public class compiled_static_method_call_as_constant : constant_node, SemanticTree.ICompiledStaticMethodCallNodeAsConstant
+    public class compiled_static_method_call_as_constant : constant_node, ICompiledStaticMethodCallNodeAsConstant
     {
         private compiled_static_method_call _method_call;
 
@@ -985,7 +987,7 @@ namespace PascalABCCompiler.TreeRealization
             _method_call = method_call;
         }
 
-        SemanticTree.ICompiledStaticMethodCallNode SemanticTree.ICompiledStaticMethodCallNodeAsConstant.MethodCall
+        PascalABCCompiler.SemanticTree.ICompiledStaticMethodCallNode PascalABCCompiler.SemanticTree.ICompiledStaticMethodCallNodeAsConstant.MethodCall
         {
             get
             {
@@ -1002,7 +1004,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -1019,7 +1021,7 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
 
-    public class common_namespace_function_call_as_constant : constant_node, SemanticTree.ICommonNamespaceFunctionCallNodeAsConstant
+    public class common_namespace_function_call_as_constant : constant_node, ICommonNamespaceFunctionCallNodeAsConstant
     {
         private common_namespace_function_call _method_call;
 
@@ -1042,7 +1044,7 @@ namespace PascalABCCompiler.TreeRealization
             _method_call = method_call;
         }
 
-        SemanticTree.ICommonNamespaceFunctionCallNode SemanticTree.ICommonNamespaceFunctionCallNodeAsConstant.MethodCall
+        PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionCallNode PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionCallNodeAsConstant.MethodCall
         {
             get
             {
@@ -1055,7 +1057,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -1072,7 +1074,7 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
 	
-    public class basic_function_call_as_constant : constant_node, SemanticTree.IBasicFunctionCallNodeAsConstant
+    public class basic_function_call_as_constant : constant_node, IBasicFunctionCallNodeAsConstant
     {
         private basic_function_call _method_call;
 
@@ -1095,7 +1097,7 @@ namespace PascalABCCompiler.TreeRealization
             _method_call = method_call;
         }
 
-        SemanticTree.IBasicFunctionCallNode SemanticTree.IBasicFunctionCallNodeAsConstant.MethodCall
+        PascalABCCompiler.SemanticTree.IBasicFunctionCallNode PascalABCCompiler.SemanticTree.IBasicFunctionCallNodeAsConstant.MethodCall
         {
             get
             {
@@ -1108,7 +1110,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -1125,7 +1127,7 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
     
-    public class compiled_constructor_call_as_constant : constant_node, SemanticTree.ICompiledConstructorCallAsConstant
+    public class compiled_constructor_call_as_constant : constant_node, ICompiledConstructorCallAsConstant
     {
         private compiled_constructor_call _method_call;
 
@@ -1148,7 +1150,7 @@ namespace PascalABCCompiler.TreeRealization
             _method_call = method_call;
         }
 
-        SemanticTree.ICompiledConstructorCall SemanticTree.ICompiledConstructorCallAsConstant.MethodCall
+        PascalABCCompiler.SemanticTree.ICompiledConstructorCall PascalABCCompiler.SemanticTree.ICompiledConstructorCallAsConstant.MethodCall
         {
             get
             {
@@ -1165,7 +1167,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -1182,7 +1184,7 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
     
-    public class namespace_constant_reference : constant_node, SemanticTree.INamespaceConstantReference
+    public class namespace_constant_reference : constant_node, INamespaceConstantReference
     {
     	private namespace_constant_definition cdn;
     	
@@ -1197,7 +1199,7 @@ namespace PascalABCCompiler.TreeRealization
 			set { cdn = value; }
 		}
     	
-    	SemanticTree.INamespaceConstantDefinitionNode SemanticTree.INamespaceConstantReference.Constant
+    	PascalABCCompiler.SemanticTree.INamespaceConstantDefinitionNode PascalABCCompiler.SemanticTree.INamespaceConstantReference.Constant
     	{
     		get
     		{
@@ -1209,7 +1211,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -1226,7 +1228,7 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
     
-    public class function_constant_reference : constant_node, SemanticTree.IFunctionConstantReference
+    public class function_constant_reference : constant_node, IFunctionConstantReference
     {
     	private function_constant_definition cdn;
     	
@@ -1241,7 +1243,7 @@ namespace PascalABCCompiler.TreeRealization
 			set { cdn = value; }
 		}
     	
-    	SemanticTree.ICommonFunctionConstantDefinitionNode SemanticTree.IFunctionConstantReference.Constant
+    	PascalABCCompiler.SemanticTree.ICommonFunctionConstantDefinitionNode PascalABCCompiler.SemanticTree.IFunctionConstantReference.Constant
     	{
     		get
     		{
@@ -1253,7 +1255,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -1270,7 +1272,7 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
     
-    public class common_constructor_call_as_constant : constant_node, SemanticTree.ICommonConstructorCallAsConstant
+    public class common_constructor_call_as_constant : constant_node, ICommonConstructorCallAsConstant
     {
         private common_constructor_call _constructor_call;
 
@@ -1293,7 +1295,7 @@ namespace PascalABCCompiler.TreeRealization
             _constructor_call = constructor_call;
         }
 
-        SemanticTree.ICommonConstructorCall SemanticTree.ICommonConstructorCallAsConstant.ConstructorCall
+        PascalABCCompiler.SemanticTree.ICommonConstructorCall PascalABCCompiler.SemanticTree.ICommonConstructorCallAsConstant.ConstructorCall
         {
             get
             {
@@ -1310,7 +1312,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

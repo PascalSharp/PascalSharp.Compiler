@@ -4,13 +4,12 @@
 using System;
 
 using PascalABCCompiler.SemanticTree;
-
-using PascalABCCompiler.TreeRealization;
-using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.CompilerTools.Errors;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.TreeConverter;TreeRealization;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter
 {
     public class StringResources
     {
@@ -82,9 +81,9 @@ namespace PascalABCCompiler.TreeConverter
         }
 
         //TODO: Сделать static. И вообще этот метод нужно вынести в location т.к. он определен в нескольких местах. И не плохо было бы сделать два вида интерфейса ILocated - один для получения ILocation а второй для получения location.
-        public SemanticTree.ILocation get_location(semantic_node sn)
+        public ILocation get_location(semantic_node sn)
         {
-            SemanticTree.ILocated iloc = sn as SemanticTree.ILocated;
+            var iloc = sn as ILocated;
             if (iloc == null)
             {
                 return null;

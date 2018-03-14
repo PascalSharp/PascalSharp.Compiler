@@ -1,20 +1,21 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.TreeConverter;
 
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
 
     /// <summary>
     /// Базовый класс, для представления типов.
     /// </summary>
 	[Serializable]
-	public abstract class type_node : definition_node, SemanticTree.ITypeNode
+	public abstract class type_node : definition_node, ITypeNode
 	{
         private System.Collections.Generic.Dictionary<type_node, type_intersection_node> type_intersections;
             //new System.Collections.Generic.Dictionary<type_node, type_intersection_node>();
@@ -125,7 +126,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
         
-        public virtual SemanticTree.ICommonTypeNode generic_type_container
+        public virtual PascalABCCompiler.SemanticTree.ICommonTypeNode generic_type_container
         {
             get
             {
@@ -147,11 +148,11 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ICommonFunctionNode SemanticTree.ITypeNode.common_generic_function_container
+        PascalABCCompiler.SemanticTree.ICommonFunctionNode PascalABCCompiler.SemanticTree.ITypeNode.common_generic_function_container
         {
             get
             {
-                return generic_function_container as SemanticTree.ICommonFunctionNode;
+                return generic_function_container as PascalABCCompiler.SemanticTree.ICommonFunctionNode;
             }
         }
 
@@ -191,7 +192,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public virtual List<SemanticTree.ITypeNode> ImplementingInterfaces
+        public virtual List<PascalABCCompiler.SemanticTree.ITypeNode> ImplementingInterfaces
         {
             get
             {
@@ -383,7 +384,7 @@ namespace PascalABCCompiler.TreeRealization
 			get;
 		}
 
-		public abstract SemanticTree.node_kind node_kind
+		public abstract PascalABCCompiler.SemanticTree.node_kind node_kind
 		{
 			get;
 		}
@@ -392,12 +393,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ITypeNode SemanticTree.ITypeNode.base_type
+		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ITypeNode.base_type
 		{
 			get
 			{
@@ -412,7 +413,7 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return general_node_type.type_node;
+				return this.general_node_type.type_node;
 			}
 		}
 
@@ -452,17 +453,17 @@ namespace PascalABCCompiler.TreeRealization
 		}
 
         public abstract SymbolInfoList find(string name, bool no_search_in_extension_methods = false);
-        public virtual SymbolInfoList find(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public virtual SymbolInfoList find(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             return find(name);
         }
         public abstract SymbolInfo find_first_in_type(string name, bool no_search_in_extension_methods = false);
-        public virtual SymbolInfo find_first_in_type(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public virtual SymbolInfo find_first_in_type(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             return find_first_in_type(name);
         }
         public abstract SymbolInfoList find_in_type(string name, bool no_search_in_extension_methods = false);   
-        public virtual SymbolInfoList find_in_type(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public virtual SymbolInfoList find_in_type(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             return find_in_type(name);
         }
@@ -471,7 +472,7 @@ namespace PascalABCCompiler.TreeRealization
         public abstract void clear_generated_names();
         public abstract void SetName(string name);
 
-        public abstract SymbolTable.Scope Scope
+        public abstract PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
         {
             get;
         }
@@ -495,13 +496,13 @@ namespace PascalABCCompiler.TreeRealization
             set;
         }
 
-        public abstract SemanticTree.type_special_kind type_special_kind
+        public abstract PascalABCCompiler.SemanticTree.type_special_kind type_special_kind
         {
             get;
             set;
         }
 
-        SemanticTree.type_special_kind SemanticTree.ITypeNode.type_special_kind
+        PascalABCCompiler.SemanticTree.type_special_kind PascalABCCompiler.SemanticTree.ITypeNode.type_special_kind
         {
             get
             {
@@ -534,7 +535,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ITypeNode SemanticTree.ITypeNode.element_type
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ITypeNode.element_type
         {
             get
             {
@@ -589,7 +590,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override SymbolTable.Scope Scope
+        public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
         {
             get
             {
@@ -597,11 +598,11 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override SemanticTree.node_kind node_kind
+        public override PascalABCCompiler.SemanticTree.node_kind node_kind
         {
             get
             {
-                return SemanticTree.node_kind.common;
+                return PascalABCCompiler.SemanticTree.node_kind.common;
             }
         }
 
@@ -613,7 +614,7 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return semantic_node_type.common_type_node;///////////////////????
+                return this.semantic_node_type.common_type_node;///////////////////????
             }
         }
 
@@ -632,7 +633,7 @@ namespace PascalABCCompiler.TreeRealization
             return null;
         }
 
-        public override SymbolInfoList find_in_type(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public override SymbolInfoList find_in_type(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             return null;
         }
@@ -664,7 +665,7 @@ namespace PascalABCCompiler.TreeRealization
         private string _name;
 
         private System.Collections.Generic.Dictionary<string, List<SymbolInfo>> additional_names =
-            new System.Collections.Generic.Dictionary<string, List<SymbolInfo>>(SystemLibrary.SystemLibrary.string_comparer);
+            new System.Collections.Generic.Dictionary<string, List<SymbolInfo>>(PascalABCCompiler.SystemLibrary.SystemLibrary.string_comparer);
         private System.Collections.Generic.Dictionary<SymbolInfo, string> additional_generated_names =
             new System.Collections.Generic.Dictionary<SymbolInfo, string>();
 
@@ -790,7 +791,7 @@ namespace PascalABCCompiler.TreeRealization
             return null;
         }
 
-        public override SymbolTable.Scope Scope
+        public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
         {
             get
             {
@@ -806,8 +807,8 @@ namespace PascalABCCompiler.TreeRealization
 
         public abstract function_node get_explicit_conversion_from(type_node ctn);
 
-        SemanticTree.type_special_kind _type_special_kind = SemanticTree.type_special_kind.none_kind;
-        public override SemanticTree.type_special_kind type_special_kind
+        PascalABCCompiler.SemanticTree.type_special_kind _type_special_kind = PascalABCCompiler.SemanticTree.type_special_kind.none_kind;
+        public override PascalABCCompiler.SemanticTree.type_special_kind type_special_kind
         {
             get
             {
@@ -822,7 +823,7 @@ namespace PascalABCCompiler.TreeRealization
     }
 	
 	[Serializable]
-	public class ref_type_node : wrapped_type, SemanticTree.IRefTypeNode
+	public class ref_type_node : wrapped_type, IRefTypeNode
 	{
 		private type_node _pointed_type;
         private location _loc;
@@ -851,7 +852,7 @@ namespace PascalABCCompiler.TreeRealization
 		public ref_type_node(type_node pointed_type)
 		{
 			_pointed_type = pointed_type;
-			SystemLibrary.SystemLibrary.init_reference_type(this);
+			PascalABCCompiler.SystemLibrary.SystemLibrary.init_reference_type(this);
 			/*
             ref_type_node rtn = _pointed_type as ref_type_node;
 			compiled_type_node ctn = _pointed_type as compiled_type_node;
@@ -902,7 +903,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 		
-		SemanticTree.ITypeNode SemanticTree.IRefTypeNode.pointed_type
+		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IRefTypeNode.pointed_type
 		{
 			get
 			{
@@ -915,7 +916,7 @@ namespace PascalABCCompiler.TreeRealization
 			if ( _pointed_type == null) return false;
 			if (_pointed_type == tn) return true;
 			if (_pointed_type is ref_type_node) return check_for_circularity((_pointed_type as ref_type_node).pointed_type,tn);
-			if (_pointed_type.type_special_kind == SemanticTree.type_special_kind.array_kind || _pointed_type.type_special_kind == SemanticTree.type_special_kind.array_wrapper)
+			if (_pointed_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_kind || _pointed_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper)
 				return check_for_circularity(_pointed_type.element_type,tn);
 			return false;
 		}
@@ -954,16 +955,16 @@ namespace PascalABCCompiler.TreeRealization
             return find_in_additional_names(name);
         }
 
-        public override SymbolInfoList find_in_type(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public override SymbolInfoList find_in_type(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             return find_in_additional_names(name);
         }
 
-        public override SemanticTree.node_kind node_kind
+        public override PascalABCCompiler.SemanticTree.node_kind node_kind
 		{
 			get
 			{
-				return SemanticTree.node_kind.common;
+				return PascalABCCompiler.SemanticTree.node_kind.common;
 			}
 		}
 		
@@ -980,11 +981,11 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.ref_type_node;
+				return this.semantic_node_type.ref_type_node;
 			}
 		}
 		
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -1001,7 +1002,7 @@ namespace PascalABCCompiler.TreeRealization
         //TODO: К чему еще можно привести указатель явно?
         public override function_node get_explicit_conversion_to(type_node ctn)
         {
-            if (ctn == SystemLibrary.SystemLibrary.integer_type)
+            if (ctn == PascalABCCompiler.SystemLibrary.SystemLibrary.integer_type)
             {
                 return PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(this, ctn, false);
             }
@@ -1012,9 +1013,9 @@ namespace PascalABCCompiler.TreeRealization
         {
             if (SemanticRules.ImplicitConversionFormPointerToTypedPointer)
             {
-                if (ctn == SystemLibrary.SystemLibrary.pointer_type)
+                if (ctn == PascalABCCompiler.SystemLibrary.SystemLibrary.pointer_type)
                 {
-                    return TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
+                    return PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
                 }
 
             }
@@ -1025,7 +1026,7 @@ namespace PascalABCCompiler.TreeRealization
         public override function_node get_implicit_conversion_to(type_node ctn)
         {            
             ref_type_node rtn = ctn as ref_type_node;
-            if (ctn == SystemLibrary.SystemLibrary.pointer_type)
+            if (ctn == PascalABCCompiler.SystemLibrary.SystemLibrary.pointer_type)
             {
             	return PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(this, ctn, false);
             }
@@ -1079,7 +1080,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Синоним типа.
     /// </summary>
     [Serializable]
-    public class type_synonym : definition_node, SemanticTree.ITypeSynonym
+    public class type_synonym : definition_node, ITypeSynonym
     {
         /// <summary>
         /// Имя синонима.
@@ -1119,7 +1120,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ITypeNode SemanticTree.ITypeSynonym.original_type
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ITypeSynonym.original_type
         {
             get
             {
@@ -1134,7 +1135,7 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return general_node_type.type_synonym;
+                return this.general_node_type.type_synonym;
             }
         }
 
@@ -1145,11 +1146,11 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return semantic_node_type.type_synonym;
+                return this.semantic_node_type.type_synonym;
             }
         }
 
-        public SemanticTree.ILocation Location
+        public PascalABCCompiler.SemanticTree.ILocation Location
         {
             get
             {
@@ -1165,7 +1166,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Обычный тип.
     /// </summary>
 	[Serializable]
-    public class common_type_node : wrapped_type, SemanticTree.ICommonTypeNode
+    public class common_type_node : wrapped_type, ICommonTypeNode
 	{
         public override string ToString() => "("+GetType().Name + " " + name + "," + scope + ")";
         /// <summary>
@@ -1176,7 +1177,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Уровень доступа к типу.
         /// </summary>
-		private SemanticTree.type_access_level _type_access_level;
+		private PascalABCCompiler.SemanticTree.type_access_level _type_access_level;
 
         /// <summary>
         /// Базовый тип.
@@ -1220,11 +1221,11 @@ namespace PascalABCCompiler.TreeRealization
         /// </summary>
 		private location _loc;
 
-        internal SymbolTable.Scope defined_in_scope;
+        internal PascalSharp.Internal.TreeConverter.SymbolTable.Scope defined_in_scope;
 
         private bool _is_value=false;
         private bool _is_class = false;
-		private SymbolTable.ClassScope _scope;
+		private PascalSharp.Internal.TreeConverter.SymbolTable.ClassScope _scope;
 
         public bool has_default_constructor = false;
         public bool has_user_defined_constructor = false;
@@ -1257,7 +1258,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
         
-        SemanticTree.ICommonMethodNode SemanticTree.ICommonTypeNode.static_constructor
+        PascalABCCompiler.SemanticTree.ICommonMethodNode PascalABCCompiler.SemanticTree.ICommonTypeNode.static_constructor
         {
         	get
         	{
@@ -1300,7 +1301,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ICommonClassFieldNode SemanticTree.ICommonTypeNode.runtime_initialization_marker
+        PascalABCCompiler.SemanticTree.ICommonClassFieldNode PascalABCCompiler.SemanticTree.ICommonTypeNode.runtime_initialization_marker
         {
             get
             {
@@ -1308,9 +1309,9 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        private SemanticTree.ICommonTypeNode _generic_type_container = null;
+        private PascalABCCompiler.SemanticTree.ICommonTypeNode _generic_type_container = null;
 
-        public override SemanticTree.ICommonTypeNode generic_type_container
+        public override PascalABCCompiler.SemanticTree.ICommonTypeNode generic_type_container
         {
             get
             {
@@ -1350,9 +1351,9 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        private List<SemanticTree.ICommonTypeNode> _generic_params = null;
+        private List<PascalABCCompiler.SemanticTree.ICommonTypeNode> _generic_params = null;
 
-        public List<SemanticTree.ICommonTypeNode> generic_params
+        public List<PascalABCCompiler.SemanticTree.ICommonTypeNode> generic_params
         {
             get { return _generic_params; }
             set { _generic_params = value; }
@@ -1411,8 +1412,8 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        private List<SemanticTree.ITypeNode> _implementing_interfaces = new List<SemanticTree.ITypeNode>();
-        public override List<SemanticTree.ITypeNode> ImplementingInterfaces
+        private List<PascalABCCompiler.SemanticTree.ITypeNode> _implementing_interfaces = new List<PascalABCCompiler.SemanticTree.ITypeNode>();
+        public override List<PascalABCCompiler.SemanticTree.ITypeNode> ImplementingInterfaces
         {
             get
             {
@@ -1420,7 +1421,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public void SetImplementingInterfaces(List<SemanticTree.ITypeNode> interfs)
+        public void SetImplementingInterfaces(List<PascalABCCompiler.SemanticTree.ITypeNode> interfs)
         {
             _implementing_interfaces = interfs;
         }
@@ -1454,10 +1455,10 @@ namespace PascalABCCompiler.TreeRealization
         }
 
 
-        private SemanticTree.type_special_kind _type_special_kind;
+        private PascalABCCompiler.SemanticTree.type_special_kind _type_special_kind;
 
-        public common_type_node(string name, SemanticTree.type_access_level type_access_level,
-            common_namespace_node comprehensive_namespace, SymbolTable.ClassScope cs, location loc)
+        public common_type_node(string name, PascalABCCompiler.SemanticTree.type_access_level type_access_level,
+            common_namespace_node comprehensive_namespace, PascalSharp.Internal.TreeConverter.SymbolTable.ClassScope cs, location loc)
         {
             _name = name;
             _type_access_level = type_access_level;
@@ -1468,8 +1469,8 @@ namespace PascalABCCompiler.TreeRealization
             _loc = loc;
         }
 
-		public common_type_node(type_node base_type,string name,SemanticTree.type_access_level type_access_level,
-			common_namespace_node comprehensive_namespace, SymbolTable.ClassScope cs, location loc)
+		public common_type_node(type_node base_type,string name,PascalABCCompiler.SemanticTree.type_access_level type_access_level,
+			common_namespace_node comprehensive_namespace, PascalSharp.Internal.TreeConverter.SymbolTable.ClassScope cs, location loc)
 		{
 			_name=name;
 			_type_access_level=type_access_level;
@@ -1512,7 +1513,7 @@ namespace PascalABCCompiler.TreeRealization
         			|| _type_special_kind == SemanticTree.type_special_kind.base_set_type || _type_special_kind == SemanticTree.type_special_kind.binary_file
         			|| _type_special_kind == SemanticTree.type_special_kind.typed_file || _type_special_kind == SemanticTree.type_special_kind.diap_type 
         			|| _type_special_kind == SemanticTree.type_special_kind.enum_kind || _type_special_kind == SemanticTree.type_special_kind.set_type*/
-        		return _type_special_kind != SemanticTree.type_special_kind.none_kind || _sealed || IsEnum;
+        		return _type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.none_kind || _sealed || IsEnum;
         	}
         }
         
@@ -1535,7 +1536,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
         
-        public override SemanticTree.type_special_kind type_special_kind
+        public override PascalABCCompiler.SemanticTree.type_special_kind type_special_kind
         {
             get
             {
@@ -1547,7 +1548,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.type_special_kind internal_type_special_kind
+        public PascalABCCompiler.SemanticTree.type_special_kind internal_type_special_kind
         {
             get
             {
@@ -1563,7 +1564,7 @@ namespace PascalABCCompiler.TreeRealization
         {
         	foreach (attribute_node attr in attributes)
         	{
-        		if (attr.attribute_type == SystemLibrary.SystemLibrary.flags_attribute_type)
+        		if (attr.attribute_type == PascalABCCompiler.SystemLibrary.SystemLibrary.flags_attribute_type)
         			return true;
         	}
         	return false;
@@ -1582,9 +1583,9 @@ namespace PascalABCCompiler.TreeRealization
         {
         	if (!has_flags_attribute())
         		return;
-        	basic_function_node _int_and = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.and_name, this, SemanticTree.basic_function_type.iand);
-            basic_function_node _int_or = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.or_name, this, SemanticTree.basic_function_type.ior);
-            basic_function_node _int_xor = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.xor_name, this, SemanticTree.basic_function_type.ixor);
+        	basic_function_node _int_and = PascalABCCompiler.SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.and_name, this, PascalABCCompiler.SemanticTree.basic_function_type.iand);
+            basic_function_node _int_or = PascalABCCompiler.SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.or_name, this, PascalABCCompiler.SemanticTree.basic_function_type.ior);
+            basic_function_node _int_xor = PascalABCCompiler.SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.xor_name, this, PascalABCCompiler.SemanticTree.basic_function_type.ixor);
             scope.AddSymbol(compiler_string_consts.and_name, new SymbolInfo(_int_and));
             scope.AddSymbol(compiler_string_consts.or_name, new SymbolInfo(_int_or));
             scope.AddSymbol(compiler_string_consts.xor_name, new SymbolInfo(_int_xor));
@@ -1619,7 +1620,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public SymbolTable.ClassScope scope
+		public PascalSharp.Internal.TreeConverter.SymbolTable.ClassScope scope
 		{
 			get
 			{
@@ -1647,7 +1648,7 @@ namespace PascalABCCompiler.TreeRealization
             }
 		}
 
-		public SemanticTree.ILocation Location
+		public PascalABCCompiler.SemanticTree.ILocation Location
 		{
 			get
 			{
@@ -1704,7 +1705,7 @@ namespace PascalABCCompiler.TreeRealization
         }
 
 		// public  internal.
-		public SemanticTree.type_access_level type_access_level
+		public PascalABCCompiler.SemanticTree.type_access_level type_access_level
 		{
 			get
 			{
@@ -1753,7 +1754,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override SymbolTable.Scope Scope
+        public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
         {
             get
             {
@@ -1832,7 +1833,7 @@ namespace PascalABCCompiler.TreeRealization
                 {
                     return string.Format(compiler_string_consts.recort_printable_name_template, "...");
                 }
-                if (this.type_special_kind == SemanticTree.type_special_kind.array_wrapper)
+                if (this.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper)
                 {
                     bounded_array_interface bai = get_internal_interface(internal_interface_kind.bounded_array_interface) as bounded_array_interface;
                     if (bai != null)
@@ -1857,7 +1858,7 @@ namespace PascalABCCompiler.TreeRealization
                     return string.Format(compiler_string_consts.bounded_array_printable_name_template, LowerValue, UpperValue, bai.element_type.PrintableName);
                     }
                 }
-                if (this.type_special_kind == SemanticTree.type_special_kind.array_kind)
+                if (this.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_kind)
                 {
                     return string.Format(compiler_string_consts.array_printable_name_template, element_type.PrintableName);
                 }
@@ -1870,7 +1871,7 @@ namespace PascalABCCompiler.TreeRealization
         	get
         	{
         		ordinal_type_interface oti = null;
-        		if (this.type_special_kind == SemanticTree.type_special_kind.set_type)
+        		if (this.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type)
         			oti = element_type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
         		else oti = get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
         		if (oti == null) return null;
@@ -1883,7 +1884,7 @@ namespace PascalABCCompiler.TreeRealization
         	get
         	{
         		ordinal_type_interface oti = null;
-        		if (this.type_special_kind == SemanticTree.type_special_kind.set_type)
+        		if (this.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type)
         			oti = element_type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
         		else oti = get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
         		if (oti == null) return null;
@@ -1901,11 +1902,11 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override SemanticTree.node_kind node_kind
+		public override PascalABCCompiler.SemanticTree.node_kind node_kind
 		{
 			get
 			{
-				return SemanticTree.node_kind.common;
+				return PascalABCCompiler.SemanticTree.node_kind.common;
 			}
 		}
 
@@ -1919,7 +1920,7 @@ namespace PascalABCCompiler.TreeRealization
            return Scope.Find(name, null);//int,:=
         }
 
-        public override SymbolInfoList find(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public override SymbolInfoList find(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             return Scope.Find(name, CurrentScope);//int,:=
         }
@@ -1937,7 +1938,7 @@ namespace PascalABCCompiler.TreeRealization
             return Scope.FindOnlyInType(name, null);//:=,create,x
         }
 
-        public override SymbolInfoList find_in_type(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public override SymbolInfoList find_in_type(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             SymbolInfoList sil = Scope.FindOnlyInType(name, CurrentScope);//:=,create,x
             if (sil == null && base_type is compiled_type_node && string.Compare(name, "create", true) != 0)
@@ -1962,7 +1963,7 @@ namespace PascalABCCompiler.TreeRealization
                 int index = 0;
                 while (index < sil.Count())
                 {
-                    SemanticTree.IClassMemberNode imn = sil.First().sym_info as SemanticTree.IClassMemberNode;
+                    PascalABCCompiler.SemanticTree.IClassMemberNode imn = sil.First().sym_info as PascalABCCompiler.SemanticTree.IClassMemberNode;
                     if (imn != null && imn.comperehensive_type.IsInterface && imn.comperehensive_type.is_generic_type_definition)
                     {
                         SymbolInfoList start = new SymbolInfoList();
@@ -2053,7 +2054,7 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.common_type_node;
+				return this.semantic_node_type.common_type_node;
 			}
 		}
 
@@ -2061,12 +2062,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ICommonMethodNode[] SemanticTree.ICommonTypeNode.methods
+		PascalABCCompiler.SemanticTree.ICommonMethodNode[] PascalABCCompiler.SemanticTree.ICommonTypeNode.methods
 		{
 			get
 			{
@@ -2074,7 +2075,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.ICommonClassFieldNode[] SemanticTree.ICommonTypeNode.fields
+		PascalABCCompiler.SemanticTree.ICommonClassFieldNode[] PascalABCCompiler.SemanticTree.ICommonTypeNode.fields
 		{
 			get
 			{
@@ -2082,7 +2083,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.ICommonPropertyNode[] SemanticTree.ICommonTypeNode.properties
+		PascalABCCompiler.SemanticTree.ICommonPropertyNode[] PascalABCCompiler.SemanticTree.ICommonTypeNode.properties
 		{
 			get
 			{
@@ -2090,7 +2091,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		SemanticTree.ICommonEventNode[] SemanticTree.ICommonTypeNode.events
+		PascalABCCompiler.SemanticTree.ICommonEventNode[] PascalABCCompiler.SemanticTree.ICommonTypeNode.events
 		{
 			get
 			{
@@ -2098,7 +2099,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		SemanticTree.ITypeNode SemanticTree.ITypeNode.base_type
+		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ITypeNode.base_type
 		{
 			get
 			{
@@ -2106,7 +2107,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.ICommonNamespaceNode SemanticTree.INamespaceMemberNode.comprehensive_namespace
+		PascalABCCompiler.SemanticTree.ICommonNamespaceNode PascalABCCompiler.SemanticTree.INamespaceMemberNode.comprehensive_namespace
 		{
 			get
 			{
@@ -2115,7 +2116,7 @@ namespace PascalABCCompiler.TreeRealization
 		}
 		
 		
-        public SemanticTree.IClassConstantDefinitionNode[] constants
+        public PascalABCCompiler.SemanticTree.IClassConstantDefinitionNode[] constants
         {
             get
             {
@@ -2123,7 +2124,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.IPropertyNode SemanticTree.ICommonTypeNode.default_property
+        PascalABCCompiler.SemanticTree.IPropertyNode PascalABCCompiler.SemanticTree.ICommonTypeNode.default_property
         {
             //TODO: Переделать. Нужен поиск default_property_node в базовых классах.
             get
@@ -2132,7 +2133,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 		
-        SemanticTree.IConstantNode SemanticTree.ICommonTypeNode.lower_value
+        PascalABCCompiler.SemanticTree.IConstantNode PascalABCCompiler.SemanticTree.ICommonTypeNode.lower_value
         {
         	get
         	{
@@ -2140,7 +2141,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
         
-        SemanticTree.IConstantNode SemanticTree.ICommonTypeNode.upper_value
+        PascalABCCompiler.SemanticTree.IConstantNode PascalABCCompiler.SemanticTree.ICommonTypeNode.upper_value
         {
         	get
         	{
@@ -2286,9 +2287,9 @@ namespace PascalABCCompiler.TreeRealization
             if (founded_inst != null) return founded_inst;
             //Создаём новую псевдо-инстанцию
             //SymbolTable.ClassScope ct_scope = SystemLibrary.SystemLibrary.syn_visitor.convertion_data_and_alghoritms.symbol_table.CreateInterfaceOrClassScope(this.IsInterface);
-            common_generic_instance_type_node ctnode = new common_generic_instance_type_node(this, param_types, SystemLibrary.SystemLibrary.object_type,
+            common_generic_instance_type_node ctnode = new common_generic_instance_type_node(this, param_types, PascalABCCompiler.SystemLibrary.SystemLibrary.object_type,
                 generic_convertions.MakePseudoInstanceName(name, param_types, true),
-                SemanticTree.type_access_level.tal_public, null, this.loc);
+                PascalABCCompiler.SemanticTree.type_access_level.tal_public, null, this.loc);
             _generic_instances.Add(new generic_type_instance_info(param_types, ctnode));
             generic_convertions.init_generic_instance(this, ctnode, param_types);
             return ctnode;
@@ -2317,9 +2318,9 @@ namespace PascalABCCompiler.TreeRealization
 
    
 
-    public class short_string_type_node: wrapped_type, SemanticTree.IShortStringTypeNode
+    public class short_string_type_node: wrapped_type, IShortStringTypeNode
     {
-        private SymbolTable.Scope _scope;
+        private PascalSharp.Internal.TreeConverter.SymbolTable.Scope _scope;
         private location _loc;
         private property_node _default_property_node;
         
@@ -2332,11 +2333,11 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 		
-		public SymbolTable.Scope scope {
+		public PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope {
 			get { return _scope; }
 		}
         
-        public override SymbolTable.Scope Scope
+        public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
         {
             get
             {
@@ -2358,12 +2359,12 @@ namespace PascalABCCompiler.TreeRealization
             this.type_special_kind = SemanticTree.type_special_kind.short_string;
         }*/
         
-        public short_string_type_node(SymbolTable.ClassScope cs, location loc, int length)
+        public short_string_type_node(PascalSharp.Internal.TreeConverter.SymbolTable.ClassScope cs, location loc, int length)
         {
         	this._scope = cs;
         	this._loc = loc;
         	this.length = length;
-        	this.type_special_kind = SemanticTree.type_special_kind.short_string;
+        	this.type_special_kind = PascalABCCompiler.SemanticTree.type_special_kind.short_string;
         }
 		
         public override SymbolInfoList find(string name, bool no_search_in_extension_methods = false)
@@ -2385,15 +2386,15 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return SystemLibrary.SystemLibrary.object_type;
+				return PascalABCCompiler.SystemLibrary.SystemLibrary.object_type;
 			}
 		}
         
-        public override SemanticTree.node_kind node_kind
+        public override PascalABCCompiler.SemanticTree.node_kind node_kind
 		{
 			get
 			{
-				return SemanticTree.node_kind.common;
+				return PascalABCCompiler.SemanticTree.node_kind.common;
 			}
 		}
         
@@ -2405,7 +2406,7 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.short_string;
+				return this.semantic_node_type.short_string;
 			}
 		}
         
@@ -2430,7 +2431,7 @@ namespace PascalABCCompiler.TreeRealization
         }
         
 		public override List<PascalABCCompiler.SemanticTree.ITypeNode> ImplementingInterfaces {
-			get { return SystemLibrary.SystemLibrary.string_type.ImplementingInterfaces; }
+			get { return PascalABCCompiler.SystemLibrary.SystemLibrary.string_type.ImplementingInterfaces; }
 		}
         
         public override string name
@@ -2462,7 +2463,7 @@ namespace PascalABCCompiler.TreeRealization
                 var temp = _scope.FindOnlyInType(name, null);
                 return temp?.First();
             }
-            return SystemLibrary.SystemLibrary.string_type.find_first_in_type(name);
+            return PascalABCCompiler.SystemLibrary.SystemLibrary.string_type.find_first_in_type(name);
         }
 
         public override SymbolInfoList find_in_type(string name, bool no_search_in_extension_methods = false)
@@ -2472,10 +2473,10 @@ namespace PascalABCCompiler.TreeRealization
             //if (name )
             if (name == compiler_string_consts.assign_name || name == compiler_string_consts.plusassign_name)
                 return _scope.FindOnlyInType(name, null);
-            return SystemLibrary.SystemLibrary.string_type.find_in_type(name);
+            return PascalABCCompiler.SystemLibrary.SystemLibrary.string_type.find_in_type(name);
         }
 
-        public override SymbolInfoList find_in_type(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public override SymbolInfoList find_in_type(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             //return this.find_in_additional_names(name);
             //SymbolInfo si = _scope.FindOnlyInType(name, CurrentScope);
@@ -2483,7 +2484,7 @@ namespace PascalABCCompiler.TreeRealization
             {
                 return _scope.FindOnlyInType(name, null);
             }
-            return SystemLibrary.SystemLibrary.string_type.find_in_type(name);
+            return PascalABCCompiler.SystemLibrary.SystemLibrary.string_type.find_in_type(name);
         }
 
         public override string PrintableName
@@ -2539,7 +2540,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Откомпилированный тип.
     /// </summary>
 	[Serializable]
-	public class compiled_type_node : wrapped_type, SemanticTree.ICompiledTypeNode , SemanticTree.ILocated
+	public class compiled_type_node : wrapped_type, ICompiledTypeNode , ILocated
 	{
         public override string ToString() => this.full_name.ToString();
 
@@ -2769,15 +2770,15 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
         
-        private List<SemanticTree.ITypeNode> _implementing_interfaces = null;
-        public override List<SemanticTree.ITypeNode> ImplementingInterfaces
+        private List<PascalABCCompiler.SemanticTree.ITypeNode> _implementing_interfaces = null;
+        public override List<PascalABCCompiler.SemanticTree.ITypeNode> ImplementingInterfaces
         {
             get
             {
                 if (_implementing_interfaces == null)
                 {
                     Type[] interf = _compiled_type.GetInterfaces();
-                    _implementing_interfaces = new List<SemanticTree.ITypeNode>(interf.Length);
+                    _implementing_interfaces = new List<PascalABCCompiler.SemanticTree.ITypeNode>(interf.Length);
                     for (int i = 0; i < interf.Length; i++)
                     {
                         _implementing_interfaces.Add(get_type_node(interf[i]));
@@ -2834,7 +2835,7 @@ namespace PascalABCCompiler.TreeRealization
                 compiled_type_node rez = compiled_type_node.get_type_node(rez_t);
                 if (rez.scope == null)
                 {
-                    rez.scope = new NetHelper.NetTypeScope(rez_t, SystemLibrary.SystemLibrary.symtab);
+                    rez.scope = new NetHelper.NetTypeScope(rez_t, PascalABCCompiler.SystemLibrary.SystemLibrary.symtab);
                 }
                 return rez;
             }
@@ -2843,9 +2844,9 @@ namespace PascalABCCompiler.TreeRealization
             if (founded_inst != null) return founded_inst;
             //Создаём новую псевдо-инстанцию
             //SymbolTable.ClassScope ct_scope = SystemLibrary.SystemLibrary.syn_visitor.convertion_data_and_alghoritms.symbol_table.CreateInterfaceOrClassScope(this.IsInterface);
-            compiled_generic_instance_type_node ctnode = new compiled_generic_instance_type_node(this, param_types, SystemLibrary.SystemLibrary.object_type,
+            compiled_generic_instance_type_node ctnode = new compiled_generic_instance_type_node(this, param_types, PascalABCCompiler.SystemLibrary.SystemLibrary.object_type,
                 generic_convertions.MakePseudoInstanceName(name, param_types, true),
-                SemanticTree.type_access_level.tal_public, null, /*ct_scope,*/ this.loc);
+                PascalABCCompiler.SemanticTree.type_access_level.tal_public, null, /*ct_scope,*/ this.loc);
             _generic_instances.Add(new generic_type_instance_info(param_types, ctnode));
             generic_convertions.init_generic_instance(this, ctnode, /*ct_scope,*/ param_types);
             return ctnode;
@@ -2867,13 +2868,13 @@ namespace PascalABCCompiler.TreeRealization
         }
 		
         private location loc=null;
-        public SemanticTree.ILocation Location
+        public PascalABCCompiler.SemanticTree.ILocation Location
         {
             get { return loc;}
             set { loc = (location)value; }
         }
 
-        public override SymbolTable.Scope Scope
+        public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
         {
             get
             {
@@ -2905,9 +2906,9 @@ namespace PascalABCCompiler.TreeRealization
         {
             //До того как мы добавили в стандартную библиотеку MulticastDelegate других делегатов не добавляем.
             //Это важно при инициализации стандартной библиотеки.
-            if (SystemLibrary.SystemLibrary.delegate_base_type != null)
+            if (PascalABCCompiler.SystemLibrary.SystemLibrary.delegate_base_type != null)
             {
-                if (base_type == SystemLibrary.SystemLibrary.delegate_base_type)
+                if (base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.delegate_base_type)
                 {
                     SymbolInfo si_int = this.find_first_in_type(compiler_string_consts.invoke_method_name);
 #if DEBUG
@@ -2949,9 +2950,9 @@ namespace PascalABCCompiler.TreeRealization
             cnfn.ConnectedToType = this;
             cnfn.compile_time_executor = executor;
             add_name(name, new SymbolInfo(cnfn));
-            common_parameter cp1 = new common_parameter(compiler_string_consts.left_param_name, this, SemanticTree.parameter_type.value,
+            common_parameter cp1 = new common_parameter(compiler_string_consts.left_param_name, this, PascalABCCompiler.SemanticTree.parameter_type.value,
                                                         cnfn, concrete_parameter_type.cpt_none, null, null);
-            common_parameter cp2 = new common_parameter(compiler_string_consts.right_param_name, this, SemanticTree.parameter_type.value,
+            common_parameter cp2 = new common_parameter(compiler_string_consts.right_param_name, this, PascalABCCompiler.SemanticTree.parameter_type.value,
                                                         cnfn, concrete_parameter_type.cpt_none, null, null);
             cnfn.parameters.AddElement(cp1);
             cnfn.parameters.AddElement(cp2);
@@ -2984,7 +2985,7 @@ namespace PascalABCCompiler.TreeRealization
 		}
 
 
-        public static compiled_type_node get_type_node(System.Type st, SymbolTable.TreeConverterSymbolTable tcst)
+        public static compiled_type_node get_type_node(System.Type st, PascalSharp.Internal.TreeConverter.SymbolTable.TreeConverterSymbolTable tcst)
         {
             compiled_type_node ctn = get_type_node(st);
             if (ctn.scope == null)
@@ -3002,9 +3003,9 @@ namespace PascalABCCompiler.TreeRealization
         private static void InitEnumOperations(compiled_type_node ctn)
         {
             if (ctn.compiled_type.GetCustomAttributes(typeof(FlagsAttribute), true).Length == 0) return;
-            basic_function_node _int_and = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.and_name, ctn, SemanticTree.basic_function_type.iand);
-            basic_function_node _int_or = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.or_name, ctn, SemanticTree.basic_function_type.ior);
-            basic_function_node _int_xor = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.xor_name, ctn, SemanticTree.basic_function_type.ixor);
+            basic_function_node _int_and = PascalABCCompiler.SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.and_name, ctn, PascalABCCompiler.SemanticTree.basic_function_type.iand);
+            basic_function_node _int_or = PascalABCCompiler.SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.or_name, ctn, PascalABCCompiler.SemanticTree.basic_function_type.ior);
+            basic_function_node _int_xor = PascalABCCompiler.SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.xor_name, ctn, PascalABCCompiler.SemanticTree.basic_function_type.ixor);
             if (ctn.scope != null)
             {
                 ctn.scope.AddSymbol(compiler_string_consts.and_name, new SymbolInfo(_int_and));
@@ -3028,7 +3029,7 @@ namespace PascalABCCompiler.TreeRealization
 		
         public void init_scope()
         {
-        	this.scope = new NetHelper.NetTypeScope(_compiled_type, SystemLibrary.SystemLibrary.symtab);
+        	this.scope = new NetHelper.NetTypeScope(_compiled_type, PascalABCCompiler.SystemLibrary.SystemLibrary.symtab);
         }
         
         public static compiled_type_node get_type_node(System.Type st)
@@ -3063,7 +3064,7 @@ namespace PascalABCCompiler.TreeRealization
             ctn.mark_if_array();
             if (st.IsEnum)
             {
-                internal_interface ii = SystemLibrary.SystemLibrary.integer_type.get_internal_interface(internal_interface_kind.ordinal_interface);
+                internal_interface ii = PascalABCCompiler.SystemLibrary.SystemLibrary.integer_type.get_internal_interface(internal_interface_kind.ordinal_interface);
                 ordinal_type_interface oti_old = (ordinal_type_interface)ii;
                 enum_const_node lower_value = new enum_const_node(0, ctn, ctn.loc);
                 enum_const_node upper_value = new enum_const_node(st.GetFields().Length-2, ctn, ctn.loc);
@@ -3074,17 +3075,17 @@ namespace PascalABCCompiler.TreeRealization
                     lower_value, upper_value, oti_old.value_to_int, oti_old.ordinal_type_to_int);
 
                 ctn.add_internal_interface(oti_new);
-                SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.gr_name, ctn, SemanticTree.basic_function_type.enumgr, SystemLibrary.SystemLibrary.bool_type);
-                SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.greq_name, ctn, SemanticTree.basic_function_type.enumgreq, SystemLibrary.SystemLibrary.bool_type);
-                SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.sm_name, ctn, SemanticTree.basic_function_type.enumsm, SystemLibrary.SystemLibrary.bool_type);
-                SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.smeq_name, ctn, SemanticTree.basic_function_type.enumsmeq, SystemLibrary.SystemLibrary.bool_type);
+                PascalABCCompiler.SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.gr_name, ctn, PascalABCCompiler.SemanticTree.basic_function_type.enumgr, PascalABCCompiler.SystemLibrary.SystemLibrary.bool_type);
+                PascalABCCompiler.SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.greq_name, ctn, PascalABCCompiler.SemanticTree.basic_function_type.enumgreq, PascalABCCompiler.SystemLibrary.SystemLibrary.bool_type);
+                PascalABCCompiler.SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.sm_name, ctn, PascalABCCompiler.SemanticTree.basic_function_type.enumsm, PascalABCCompiler.SystemLibrary.SystemLibrary.bool_type);
+                PascalABCCompiler.SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.smeq_name, ctn, PascalABCCompiler.SemanticTree.basic_function_type.enumsmeq, PascalABCCompiler.SystemLibrary.SystemLibrary.bool_type);
                 InitEnumOperations(ctn);
             }
             //ctn.init_scope();
             //TODO: Тут надо подумать. Может как-то сделать по другому?
             if (!NetHelper.NetHelper.IsStandType(st))
 			{
-				SystemLibrary.SystemLibrary.init_reference_type(ctn);
+				PascalABCCompiler.SystemLibrary.SystemLibrary.init_reference_type(ctn);
 			}
 			return ctn;
 		}
@@ -3110,7 +3111,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-        public override SemanticTree.type_special_kind type_special_kind
+        public override PascalABCCompiler.SemanticTree.type_special_kind type_special_kind
         {
             get
             {
@@ -3118,18 +3119,18 @@ namespace PascalABCCompiler.TreeRealization
                     return _type_special_kind;
                 if (compiled_type.IsArray)
                 {
-                    _type_special_kind = SemanticTree.type_special_kind.array_kind;
+                    _type_special_kind = PascalABCCompiler.SemanticTree.type_special_kind.array_kind;
                 }
                 else if (compiled_type.IsEnum || compiled_type.BaseType != null && compiled_type.BaseType == NetHelper.NetHelper.EnumType)
                 {
-                    _type_special_kind = SemanticTree.type_special_kind.enum_kind;
+                    _type_special_kind = PascalABCCompiler.SemanticTree.type_special_kind.enum_kind;
                 }
                 else if (compiled_type.IsValueType && !NetHelper.NetHelper.IsStandType(compiled_type))
                 {
-                    _type_special_kind = SemanticTree.type_special_kind.record;
+                    _type_special_kind = PascalABCCompiler.SemanticTree.type_special_kind.record;
                 }
                 else
-                    _type_special_kind = SemanticTree.type_special_kind.none_kind;
+                    _type_special_kind = PascalABCCompiler.SemanticTree.type_special_kind.none_kind;
                 return _type_special_kind;
             }
             set
@@ -3157,7 +3158,7 @@ namespace PascalABCCompiler.TreeRealization
                     base_type_is_null = true;
                     return null;
                 }
-                _base_type = get_type_node(bn, SystemLibrary.SystemLibrary.symtab);
+                _base_type = get_type_node(bn, PascalABCCompiler.SystemLibrary.SystemLibrary.symtab);
                 return _base_type;
             }
         }
@@ -3243,7 +3244,7 @@ namespace PascalABCCompiler.TreeRealization
                 si = AddToSymbolInfo(si, scope.SymbolTable.Find(scope,name));
 			return si;
             */
-            if (this.type_special_kind == SemanticTree.type_special_kind.array_kind && scope == null)
+            if (this.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_kind && scope == null)
                 this.init_scope();
             if (scope == null)
             {
@@ -3285,7 +3286,7 @@ namespace PascalABCCompiler.TreeRealization
                 if (!no_search_in_extension_methods || this._compiled_type.IsGenericType)
                 {
                     
-                    if (this.type_special_kind == SemanticTree.type_special_kind.array_kind && this.base_type.Scope != null)
+                    if (this.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_kind && this.base_type.Scope != null)
                     {
                         SymbolInfoList tmp_si = this.base_type.Scope.SymbolTable.Find(this.base_type.Scope, name);
                         if (tmp_si != null)
@@ -3363,7 +3364,7 @@ namespace PascalABCCompiler.TreeRealization
                 else if (sil3 != null)
                     sil = sil3;
                 
-                if (sil == null && sil2 == null && this == SystemLibrary.SystemLibrary.string_type && SystemLibrary.SystemLibrary.syn_visitor.from_pabc_dll)
+                if (sil == null && sil2 == null && this == PascalABCCompiler.SystemLibrary.SystemLibrary.string_type && PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.from_pabc_dll)
                 {
                     sil = compiled_type_node.get_type_node(NetHelper.NetHelper.PABCSystemType).find_in_type(name);
                 }
@@ -3384,7 +3385,7 @@ namespace PascalABCCompiler.TreeRealization
             return find(name, no_search_in_extension_methods);
         }
 
-        public override SymbolInfoList find_in_type(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public override SymbolInfoList find_in_type(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             //return find(name);
             SymbolInfoList result = find(name, no_search_in_extension_methods);
@@ -3460,16 +3461,16 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.compiled_type_node;
+				return this.semantic_node_type.compiled_type_node;
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ITypeNode SemanticTree.ITypeNode.base_type
+		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ITypeNode.base_type
 		{
 			get
 			{
@@ -3477,11 +3478,11 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override SemanticTree.node_kind node_kind
+		public override PascalABCCompiler.SemanticTree.node_kind node_kind
 		{
 			get
 			{
-				return SemanticTree.node_kind.compiled;
+				return PascalABCCompiler.SemanticTree.node_kind.compiled;
 			}
 		}
 
@@ -3599,20 +3600,20 @@ namespace PascalABCCompiler.TreeRealization
             if (_explicit_convertions_from.TryGetValue(ctn, out fn))
                 return fn;
             if (SemanticRules.PoinerRealization == PoinerRealization.VoidStar)
-                if ((this == SystemLibrary.SystemLibrary.integer_type && ctn == SystemLibrary.SystemLibrary.pointer_type) ||
-                    (this == SystemLibrary.SystemLibrary.pointer_type && ctn == SystemLibrary.SystemLibrary.integer_type))
+                if ((this == PascalABCCompiler.SystemLibrary.SystemLibrary.integer_type && ctn == PascalABCCompiler.SystemLibrary.SystemLibrary.pointer_type) ||
+                    (this == PascalABCCompiler.SystemLibrary.SystemLibrary.pointer_type && ctn == PascalABCCompiler.SystemLibrary.SystemLibrary.integer_type))
                 {
-                    fn = TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
+                    fn = PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
                     _explicit_convertions_from.Add(ctn, fn);
                     return fn;
                 }
 
             //enum->int32, int32->enum
             //TODO переделать это. Наверно это делается както нетак. Enum Conversion
-            if ((ctn.base_type == SystemLibrary.SystemLibrary.enum_base_type && this == SystemLibrary.SystemLibrary.integer_type)
-              || (this.base_type == SystemLibrary.SystemLibrary.enum_base_type && ctn == SystemLibrary.SystemLibrary.integer_type))
+            if ((ctn.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.enum_base_type && this == PascalABCCompiler.SystemLibrary.SystemLibrary.integer_type)
+              || (this.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.enum_base_type && ctn == PascalABCCompiler.SystemLibrary.SystemLibrary.integer_type))
             {
-                fn = TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
+                fn = PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
                 _explicit_convertions_from.Add(ctn, fn);
                 return fn;
             }
@@ -3676,11 +3677,11 @@ namespace PascalABCCompiler.TreeRealization
     }
 
 	[Serializable]
-	public class simple_array : wrapped_type, SemanticTree.ISimpleArrayNode
+	public class simple_array : wrapped_type, ISimpleArrayNode
 	{
 		private type_node _element_type;
 		private int _length;
-        private SymbolTable.Scope _scope;
+        private PascalSharp.Internal.TreeConverter.SymbolTable.Scope _scope;
 
         public simple_array()
         {
@@ -3697,7 +3698,7 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return SystemLibrary.SystemLibrary.array_base_type;
+				return PascalABCCompiler.SystemLibrary.SystemLibrary.array_base_type;
 			}
 		}
 
@@ -3717,11 +3718,11 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public override SemanticTree.node_kind node_kind
+		public override PascalABCCompiler.SemanticTree.node_kind node_kind
 		{
 			get
 			{
-				return SemanticTree.node_kind.basic;
+				return PascalABCCompiler.SemanticTree.node_kind.basic;
 			}
 		}
 
@@ -3729,7 +3730,7 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.simple_array;
+				return this.semantic_node_type.simple_array;
 			}
 		}
 
@@ -3755,11 +3756,11 @@ namespace PascalABCCompiler.TreeRealization
 			get { return name; }
 		}
 		
-        public override SemanticTree.type_special_kind type_special_kind
+        public override PascalABCCompiler.SemanticTree.type_special_kind type_special_kind
         {
             get
             {
-                return SemanticTree.type_special_kind.none_kind;
+                return PascalABCCompiler.SemanticTree.type_special_kind.none_kind;
             }
         }
 
@@ -3802,18 +3803,18 @@ namespace PascalABCCompiler.TreeRealization
             return _scope.FindOnlyInType(name, null);
 		}
 
-        public override SymbolInfoList find_in_type(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public override SymbolInfoList find_in_type(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             //return this.find_in_additional_names(name);
             return _scope.FindOnlyInType(name, CurrentScope);
         }
         
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ITypeNode SemanticTree.ISimpleArrayNode.element_type
+		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ISimpleArrayNode.element_type
 		{
 			get
 			{
@@ -3821,7 +3822,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.ITypeNode SemanticTree.ITypeNode.base_type
+		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ITypeNode.base_type
 		{
 			get
 			{
@@ -3829,7 +3830,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-        public override SymbolTable.Scope Scope
+        public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
         {
             get
             {
@@ -3859,7 +3860,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-	public class simple_array_indexing : addressed_expression, SemanticTree.ISimpleArrayIndexingNode
+	public class simple_array_indexing : addressed_expression, ISimpleArrayIndexingNode
 	{
 		private expression_node _simple_arr_expr;
 		private expression_node _ind_expr;
@@ -3908,7 +3909,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -3917,11 +3918,11 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.simple_array_indexing;
+				return this.semantic_node_type.simple_array_indexing;
 			}
 		}
 
-		public SemanticTree.IExpressionNode array
+		public PascalABCCompiler.SemanticTree.IExpressionNode array
 		{
 			get
 			{
@@ -3929,7 +3930,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SemanticTree.IExpressionNode[] indices
+		public PascalABCCompiler.SemanticTree.IExpressionNode[] indices
 		{
 			get
 			{
@@ -3937,7 +3938,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		public SemanticTree.IExpressionNode index
+		public PascalABCCompiler.SemanticTree.IExpressionNode index
 		{
 			get
 			{
@@ -3951,7 +3952,7 @@ namespace PascalABCCompiler.TreeRealization
     public class null_type_node : wrapped_type
     {
         private static null_type_node typ;
-		private SymbolTable.ClassScope _scope;
+		private PascalSharp.Internal.TreeConverter.SymbolTable.ClassScope _scope;
 		
         private null_type_node()
         {
@@ -3963,7 +3964,7 @@ namespace PascalABCCompiler.TreeRealization
             if (typ == null) 
             {
             	typ = new null_type_node();
-            	SystemLibrary.SystemLibrary.init_reference_type(typ);
+            	PascalABCCompiler.SystemLibrary.SystemLibrary.init_reference_type(typ);
             }
             return typ;
         }
@@ -4011,7 +4012,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override SymbolTable.Scope Scope
+        public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
         {
             get
             {
@@ -4019,11 +4020,11 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override SemanticTree.node_kind node_kind
+        public override PascalABCCompiler.SemanticTree.node_kind node_kind
         {
             get
             {
-                return SemanticTree.node_kind.common;
+                return PascalABCCompiler.SemanticTree.node_kind.common;
             }
         }
 
@@ -4036,7 +4037,7 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return semantic_node_type.null_type_node;
+                return this.semantic_node_type.null_type_node;
             }
         }
 
@@ -4055,7 +4056,7 @@ namespace PascalABCCompiler.TreeRealization
             return _scope.FindOnlyInScope(name);
         }
         
-        public override SymbolInfoList find_in_type(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public override SymbolInfoList find_in_type(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             return _scope.FindOnlyInScope(name);
         }
@@ -4242,7 +4243,7 @@ namespace PascalABCCompiler.TreeRealization
                     int param_num = (fn.simple_function_node is common_namespace_function_node && (fn.simple_function_node as common_namespace_function_node).ConnectedToType != null || fn.simple_function_node is compiled_function_node && (fn.simple_function_node as compiled_function_node).ConnectedToType != null) ? 1 : 0;
                 	if (fn.simple_function_node.return_value_type == ctn)
                     {
-                		common_namespace_function_call cnfc = new common_namespace_function_call(SystemLibrary.SystemLibInitializer.NewArrayProcedureDecl,null);
+                		common_namespace_function_call cnfc = new common_namespace_function_call(PascalABCCompiler.SystemLibrary.SystemLibInitializer.NewArrayProcedureDecl,null);
                         cnfc.parameters.AddElement(new typeof_operator(fn.simple_function_node.parameters[param_num].type, null));
                 		cnfc.parameters.AddElement(new int_const_node(0,null));
                         if (copy_fn.parameters.Count < fn.simple_function_node.parameters.Count)
@@ -4261,7 +4262,7 @@ namespace PascalABCCompiler.TreeRealization
                     {
                         continue;
                     }
-                    common_namespace_function_call cnfc2 = new common_namespace_function_call(SystemLibrary.SystemLibInitializer.NewArrayProcedureDecl,null);
+                    common_namespace_function_call cnfc2 = new common_namespace_function_call(PascalABCCompiler.SystemLibrary.SystemLibInitializer.NewArrayProcedureDecl,null);
                     cnfc2.parameters.AddElement(new typeof_operator(fn.simple_function_node.parameters[param_num].type, null));
                 	cnfc2.parameters.AddElement(new int_const_node(0,null));
                     if (copy_fn.parameters.Count < fn.simple_function_node.parameters.Count)
@@ -4447,11 +4448,11 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override SemanticTree.node_kind node_kind
+        public override PascalABCCompiler.SemanticTree.node_kind node_kind
         {
             get
             {
-                return SemanticTree.node_kind.basic;
+                return PascalABCCompiler.SemanticTree.node_kind.basic;
             }
         }
 		
@@ -4470,10 +4471,10 @@ namespace PascalABCCompiler.TreeRealization
         		sb.Append('(');
         		for (int i=0; i<bfc.function.parameters.Length; i++)
         		{
-        			SemanticTree.IParameterNode prm = bfc.function.parameters[i];
+        			PascalABCCompiler.SemanticTree.IParameterNode prm = bfc.function.parameters[i];
         			switch (prm.parameter_type)
         			{
-        				case SemanticTree.parameter_type.var : sb.Append("var "); break;
+        				case PascalABCCompiler.SemanticTree.parameter_type.var : sb.Append("var "); break;
         			}
         			if (prm.is_params) sb.Append("params ");
         			sb.Append(prm.name+": ");
@@ -4519,7 +4520,7 @@ namespace PascalABCCompiler.TreeRealization
             return compiled_type_node.get_type_node(typeof(Delegate)).find(name);
             //return null;
         }
-        public override SymbolInfoList find_in_type(string name, SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
+        public override SymbolInfoList find_in_type(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope, bool no_search_in_extension_methods = false)
         {
             return find_in_type(name);
         }
@@ -4536,7 +4537,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override SymbolTable.Scope Scope
+        public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
         {
             get
             {
@@ -4556,7 +4557,7 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return semantic_node_type.delegated_method;
+                return this.semantic_node_type.delegated_method;
             }
         }
     }
@@ -4789,9 +4790,9 @@ namespace PascalABCCompiler.TreeRealization
             get { return null; }
         }
 
-        public override SemanticTree.node_kind node_kind
+        public override PascalABCCompiler.SemanticTree.node_kind node_kind
         {
-            get { return SemanticTree.node_kind.basic; }
+            get { return PascalABCCompiler.SemanticTree.node_kind.basic; }
         }
 
         public override SymbolInfoList find(string name, bool no_search_in_extension_methods = false)
@@ -4827,7 +4828,7 @@ namespace PascalABCCompiler.TreeRealization
             _name = name;
         }
 
-        public override SymbolTable.Scope Scope
+        public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
         {
             get { return null; }
         }
@@ -4849,11 +4850,11 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override SemanticTree.type_special_kind type_special_kind
+        public override PascalABCCompiler.SemanticTree.type_special_kind type_special_kind
         {
             get
             {
-                return SemanticTree.type_special_kind.none_kind;
+                return PascalABCCompiler.SemanticTree.type_special_kind.none_kind;
             }
             set
             {
@@ -4863,7 +4864,7 @@ namespace PascalABCCompiler.TreeRealization
 
         public override semantic_node_type semantic_node_type
         {
-            get { return semantic_node_type.none; }
+            get { return this.semantic_node_type.none; }
         }
     }
 

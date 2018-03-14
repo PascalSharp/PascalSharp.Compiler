@@ -1,12 +1,11 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 using System;
-
-using PascalABCCompiler.TreeRealization;
 using System.Collections.Generic;
 using System.Collections;
+using PascalSharp.Internal.TreeConverter;TreeRealization;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.SymbolTable
 {
 
 	public enum access_level {al_none, al_private, al_protected, al_public, al_internal};

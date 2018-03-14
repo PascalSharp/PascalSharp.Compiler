@@ -1,10 +1,11 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
 
-namespace PascalABCCompiler.TreeRealization
+using PascalABCCompiler.SemanticTree;
+
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
-    public abstract class event_node : definition_node, SemanticTree.IEventNode
+    public abstract class event_node : definition_node, IEventNode
     {
         public override general_node_type general_node_type
         {
@@ -24,7 +25,7 @@ namespace PascalABCCompiler.TreeRealization
         	get;
         }
         
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -55,13 +56,13 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
 	
-    public class common_event : event_node, SemanticTree.ICommonEventNode
+    public class common_event : event_node, ICommonEventNode
     {
     	private string _name;
     	private type_node del_type;
     	private location _loc;
-    	private SemanticTree.field_access_level _field_access_level;
-    	private SemanticTree.polymorphic_state _polymorphic_state;
+    	private PascalABCCompiler.SemanticTree.field_access_level _field_access_level;
+    	private PascalABCCompiler.SemanticTree.polymorphic_state _polymorphic_state;
     	private common_type_node _cont_type;
     	private common_method_node _add_method;
     	private common_method_node _remove_method;
@@ -69,7 +70,7 @@ namespace PascalABCCompiler.TreeRealization
     	private class_field _field;
     	
     	public common_event(string name, type_node del_type, common_type_node cont_type, common_method_node add_method, common_method_node remove_method, common_method_node raise_method, 
-    	                    SemanticTree.field_access_level fal, SemanticTree.polymorphic_state ps, location loc)
+    	                    PascalABCCompiler.SemanticTree.field_access_level fal, PascalABCCompiler.SemanticTree.polymorphic_state ps, location loc)
     	{
     		this._name = name;
     		this.del_type = del_type;
@@ -102,7 +103,7 @@ namespace PascalABCCompiler.TreeRealization
     		}
     	}
     	
-    	public SemanticTree.field_access_level field_access_level
+    	public PascalABCCompiler.SemanticTree.field_access_level field_access_level
     	{
     		get
     		{
@@ -119,7 +120,7 @@ namespace PascalABCCompiler.TreeRealization
 		}
     	
 		public override bool is_static {
-			get { return _polymorphic_state == SemanticTree.polymorphic_state.ps_static; }
+			get { return _polymorphic_state == PascalABCCompiler.SemanticTree.polymorphic_state.ps_static; }
 		}
     	
     	public location loc
@@ -201,7 +202,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
         
-        string SemanticTree.ICommonEventNode.Name
+        string PascalABCCompiler.SemanticTree.ICommonEventNode.Name
         {
         	get
         	{
@@ -209,7 +210,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
 
-        SemanticTree.ICommonClassFieldNode SemanticTree.ICommonEventNode.Field
+        PascalABCCompiler.SemanticTree.ICommonClassFieldNode PascalABCCompiler.SemanticTree.ICommonEventNode.Field
         {
             get
             {
@@ -217,7 +218,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ICommonMethodNode SemanticTree.ICommonEventNode.AddMethod
+        PascalABCCompiler.SemanticTree.ICommonMethodNode PascalABCCompiler.SemanticTree.ICommonEventNode.AddMethod
         {
         	get
         	{
@@ -225,7 +226,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
         
-        SemanticTree.ICommonMethodNode SemanticTree.ICommonEventNode.RemoveMethod
+        PascalABCCompiler.SemanticTree.ICommonMethodNode PascalABCCompiler.SemanticTree.ICommonEventNode.RemoveMethod
         {
         	get
         	{
@@ -233,7 +234,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
         
-        SemanticTree.ICommonMethodNode SemanticTree.ICommonEventNode.RaiseMethod
+        PascalABCCompiler.SemanticTree.ICommonMethodNode PascalABCCompiler.SemanticTree.ICommonEventNode.RaiseMethod
         {
         	get
         	{
@@ -241,7 +242,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
         
-        SemanticTree.ITypeNode SemanticTree.ICommonEventNode.DelegateType
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ICommonEventNode.DelegateType
         {
         	get
         	{
@@ -249,7 +250,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
         
-        bool SemanticTree.ICommonEventNode.IsStatic
+        bool PascalABCCompiler.SemanticTree.ICommonEventNode.IsStatic
         {
         	get
         	{
@@ -279,7 +280,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
 		}
         
-        public SemanticTree.ILocation Location
+        public PascalABCCompiler.SemanticTree.ILocation Location
 		{
 			get
 			{
@@ -293,7 +294,7 @@ namespace PascalABCCompiler.TreeRealization
 		}
     }
 
-    public class common_namespace_event : event_node, SemanticTree.ICommonNamespaceEventNode
+    public class common_namespace_event : event_node, ICommonNamespaceEventNode
     {
         private string _name;
     	private type_node del_type;
@@ -426,7 +427,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
         
-        string SemanticTree.ICommonNamespaceEventNode.Name
+        string PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.Name
         {
         	get
         	{
@@ -434,7 +435,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
 
-        SemanticTree.ICommonNamespaceVariableNode SemanticTree.ICommonNamespaceEventNode.Field
+        PascalABCCompiler.SemanticTree.ICommonNamespaceVariableNode PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.Field
         {
             get
             {
@@ -442,7 +443,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ICommonNamespaceFunctionNode SemanticTree.ICommonNamespaceEventNode.AddFunction
+        PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.AddFunction
         {
         	get
         	{
@@ -450,7 +451,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
 
-        SemanticTree.ICommonNamespaceFunctionNode SemanticTree.ICommonNamespaceEventNode.RemoveFunction
+        PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.RemoveFunction
         {
         	get
         	{
@@ -458,7 +459,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
 
-        SemanticTree.ICommonNamespaceFunctionNode SemanticTree.ICommonNamespaceEventNode.RaiseFunction
+        PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.RaiseFunction
         {
         	get
         	{
@@ -466,7 +467,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
         
-        SemanticTree.ITypeNode SemanticTree.ICommonNamespaceEventNode.DelegateType
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.DelegateType
         {
         	get
         	{
@@ -474,7 +475,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
         
-        public SemanticTree.ILocation Location
+        public PascalABCCompiler.SemanticTree.ILocation Location
 		{
 			get
 			{
@@ -488,7 +489,7 @@ namespace PascalABCCompiler.TreeRealization
 		}
     }
 
-    public class compiled_event : event_node, SemanticTree.ICompiledEventNode
+    public class compiled_event : event_node, ICompiledEventNode
     {
 
         private System.Reflection.EventInfo _ei;
@@ -547,7 +548,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -586,7 +587,7 @@ namespace PascalABCCompiler.TreeRealization
 
     }
 
-    public class static_event_reference : addressed_expression, SemanticTree.IStaticEventReference
+    public class static_event_reference : addressed_expression, IStaticEventReference
     {
         private event_node _en;
 
@@ -604,7 +605,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 		
-        SemanticTree.IEventNode SemanticTree.IStaticEventReference.Event
+        PascalABCCompiler.SemanticTree.IEventNode PascalABCCompiler.SemanticTree.IStaticEventReference.Event
         {
         	get
         	{
@@ -626,7 +627,7 @@ namespace PascalABCCompiler.TreeRealization
 		}
     }
 	 
-    public class nonstatic_event_reference : static_event_reference, SemanticTree.INonStaticEventReference
+    public class nonstatic_event_reference : static_event_reference, INonStaticEventReference
     {
         private expression_node _obj;
 
@@ -644,7 +645,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 		
-        SemanticTree.IExpressionNode SemanticTree.INonStaticEventReference.obj
+        PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.INonStaticEventReference.obj
         {
         	get
         	{
@@ -652,7 +653,7 @@ namespace PascalABCCompiler.TreeRealization
         	}
         }
         
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

@@ -1,8 +1,9 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 
-namespace PascalABCCompiler.Collections
+namespace PascalSharp.Internal.TreeConverter.Collections
 {
     /// <summary>
     /// Расширяемая коллекция. Элементы из нее нельзя удалять.

@@ -6,8 +6,8 @@ using System.Linq;
 using PascalABCCompiler.SystemLibrary;
 using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter;TreeConversion;
 
 namespace TreeConverter.LambdaExpressions.Closure
 {
@@ -529,7 +529,7 @@ namespace TreeConverter.LambdaExpressions.Closure
 
             newTreeNode.SymbolInfoLoopVar = _visitor.context.find_first(loopIdentName);
             
-            var fn = new PascalABCCompiler.TreeRealization.for_node(null, null, null, null, null, _visitor.get_location(_for_node));
+            var fn = new PascalSharp.Internal.TreeConverter.TreeRealization.for_node(null, null, null, null, null, _visitor.get_location(_for_node));
             if (vdn.type == SystemLibrary.bool_type)
             {
                 fn.bool_cycle = true;

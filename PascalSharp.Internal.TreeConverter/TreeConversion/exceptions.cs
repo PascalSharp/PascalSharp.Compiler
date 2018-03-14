@@ -3,7 +3,7 @@
 //Класс, представляющий внутреннюю ошибку компилятора.
 using System;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
 
 	public class CompilerInternalError : System.Exception

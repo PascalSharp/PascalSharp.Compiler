@@ -9,8 +9,7 @@ using System.Reflection;
 using PascalABCCompiler;
 using PascalABCCompiler.Parsers;
 using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Compiler.PCU;
 
 namespace PascalSharp.Internal.CodeCompletion

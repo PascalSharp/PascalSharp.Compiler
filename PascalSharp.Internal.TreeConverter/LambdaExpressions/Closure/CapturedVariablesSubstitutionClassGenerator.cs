@@ -5,8 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
+using PascalSharp.Internal.TreeConverter;
 
 namespace TreeConverter.LambdaExpressions.Closure
 {

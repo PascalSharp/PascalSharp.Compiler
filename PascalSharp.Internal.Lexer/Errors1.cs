@@ -1,11 +1,11 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 using System;
-using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SyntaxTree;
 using System.Collections.Generic;
 using PascalSharp.Internal.Errors;
 
-namespace PascalABCCompiler.Errors
+namespace PascalSharp.Internal.Lexer.Errors
 {
     public class bad_operand_type: SyntaxError
 	{

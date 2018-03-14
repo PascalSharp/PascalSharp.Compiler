@@ -1,12 +1,14 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
 
-namespace PascalABCCompiler.TreeRealization
+using System;
+using PascalABCCompiler.SemanticTree;
+
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
 
 	[Serializable]
-    public class local_variable_reference : variable_reference, SemanticTree.ILocalVariableReferenceNode
+    public class local_variable_reference : variable_reference, ILocalVariableReferenceNode
 	{
 		private local_variable _var;
 		private int _static_depth;
@@ -17,7 +19,7 @@ namespace PascalABCCompiler.TreeRealization
 			this.static_depth=static_depth;   
 		}
 
-        SemanticTree.IVAriableDefinitionNode SemanticTree.IReferenceNode.Variable
+        PascalABCCompiler.SemanticTree.IVAriableDefinitionNode PascalABCCompiler.SemanticTree.IReferenceNode.Variable
         {
             get
             {
@@ -59,12 +61,12 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		public SemanticTree.ILocalVariableNode variable
+		public PascalABCCompiler.SemanticTree.ILocalVariableNode variable
 		{
 			get
 			{
@@ -83,7 +85,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
     [Serializable]
-    public class local_block_variable_reference : variable_reference, SemanticTree.ILocalBlockVariableReferenceNode
+    public class local_block_variable_reference : variable_reference, ILocalBlockVariableReferenceNode
     {
         public override string ToString() => _var.ToString();
         private local_block_variable _var;
@@ -94,7 +96,7 @@ namespace PascalABCCompiler.TreeRealization
             _var = var;
         }
 
-        SemanticTree.IVAriableDefinitionNode SemanticTree.IReferenceNode.Variable
+        PascalABCCompiler.SemanticTree.IVAriableDefinitionNode PascalABCCompiler.SemanticTree.IReferenceNode.Variable
         {
             get
             {
@@ -120,12 +122,12 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        public SemanticTree.ILocalBlockVariableNode Variable
+        public PascalABCCompiler.SemanticTree.ILocalBlockVariableNode Variable
         {
             get
             {
@@ -161,7 +163,7 @@ namespace PascalABCCompiler.TreeRealization
     }
     
     [Serializable]
-    public class namespace_variable_reference : variable_reference, SemanticTree.INamespaceVariableReferenceNode
+    public class namespace_variable_reference : variable_reference, INamespaceVariableReferenceNode
 	{
 		private namespace_variable _var;
 
@@ -172,7 +174,7 @@ namespace PascalABCCompiler.TreeRealization
 		}
 
 
-        SemanticTree.IVAriableDefinitionNode SemanticTree.IReferenceNode.Variable
+        PascalABCCompiler.SemanticTree.IVAriableDefinitionNode PascalABCCompiler.SemanticTree.IReferenceNode.Variable
         {
             get
             {
@@ -197,12 +199,12 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		public SemanticTree.ICommonNamespaceVariableNode variable
+		public PascalABCCompiler.SemanticTree.ICommonNamespaceVariableNode variable
 		{
 			get
 			{
@@ -220,7 +222,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-    public class class_field_reference : variable_reference, SemanticTree.ICommonClassFieldReferenceNode
+    public class class_field_reference : variable_reference, ICommonClassFieldReferenceNode
 	{
 		private class_field _field;
 		private expression_node _obj;
@@ -240,7 +242,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.IVAriableDefinitionNode SemanticTree.IReferenceNode.Variable
+        PascalABCCompiler.SemanticTree.IVAriableDefinitionNode PascalABCCompiler.SemanticTree.IReferenceNode.Variable
         {
             get
             {
@@ -278,12 +280,12 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ICommonClassFieldNode SemanticTree.ICommonClassFieldReferenceNode.field
+		PascalABCCompiler.SemanticTree.ICommonClassFieldNode PascalABCCompiler.SemanticTree.ICommonClassFieldReferenceNode.field
 		{
 			get
 			{
@@ -291,7 +293,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.IExpressionNode SemanticTree.ICommonClassFieldReferenceNode.obj
+		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.ICommonClassFieldReferenceNode.obj
 		{
 			get
 			{
@@ -305,13 +307,13 @@ namespace PascalABCCompiler.TreeRealization
             {
                 bool flag;
                 general_node_type gnd;
-            	return !TreeConverter.convertion_data_and_alghoritms.check_for_constant_or_readonly(this,out flag, out gnd);
+            	return !PascalSharp.Internal.TreeConverter.convertion_data_and_alghoritms.check_for_constant_or_readonly(this,out flag, out gnd);
             }
         }
 	}
 
 	[Serializable]
-    public class static_class_field_reference : variable_reference, SemanticTree.IStaticCommonClassFieldReferenceNode
+    public class static_class_field_reference : variable_reference, IStaticCommonClassFieldReferenceNode
 	{
 		private class_field _field;
 		private common_type_node _type;
@@ -332,7 +334,7 @@ namespace PascalABCCompiler.TreeRealization
 			_type=static_field.cont_type;
 		}
 
-        SemanticTree.IVAriableDefinitionNode SemanticTree.IReferenceNode.Variable
+        PascalABCCompiler.SemanticTree.IVAriableDefinitionNode PascalABCCompiler.SemanticTree.IReferenceNode.Variable
         {
             get
             {
@@ -366,12 +368,12 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.ICommonClassFieldNode SemanticTree.IStaticCommonClassFieldReferenceNode.static_field
+		PascalABCCompiler.SemanticTree.ICommonClassFieldNode PascalABCCompiler.SemanticTree.IStaticCommonClassFieldReferenceNode.static_field
 		{
 			get
 			{
@@ -379,7 +381,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.ICommonTypeNode SemanticTree.IStaticCommonClassFieldReferenceNode.class_type
+		PascalABCCompiler.SemanticTree.ICommonTypeNode PascalABCCompiler.SemanticTree.IStaticCommonClassFieldReferenceNode.class_type
 		{
 			get
 			{
@@ -398,7 +400,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-    public class compiled_variable_reference : variable_reference, SemanticTree.ICompiledFieldReferenceNode
+    public class compiled_variable_reference : variable_reference, ICompiledFieldReferenceNode
 	{
 		private compiled_variable_definition _var;
 		private expression_node _obj;
@@ -427,7 +429,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-        SemanticTree.IVAriableDefinitionNode SemanticTree.IReferenceNode.Variable
+        PascalABCCompiler.SemanticTree.IVAriableDefinitionNode PascalABCCompiler.SemanticTree.IReferenceNode.Variable
         {
             get
             {
@@ -457,12 +459,12 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		public SemanticTree.ICompiledClassFieldNode field
+		public PascalABCCompiler.SemanticTree.ICompiledClassFieldNode field
 		{
 			get
 			{
@@ -470,7 +472,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.IExpressionNode SemanticTree.ICompiledFieldReferenceNode.obj
+		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.ICompiledFieldReferenceNode.obj
 		{
 			get
 			{
@@ -480,7 +482,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-    public class static_compiled_variable_reference : variable_reference, SemanticTree.IStaticCompiledFieldReferenceNode
+    public class static_compiled_variable_reference : variable_reference, IStaticCompiledFieldReferenceNode
 	{
 		private compiled_variable_definition _var;
 		private compiled_type_node _type;
@@ -508,7 +510,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-        SemanticTree.IVAriableDefinitionNode SemanticTree.IReferenceNode.Variable
+        PascalABCCompiler.SemanticTree.IVAriableDefinitionNode PascalABCCompiler.SemanticTree.IReferenceNode.Variable
         {
             get
             {
@@ -534,12 +536,12 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		public SemanticTree.ICompiledClassFieldNode static_field
+		public PascalABCCompiler.SemanticTree.ICompiledClassFieldNode static_field
 		{
 			get
 			{
@@ -547,7 +549,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.ICompiledTypeNode SemanticTree.IStaticCompiledFieldReferenceNode.class_type
+		PascalABCCompiler.SemanticTree.ICompiledTypeNode PascalABCCompiler.SemanticTree.IStaticCompiledFieldReferenceNode.class_type
 		{
 			get
 			{
@@ -566,7 +568,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-    public class common_parameter_reference : variable_reference, SemanticTree.ICommonParameterReferenceNode
+    public class common_parameter_reference : variable_reference, ICommonParameterReferenceNode
 	{
 		private common_parameter _par;
 		private int _static_depth;
@@ -595,7 +597,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-        SemanticTree.IVAriableDefinitionNode SemanticTree.IReferenceNode.Variable
+        PascalABCCompiler.SemanticTree.IVAriableDefinitionNode PascalABCCompiler.SemanticTree.IReferenceNode.Variable
         {
             get
             {
@@ -640,12 +642,12 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		int SemanticTree.ICommonParameterReferenceNode.static_depth
+		int PascalABCCompiler.SemanticTree.ICommonParameterReferenceNode.static_depth
 		{
 			get
 			{
@@ -653,7 +655,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public SemanticTree.ICommonParameterNode parameter
+		public PascalABCCompiler.SemanticTree.ICommonParameterNode parameter
 		{
 			get
 			{

@@ -3,9 +3,9 @@
 // (see accompanying GPPGcopyright.rtf)
 
 // GPPG version 1.3.6
-// Machine:  IVAN-PC
-// DateTime: 09.05.2017 19:33:14
-// UserName: Ivan
+// Machine:  ANDREWPC
+// DateTime: 3/13/2018 21:25:01
+// UserName: boyar
 // Input file <Preprocessor3Yacc.y>
 
 // options: no-lines gplex
@@ -15,9 +15,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using QUT.Gppg;
-using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SyntaxTree;
 
-namespace GPPGPreprocessor3
+namespace PascalSharp.Internal.Lexer
 {
 public enum Tokens {
     error=1,EOF=2,DIRECTIVE=3,NODIRECTIVE=4};

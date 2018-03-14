@@ -1,10 +1,11 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
 
-namespace PascalABCCompiler.TreeRealization
+using PascalABCCompiler.SemanticTree;
+
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
-    public class throw_statement_node : statement_node, SemanticTree.IThrowNode
+    public class throw_statement_node : statement_node, IThrowNode
     {
         private expression_node _excpetion;
 
@@ -22,7 +23,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IExpressionNode exception_expresion
+        public PascalABCCompiler.SemanticTree.IExpressionNode exception_expresion
         {
             get
             {
@@ -38,13 +39,13 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
     }
     
-    public class rethrow_statement_node : statement_node, SemanticTree.IRethrowStatement
+    public class rethrow_statement_node : statement_node, IRethrowStatement
     {
 
         public rethrow_statement_node(location loc) :
@@ -60,7 +61,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

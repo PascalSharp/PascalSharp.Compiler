@@ -1,12 +1,14 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
+using PascalABCCompiler.SemanticTree;
 
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
 
-    public class as_node : expression_node, SemanticTree.IAsNode
+    public class as_node : expression_node, IAsNode
     {
         private expression_node _left;
         private type_node _right;
@@ -34,7 +36,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.IExpressionNode SemanticTree.IAsNode.left
+        PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IAsNode.left
         {
             get
             {
@@ -42,7 +44,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ITypeNode SemanticTree.IAsNode.right
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IAsNode.right
         {
             get
             {
@@ -58,13 +60,13 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
     }
 
-    public class is_node : expression_node, SemanticTree.IIsNode
+    public class is_node : expression_node, IIsNode
     {
         private expression_node _left;
         private type_node _right;
@@ -92,7 +94,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.IExpressionNode SemanticTree.IIsNode.left
+        PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IIsNode.left
         {
             get
             {
@@ -100,7 +102,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ITypeNode SemanticTree.IIsNode.right
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IIsNode.right
         {
             get
             {
@@ -116,13 +118,13 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
     }
 
-    public class sizeof_operator : expression_node, SemanticTree.ISizeOfOperator
+    public class sizeof_operator : expression_node, ISizeOfOperator
     {
         private type_node _oftype;
 
@@ -140,7 +142,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ITypeNode SemanticTree.ISizeOfOperator.oftype
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ISizeOfOperator.oftype
         {
             get
             {
@@ -156,18 +158,18 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
     }
 
-    public class typeof_operator : expression_node, SemanticTree.ITypeOfOperator
+    public class typeof_operator : expression_node, ITypeOfOperator
     {
         private type_node _oftype;
 
         public typeof_operator(type_node oftype, location loc)
-            : base(compiled_type_node.get_type_node(typeof(Type),SystemLibrary.SystemLibrary.syn_visitor.SymbolTable), loc)
+            : base(compiled_type_node.get_type_node(typeof(Type),PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.SymbolTable), loc)
         {
             _oftype = oftype;
         }
@@ -180,7 +182,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ITypeNode SemanticTree.ITypeOfOperator.oftype
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ITypeOfOperator.oftype
         {
             get
             {
@@ -196,13 +198,13 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
     }
 
-    public class statements_expression_node : expression_node, SemanticTree.IStatementsExpressionNode
+    public class statements_expression_node : expression_node, IStatementsExpressionNode
     {
         private statement_node_list _statements_list;
         private expression_node _expression;
@@ -230,7 +232,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IStatementNode[] statements
+        public PascalABCCompiler.SemanticTree.IStatementNode[] statements
         {
             get
             {
@@ -238,7 +240,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IExpressionNode expresion
+        public PascalABCCompiler.SemanticTree.IExpressionNode expresion
         {
             get
             {
@@ -254,13 +256,13 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
     }
 
-    public class question_colon_expression : expression_node, SemanticTree.IQuestionColonExpressionNode
+    public class question_colon_expression : expression_node, IQuestionColonExpressionNode
     {
         private expression_node _condition;
         private expression_node _ret_if_true;
@@ -303,7 +305,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IExpressionNode condition
+        public PascalABCCompiler.SemanticTree.IExpressionNode condition
         {
             get
             {
@@ -311,7 +313,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IExpressionNode ret_if_true
+        public PascalABCCompiler.SemanticTree.IExpressionNode ret_if_true
         {
             get
             {
@@ -319,7 +321,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IExpressionNode ret_if_false
+        public PascalABCCompiler.SemanticTree.IExpressionNode ret_if_false
         {
             get
             {
@@ -335,13 +337,13 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
         
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
     }
 	
-    public class array_initializer : expression_node, SemanticTree.IArrayInitializer
+    public class array_initializer : expression_node, IArrayInitializer
     {
     	private List<expression_node> _element_values;
 
@@ -357,7 +359,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.IExpressionNode[] SemanticTree.IArrayInitializer.ElementValues
+        PascalABCCompiler.SemanticTree.IExpressionNode[] PascalABCCompiler.SemanticTree.IArrayInitializer.ElementValues
         {
             get
             {
@@ -365,7 +367,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ITypeNode SemanticTree.IArrayInitializer.ElementType
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IArrayInitializer.ElementType
         {
             get
             {
@@ -393,7 +395,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -410,7 +412,7 @@ namespace PascalABCCompiler.TreeRealization
         }
     }
     
-    public class record_initializer : expression_node, SemanticTree.IRecordInitializer
+    public class record_initializer : expression_node, IRecordInitializer
     {
     	private List<expression_node> _field_values = new List<expression_node>();
         
@@ -422,7 +424,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        internal List<SyntaxTree.record_const_definition> record_const_definition_list;
+        internal List<PascalABCCompiler.SyntaxTree.record_const_definition> record_const_definition_list;
 
         public record_initializer(List<expression_node> field_values, location loc)
             :base(null, loc)
@@ -430,13 +432,13 @@ namespace PascalABCCompiler.TreeRealization
             _field_values = field_values;
         }
 
-        internal record_initializer(List<SyntaxTree.record_const_definition> record_const_definition_list, location loc)
+        internal record_initializer(List<PascalABCCompiler.SyntaxTree.record_const_definition> record_const_definition_list, location loc)
             : base(null, loc)
         {
             this.record_const_definition_list = record_const_definition_list;
         }
 		
-        public SemanticTree.IExpressionNode[] FieldValues
+        public PascalABCCompiler.SemanticTree.IExpressionNode[] FieldValues
         {
             get
             {
@@ -448,7 +450,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

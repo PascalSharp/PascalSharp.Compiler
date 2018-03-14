@@ -1,74 +1,75 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
+using PascalABCCompiler.SemanticTree;
+using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.TreeConverter;
 
-using PascalABCCompiler.TreeConverter;
-using PascalABCCompiler.TreeRealization;
-
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     /// <summary>
     /// Базовый класс для представления пространств имен.
     /// </summary>
-	[Serializable]
-	public abstract class namespace_node : definition_node, SemanticTree.INamespaceNode
-	{
+    [Serializable]
+    public abstract class namespace_node : definition_node, INamespaceNode
+    {
         /// <summary>
         /// Полное имя пространства имен.
         /// </summary>
-		public abstract string namespace_full_name
-		{
-			get;
-		}
+        public abstract string namespace_full_name
+        {
+            get;
+        }
 
         /// <summary>
         /// Поиск символа в пространстве имен.
         /// </summary>
         /// <param name="name">Имя элемента для поиска.</param>
         /// <returns>Информация о найденном символе. null, если ни чего не найдено.</returns>
-		public abstract SymbolInfoList find(string name);
+        public abstract SymbolInfoList find(string name);
 
         /// <summary>
         /// Имя пространства имен.
         /// </summary>
-		public abstract string namespace_name
-		{
-			get;
-		}
+        public abstract string namespace_name
+        {
+            get;
+        }
 
         /// <summary>
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
-		{
-			visitor.visit(this);
-		}
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        {
+            visitor.visit(this);
+        }
 
         /// <summary>
         /// Обобщенный тип узла.
         /// </summary>
-		public override general_node_type general_node_type
-		{
-			get
-			{
-				return general_node_type.namespace_node;
-			}
-		}
+        public override general_node_type general_node_type
+        {
+            get
+            {
+                return general_node_type.namespace_node;
+            }
+        }
 
-	}
+    }
 
     /// <summary>
     /// Класс, представляющий обычное пространство имен.
     /// </summary>
-	[Serializable]
-	public class common_namespace_node : namespace_node, SemanticTree.ICommonNamespaceNode
-	{
+    [Serializable]
+    public class common_namespace_node : namespace_node, ICommonNamespaceNode
+    {
         /// <summary>
         /// Список типов, вложенных в пространство имен.
         /// </summary>
-		private readonly common_type_node_list _types=new common_type_node_list();
+        private readonly common_type_node_list _types=new common_type_node_list();
 
         //ssyy добавил
         /// <summary>
@@ -114,39 +115,39 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Список констант, определенных в пространстве имен.
         /// </summary>
-		private readonly namespace_constant_definition_list _constants=new namespace_constant_definition_list();
+        private readonly namespace_constant_definition_list _constants=new namespace_constant_definition_list();
 
         /// <summary>
         /// Список пространств имен, вложенных в пространство имен.
         /// </summary>
-		private readonly common_namespace_node_list _namespaces= new common_namespace_node_list();
+        private readonly common_namespace_node_list _namespaces= new common_namespace_node_list();
 
         /// <summary>
         /// Пространство имен, в которое вложено это пространство имен.
         /// </summary>
-		private namespace_node _comprehensive_namespace;
+        private namespace_node _comprehensive_namespace;
 
         /// <summary>
         /// Модуль, в котором содержится это пространство имен.
         /// При генерации кода, когда возможна ситуация при которой простраство имен расположено в нескольких модулях,
         /// этот элемент указывает на один из модулей в котором встретилось это пространство имен.
         /// </summary>
-		private unit_node _cont_unit;
+        private unit_node _cont_unit;
 
         /// <summary>
         /// Имя пространства имен.
         /// </summary>
-		private string _name;
+        private string _name;
 
         /// <summary>
         /// Область видимости пространства имен.
         /// </summary>
-		private SymbolTable.Scope _scope;
+        private PascalSharp.Internal.TreeConverter.SymbolTable.Scope _scope;
 
         /// <summary>
         /// Расположения заголовка пространства имен.
         /// </summary>
-		private location _loc;
+        private location _loc;
 
         /// <summary>
         /// Конструктор узла.
@@ -157,7 +158,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="scope">Область видимости пространства имен.</param>
         /// <param name="loc">Расположения заголовка пространства имен.</param>
         public common_namespace_node(namespace_node comprehensive_namespace, unit_node cont_unit, string name, 
-            SymbolTable.Scope scope, location loc)
+            PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope, location loc)
         {
             _comprehensive_namespace = comprehensive_namespace;
             _cont_unit = cont_unit;
@@ -208,100 +209,100 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
         
-        bool SemanticTree.ICommonNamespaceNode.IsMain
+        bool PascalABCCompiler.SemanticTree.ICommonNamespaceNode.IsMain
         {
-        	get
-        	{
-        		return _is_main;
-        	}
+            get
+            {
+                return _is_main;
+            }
         }
         /// <summary>
         /// Область видимости пространства имен.
         /// </summary>
-		public SymbolTable.Scope scope
-		{
-			get
-			{
-				return _scope;
-			}
+        public PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope
+        {
+            get
+            {
+                return _scope;
+            }
             set
             {
                 _scope = value;
             }
-		}
+        }
 
         /// <summary>
         /// Расположения заголовка пространства имен.
         /// </summary>
-		public location loc
-		{
-			get
-			{
-				return _loc;
-			}
-		}
+        public location loc
+        {
+            get
+            {
+                return _loc;
+            }
+        }
 
         /// <summary>
         /// Расположения заголовка пространства имен.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-		public SemanticTree.ILocation Location
-		{
-			get
-			{
-				return _loc;
-			}
-		}
+        public PascalABCCompiler.SemanticTree.ILocation Location
+        {
+            get
+            {
+                return _loc;
+            }
+        }
 
         /// <summary>
         /// Имя пространства имен.
         /// </summary>
-		public override string namespace_name
-		{
-			get
-			{
-				return _name;
-			}
-		}
+        public override string namespace_name
+        {
+            get
+            {
+                return _name;
+            }
+        }
 		
-		public void SetNamespaceName(string name)
-		{
-			_name = name;
-		}
+        public void SetNamespaceName(string name)
+        {
+            _name = name;
+        }
 		
         /// <summary>
         /// Пространство имен, в которое вложено это пространство имен.
         /// </summary>
-		public namespace_node comprehensive_namespace
-		{
-			get
-			{
-				return _comprehensive_namespace;
-			}
-		}
+        public namespace_node comprehensive_namespace
+        {
+            get
+            {
+                return _comprehensive_namespace;
+            }
+        }
 
         /// <summary>
         /// Модуль, в котором содержится это пространство имен.
         /// При генерации кода, когда возможна ситуация при которой простраство имен расположено в нескольких модулях,
         /// этот элемент указывает на один из модулей в котором встретилось это пространство имен.
         /// </summary>
-		public unit_node cont_unit
-		{
-			get
-			{
-				return _cont_unit;
-			}
-		}
+        public unit_node cont_unit
+        {
+            get
+            {
+                return _cont_unit;
+            }
+        }
 
         /// <summary>
         /// Список типов, вложенных в пространство имен.
         /// </summary>
-		public common_type_node_list types
-		{
-			get
-			{
-				return _types;
-			}
+        public common_type_node_list types
+        {
+            get
+            {
+                return _types;
+            }
         }
 
         //ssyy добавил
@@ -354,24 +355,24 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Список пространств имен, вложенных в пространство имен.
         /// </summary>
-		public common_namespace_node_list namespaces
-		{
-			get
-			{
-				return _namespaces;
-			}
-		}
+        public common_namespace_node_list namespaces
+        {
+            get
+            {
+                return _namespaces;
+            }
+        }
 
         /// <summary>
         /// Список переменных, определенных в прстранстве имен.
         /// </summary>
-		public namespace_variable_list variables
-		{
-			get
-			{
-				return _variables;
-			}
-		}
+        public namespace_variable_list variables
+        {
+            get
+            {
+                return _variables;
+            }
+        }
 
         public namespace_event_list events
         {
@@ -395,39 +396,39 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Список функций, определенных в пространстве имен.
         /// </summary>
-		public common_namespace_function_node_list functions
-		{
-			get
-			{
-				return _functions;
-			}
-		}
+        public common_namespace_function_node_list functions
+        {
+            get
+            {
+                return _functions;
+            }
+        }
 
         /// <summary>
         /// Список констант, определенных в пространстве имен.
         /// </summary>
-		public namespace_constant_definition_list constants
-		{
-			get
-			{
-				return _constants;
-			}
-		}
+        public namespace_constant_definition_list constants
+        {
+            get
+            {
+                return _constants;
+            }
+        }
 
         /// <summary>
         /// Полное имя пространства имен.
         /// </summary>
-		public override string namespace_full_name
-		{
-			get
-			{
-				if (_comprehensive_namespace==null)
-				{
-					return _name;
-				}
-				return (_comprehensive_namespace.namespace_full_name+"."+_name);
-			}
-		}
+        public override string namespace_full_name
+        {
+            get
+            {
+                if (_comprehensive_namespace==null)
+                {
+                    return _name;
+                }
+                return (_comprehensive_namespace.namespace_full_name+"."+_name);
+            }
+        }
 
         private bool _from_pcu;
         public bool from_pcu
@@ -447,8 +448,8 @@ namespace PascalABCCompiler.TreeRealization
         /// </summary>
         /// <param name="name">Искомое имя.</param>
         /// <returns>Информация о найденом символе. null, если ни чего не найдена.</returns>
-		public override SymbolInfoList find(string name)
-		{
+        public override SymbolInfoList find(string name)
+        {
             return _scope.Find(name);//c,cc,c,cc
         }
         public SymbolInfo findFirstOnlyInNamespace(string name)
@@ -464,48 +465,48 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Тип узла.
         /// </summary>
-		public override semantic_node_type semantic_node_type
-		{
-			get
-			{
-				return semantic_node_type.common_namespace_node;
-			}
-		}
+        public override semantic_node_type semantic_node_type
+        {
+            get
+            {
+                return semantic_node_type.common_namespace_node;
+            }
+        }
 
         /// <summary>
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
-		{
-			visitor.visit(this);
-		}
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        {
+            visitor.visit(this);
+        }
 
-		SemanticTree.ICommonNamespaceNode[] SemanticTree.ICommonNamespaceNode.nested_namespaces
-		{
-			get
-			{
-				return (this._namespaces.ToArray());
-			}
-		}
+        PascalABCCompiler.SemanticTree.ICommonNamespaceNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.nested_namespaces
+        {
+            get
+            {
+                return (this._namespaces.ToArray());
+            }
+        }
 
-		SemanticTree.ICommonTypeNode[] SemanticTree.ICommonNamespaceNode.types
-		{
-			get
-			{
-				return (this._types.ToArray());
-			}
-		}
+        PascalABCCompiler.SemanticTree.ICommonTypeNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.types
+        {
+            get
+            {
+                return (this._types.ToArray());
+            }
+        }
 		
-		SemanticTree.ITypeSynonym[] SemanticTree.ICommonNamespaceNode.type_synonims
-		{
-			get
-			{
-				return this._type_synonyms.ToArray();
-			}
-		}
+        PascalABCCompiler.SemanticTree.ITypeSynonym[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.type_synonims
+        {
+            get
+            {
+                return this._type_synonyms.ToArray();
+            }
+        }
 
-        SemanticTree.ITemplateClass[] SemanticTree.ICommonNamespaceNode.templates
+        PascalABCCompiler.SemanticTree.ITemplateClass[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.templates
         {
             get
             {
@@ -513,15 +514,15 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-		SemanticTree.ICommonNamespaceVariableNode[] SemanticTree.ICommonNamespaceNode.variables
-		{
-			get
-			{
-				return (this._variables.ToArray());
-			}
-		}
+        PascalABCCompiler.SemanticTree.ICommonNamespaceVariableNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.variables
+        {
+            get
+            {
+                return (this._variables.ToArray());
+            }
+        }
 
-        SemanticTree.ICommonNamespaceEventNode[] SemanticTree.ICommonNamespaceNode.events
+        PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.events
         {
             get
             {
@@ -529,23 +530,23 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-		SemanticTree.ICommonNamespaceFunctionNode[] SemanticTree.ICommonNamespaceNode.functions
-		{
-			get
-			{
-				return (this._functions.ToArray());
-			}
-		}
+        PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.functions
+        {
+            get
+            {
+                return (this._functions.ToArray());
+            }
+        }
 
-		SemanticTree.INamespaceNode SemanticTree.ICommonNamespaceNode.comprehensive_namespace
-		{
-			get
-			{
-				return (this._comprehensive_namespace);
-			}
-		}
+        PascalABCCompiler.SemanticTree.INamespaceNode PascalABCCompiler.SemanticTree.ICommonNamespaceNode.comprehensive_namespace
+        {
+            get
+            {
+                return (this._comprehensive_namespace);
+            }
+        }
 
-        SemanticTree.INamespaceConstantDefinitionNode[] SemanticTree.ICommonNamespaceNode.constants
+        PascalABCCompiler.SemanticTree.INamespaceConstantDefinitionNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.constants
         {
             get
             {
@@ -583,26 +584,26 @@ namespace PascalABCCompiler.TreeRealization
     /// <summary>
     /// Класс, представляющий пространство имен в откомпилированном коде.
     /// </summary>
-	[Serializable]
-	public class compiled_namespace_node : namespace_node, SemanticTree.ICompiledNamespaceNode
-	{
+    [Serializable]
+    public class compiled_namespace_node : namespace_node, ICompiledNamespaceNode
+    {
         /// <summary>
         /// Имя (полное) пространства имен.
         /// </summary>
-		private string _name;
+        private string _name;
         private common_namespace_node _common_namespace;
 
-        private SymbolTable.TreeConverterSymbolTable _tcst;
+        private PascalSharp.Internal.TreeConverter.SymbolTable.TreeConverterSymbolTable _tcst;
 
         /// <summary>
         /// Конструктор узла.
         /// </summary>
         /// <param name="name">Полное имя пространства имен.</param>
-        public compiled_namespace_node(string name, SymbolTable.TreeConverterSymbolTable tcst)
-		{
-			_name=name;
+        public compiled_namespace_node(string name, PascalSharp.Internal.TreeConverter.SymbolTable.TreeConverterSymbolTable tcst)
+        {
+            _name=name;
             _tcst = tcst;
-		}
+        }
 
         /// <summary>
         /// Получение имени пространства имен по его полному имени.
@@ -620,7 +621,7 @@ namespace PascalABCCompiler.TreeRealization
         }
 
         private static Dictionary<string, compiled_namespace_node> compiled_namespaces = new Dictionary<string, compiled_namespace_node>();
-        public static compiled_namespace_node get_compiled_namespace(string full_name, SymbolTable.TreeConverterSymbolTable tcst)
+        public static compiled_namespace_node get_compiled_namespace(string full_name, PascalSharp.Internal.TreeConverter.SymbolTable.TreeConverterSymbolTable tcst)
         {
             compiled_namespace_node cnn = null;
             if (!compiled_namespaces.TryGetValue(full_name, out cnn))
@@ -635,24 +636,24 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Имя пространства имен (не полное).
         /// </summary>
-		public override string namespace_name
-		{
-			get
-			{
+        public override string namespace_name
+        {
+            get
+            {
                 return get_namespace_name(_name);
-			}
-		}
+            }
+        }
 
         /// <summary>
         /// Полное имя пространства имен.
         /// </summary>
-		public override string namespace_full_name
-		{
-			get
-			{
-				return _name;
-			}
-		}
+        public override string namespace_full_name
+        {
+            get
+            {
+                return _name;
+            }
+        }
 
         public common_namespace_node common_namespace
         {
@@ -671,8 +672,8 @@ namespace PascalABCCompiler.TreeRealization
         /// </summary>
         /// <param name="name">Имя для поиска.</param>
         /// <returns>Первый элемент списка найденных имен. null если ни чего не найдено.</returns>
-		public override SymbolInfoList find(string name)
-		{
+        public override SymbolInfoList find(string name)
+        {
             bool is_ns = NetHelper.NetHelper.IsNetNamespace(_name + "." + name);
             SymbolInfoList sil = null;
             if (is_ns)
@@ -697,10 +698,10 @@ namespace PascalABCCompiler.TreeRealization
                 }
                 else
                 {
-                	t = NetHelper.NetHelper.FindType(_name+"."+_name);
-                	if (t != null && NetHelper.NetHelper.IsEntryType(t))
-                	{
-                		sil = NetHelper.NetHelper.FindName(t,name);
+                    t = NetHelper.NetHelper.FindType(_name+"."+_name);
+                    if (t != null && NetHelper.NetHelper.IsEntryType(t))
+                    {
+                        sil = NetHelper.NetHelper.FindName(t,name);
                         if (sil == null)
                         {
                             type_node tn = NetHelper.NetHelper.FindCompiledPascalType(_name + "." + name);
@@ -713,42 +714,38 @@ namespace PascalABCCompiler.TreeRealization
                                     sil = new SymbolInfoList(new SymbolInfo(tc));
                             }
                         }
-                	}
+                    }
                 }
             }
             return sil;
 
-		}
+        }
 
         /// <summary>
         /// Тип узла.
         /// </summary>
-		public override semantic_node_type semantic_node_type
-		{
-			get
-			{
-				return semantic_node_type.compiled_namespace_node;
-			}
-		}
+        public override semantic_node_type semantic_node_type
+        {
+            get
+            {
+                return semantic_node_type.compiled_namespace_node;
+            }
+        }
 
         /// <summary>
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
-		{
-			visitor.visit(this);
-		}
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        {
+            visitor.visit(this);
+        }
 
-	}
+    }
 
-}
-
-namespace PascalABCCompiler.SyntaxTree
-{
     public class syntax_namespace_node : base_syntax_namespace_node
     {
-        PascalABCCompiler.TreeRealization.unit_node_list _referenced_units;
+        PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list _referenced_units;
 
         public syntax_namespace_node(string name):base(name)
         {

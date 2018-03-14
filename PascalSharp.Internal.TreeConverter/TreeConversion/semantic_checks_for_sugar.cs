@@ -4,9 +4,8 @@ using System.Linq;
 using System.Text;
 
 using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.TreeRealization;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
     public partial class syntax_tree_visitor
     {

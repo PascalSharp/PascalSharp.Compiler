@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
+using PascalABCCompiler.SemanticTree;
 
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     /// <summary>
     /// Пустое выражение.
@@ -34,7 +36,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -68,7 +70,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -80,16 +82,16 @@ namespace PascalABCCompiler.TreeRealization
     }
 
     [Serializable]
-    public class runtime_statement : statement_node, SemanticTree.IRuntimeManagedMethodBody
+    public class runtime_statement : statement_node, IRuntimeManagedMethodBody
     {
-        private SemanticTree.runtime_statement_type _rts;
+        private PascalABCCompiler.SemanticTree.runtime_statement_type _rts;
 
-        public runtime_statement(SemanticTree.runtime_statement_type rts,location loc) :base(loc)
+        public runtime_statement(PascalABCCompiler.SemanticTree.runtime_statement_type rts,location loc) :base(loc)
         {
             _rts = rts;
         }
 
-        public SemanticTree.runtime_statement_type runtime_statement_type
+        public PascalABCCompiler.SemanticTree.runtime_statement_type runtime_statement_type
         {
             get
             {
@@ -101,7 +103,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -121,7 +123,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Обращение к методу в неуправляемой dll.
     /// </summary>
 	[Serializable]
-	public class external_statement : statement_node, SemanticTree.IExternalStatementNode
+	public class external_statement : statement_node, IExternalStatementNode
 	{
         /// <summary>
         /// Имя dll.
@@ -186,14 +188,14 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 	}
 	
 	[Serializable]
-	public class pinvoke_statement : statement_node, SemanticTree.IPInvokeStatementNode
+	public class pinvoke_statement : statement_node, IPInvokeStatementNode
 	{
 		public pinvoke_statement(location loc) : base(loc)
 		{
@@ -212,7 +214,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -222,7 +224,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, представляющий узел if  в программе.
     /// </summary>
 	[Serializable]
-	public class if_node : statement_node, SemanticTree.IIfNode
+	public class if_node : statement_node, IIfNode
 	{
         /// <summary>
         /// Условие.
@@ -310,12 +312,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.IStatementNode SemanticTree.IIfNode.else_body
+		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IIfNode.else_body
 		{
 			get
 			{
@@ -323,7 +325,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.IExpressionNode SemanticTree.IIfNode.condition
+		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IIfNode.condition
 		{
 			get
 			{
@@ -331,7 +333,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.IStatementNode SemanticTree.IIfNode.then_body
+		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IIfNode.then_body
 		{
 			get
 			{
@@ -344,7 +346,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, представляющий узел while в программе.
     /// </summary>
 	[Serializable]
-	public class while_node : statement_node, SemanticTree.IWhileNode
+	public class while_node : statement_node, IWhileNode
 	{
         /// <summary>
         /// Условие цикла.
@@ -419,12 +421,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.IExpressionNode SemanticTree.IWhileNode.condition
+		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IWhileNode.condition
 		{
 			get
 			{
@@ -432,7 +434,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.IStatementNode SemanticTree.IWhileNode.body
+		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IWhileNode.body
 		{
 			get
 			{
@@ -445,7 +447,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, представляющий узел repeat в программе.
     /// </summary>
 	[Serializable]
-	public class repeat_node : statement_node, SemanticTree.IRepeatNode
+	public class repeat_node : statement_node, IRepeatNode
 	{
         /// <summary>
         /// Тело цикла.
@@ -523,12 +525,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.IExpressionNode SemanticTree.IRepeatNode.condition
+		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IRepeatNode.condition
 		{
 			get
 			{
@@ -536,7 +538,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.IStatementNode SemanticTree.IRepeatNode.body
+		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IRepeatNode.body
 		{
 			get
 			{
@@ -549,7 +551,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Узел цикла for.
     /// </summary>
 	[Serializable]
-	public class for_node : statement_node, SemanticTree.IForNode
+	public class for_node : statement_node, IForNode
 	{
         /// <summary>
         /// Выражение инициализации переменной цикла.
@@ -692,12 +694,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.IStatementNode SemanticTree.IForNode.initialization_statement
+		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IForNode.initialization_statement
 		{
 			get
 			{
@@ -705,7 +707,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.IStatementNode SemanticTree.IForNode.body
+		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IForNode.body
 		{
 			get
 			{
@@ -713,7 +715,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.IStatementNode SemanticTree.IForNode.increment_statement
+		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IForNode.increment_statement
 		{
 			get
 			{
@@ -721,7 +723,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		SemanticTree.IExpressionNode SemanticTree.IForNode.while_expr
+		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IForNode.while_expr
 		{
 			get
 			{
@@ -729,7 +731,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		SemanticTree.IExpressionNode SemanticTree.IForNode.init_while_expr
+		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IForNode.init_while_expr
 		{
 			get
 			{
@@ -737,7 +739,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 		
-		bool SemanticTree.IForNode.IsBoolCycle
+		bool PascalABCCompiler.SemanticTree.IForNode.IsBoolCycle
 		{
 			get
 			{
@@ -750,7 +752,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Список выражений.
     /// </summary>
 	[Serializable]
-	public class statements_list : statement_node, SemanticTree.IStatementsListNode
+	public class statements_list : statement_node, IStatementsListNode
 	{
         /// <summary>
         /// Список выражений.
@@ -788,7 +790,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Массив переменных, определенных в блоке.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        SemanticTree.ILocalBlockVariableNode[] SemanticTree.IStatementsListNode.LocalVariables
+        PascalABCCompiler.SemanticTree.ILocalBlockVariableNode[] PascalABCCompiler.SemanticTree.IStatementsListNode.LocalVariables
         {
             get
             {
@@ -822,7 +824,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Положение левой логической скобки
         /// </summary>
-        public SemanticTree.ILocation LeftLogicalBracketLocation
+        public PascalABCCompiler.SemanticTree.ILocation LeftLogicalBracketLocation
         {
             get
             {
@@ -837,7 +839,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Положение правой логической скобки
         /// </summary>
-        public SemanticTree.ILocation RightLogicalBracketLocation
+        public PascalABCCompiler.SemanticTree.ILocation RightLogicalBracketLocation
         {
             get
             {
@@ -864,12 +866,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		SemanticTree.IStatementNode[] SemanticTree.IStatementsListNode.statements
+		PascalABCCompiler.SemanticTree.IStatementNode[] PascalABCCompiler.SemanticTree.IStatementsListNode.statements
 		{
 			get
 			{
@@ -877,7 +879,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-        internal SymbolTable.Scope Scope = null;
+        internal PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope = null;
 	}
 
     //TODO: Неплохо-бы в следующих 3-х классах хранить ссылку на следующее за циклом выражение.
@@ -885,7 +887,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Узел break в цикле while.
     /// </summary>
     [Serializable]
-	public class while_break_node : expression_node, SemanticTree.IWhileBreakNode
+	public class while_break_node : expression_node, IWhileBreakNode
 	{
         /// <summary>
         /// Узел while.
@@ -914,7 +916,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public SemanticTree.IWhileNode while_node
+		public PascalABCCompiler.SemanticTree.IWhileNode while_node
 		{
 			get
 			{
@@ -926,9 +928,9 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
-			visitor.visit((SemanticTree.IWhileBreakNode)this);
+			visitor.visit((PascalABCCompiler.SemanticTree.IWhileBreakNode)this);
 		}
 	}
 
@@ -936,7 +938,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Узел break в цикле repeat.
     /// </summary>
     [Serializable]
-	public class repeat_break_node : expression_node, SemanticTree.IRepeatBreakNode
+	public class repeat_break_node : expression_node, IRepeatBreakNode
 	{
         /// <summary>
         /// Узел repeat, внутри которого расположен этот break.
@@ -969,12 +971,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
-			visitor.visit((SemanticTree.IRepeatBreakNode)this);
+			visitor.visit((PascalABCCompiler.SemanticTree.IRepeatBreakNode)this);
 		}
 
-		public SemanticTree.IRepeatNode repeat_node
+		public PascalABCCompiler.SemanticTree.IRepeatNode repeat_node
 		{
 			get
 			{
@@ -987,7 +989,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Узел break в икле for.
     /// </summary>
     [Serializable]
-	public class for_break_node : expression_node, SemanticTree.IForBreakNode
+	public class for_break_node : expression_node, IForBreakNode
 	{
         /// <summary>
         /// Цикл for внутри которого расположен этот break.
@@ -1020,12 +1022,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
-			visitor.visit((SemanticTree.IForBreakNode)this);
+			visitor.visit((PascalABCCompiler.SemanticTree.IForBreakNode)this);
 		}
 
-		public SemanticTree.IForNode for_node
+		public PascalABCCompiler.SemanticTree.IForNode for_node
 		{
 			get
 			{
@@ -1035,7 +1037,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 	
 	[Serializable]
-	public class foreach_break_node : expression_node, SemanticTree.IForeachBreakNode
+	public class foreach_break_node : expression_node, IForeachBreakNode
 	{
         /// <summary>
         /// Цикл for внутри которого расположен этот break.
@@ -1068,12 +1070,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
-			visitor.visit((SemanticTree.IForeachBreakNode)this);
+			visitor.visit((PascalABCCompiler.SemanticTree.IForeachBreakNode)this);
 		}
 
-		public SemanticTree.IForeachNode foreach_node
+		public PascalABCCompiler.SemanticTree.IForeachNode foreach_node
 		{
 			get
 			{
@@ -1086,7 +1088,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Узел exit где угодно
     /// </summary>
     [Serializable]
-    public class exit_procedure : expression_node, SemanticTree.IExitProcedure
+    public class exit_procedure : expression_node, IExitProcedure
     {
 
         /// <summary>
@@ -1114,9 +1116,9 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
-            visitor.visit((SemanticTree.IExitProcedure)this);
+            visitor.visit((PascalABCCompiler.SemanticTree.IExitProcedure)this);
         }
 
     }
@@ -1126,7 +1128,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Узел, представляющий continue внутри цикла while.
     /// </summary>
     [Serializable]
-	public class while_continue_node : expression_node, SemanticTree.IWhileContinueNode
+	public class while_continue_node : expression_node, IWhileContinueNode
 	{
         /// <summary>
         /// Цикл while внутри которого расположен этот continue.
@@ -1159,12 +1161,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
-			visitor.visit((SemanticTree.IWhileContinueNode)this);
+			visitor.visit((PascalABCCompiler.SemanticTree.IWhileContinueNode)this);
 		}
 
-		public SemanticTree.IWhileNode while_node
+		public PascalABCCompiler.SemanticTree.IWhileNode while_node
 		{
 			get
 			{
@@ -1177,7 +1179,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Узел continue в цикле repeat.
     /// </summary>
     [Serializable]
-	public class repeat_continue_node : expression_node, SemanticTree.IRepeatContinueNode
+	public class repeat_continue_node : expression_node, IRepeatContinueNode
 	{
         /// <summary>
         /// Цикл repeat, внутри которог расположен этот continue.
@@ -1210,12 +1212,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
-			visitor.visit((SemanticTree.IRepeatContinueNode)this);
+			visitor.visit((PascalABCCompiler.SemanticTree.IRepeatContinueNode)this);
 		}
 
-		public SemanticTree.IRepeatNode repeat_node
+		public PascalABCCompiler.SemanticTree.IRepeatNode repeat_node
 		{
 			get
 			{
@@ -1228,7 +1230,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Узел continue внутри цикла for.
     /// </summary>
     [Serializable]
-	public class for_continue_node : expression_node, SemanticTree.IForContinueNode
+	public class for_continue_node : expression_node, IForContinueNode
 	{
         /// <summary>
         /// Цикл for, внутри которого расположен этот continue.
@@ -1261,12 +1263,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
-            visitor.visit((SemanticTree.IForContinueNode)this);
+            visitor.visit((PascalABCCompiler.SemanticTree.IForContinueNode)this);
         }
 
-		public SemanticTree.IForNode for_node
+		public PascalABCCompiler.SemanticTree.IForNode for_node
 		{
 			get
 			{
@@ -1276,7 +1278,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 	
 	[Serializable]
-	public class foreach_continue_node : expression_node, SemanticTree.IForeachContinueNode
+	public class foreach_continue_node : expression_node, IForeachContinueNode
 	{
         /// <summary>
         /// Цикл for, внутри которого расположен этот continue.
@@ -1309,12 +1311,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
-            visitor.visit((SemanticTree.IForeachContinueNode)this);
+            visitor.visit((PascalABCCompiler.SemanticTree.IForeachContinueNode)this);
         }
 
-		public SemanticTree.IForeachNode foreach_node
+		public PascalABCCompiler.SemanticTree.IForeachNode foreach_node
 		{
 			get
 			{
@@ -1324,7 +1326,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 	
     [Serializable]
-    public class switch_node : statement_node, SemanticTree.ISwitchNode
+    public class switch_node : statement_node, ISwitchNode
     {
         private expression_node _condition;
         private case_variant_node_list _case_variants = new case_variant_node_list();
@@ -1381,12 +1383,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        SemanticTree.ICaseVariantNode[] SemanticTree.ISwitchNode.case_variants
+        PascalABCCompiler.SemanticTree.ICaseVariantNode[] PascalABCCompiler.SemanticTree.ISwitchNode.case_variants
         {
             get
             {
@@ -1394,7 +1396,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.IStatementNode SemanticTree.ISwitchNode.default_statement
+        PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.ISwitchNode.default_statement
         {
             get
             {
@@ -1402,7 +1404,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IExpressionNode case_expression
+        public PascalABCCompiler.SemanticTree.IExpressionNode case_expression
         {
             get
             {
@@ -1412,7 +1414,7 @@ namespace PascalABCCompiler.TreeRealization
     }
 
     [Serializable]
-    public class case_variant_node : statement_node, SemanticTree.ICaseVariantNode
+    public class case_variant_node : statement_node, ICaseVariantNode
     {
         private case_range_node_list _case_ranges = new case_range_node_list();
         //private constant_node_list _case_constants = new constant_node_list();
@@ -1466,12 +1468,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        public SemanticTree.IIntConstantNode[] elements
+        public PascalABCCompiler.SemanticTree.IIntConstantNode[] elements
         {
             get
             {
@@ -1479,7 +1481,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.ICaseRangeNode[] ranges
+        public PascalABCCompiler.SemanticTree.ICaseRangeNode[] ranges
         {
             get
             {
@@ -1487,7 +1489,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IStatementNode statement_to_execute
+        public PascalABCCompiler.SemanticTree.IStatementNode statement_to_execute
         {
             get
             {
@@ -1497,7 +1499,7 @@ namespace PascalABCCompiler.TreeRealization
     }
 
     [Serializable]
-    public class case_range_node : statement_node, SemanticTree.ICaseRangeNode
+    public class case_range_node : statement_node, ICaseRangeNode
     {
         private int_const_node _lower_bound;
         private int_const_node _high_bound;
@@ -1539,12 +1541,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        SemanticTree.IIntConstantNode SemanticTree.ICaseRangeNode.lower_bound
+        PascalABCCompiler.SemanticTree.IIntConstantNode PascalABCCompiler.SemanticTree.ICaseRangeNode.lower_bound
         {
             get
             {
@@ -1552,7 +1554,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.IIntConstantNode SemanticTree.ICaseRangeNode.high_bound
+        PascalABCCompiler.SemanticTree.IIntConstantNode PascalABCCompiler.SemanticTree.ICaseRangeNode.high_bound
         {
             get
             {
@@ -1562,7 +1564,7 @@ namespace PascalABCCompiler.TreeRealization
     }
 
     [Serializable]
-    public class exception_filter : statement_node, SemanticTree.IExceptionFilterBlockNode
+    public class exception_filter : statement_node, IExceptionFilterBlockNode
     {
         private type_node _filter_type;
         private local_block_variable_reference _exception_var;
@@ -1612,7 +1614,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.ITypeNode ExceptionType
+        public PascalABCCompiler.SemanticTree.ITypeNode ExceptionType
         {
             get
             {
@@ -1620,7 +1622,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.ILocalBlockVariableReferenceNode ExceptionInstance
+        public PascalABCCompiler.SemanticTree.ILocalBlockVariableReferenceNode ExceptionInstance
         {
             get
             {
@@ -1628,7 +1630,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IStatementNode ExceptionHandler
+        public PascalABCCompiler.SemanticTree.IStatementNode ExceptionHandler
         {
             get
             {
@@ -1651,14 +1653,14 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
     }
 
     [Serializable]
-    public class try_block : statement_node, SemanticTree.ITryBlockNode
+    public class try_block : statement_node, ITryBlockNode
     {
         private statement_node _try_statements;
         private statement_node _finally_statements;
@@ -1712,12 +1714,12 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        public SemanticTree.IStatementNode TryStatements
+        public PascalABCCompiler.SemanticTree.IStatementNode TryStatements
         {
             get
             {
@@ -1725,7 +1727,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IStatementNode FinallyStatements
+        public PascalABCCompiler.SemanticTree.IStatementNode FinallyStatements
         {
             get
             {
@@ -1733,7 +1735,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IExceptionFilterBlockNode[] ExceptionFilters
+        public PascalABCCompiler.SemanticTree.IExceptionFilterBlockNode[] ExceptionFilters
         {
             get
             {
@@ -1744,7 +1746,7 @@ namespace PascalABCCompiler.TreeRealization
     }
 
     [Serializable]
-    public class foreach_node : statement_node, SemanticTree.IForeachNode
+    public class foreach_node : statement_node, IForeachNode
     {
         private var_definition_node _ident;
         private expression_node _in_what;
@@ -1793,7 +1795,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IStatementNode Body
+        public PascalABCCompiler.SemanticTree.IStatementNode Body
         {
             get
             {
@@ -1801,7 +1803,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IExpressionNode InWhatExpr
+        public PascalABCCompiler.SemanticTree.IExpressionNode InWhatExpr
         {
             get
             {
@@ -1809,7 +1811,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IVAriableDefinitionNode VarIdent
+        public PascalABCCompiler.SemanticTree.IVAriableDefinitionNode VarIdent
         {
             get
             {
@@ -1831,7 +1833,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -1839,7 +1841,7 @@ namespace PascalABCCompiler.TreeRealization
 
 
     [Serializable]
-    public class lock_statement : statement_node, SemanticTree.ILockStatement
+    public class lock_statement : statement_node, ILockStatement
     {
         private expression_node _lock_object;
         private statement_node _body;
@@ -1875,7 +1877,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IStatementNode Body
+        public PascalABCCompiler.SemanticTree.IStatementNode Body
         {
             get
             {
@@ -1883,7 +1885,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public SemanticTree.IExpressionNode LockObject
+        public PascalABCCompiler.SemanticTree.IExpressionNode LockObject
         {
             get
             {
@@ -1907,7 +1909,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

@@ -1,9 +1,11 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
+using PascalABCCompiler.SemanticTree;
 
-namespace PascalABCCompiler.TreeRealization
+namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
     public enum function_compare { non_comparable, less, greater };
 
@@ -61,7 +63,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Базовый класс для описания функций.
     /// </summary>
 	[Serializable]
-	public abstract class function_node : definition_node, SemanticTree.IFunctionNode
+	public abstract class function_node : definition_node, IFunctionNode
 	{
         private parameter_list _parameters = new parameter_list();
 
@@ -104,7 +106,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public virtual SemanticTree.polymorphic_state polymorphic_state
+        public virtual PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
         {
             get
             {
@@ -114,11 +116,11 @@ namespace PascalABCCompiler.TreeRealization
             {
             }
         }
-        public virtual SemanticTree.field_access_level field_access_level
+        public virtual PascalABCCompiler.SemanticTree.field_access_level field_access_level
         {
             get
             {
-                return SemanticTree.field_access_level.fal_public;
+                return PascalABCCompiler.SemanticTree.field_access_level.fal_public;
             }
             set
             {
@@ -197,7 +199,7 @@ namespace PascalABCCompiler.TreeRealization
             function_intersection_node func_int_left = left.get_intersecion(right);
             if (func_int_left != null)
             {
-                throw new TreeConverter.CompilerInternalError("Duplicate function intersection");
+                throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("Duplicate function intersection");
             }
 #endif
             left.add_intersection(right, intersec);
@@ -247,9 +249,9 @@ namespace PascalABCCompiler.TreeRealization
                 {
                     return function_compare.greater;
                 }
-                throw new TreeConverter.CompilerInternalError("Contradiction in function relations");
+                throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("Contradiction in function relations");
             }
-            throw new TreeConverter.CompilerInternalError("Error in function relations");
+            throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("Error in function relations");
         }
 
         /// <summary>
@@ -295,7 +297,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Вид узла - базовый (basic), обычный (common) или экспортируемый (compiled).
         /// </summary>
-		public abstract SemanticTree.node_kind node_kind
+		public abstract PascalABCCompiler.SemanticTree.node_kind node_kind
 		{
 			get;
 		}
@@ -345,7 +347,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Расположение узла - в пространстве имен, классе или функции.
         /// </summary>
-		public abstract SemanticTree.node_location_kind node_location_kind
+		public abstract PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get;
 		}
@@ -357,7 +359,7 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return general_node_type.function_node;
+				return this.general_node_type.function_node;
 			}
 		}
 
@@ -365,7 +367,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -373,7 +375,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Тип возвращаеого значения.
         /// </summary>
-		SemanticTree.ITypeNode SemanticTree.IFunctionNode.return_value_type
+		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IFunctionNode.return_value_type
 		{
 			get
 			{
@@ -384,7 +386,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Список формальных параметров функции.
         /// </summary>
-		SemanticTree.IParameterNode[] SemanticTree.IFunctionNode.parameters
+		PascalABCCompiler.SemanticTree.IParameterNode[] PascalABCCompiler.SemanticTree.IFunctionNode.parameters
 		{
 			get
 			{
@@ -405,11 +407,11 @@ namespace PascalABCCompiler.TreeRealization
             this._good = good;
         }
 
-        public override SemanticTree.node_kind node_kind
+        public override PascalABCCompiler.SemanticTree.node_kind node_kind
         {
             get
             {
-                return SemanticTree.node_kind.basic;
+                return PascalABCCompiler.SemanticTree.node_kind.basic;
             }
         }
 
@@ -421,11 +423,11 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override SemanticTree.node_location_kind node_location_kind
+        public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
         {
             get
             {
-                return SemanticTree.node_location_kind.in_namespace_location;
+                return PascalABCCompiler.SemanticTree.node_location_kind.in_namespace_location;
             }
         }
 
@@ -433,7 +435,7 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return semantic_node_type.convert_types_function_node;
+                return this.semantic_node_type.convert_types_function_node;
             }
         }
 
@@ -452,11 +454,11 @@ namespace PascalABCCompiler.TreeRealization
     /// Класс, базовый, нигде не определенный метод, например операцию сложения двух целых чисел.
     /// </summary>
 	[Serializable]
-	public class basic_function_node : function_node, SemanticTree.IBasicFunctionNode
+	public class basic_function_node : function_node, IBasicFunctionNode
 	{
         private string _name = null;
 
-		private SemanticTree.basic_function_type _basic_function_type;
+		private PascalABCCompiler.SemanticTree.basic_function_type _basic_function_type;
 
 		private bool _overload;
 
@@ -468,7 +470,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="bft">Тип базовой функции.</param>
         /// <param name="ret_type">Тип возвращаемого значения.</param>
         /// <param name="is_overload">Перегружена-ли функция.</param>
-		public basic_function_node(SemanticTree.basic_function_type bft,type_node ret_type,
+		public basic_function_node(PascalABCCompiler.SemanticTree.basic_function_type bft,type_node ret_type,
             bool is_overload) :
 			base(ret_type)
 		{
@@ -483,7 +485,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="ret_type">Тип возвращаемого значения.</param>
         /// <param name="is_overload">Перегружена-ли функция.</param>
         /// <param name="name">Имя</param>
-        public basic_function_node(SemanticTree.basic_function_type bft, type_node ret_type,
+        public basic_function_node(PascalABCCompiler.SemanticTree.basic_function_type bft, type_node ret_type,
             bool is_overload, string name)
             :
             base(ret_type)
@@ -496,7 +498,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Какая именно это базовая функция.
         /// </summary>
-		public SemanticTree.basic_function_type basic_function_type
+		public PascalABCCompiler.SemanticTree.basic_function_type basic_function_type
 		{
 			get
 			{
@@ -547,22 +549,22 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Расположение узла - в пространстве имен, классе или функции.
         /// </summary>
-		public override SemanticTree.node_location_kind node_location_kind
+		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get
 			{
-				return SemanticTree.node_location_kind.in_namespace_location;
+				return PascalABCCompiler.SemanticTree.node_location_kind.in_namespace_location;
 			}
 		}
 
         /// <summary>
         /// Вид узла - обычный, базовый или откомпилированный.
         /// </summary>
-		public override SemanticTree.node_kind node_kind
+		public override PascalABCCompiler.SemanticTree.node_kind node_kind
 		{
 			get
 			{
-				return SemanticTree.node_kind.basic;
+				return PascalABCCompiler.SemanticTree.node_kind.basic;
 			}
 		}
 
@@ -573,7 +575,7 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.basic_function_node;
+				return this.semantic_node_type.basic_function_node;
 			}
 		}
 
@@ -581,7 +583,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -591,7 +593,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Обычная, определенная пользователем функция.
     /// </summary>
 	[Serializable]
-	public abstract class common_function_node : function_node, SemanticTree.ICommonFunctionNode
+	public abstract class common_function_node : function_node, ICommonFunctionNode
 	{
         public override string ToString() => "(" + GetType().Name + " " + name + "," + scope + ")";
 
@@ -603,9 +605,9 @@ namespace PascalABCCompiler.TreeRealization
 
         protected readonly function_constant_definition_list _const_defs = new function_constant_definition_list();
 
-        protected SemanticTree.SpecialFunctionKind specialFunctionKind = SemanticTree.SpecialFunctionKind.None;
+        protected PascalABCCompiler.SemanticTree.SpecialFunctionKind specialFunctionKind = PascalABCCompiler.SemanticTree.SpecialFunctionKind.None;
 
-        public SemanticTree.SpecialFunctionKind SpecialFunctionKind
+        public PascalABCCompiler.SemanticTree.SpecialFunctionKind SpecialFunctionKind
         {
             get { return specialFunctionKind; }
             set { specialFunctionKind = value; }
@@ -625,7 +627,7 @@ namespace PascalABCCompiler.TreeRealization
         //TODO: Вынести в ассоциированную с функцией информацию.
 		private statement_node_stack _cycles_stack = new statement_node_stack();
 
-		private SymbolTable.Scope _scope;
+		private PascalSharp.Internal.TreeConverter.SymbolTable.Scope _scope;
 
 		private location _loc;
 
@@ -633,9 +635,9 @@ namespace PascalABCCompiler.TreeRealization
 		private int _num_of_default_variables;
 		private int _num_of_for_cycles;
 
-        protected List<SemanticTree.ICommonTypeNode> _generic_params = null;
+        protected List<PascalABCCompiler.SemanticTree.ICommonTypeNode> _generic_params = null;
 
-        public List<SemanticTree.ICommonTypeNode> generic_params
+        public List<PascalABCCompiler.SemanticTree.ICommonTypeNode> generic_params
         {
             get { return _generic_params; }
             set { _generic_params = value; }
@@ -687,7 +689,7 @@ namespace PascalABCCompiler.TreeRealization
                 }
                 if (!this.is_generic_function)
                 {
-                    throw new TreeConverter.CompilerInternalError("Function is not generic.");
+                    throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("Function is not generic.");
                 }
                 _parameters_eliminations = generic_parameter_eliminations.make_eliminations_common(generic_params);
                 return _parameters_eliminations;
@@ -700,7 +702,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="name">Имя функции.</param>
         /// <param name="loc">Расположение функции.</param>
         /// <param name="scope">Пространство имен этой функции.</param>
-        public common_function_node(string name, location loc,SymbolTable.Scope scope)
+        public common_function_node(string name, location loc,PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope)
         {
             _name = name;
             _loc = loc;
@@ -714,7 +716,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="ret_type">Тип возвращаемого значения функции.</param>
         /// <param name="loc">Расположение функции.</param>
         /// <param name="scope">Пространство имен этой функции.</param>
-		public common_function_node(string name,type_node ret_type,location loc, SymbolTable.Scope scope) :
+		public common_function_node(string name,type_node ret_type,location loc, PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope) :
 			base(ret_type)
 		{
 			_name=name;
@@ -786,7 +788,7 @@ namespace PascalABCCompiler.TreeRealization
         /// </summary>
         /// <param name="name">Имя символа.</param>
         /// <returns>Информация о найленном символе. null, если ни чего не найдено.</returns>
-        public PascalABCCompiler.TreeConverter.SymbolInfoList find(string name, SymbolTable.Scope CurrentScope)
+        public PascalSharp.Internal.TreeConverter.SymbolInfoList find(string name, PascalSharp.Internal.TreeConverter.SymbolTable.Scope CurrentScope)
         {
             return _scope.Find(name, CurrentScope);
         }
@@ -796,7 +798,7 @@ namespace PascalABCCompiler.TreeRealization
         /// </summary>
         /// <param name="name">Имя символа.</param>
         /// <returns>Информация о найленном символе. null, если ни чего не найдено.</returns>
-        //public PascalABCCompiler.TreeConverter.SymbolInfo find_only_in_namespace(string name)
+        //public PascalSharp.Internal.TreeConverter.SymbolInfo find_only_in_namespace(string name)
         //{
          //   return _scope.FindOnlyInScopeAndBlocks(name);
         //}
@@ -804,7 +806,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Пространство имен функции.
         /// </summary>
-		public SymbolTable.Scope scope
+		public PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope
 		{
 			get
 			{
@@ -851,7 +853,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Расположение имени функции в программе.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-		public SemanticTree.ILocation Location
+		public PascalABCCompiler.SemanticTree.ILocation Location
 		{
 			get
 			{
@@ -971,11 +973,11 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Вид узла - обычный, базовый или откомпилированный.
         /// </summary>
-		public override SemanticTree.node_kind node_kind
+		public override PascalABCCompiler.SemanticTree.node_kind node_kind
 		{
 			get
 			{
-				return SemanticTree.node_kind.common;
+				return PascalABCCompiler.SemanticTree.node_kind.common;
 			}
 		}
 
@@ -983,7 +985,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -992,7 +994,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Код функции.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-		SemanticTree.IStatementNode SemanticTree.ICommonFunctionNode.function_code
+		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.ICommonFunctionNode.function_code
 		{
 			get
 			{
@@ -1005,7 +1007,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Используется при обходе дерева посетителем.
         /// Хотя не должно использоваться. Скорее всего будет удалено.
         /// </summary>
-		SemanticTree.ILocalVariableNode SemanticTree.ICommonFunctionNode.return_variable
+		PascalABCCompiler.SemanticTree.ILocalVariableNode PascalABCCompiler.SemanticTree.ICommonFunctionNode.return_variable
 		{
 			get
 			{
@@ -1017,7 +1019,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Массив функций определенных в этой функции.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-		public SemanticTree.ICommonNestedInFunctionFunctionNode[] functions_nodes
+		public PascalABCCompiler.SemanticTree.ICommonNestedInFunctionFunctionNode[] functions_nodes
 		{
 			get
 			{
@@ -1029,7 +1031,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Массив переменных, определенных в функции.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-		public SemanticTree.ILocalVariableNode[] var_definition_nodes
+		public PascalABCCompiler.SemanticTree.ILocalVariableNode[] var_definition_nodes
 		{
 			get
 			{
@@ -1041,7 +1043,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Массив констант, определенных в функции.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        SemanticTree.ICommonFunctionConstantDefinitionNode[] SemanticTree.ICommonFunctionNode.constants
+        PascalABCCompiler.SemanticTree.ICommonFunctionConstantDefinitionNode[] PascalABCCompiler.SemanticTree.ICommonFunctionNode.constants
         {
             get
             {
@@ -1055,7 +1057,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Функция, определенная в пространстве имен.
     /// </summary>
 	[Serializable]
-	public class common_namespace_function_node : common_function_node, SemanticTree.ICommonNamespaceFunctionNode
+	public class common_namespace_function_node : common_function_node, ICommonNamespaceFunctionNode
 	{
 		private common_namespace_node _namespace;
 
@@ -1066,7 +1068,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="loc">Расположение функции.</param>
         /// <param name="nsp">Пространство имен, в котором определена функция.</param>
         /// <param name="scope">Пространство имен функции.</param>
-        public common_namespace_function_node(string name, location loc, common_namespace_node nsp,SymbolTable.Scope scope) :
+        public common_namespace_function_node(string name, location loc, common_namespace_node nsp,PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope) :
             base(name, loc,scope)
         {
             _namespace = nsp;
@@ -1080,7 +1082,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="loc">Расположение функции.</param>
         /// <param name="nsp">Пространство имен, в котором определена функция.</param>
         /// <param name="scope">Пространство имен функции.</param>
-        public common_namespace_function_node(string name, type_node ret_type, location loc, common_namespace_node nsp, SymbolTable.Scope scope) :
+        public common_namespace_function_node(string name, type_node ret_type, location loc, common_namespace_node nsp, PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope) :
 			base(name,ret_type,loc,scope)
 		{
 			_namespace=nsp;
@@ -1112,7 +1114,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.ITypeNode SemanticTree.ICommonNamespaceFunctionNode.ConnectedToType
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode.ConnectedToType
         {
             get
             {
@@ -1138,11 +1140,11 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Расположение функции - функция определена непосредственно в namespace.
         /// </summary>
-		public override SemanticTree.node_location_kind node_location_kind
+		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get
 			{
-				return SemanticTree.node_location_kind.in_namespace_location;
+				return PascalABCCompiler.SemanticTree.node_location_kind.in_namespace_location;
 			}
 		}
 
@@ -1153,7 +1155,7 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.common_namespace_function_node;
+				return this.semantic_node_type.common_namespace_function_node;
 			}
 		}
 
@@ -1161,7 +1163,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -1170,7 +1172,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Пространство имен в котором определена функция.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-		SemanticTree.ICommonNamespaceNode SemanticTree.ICommonNamespaceFunctionNode.namespace_node
+		PascalABCCompiler.SemanticTree.ICommonNamespaceNode PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode.namespace_node
 		{
 			get
 			{
@@ -1182,7 +1184,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Пространство имен в котором определена функция.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-		public SemanticTree.ICommonNamespaceNode comprehensive_namespace
+		public PascalABCCompiler.SemanticTree.ICommonNamespaceNode comprehensive_namespace
 		{
 			get
 			{
@@ -1196,12 +1198,12 @@ namespace PascalABCCompiler.TreeRealization
             {
                 if (stop_on_error)
                 {
-                    throw new TreeConverter.SimpleSemanticError(loc, "FUNCTION_{0}_DEPEND_FROM_{1}_TYPE_PARAMS", name, this.generic_parameters_count);
+                    throw new PascalSharp.Internal.TreeConverter.SimpleSemanticError(loc, "FUNCTION_{0}_DEPEND_FROM_{1}_TYPE_PARAMS", name, this.generic_parameters_count);
                 }
                 return null;
             }
             int num;
-            TreeConverter.CompilationErrorWithLocation err = generic_parameter_eliminations.check_type_list(param_types, parameters_eliminations, true, out num);
+            PascalSharp.Internal.TreeConverter.CompilationErrorWithLocation err = generic_parameter_eliminations.check_type_list(param_types, parameters_eliminations, true, out num);
             if (err != null)
             {
                 if (stop_on_error)
@@ -1219,7 +1221,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Функция, определенная в другой функции.
     /// </summary>
 	[Serializable]
-	public class common_in_function_function_node : common_function_node, SemanticTree.ICommonNestedInFunctionFunctionNode
+	public class common_in_function_function_node : common_function_node, ICommonNestedInFunctionFunctionNode
 	{
 		private readonly common_function_node _up_function;
 
@@ -1230,7 +1232,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="loc">Расположение имени функции в программе.</param>
         /// <param name="up_function">Функция, в которой определена эта функция.</param>
         /// <param name="scope">Протсранство имен этой функции.</param>
-        public common_in_function_function_node(string name, location loc, common_function_node up_function, SymbolTable.Scope scope) :
+        public common_in_function_function_node(string name, location loc, common_function_node up_function, PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope) :
             base(name, loc,scope)
         {
             _up_function = up_function;
@@ -1244,7 +1246,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="loc">Расположение имени функции в программе.</param>
         /// <param name="up_function">Функция, в которой определена эта функция.</param>
         /// <param name="scope">Протсранство имен этой функции.</param>
-        public common_in_function_function_node(string name, type_node ret_type, location loc, common_function_node up_function, SymbolTable.Scope scope) :
+        public common_in_function_function_node(string name, type_node ret_type, location loc, common_function_node up_function, PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope) :
 			base(name,ret_type,loc,scope)
 		{
 			_up_function=up_function;
@@ -1264,11 +1266,11 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Расположение функции - функция определена в дргой функции.
         /// </summary>
-		public override SemanticTree.node_location_kind node_location_kind
+		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get
 			{
-				return SemanticTree.node_location_kind.in_function_location;
+				return PascalABCCompiler.SemanticTree.node_location_kind.in_function_location;
 			}
 		}
 
@@ -1279,7 +1281,7 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.common_in_function_function_node;
+				return this.semantic_node_type.common_in_function_function_node;
 			}
 		}
 
@@ -1287,7 +1289,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -1296,7 +1298,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Функция в которой определена эта функция.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-		SemanticTree.ICommonFunctionNode SemanticTree.IFunctionMemberNode.function
+		PascalABCCompiler.SemanticTree.ICommonFunctionNode PascalABCCompiler.SemanticTree.IFunctionMemberNode.function
 		{
 			get
 			{
@@ -1309,11 +1311,11 @@ namespace PascalABCCompiler.TreeRealization
     /// Метод класса.
     /// </summary>
 	[Serializable]
-	public class common_method_node : common_function_node, SemanticTree.ICommonMethodNode
+	public class common_method_node : common_function_node, ICommonMethodNode
 	{
 		private common_type_node _cont_type;
-		private SemanticTree.field_access_level _field_access_level;
-		private SemanticTree.polymorphic_state _polymorphic_state;
+		private PascalABCCompiler.SemanticTree.field_access_level _field_access_level;
+		private PascalABCCompiler.SemanticTree.polymorphic_state _polymorphic_state;
 
         private type_node _explicit_interface;
 		private bool _is_constructor;
@@ -1401,7 +1403,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="field_access_level">Уровень доступа к методу.</param>
         /// <param name="scope">Пространство имен функции.</param>
         public common_method_node(string name, location loc, common_type_node cont_type,
-            SemanticTree.polymorphic_state polymorphic_state, SemanticTree.field_access_level field_access_level, SymbolTable.Scope scope) :
+            PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state, PascalABCCompiler.SemanticTree.field_access_level field_access_level, PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope) :
             base(name, loc,scope)
         {
             _cont_type = cont_type;
@@ -1420,7 +1422,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <param name="field_access_level">Уровень доступа к методу.</param>
         /// <param name="scope">Пространство имен функции.</param>
 		public common_method_node(string name,type_node ret_type, location loc, common_type_node cont_type,
-            SemanticTree.polymorphic_state polymorphic_state, SemanticTree.field_access_level field_access_level, SymbolTable.Scope scope) :
+            PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state, PascalABCCompiler.SemanticTree.field_access_level field_access_level, PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope) :
 			base(name,ret_type,loc,scope)
 		{
 			_cont_type=cont_type;
@@ -1428,7 +1430,7 @@ namespace PascalABCCompiler.TreeRealization
             _polymorphic_state = polymorphic_state;
 		}
 		
-		public common_method_node(string name,location loc,SymbolTable.Scope scope) :
+		public common_method_node(string name,location loc,PascalSharp.Internal.TreeConverter.SymbolTable.Scope scope) :
             base(name,loc,scope)
         {
         }
@@ -1514,7 +1516,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Обычный, виртуальный или статический метод.
         /// </summary>
-		public override SemanticTree.polymorphic_state polymorphic_state
+		public override PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
 		{
 			get
 			{
@@ -1529,7 +1531,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Уровень доступа к методу.
         /// </summary>
-		public override SemanticTree.field_access_level field_access_level
+		public override PascalABCCompiler.SemanticTree.field_access_level field_access_level
 		{
 			get
 			{
@@ -1542,7 +1544,7 @@ namespace PascalABCCompiler.TreeRealization
             }
             //\ssyy
 		}
-        public void set_access_level(SemanticTree.field_access_level fal)
+        public void set_access_level(PascalABCCompiler.SemanticTree.field_access_level fal)
         {
             _field_access_level = fal;
         }
@@ -1565,11 +1567,11 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Расположение функции - функция определена в классе.
         /// </summary>
-		public override SemanticTree.node_location_kind node_location_kind
+		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get
 			{
-				return SemanticTree.node_location_kind.in_class_location;
+				return PascalABCCompiler.SemanticTree.node_location_kind.in_class_location;
 			}
 		}
 
@@ -1580,7 +1582,7 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.common_method_node;
+				return this.semantic_node_type.common_method_node;
 			}
 		}
 
@@ -1588,7 +1590,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -1596,7 +1598,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Тип, который содержит этот метод.
         /// </summary>
-		public SemanticTree.ICommonTypeNode common_comprehensive_type
+		public PascalABCCompiler.SemanticTree.ICommonTypeNode common_comprehensive_type
 		{
 			get
 			{
@@ -1607,7 +1609,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Тип, который содержит этот метод.
         /// </summary>
-		public virtual SemanticTree.ITypeNode comperehensive_type
+		public virtual PascalABCCompiler.SemanticTree.ITypeNode comperehensive_type
 		{
 			get
 			{
@@ -1615,7 +1617,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-        SemanticTree.IFunctionNode SemanticTree.ICommonMethodNode.overrided_method
+        PascalABCCompiler.SemanticTree.IFunctionNode PascalABCCompiler.SemanticTree.ICommonMethodNode.overrided_method
         {
             get
             {
@@ -1629,12 +1631,12 @@ namespace PascalABCCompiler.TreeRealization
             {
                 if (stop_on_error)
                 {
-                    throw new TreeConverter.SimpleSemanticError(loc, "FUNCTION_{0}_DEPEND_FROM_{1}_TYPE_PARAMS", name, this.generic_parameters_count);
+                    throw new PascalSharp.Internal.TreeConverter.SimpleSemanticError(loc, "FUNCTION_{0}_DEPEND_FROM_{1}_TYPE_PARAMS", name, this.generic_parameters_count);
                 }
                 return null;
             }
             int num;
-            TreeConverter.CompilationErrorWithLocation err = generic_parameter_eliminations.check_type_list(param_types, parameters_eliminations, true, out num);
+            PascalSharp.Internal.TreeConverter.CompilationErrorWithLocation err = generic_parameter_eliminations.check_type_list(param_types, parameters_eliminations, true, out num);
             if (err != null)
             {
                 if (stop_on_error)
@@ -1652,7 +1654,7 @@ namespace PascalABCCompiler.TreeRealization
     /// Обертка для откомпилированного метода.
     /// </summary>
 	[Serializable]
-	public class compiled_function_node : function_node, SemanticTree.ICompiledMethodNode
+	public class compiled_function_node : function_node, ICompiledMethodNode
 	{
         public override string ToString() => _mi.ToString().Replace("System.Collections.Generic.", "").Replace("System.", "").Replace("`1", "").Replace("`2", "");
 
@@ -1677,7 +1679,7 @@ namespace PascalABCCompiler.TreeRealization
 			if (_mi.ReturnType!=null)
 			{
 				ret_val=compiled_type_node.get_type_node(mi.ReturnType);
-                if (ret_val == SystemLibrary.SystemLibrary.void_type)
+                if (ret_val == PascalABCCompiler.SystemLibrary.SystemLibrary.void_type)
                 {
                     ret_val = null;
                 }
@@ -1692,7 +1694,7 @@ namespace PascalABCCompiler.TreeRealization
                     Type t = null;
                     
                     type_node par_type = null;
-                    SemanticTree.parameter_type pt = SemanticTree.parameter_type.value;
+                    PascalABCCompiler.SemanticTree.parameter_type pt = PascalABCCompiler.SemanticTree.parameter_type.value;
 //                    if (pi.ParameterType.Name.EndsWith("&") == true)
                     //(ssyy) Лучше так:
                     if (pi.ParameterType.IsByRef)
@@ -1701,7 +1703,7 @@ namespace PascalABCCompiler.TreeRealization
                         //(ssyy) Лучше так:
                         t = pi.ParameterType.GetElementType();
                         par_type = compiled_type_node.get_type_node(t);
-                        pt = SemanticTree.parameter_type.var;
+                        pt = PascalABCCompiler.SemanticTree.parameter_type.var;
                     }
                     else
                     {
@@ -1769,7 +1771,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        bool SemanticTree.ICompiledMethodNode.is_extension
+        bool PascalABCCompiler.SemanticTree.ICompiledMethodNode.is_extension
         {
             get
             {
@@ -1831,11 +1833,11 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Функция - метод кдасса.
         /// </summary>
-		public override SemanticTree.node_location_kind node_location_kind
+		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get
 			{
-				return SemanticTree.node_location_kind.in_class_location;
+				return PascalABCCompiler.SemanticTree.node_location_kind.in_class_location;
 			}
 		}
 
@@ -1846,7 +1848,7 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.compiled_function_node;
+				return this.semantic_node_type.compiled_function_node;
 			}
 		}
 
@@ -1854,7 +1856,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -1862,23 +1864,23 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Обычный, виртуальный или статический метод.
         /// </summary>
-		public override SemanticTree.polymorphic_state polymorphic_state
+		public override PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
 		{
 			get
 			{
 				if (_mi.IsAbstract)
 				{
-					return SemanticTree.polymorphic_state.ps_virtual_abstract;
+					return PascalABCCompiler.SemanticTree.polymorphic_state.ps_virtual_abstract;
 				}
 				if (_mi.IsStatic)
 				{
-					return SemanticTree.polymorphic_state.ps_static;
+					return PascalABCCompiler.SemanticTree.polymorphic_state.ps_static;
 				}
 				if (_mi.IsVirtual)
 				{
-					return SemanticTree.polymorphic_state.ps_virtual;
+					return PascalABCCompiler.SemanticTree.polymorphic_state.ps_virtual;
 				}
-				return SemanticTree.polymorphic_state.ps_common;
+				return PascalABCCompiler.SemanticTree.polymorphic_state.ps_common;
 			}
 		}
 		
@@ -1913,7 +1915,7 @@ namespace PascalABCCompiler.TreeRealization
                 }
                 if (!_mi.IsGenericMethodDefinition)
                 {
-                    throw new TreeConverter.CompilerInternalError("Method is not generic.");
+                    throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("Method is not generic.");
                 }
                 _parameters_eliminations = generic_parameter_eliminations.make_eliminations_compiled(_mi.GetGenericArguments());
                 return _parameters_eliminations;
@@ -1938,7 +1940,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Уровень доступа к методу.
         /// </summary>
-		public override SemanticTree.field_access_level field_access_level
+		public override PascalABCCompiler.SemanticTree.field_access_level field_access_level
 		{
 			get
 			{
@@ -1949,11 +1951,11 @@ namespace PascalABCCompiler.TreeRealization
 	    /// <summary>
 	    /// Вид узла - откомпилированный метод.
 	    /// </summary>
-		public override SemanticTree.node_kind node_kind
+		public override PascalABCCompiler.SemanticTree.node_kind node_kind
 		{
 			get
 			{
-				return SemanticTree.node_kind.compiled;
+				return PascalABCCompiler.SemanticTree.node_kind.compiled;
 			}
 		}
 
@@ -1961,7 +1963,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Класс, содержащий этот метод.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-		public SemanticTree.ICompiledTypeNode comprehensive_type
+		public PascalABCCompiler.SemanticTree.ICompiledTypeNode comprehensive_type
 		{
 			get
 			{
@@ -1973,7 +1975,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Класс, содержащий этот метод.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-		public SemanticTree.ITypeNode comperehensive_type
+		public PascalABCCompiler.SemanticTree.ITypeNode comperehensive_type
 		{
 			get
 			{
@@ -1985,7 +1987,7 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return (this != SystemLibrary.SystemLibrary.resize_func) && _mi.IsGenericMethodDefinition;
+                return (this != PascalABCCompiler.SystemLibrary.SystemLibrary.resize_func) && _mi.IsGenericMethodDefinition;
             }
         }
 
@@ -2024,12 +2026,12 @@ namespace PascalABCCompiler.TreeRealization
             {
                 if (stop_on_error)
                 {
-                    throw new TreeConverter.SimpleSemanticError(loc, "FUNCTION_{0}_DEPEND_FROM_{1}_TYPE_PARAMS", name, _generic_params_count);
+                    throw new PascalSharp.Internal.TreeConverter.SimpleSemanticError(loc, "FUNCTION_{0}_DEPEND_FROM_{1}_TYPE_PARAMS", name, _generic_params_count);
                 }
                 return null;
             }
             int num;
-            TreeConverter.CompilationErrorWithLocation err = generic_parameter_eliminations.check_type_list(param_types, parameters_eliminations, true, out num);
+            PascalSharp.Internal.TreeConverter.CompilationErrorWithLocation err = generic_parameter_eliminations.check_type_list(param_types, parameters_eliminations, true, out num);
             if (err != null)
             {
                 if (stop_on_error)
@@ -2066,7 +2068,7 @@ namespace PascalABCCompiler.TreeRealization
 	}
 
 	[Serializable]
-	public class return_node : statement_node, SemanticTree.IReturnNode
+	public class return_node : statement_node, IReturnNode
 	{
 		private expression_node _return_expr;
 
@@ -2087,11 +2089,11 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.return_node;
+				return this.semantic_node_type.return_node;
 			}
 		}
 
-		public SemanticTree.IExpressionNode return_value
+		public PascalABCCompiler.SemanticTree.IExpressionNode return_value
 		{
 			get
 			{
@@ -2099,7 +2101,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -2131,7 +2133,7 @@ namespace PascalABCCompiler.TreeRealization
 
     //TODO: Связать с compiled_function_node.
 	[Serializable]
-	public class compiled_constructor_node : function_node, SemanticTree.ICompiledConstructorNode
+	public class compiled_constructor_node : function_node, ICompiledConstructorNode
 	{
         private static System.Collections.Generic.Dictionary<System.Reflection.ConstructorInfo, compiled_constructor_node> compiled_constructors =
             new System.Collections.Generic.Dictionary<System.Reflection.ConstructorInfo, compiled_constructor_node>();
@@ -2163,12 +2165,12 @@ namespace PascalABCCompiler.TreeRealization
 			{
 				Type t=null;
 				type_node par_type=null;
-				SemanticTree.parameter_type pt=SemanticTree.parameter_type.value;
+				PascalABCCompiler.SemanticTree.parameter_type pt=PascalABCCompiler.SemanticTree.parameter_type.value;
 				if (pi.ParameterType.IsByRef) 
 				{
 					t=pi.ParameterType.GetElementType();
 					par_type=compiled_type_node.get_type_node(t);
-					pt=SemanticTree.parameter_type.var;
+					pt=PascalABCCompiler.SemanticTree.parameter_type.var;
 				}
 				else
 				{
@@ -2211,19 +2213,19 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override SemanticTree.node_kind node_kind
+		public override PascalABCCompiler.SemanticTree.node_kind node_kind
 		{
 			get
 			{
-				return SemanticTree.node_kind.compiled;
+				return PascalABCCompiler.SemanticTree.node_kind.compiled;
 			}
 		}
 
-		public override SemanticTree.node_location_kind node_location_kind
+		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
 		{
 			get
 			{
-				return SemanticTree.node_location_kind.in_class_location;
+				return PascalABCCompiler.SemanticTree.node_location_kind.in_class_location;
 			}
 		}
 
@@ -2239,11 +2241,11 @@ namespace PascalABCCompiler.TreeRealization
 		{
 			get
 			{
-				return semantic_node_type.compiled_constructor_node;
+				return this.semantic_node_type.compiled_constructor_node;
 			}
 		}
 
-		public override void visit(SemanticTree.ISemanticVisitor visitor)
+		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -2256,7 +2258,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public SemanticTree.ICompiledTypeNode comprehensive_type
+		public PascalABCCompiler.SemanticTree.ICompiledTypeNode comprehensive_type
 		{
 			get
 			{
@@ -2264,7 +2266,7 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public SemanticTree.ITypeNode comperehensive_type
+		public PascalABCCompiler.SemanticTree.ITypeNode comperehensive_type
 		{
 			get
 			{
@@ -2272,34 +2274,34 @@ namespace PascalABCCompiler.TreeRealization
 			}
 		}
 
-		public override SemanticTree.field_access_level field_access_level
+		public override PascalABCCompiler.SemanticTree.field_access_level field_access_level
 		{
 			get
 			{
 				if (_con_info.IsPublic)
 				{
-					return SemanticTree.field_access_level.fal_public;
+					return PascalABCCompiler.SemanticTree.field_access_level.fal_public;
 				}
 				if (_con_info.IsPrivate)
 				{
-					return SemanticTree.field_access_level.fal_private;
+					return PascalABCCompiler.SemanticTree.field_access_level.fal_private;
 				}
 				//Как в System.Reflection отображается то, что метод protected?
-				return SemanticTree.field_access_level.fal_protected;
+				return PascalABCCompiler.SemanticTree.field_access_level.fal_protected;
 			}
 		}
 
-		public SemanticTree.polymorphic_state polymorphic_state
+		public PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
 		{
 			get
 			{
-				return SemanticTree.polymorphic_state.ps_common;
+				return PascalABCCompiler.SemanticTree.polymorphic_state.ps_common;
 			}
 		}
 	}
 
     [Serializable]
-    public class function_lambda_node : expression_node, SemanticTree.ILambdaFunctionNode
+    public class function_lambda_node : expression_node, ILambdaFunctionNode
     {
         private parameter_list _parameters = new parameter_list();
 
@@ -2527,7 +2529,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Вид узла - базовый (basic), обычный (common) или экспортируемый (compiled).
         /// </summary>
-        public SemanticTree.node_kind node_kind
+        public PascalABCCompiler.SemanticTree.node_kind node_kind
         {
             get { return node_kind; }
         }
@@ -2589,7 +2591,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Расположение узла - в пространстве имен, классе или функции.
         /// </summary>
-        public SemanticTree.node_location_kind node_location_kind
+        public PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
         {
             get { return node_location_kind; }
         }
@@ -2601,7 +2603,7 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return general_node_type.function_node;
+                return this.general_node_type.function_node;
             }
         }
 
@@ -2609,7 +2611,7 @@ namespace PascalABCCompiler.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -2617,7 +2619,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Тип возвращаеого значения.
         /// </summary>
-        SemanticTree.ITypeNode SemanticTree.ILambdaFunctionNode.return_value_type
+        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ILambdaFunctionNode.return_value_type
         {
             get
             {
@@ -2628,7 +2630,7 @@ namespace PascalABCCompiler.TreeRealization
         /// <summary>
         /// Список формальных параметров функции.
         /// </summary>
-        SemanticTree.IParameterNode[] SemanticTree.ILambdaFunctionNode.parameters
+        PascalABCCompiler.SemanticTree.IParameterNode[] PascalABCCompiler.SemanticTree.ILambdaFunctionNode.parameters
         {
             get
             {
@@ -2636,7 +2638,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        SemanticTree.IStatementNode SemanticTree.ILambdaFunctionNode.body
+        PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.ILambdaFunctionNode.body
         {
             get
             {
@@ -2648,11 +2650,11 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return semantic_node_type.return_node;
+                return this.semantic_node_type.return_node;
             }
         }
 
-        SemanticTree.IFunctionNode SemanticTree.ILambdaFunctionNode.function
+        PascalABCCompiler.SemanticTree.IFunctionNode PascalABCCompiler.SemanticTree.ILambdaFunctionNode.function
         {
             get
             {
@@ -2662,7 +2664,7 @@ namespace PascalABCCompiler.TreeRealization
 
     }
     [Serializable]
-    public class function_lambda_call_node : expression_node, SemanticTree.ILambdaFunctionCallNode
+    public class function_lambda_call_node : expression_node, ILambdaFunctionCallNode
     {
         private expressions_list _parameters = new expressions_list();
 
@@ -2692,7 +2694,7 @@ namespace PascalABCCompiler.TreeRealization
                 return _parameters;
             }
         }
-        public SemanticTree.node_kind node_kind
+        public PascalABCCompiler.SemanticTree.node_kind node_kind
         {
             get { return node_kind; }
         }
@@ -2703,7 +2705,7 @@ namespace PascalABCCompiler.TreeRealization
                 return _fln;
             }
         }
-        public SemanticTree.node_location_kind node_location_kind
+        public PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
         {
             get { return node_location_kind; }
         }
@@ -2715,7 +2717,7 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return general_node_type.function_node;
+                return this.general_node_type.function_node;
             }
         }
 
@@ -2728,17 +2730,17 @@ namespace PascalABCCompiler.TreeRealization
         {
             get
             {
-                return semantic_node_type.return_node;
+                return this.semantic_node_type.return_node;
             }
         }
-        SemanticTree.IExpressionNode[] SemanticTree.ILambdaFunctionCallNode.parameters
+        PascalABCCompiler.SemanticTree.IExpressionNode[] PascalABCCompiler.SemanticTree.ILambdaFunctionCallNode.parameters
         {
             get
             {
                 return (_parameters.ToArray());
             }
         }
-        SemanticTree.ILambdaFunctionNode SemanticTree.ILambdaFunctionCallNode.lambda
+        PascalABCCompiler.SemanticTree.ILambdaFunctionNode PascalABCCompiler.SemanticTree.ILambdaFunctionCallNode.lambda
         {
             get
             {
@@ -2746,7 +2748,7 @@ namespace PascalABCCompiler.TreeRealization
             }
         }
 
-        public override void visit(SemanticTree.ISemanticVisitor visitor)
+        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

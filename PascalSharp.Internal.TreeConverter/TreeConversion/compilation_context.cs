@@ -3,20 +3,20 @@
 //Класс, хранящий текущий контекст. Где находится компилятор (в какой функции, типе, пространстве имен).
 using System;
 using System.Linq;
-using PascalABCCompiler.TreeRealization;
 using System.Collections.Generic;
 using System.Collections;
 using PascalSharp.Internal.CompilerTools;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.TreeConverter;TreeConversion;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
 
 	public enum block_type {function_block,type_block,namespace_block,compiled_type_block, lambda_block}; //lroman//
 
     public class ContextState
     {
-        // Stack<global::SymbolTable.Scope> _scope_stack; не трогать - работать с ним аккуратно при переходе в другой Scope
+        // Stack<PascalSharp.Internal.TreeConverter.SymbolTable.Scope> _scope_stack; не трогать - работать с ним аккуратно при переходе в другой Scope
 
         public common_namespace_node cmn; // текущий namespace
         public common_type_node ctn;      // текущий разбираемый тип
@@ -541,7 +541,7 @@ namespace PascalABCCompiler.TreeConverter
             clear_special_local_vars();
         }
 
-        public void enter_scope(global::SymbolTable.Scope new_scope)
+        public void enter_scope(PascalSharp.Internal.TreeConverter.SymbolTable.Scope new_scope)
         {
             switch (converting_block())
             {
@@ -568,10 +568,10 @@ namespace PascalABCCompiler.TreeConverter
             }
         }
 
-        /*private List<global::SymbolTable.Scope> with_stack = new List<global::SymbolTable.Scope>();
+        /*private List<PascalSharp.Internal.TreeConverter.SymbolTable.Scope> with_stack = new List<PascalSharp.Internal.TreeConverter.SymbolTable.Scope>();
         private List<expression_node> with_expr_stack = new List<expression_node>();
 
-        public void enter_scope(global::SymbolTable.Scope new_scope, expression_node en)
+        public void enter_scope(PascalSharp.Internal.TreeConverter.SymbolTable.Scope new_scope, expression_node en)
         {
             with_stack.Add(new_scope);
             with_expr_stack.Add(en);
@@ -2243,7 +2243,7 @@ namespace PascalABCCompiler.TreeConverter
                     check_predefinition_defined();
                     if (_ctn.is_generic_type_definition && !_ctn.IsInterface && _ctn.static_constr == null)
                     {
-                        _ctn.static_constr = new common_method_node(PascalABCCompiler.TreeConverter.compiler_string_consts.static_ctor_prefix + "Create", null, _ctn, SemanticTree.polymorphic_state.ps_static, SemanticTree.field_access_level.fal_private, null);
+                        _ctn.static_constr = new common_method_node(PascalSharp.Internal.TreeConverter.compiler_string_consts.static_ctor_prefix + "Create", null, _ctn, SemanticTree.polymorphic_state.ps_static, SemanticTree.field_access_level.fal_private, null);
                         _ctn.static_constr.is_constructor = true;
                         statements_list st = new statements_list(null); 
                         st.statements.AddElement(new return_node(new null_const_node(SystemLibrary.SystemLibrary.object_type, null), null));

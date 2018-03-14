@@ -3,7 +3,7 @@
 //Отображение типов операторов узлов синтаксического дерева в имена методов.
 using System;
 
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
 
 	public class name_reflector

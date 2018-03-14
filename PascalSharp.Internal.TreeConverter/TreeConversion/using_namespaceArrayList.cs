@@ -1,8 +1,6 @@
 using System;
 
-using PascalABCCompiler.TreeRealization;
-
-namespace PascalABCCompiler.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.
 {
 
     //TODO: Переделать с использованием коллекций.

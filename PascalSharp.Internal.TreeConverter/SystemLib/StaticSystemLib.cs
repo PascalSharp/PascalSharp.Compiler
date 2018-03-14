@@ -2,10 +2,7 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Инициализация системной библиотеки
 using System;
-
-using PascalABCCompiler.TreeRealization;
-
-using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.TreeConverter;
 
 using System.Collections;
 using System.Collections.Generic;
@@ -2093,7 +2090,7 @@ namespace PascalABCCompiler.SystemLibrary
         {
             
             array_internal_interface aii = (array_internal_interface)
-                pars[0].type.get_internal_interface(PascalABCCompiler.TreeRealization.internal_interface_kind.unsized_array_interface);
+                pars[0].type.get_internal_interface(PascalSharp.Internal.TreeConverter.TreeRealization.internal_interface_kind.unsized_array_interface);
 
             if (aii == null)
             {
