@@ -155,12 +155,12 @@ namespace PascalSharp.Internal.Optimizer
                             vdn.is_ret_value && 
                             !cmn.name.StartsWith("<") && 
                             !cmn.cont_type.IsInterface && 
-                            cmn.polymorphic_state != PascalABCCompiler.SemanticTree.polymorphic_state.ps_virtual_abstract &&
+                            cmn.polymorphic_state != polymorphic_state.ps_virtual_abstract &&
                             cmn.return_value_type != null && 
                             !cmn.return_value_type.IsPointer && 
                             !cmn.is_constructor && 
-                            cmn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.record && 
-                            cmn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper
+                            cmn.return_value_type.type_special_kind != type_special_kind.record && 
+                            cmn.return_value_type.type_special_kind != type_special_kind.array_wrapper
                             && !helper.IsExternal(cmn))
                         warns.Add(new UndefinedReturnValue(cmn.name, cmn.function_code.location));
             	}
@@ -174,12 +174,12 @@ namespace PascalSharp.Internal.Optimizer
                             vdn.is_ret_value && 
                             !cmn.name.StartsWith("<") && 
                             !cmn.cont_type.IsInterface && 
-                            cmn.polymorphic_state != PascalABCCompiler.SemanticTree.polymorphic_state.ps_virtual_abstract && 
+                            cmn.polymorphic_state != polymorphic_state.ps_virtual_abstract && 
                             cmn.return_value_type != null && 
                             !cmn.return_value_type.IsPointer && 
                             !cmn.is_constructor && 
-                            cmn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.record && 
-                            cmn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper
+                            cmn.return_value_type.type_special_kind != type_special_kind.record && 
+                            cmn.return_value_type.type_special_kind != type_special_kind.array_wrapper
                             && !helper.IsExternal(cmn))
                         warns.Add(new UndefinedReturnValue(cmn.name, cmn.function_code.location));
             	}
@@ -230,11 +230,11 @@ namespace PascalSharp.Internal.Optimizer
             {
                 AddHint("DO_NOT_USE_POINTERS_TO_RECORDS", loc);
             }*/
-            if (type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.short_string && !(current_type != null && current_type.is_value))
+            if (type.type_special_kind == type_special_kind.short_string && !(current_type != null && current_type.is_value))
             {
                 AddHint("DO_NOT_USE_SHORT_STRINGS", loc);
             }
-            else if (type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_kind || type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper)
+            else if (type.type_special_kind == type_special_kind.array_kind || type.type_special_kind == type_special_kind.array_wrapper)
             {
                 CheckType(type.element_type, initial_value, loc);
             }
@@ -274,9 +274,9 @@ namespace PascalSharp.Internal.Optimizer
                             vdn.is_ret_value && 
                             !cnfn.name.StartsWith("<") && 
                             cnfn.return_value_type != null && 
-                            cnfn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.record && 
+                            cnfn.return_value_type.type_special_kind != type_special_kind.record && 
                             !cnfn.return_value_type.IsPointer && 
-                            cnfn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper && 
+                            cnfn.return_value_type.type_special_kind != type_special_kind.array_wrapper && 
                             !helper.IsExternal(cnfn))
                         warns.Add(new UndefinedReturnValue(cnfn.name, cnfn.function_code.location));
                 	if (vi.num_ass > 0 && vi.act_num_use == 0 && !vdn.is_special_name)
@@ -292,9 +292,9 @@ namespace PascalSharp.Internal.Optimizer
                              vdn.is_ret_value && 
                              !cnfn.name.StartsWith("<") && 
                              cnfn.return_value_type != null && 
-                             cnfn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.record && 
+                             cnfn.return_value_type.type_special_kind != type_special_kind.record && 
                              !cnfn.return_value_type.IsPointer && 
-                             cnfn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper && 
+                             cnfn.return_value_type.type_special_kind != type_special_kind.array_wrapper && 
                              !helper.IsExternal(cnfn))
                         warns.Add(new UndefinedReturnValue(cnfn.name, cnfn.function_code.location));
                 	if (vi.num_ass > 0 && vi.act_num_use == 0 && !vdn.is_special_name)
@@ -343,9 +343,9 @@ namespace PascalSharp.Internal.Optimizer
                     else if (vi.num_ass == 0 && 
                              vdn.is_ret_value && 
                              !cnfn.name.StartsWith("<") && 
-                             cnfn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.record && 
+                             cnfn.return_value_type.type_special_kind != type_special_kind.record && 
                              !cnfn.return_value_type.IsPointer && 
-                             cnfn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper && 
+                             cnfn.return_value_type.type_special_kind != type_special_kind.array_wrapper && 
                              !helper.IsExternal(cnfn))
                         warns.Add(new UndefinedReturnValue(cnfn.name, cnfn.function_code.location));
                 	if (vi.num_ass > 0 && vi.act_num_use == 0 && !vdn.is_special_name)
@@ -360,9 +360,9 @@ namespace PascalSharp.Internal.Optimizer
                     else if (vi.num_ass == 0 && 
                              vdn.is_ret_value && 
                              !cnfn.name.StartsWith("<") && 
-                             cnfn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.record && 
+                             cnfn.return_value_type.type_special_kind != type_special_kind.record && 
                              !cnfn.return_value_type.IsPointer && 
-                             cnfn.return_value_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper && 
+                             cnfn.return_value_type.type_special_kind != type_special_kind.array_wrapper && 
                              !helper.IsExternal(cnfn))
                         warns.Add(new UndefinedReturnValue(cnfn.name, cnfn.function_code.location));
                 	if (vi.num_ass > 0 && vi.act_num_use == 0 && !vdn.is_special_name)
@@ -710,7 +710,7 @@ namespace PascalSharp.Internal.Optimizer
 
         private void CheckVarParameter(expression_node expr, function_node func, int index)
         {
-            if (index < func.parameters.Count && func.parameters[index].parameter_type == PascalABCCompiler.SemanticTree.parameter_type.var
+            if (index < func.parameters.Count && func.parameters[index].parameter_type == parameter_type.var
                 || (func is compiled_function_node && (func as compiled_function_node).cont_type.compiled_type == typeof(Array) && index == 0))
             {
                 if (expr is local_block_variable_reference)
@@ -1205,19 +1205,19 @@ namespace PascalSharp.Internal.Optimizer
         {
             switch (en.function_node.basic_function_type)
             {
-                case PascalABCCompiler.SemanticTree.basic_function_type.iassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.bassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.boolassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.fassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.dassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.sassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.lassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.charassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.sbassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.uiassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.ulassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.usassign:
-                case PascalABCCompiler.SemanticTree.basic_function_type.objassign:
+                case basic_function_type.iassign:
+                case basic_function_type.bassign:
+                case basic_function_type.boolassign:
+                case basic_function_type.fassign:
+                case basic_function_type.dassign:
+                case basic_function_type.sassign:
+                case basic_function_type.lassign:
+                case basic_function_type.charassign:
+                case basic_function_type.sbassign:
+                case basic_function_type.uiassign:
+                case basic_function_type.ulassign:
+                case basic_function_type.usassign:
+                case basic_function_type.objassign:
                     VisitAssignment(en); return;
             }
             for (int i = 0; i < en.parameters.Count; i++)

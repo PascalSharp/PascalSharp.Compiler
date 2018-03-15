@@ -132,7 +132,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <summary>
         /// Документ, в котором расположен этот фрагмент кода.
         /// </summary>
-		public PascalABCCompiler.SemanticTree.IDocument document
+		public IDocument document
 		{
 			get
 			{

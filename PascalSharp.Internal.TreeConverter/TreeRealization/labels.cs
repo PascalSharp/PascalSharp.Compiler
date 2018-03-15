@@ -85,12 +85,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
-            visitor.visit((PascalABCCompiler.SemanticTree.ILabelNode)this);
+            visitor.visit((ILabelNode)this);
         }
 
-        public PascalABCCompiler.SemanticTree.ILocation Location
+        public ILocation Location
         {
             get
             {
@@ -163,7 +163,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ILabelNode PascalABCCompiler.SemanticTree.ILabeledStatementNode.label
+        ILabelNode ILabeledStatementNode.label
         {
             get
             {
@@ -171,7 +171,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.ILabeledStatementNode.statement
+        IStatementNode ILabeledStatementNode.statement
         {
             get
             {
@@ -197,9 +197,9 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
-            visitor.visit((PascalABCCompiler.SemanticTree.ILabeledStatementNode)this);
+            visitor.visit((ILabeledStatementNode)this);
         }
     }
 
@@ -215,7 +215,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             set { _comprehensive_code_block = value; }
         }
 
-        PascalABCCompiler.SemanticTree.ILabelNode PascalABCCompiler.SemanticTree.IGotoStatementNode.label
+        ILabelNode IGotoStatementNode.label
         {
             get
             {
@@ -242,9 +242,9 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
-            visitor.visit((PascalABCCompiler.SemanticTree.IGotoStatementNode)this);
+            visitor.visit((IGotoStatementNode)this);
         }
 
         public goto_statement(label_node v_label, location v_location)

@@ -7,6 +7,9 @@ using System.IO;
 using System.Text;
 using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.ParserTools.SyntaxTreeVisitors;
+using PascalSharp.Internal.SyntaxTree;
 
 //using ICSharpCode.SharpDevelop.Dom;
 
@@ -98,10 +101,10 @@ namespace PascalSharp.Internal.CodeCompletion
             return -1;
         }
 
-        public static string GetDescription(int pos, string content, int line, int col, string FileName, DomConverter dc, PascalABCCompiler.Parsers.Controller controller)
+        public static string GetDescription(int pos, string content, int line, int col, string FileName, DomConverter dc, Controller controller)
         {
             string expr_without_brackets = null;
-            PascalABCCompiler.Parsers.KeywordKind keyw;
+            ParserTools.KeywordKind keyw;
             var expr = CodeCompletion.CodeCompletionController.CurrentParser.LanguageInformation.FindExpressionFromAnyPosition(pos, content, line, col, out keyw, out expr_without_brackets);
             if (expr == null)
               expr = expr_without_brackets;
@@ -126,8 +129,8 @@ namespace PascalSharp.Internal.CodeCompletion
     		int off=0;
     		int line=0;
     		int col=0;
-    		PascalABCCompiler.Parsers.KeywordKind keyw;
-    		PascalABCCompiler.Parsers.IParser parser = CodeCompletionController.ParsersController.selectParser(".vb");
+    		ParserTools.KeywordKind keyw;
+    		IParser parser = CodeCompletionController.ParsersController.selectParser(".vb");
     		
     		string test_str = "System.Console";
     		off = test_str.Length;
@@ -161,9 +164,9 @@ namespace PascalSharp.Internal.CodeCompletion
     		int off=0;
     		int line=0;
     		int col=0;
-    		PascalABCCompiler.Parsers.KeywordKind keyw;
+    		ParserTools.KeywordKind keyw;
             CodeCompletionController.ParsersController.Reload();
-    		PascalABCCompiler.Parsers.IParser parser = CodeCompletionController.ParsersController.selectParser(".pas");
+    		IParser parser = CodeCompletionController.ParsersController.selectParser(".pas");
     		
     		string test_str = "System.Console";
     		off = test_str.Length;

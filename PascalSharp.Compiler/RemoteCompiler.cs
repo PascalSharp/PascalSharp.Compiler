@@ -9,11 +9,15 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading;
 using PascalABCCompiler;
+using PascalABCCompiler.SemanticTree;
 using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Compiler.SemanticTreeConverters;
 using PascalSharp.Internal.CompilerTools;
 using PascalSharp.Internal.Errors;
 using PascalSharp.Internal.Localization;
+using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 using CompilerInternalError = PascalSharp.Internal.Errors.CompilerInternalError;
 
 namespace PascalSharp.Compiler
@@ -479,7 +483,7 @@ namespace PascalSharp.Compiler
             }
         }
         
-        public PascalABCCompiler.SyntaxTree.compilation_unit ParseText(string FileName, string Text, List<Error> ErrorList, List<CompilerWarning> Warnings)
+        public compilation_unit ParseText(string FileName, string Text, List<Error> ErrorList, List<CompilerWarning> Warnings)
         {
             throw new NotSupportedException();
         }
@@ -505,7 +509,7 @@ namespace PascalSharp.Compiler
             }
         }
 
-        public PascalABCCompiler.Parsers.Controller ParsersController
+        public Controller ParsersController
         {
             get
             {
@@ -513,7 +517,7 @@ namespace PascalSharp.Compiler
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IProgramNode SemanticTree
+        public IProgramNode SemanticTree
         {
             get
             {

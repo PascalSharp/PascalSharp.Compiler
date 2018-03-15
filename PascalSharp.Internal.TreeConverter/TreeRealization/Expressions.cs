@@ -36,7 +36,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IAsNode.left
+        IExpressionNode IAsNode.left
         {
             get
             {
@@ -44,7 +44,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IAsNode.right
+        ITypeNode IAsNode.right
         {
             get
             {
@@ -60,7 +60,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -94,7 +94,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IIsNode.left
+        IExpressionNode IIsNode.left
         {
             get
             {
@@ -102,7 +102,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IIsNode.right
+        ITypeNode IIsNode.right
         {
             get
             {
@@ -118,7 +118,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -142,7 +142,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ISizeOfOperator.oftype
+        ITypeNode ISizeOfOperator.oftype
         {
             get
             {
@@ -158,7 +158,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -169,7 +169,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         private type_node _oftype;
 
         public typeof_operator(type_node oftype, location loc)
-            : base(compiled_type_node.get_type_node(typeof(Type),PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.SymbolTable), loc)
+            : base(compiled_type_node.get_type_node(typeof(Type),SystemLibrary.syn_visitor.SymbolTable), loc)
         {
             _oftype = oftype;
         }
@@ -182,7 +182,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ITypeOfOperator.oftype
+        ITypeNode ITypeOfOperator.oftype
         {
             get
             {
@@ -198,7 +198,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -232,7 +232,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IStatementNode[] statements
+        public IStatementNode[] statements
         {
             get
             {
@@ -240,7 +240,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IExpressionNode expresion
+        public IExpressionNode expresion
         {
             get
             {
@@ -256,7 +256,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -305,7 +305,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IExpressionNode condition
+        public IExpressionNode condition
         {
             get
             {
@@ -313,7 +313,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IExpressionNode ret_if_true
+        public IExpressionNode ret_if_true
         {
             get
             {
@@ -321,7 +321,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IExpressionNode ret_if_false
+        public IExpressionNode ret_if_false
         {
             get
             {
@@ -337,7 +337,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
         
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -359,7 +359,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.IExpressionNode[] PascalABCCompiler.SemanticTree.IArrayInitializer.ElementValues
+        IExpressionNode[] IArrayInitializer.ElementValues
         {
             get
             {
@@ -367,7 +367,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IArrayInitializer.ElementType
+        ITypeNode IArrayInitializer.ElementType
         {
             get
             {
@@ -395,7 +395,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -424,7 +424,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        internal List<PascalABCCompiler.SyntaxTree.record_const_definition> record_const_definition_list;
+        internal List<record_const_definition> record_const_definition_list;
 
         public record_initializer(List<expression_node> field_values, location loc)
             :base(null, loc)
@@ -432,13 +432,13 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             _field_values = field_values;
         }
 
-        internal record_initializer(List<PascalABCCompiler.SyntaxTree.record_const_definition> record_const_definition_list, location loc)
+        internal record_initializer(List<record_const_definition> record_const_definition_list, location loc)
             : base(null, loc)
         {
             this.record_const_definition_list = record_const_definition_list;
         }
 		
-        public PascalABCCompiler.SemanticTree.IExpressionNode[] FieldValues
+        public IExpressionNode[] FieldValues
         {
             get
             {
@@ -450,7 +450,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

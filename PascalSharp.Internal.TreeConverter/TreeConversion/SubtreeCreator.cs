@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
-using PascalSharp.Internal.TreeConverter;TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalABCCompiler.TreeConversion
 {
@@ -163,7 +163,7 @@ namespace PascalABCCompiler.TreeConversion
             SyntaxTree.method_call mc = new SyntaxTree.method_call();
             mc.dereferencing_value = new ident(procName);
             pc.func_name = mc;
-            SyntaxTree.expression_list exl = new PascalABCCompiler.SyntaxTree.expression_list();
+            SyntaxTree.expression_list exl = new expression_list();
             foreach (expression x in exprList)
                 exl.Add(x);
             mc.parameters = exl;

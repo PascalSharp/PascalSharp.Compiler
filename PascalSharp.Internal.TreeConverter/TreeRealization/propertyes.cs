@@ -20,7 +20,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <summary>
         /// Вид объекта.
         /// </summary>
-		public abstract PascalABCCompiler.SemanticTree.node_kind node_kind
+		public abstract node_kind node_kind
 		{
 			get;
 		}
@@ -52,7 +52,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <summary>
         /// Уровень доступа к свойству.
         /// </summary>
-		public abstract PascalABCCompiler.SemanticTree.field_access_level field_access_level
+		public abstract field_access_level field_access_level
 		{
 			get;
 		}
@@ -60,11 +60,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <summary>
         /// Тип свойства (виртуальное, статическое или обычное).
         /// </summary>
-		public virtual PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
+		public virtual polymorphic_state polymorphic_state
 		{
 			get
 			{
-				return PascalABCCompiler.SemanticTree.polymorphic_state.ps_common;
+				return polymorphic_state.ps_common;
 			}
 			set
 			{
@@ -110,7 +110,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.IParameterNode[] PascalABCCompiler.SemanticTree.IPropertyNode.parameters
+		IParameterNode[] IPropertyNode.parameters
 		{
 			get
 			{
@@ -122,12 +122,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-		PascalABCCompiler.SemanticTree.IFunctionNode PascalABCCompiler.SemanticTree.IPropertyNode.get_function
+		IFunctionNode IPropertyNode.get_function
 		{
 			get
 			{
@@ -135,7 +135,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.IFunctionNode PascalABCCompiler.SemanticTree.IPropertyNode.set_function
+		IFunctionNode IPropertyNode.set_function
 		{
 			get
 			{
@@ -143,7 +143,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IPropertyNode.property_type
+		ITypeNode IPropertyNode.property_type
 		{
 			get
 			{
@@ -151,7 +151,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IPropertyNode.comprehensive_type
+		ITypeNode IPropertyNode.comprehensive_type
 		{
             get
             {
@@ -194,12 +194,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <summary>
         /// Уровень доступа к свойству.
         /// </summary>
-		private PascalABCCompiler.SemanticTree.field_access_level _field_access_level;
+		private field_access_level _field_access_level;
 
         /// <summary>
         /// Тип свойства (виртуальное, статическое или обычное).
         /// </summary>
-		private PascalABCCompiler.SemanticTree.polymorphic_state _polymorphic_state;
+		private polymorphic_state _polymorphic_state;
 
         /// <summary>
         /// Расположение свойства.
@@ -207,7 +207,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		private location _loc;
 
         public common_property_node(string name, common_type_node comprehensive_type, location loc,
-            PascalABCCompiler.SemanticTree.field_access_level field_access_level, PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state)
+            field_access_level field_access_level, polymorphic_state polymorphic_state)
         {
             _name = name;
             _comprehensive_type = comprehensive_type;
@@ -218,7 +218,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
 		public common_property_node(string name,common_type_node comprehensive_type,type_node property_type,
 			function_node get_function,function_node set_function,location loc,
-            PascalABCCompiler.SemanticTree.field_access_level field_access_level, PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state)
+            field_access_level field_access_level, polymorphic_state polymorphic_state)
 		{
 			_name=name;
 			_comprehensive_type=comprehensive_type;
@@ -245,7 +245,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Расположение свойства.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-		public PascalABCCompiler.SemanticTree.ILocation Location
+		public ILocation Location
 		{
 			get
 			{
@@ -267,7 +267,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <summary>
         /// Уровень доступа к свойству.
         /// </summary>
-		public override PascalABCCompiler.SemanticTree.field_access_level field_access_level
+		public override field_access_level field_access_level
 		{
 			get
 			{
@@ -381,7 +381,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -394,7 +394,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         //    }
         //}
 
-		PascalABCCompiler.SemanticTree.ICommonTypeNode PascalABCCompiler.SemanticTree.ICommonClassMemberNode.common_comprehensive_type
+		ICommonTypeNode ICommonClassMemberNode.common_comprehensive_type
 		{
 			get
 			{
@@ -402,7 +402,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IClassMemberNode.comperehensive_type
+		ITypeNode IClassMemberNode.comperehensive_type
 		{
 			get
 			{
@@ -410,7 +410,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.field_access_level PascalABCCompiler.SemanticTree.IClassMemberNode.field_access_level
+		field_access_level IClassMemberNode.field_access_level
 		{
 			get
 			{
@@ -418,7 +418,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public override PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
+		public override polymorphic_state polymorphic_state
 		{
 			get
 			{
@@ -430,11 +430,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
 		}
 
-        public override PascalABCCompiler.SemanticTree.node_kind node_kind
+        public override node_kind node_kind
         {
             get
             {
-                return PascalABCCompiler.SemanticTree.node_kind.common;
+                return node_kind.common;
             }
         }
     }
@@ -531,7 +531,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                System.Reflection.MethodInfo mi=PascalABCCompiler.NetHelper.NetHelper.GetReadAccessor(_pi);
+                System.Reflection.MethodInfo mi=NetHelper.GetReadAccessor(_pi);
 				if (mi==null)
 				{
 					return null;
@@ -555,7 +555,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                System.Reflection.MethodInfo mi=PascalABCCompiler.NetHelper.NetHelper.GetWriteAccessor(_pi);
+                System.Reflection.MethodInfo mi=NetHelper.GetWriteAccessor(_pi);
 				if (mi==null)
 				{
 					return null;
@@ -590,7 +590,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -599,29 +599,29 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <summary>
         /// Виртуальное, статическое или обычное свойство.
         /// </summary>
-		public override PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
+		public override polymorphic_state polymorphic_state
 		{
 			get
 			{
-                System.Reflection.MethodInfo _mi=PascalABCCompiler.NetHelper.NetHelper.GetAnyAccessor(_pi);
+                System.Reflection.MethodInfo _mi=NetHelper.GetAnyAccessor(_pi);
 				if (_mi==null)
 				{
-					return PascalABCCompiler.SemanticTree.polymorphic_state.ps_common;
+					return polymorphic_state.ps_common;
 				}
 				if (_mi.IsAbstract)
 				{
-					return PascalABCCompiler.SemanticTree.polymorphic_state.ps_virtual_abstract;
+					return polymorphic_state.ps_virtual_abstract;
 				}
 				if (_mi.IsStatic)
 				{
-					return PascalABCCompiler.SemanticTree.polymorphic_state.ps_static;
+					return polymorphic_state.ps_static;
 				}
 				if (_mi.IsVirtual)
 				{
-					return PascalABCCompiler.SemanticTree.polymorphic_state.ps_virtual;
+					return polymorphic_state.ps_virtual;
 				}
 				//Как с остальными - override,new? Наверно они не нужны?
-				return PascalABCCompiler.SemanticTree.polymorphic_state.ps_common;
+				return polymorphic_state.ps_common;
 			}
 		}
 
@@ -629,25 +629,25 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Уровень доступа к свойству. Мало что значит, т.к. надо проверять акцессоры 
         /// по отдельности при обращении к ним, т.к. могут быть акцессоры с разными уровнями доступа.
         /// </summary>
-		public override PascalABCCompiler.SemanticTree.field_access_level field_access_level
+		public override field_access_level field_access_level
 		{
 			get
 			{
-				System.Reflection.MethodInfo _mi=PascalABCCompiler.NetHelper.NetHelper.GetAnyAccessor(_pi);
+				System.Reflection.MethodInfo _mi=NetHelper.GetAnyAccessor(_pi);
 				if (_mi==null)
 				{
-					return PascalABCCompiler.SemanticTree.field_access_level.fal_private;
+					return field_access_level.fal_private;
 				}
 				if (_mi.IsPublic)
 				{
-					return PascalABCCompiler.SemanticTree.field_access_level.fal_public;
+					return field_access_level.fal_public;
 				}
 				if (_mi.IsPrivate)
 				{
-					return PascalABCCompiler.SemanticTree.field_access_level.fal_private;
+					return field_access_level.fal_private;
 				}
 				//Как в System.Reflection отображается то, что метод protected?
-				return PascalABCCompiler.SemanticTree.field_access_level.fal_protected;
+				return field_access_level.fal_protected;
 			}
 		}
 
@@ -663,7 +663,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.ICompiledMethodNode PascalABCCompiler.SemanticTree.ICompiledPropertyNode.compiled_get_method
+		ICompiledMethodNode ICompiledPropertyNode.compiled_get_method
 		{
 			get
 			{
@@ -671,7 +671,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.ICompiledMethodNode PascalABCCompiler.SemanticTree.ICompiledPropertyNode.compiled_set_method
+		ICompiledMethodNode ICompiledPropertyNode.compiled_set_method
 		{
 			get
 			{
@@ -679,7 +679,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-        PascalABCCompiler.SemanticTree.ICompiledTypeNode PascalABCCompiler.SemanticTree.ICompiledPropertyNode.compiled_comprehensive_type
+        ICompiledTypeNode ICompiledPropertyNode.compiled_comprehensive_type
         {
             get
             {
@@ -687,15 +687,15 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-		public override PascalABCCompiler.SemanticTree.node_kind node_kind
+		public override node_kind node_kind
 		{
 			get
 			{
-				return PascalABCCompiler.SemanticTree.node_kind.compiled;
+				return node_kind.compiled;
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.ICompiledTypeNode PascalABCCompiler.SemanticTree.ICompiledClassMemberNode.comprehensive_type
+		ICompiledTypeNode ICompiledClassMemberNode.comprehensive_type
 		{
 			get
 			{
@@ -703,7 +703,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public PascalABCCompiler.SemanticTree.ITypeNode comperehensive_type
+		public ITypeNode comperehensive_type
 		{
 			get
 			{

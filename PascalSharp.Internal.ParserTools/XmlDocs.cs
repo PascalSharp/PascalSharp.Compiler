@@ -1,17 +1,17 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Xml;
 using System.Reflection;
 using System.Text;
-using System.Globalization;
+using System.Threading;
+using System.Xml;
 using PascalSharp.Internal.Localization;
 
-namespace CodeCompletionTools
+namespace PascalSharp.Internal.ParserTools
 {
 	
 	public partial class AssemblyDocCache

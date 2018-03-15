@@ -3,6 +3,10 @@
 //Инициализация системной библиотеки
 using System;
 using System.Collections.Generic;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalABCCompiler.SystemLibrary
 {
@@ -11,9 +15,9 @@ namespace PascalABCCompiler.SystemLibrary
         common_unit_node cmn;
         dot_net_unit_node dnu;
         string name;
-        TreeConverter.SymbolInfoList symbolInfo = null;
-        TreeConverter.SymbolInfoList _notCreatedSymbolInfo = null;
-        TreeConverter.SymbolInfoList notCreatedSymbolInfo
+        SymbolInfoList symbolInfo = null;
+        SymbolInfoList _notCreatedSymbolInfo = null;
+        SymbolInfoList notCreatedSymbolInfo
         {
             get
             {
@@ -25,20 +29,20 @@ namespace PascalABCCompiler.SystemLibrary
                 }
                 else
                 {
-                    Type t = NetHelper.NetHelper.PABCSystemType.Assembly.GetType("PABCSystem." + name);
+                    Type t = PABCSystemType.Assembly.GetType("PABCSystem." + name);
                     if (t != null)
                     {
-                        _notCreatedSymbolInfo = new TreeConverter.SymbolInfoList(new TreeConverter.SymbolInfo(compiled_type_node.get_type_node(t, SystemLibrary.syn_visitor.SymbolTable)));
+                        _notCreatedSymbolInfo = new SymbolInfoList(new SymbolInfo(compiled_type_node.get_type_node(t, SystemLibrary.syn_visitor.SymbolTable)));
                     }
                     else
                     {
-                        compiled_type_node ctn = compiled_type_node.get_type_node(NetHelper.NetHelper.PABCSystemType);
+                        compiled_type_node ctn = compiled_type_node.get_type_node(NetHelper.PABCSystemType);
                         _notCreatedSymbolInfo = ctn.find_in_type(name);
                         /*if (name == TreeConverter.compiler_string_consts.read_procedure_name || name == TreeConverter.compiler_string_consts.readln_procedure_name)
                         {
-                            compiled_type_node ctn2 = compiled_type_node.get_type_node(NetHelper.NetHelper.PT4Type);
-                            TreeConverter.SymbolInfo si = ctn2.find_in_type(name);
-                            TreeConverter.SymbolInfo tmp = _notCreatedSymbolInfo;
+                            compiled_type_node ctn2 = compiled_type_node.get_type_node(NetHelper.PT4Type);
+                            SymbolInfo si = ctn2.find_in_type(name);
+                            SymbolInfo tmp = _notCreatedSymbolInfo;
                             while (tmp.Next != null)
                                 tmp = tmp.Next;
                             tmp.Next = si;
@@ -71,7 +75,7 @@ namespace PascalABCCompiler.SystemLibrary
         {
             get { return dnu != null; }
         }
-        public TreeConverter.SymbolInfoList SymbolInfo
+        public SymbolInfoList SymbolInfo
         {
             get
             {
@@ -83,20 +87,20 @@ namespace PascalABCCompiler.SystemLibrary
                 }
                 else
                 {
-                    Type t = NetHelper.NetHelper.PABCSystemType.Assembly.GetType("PABCSystem." + name);
+                    Type t = PABCSystemType.Assembly.GetType("PABCSystem." + name);
                     if (t != null)
                     {
-                        symbolInfo = new TreeConverter.SymbolInfoList(new TreeConverter.SymbolInfo(compiled_type_node.get_type_node(t, SystemLibrary.syn_visitor.SymbolTable)));
+                        symbolInfo = new SymbolInfoList(new SymbolInfo(compiled_type_node.get_type_node(t, SystemLibrary.syn_visitor.SymbolTable)));
                     }
                     else
                     {
-                        compiled_type_node ctn = compiled_type_node.get_type_node(NetHelper.NetHelper.PABCSystemType);
+                        compiled_type_node ctn = compiled_type_node.get_type_node(NetHelper.PABCSystemType);
                         symbolInfo = ctn.find_in_type(name);
                         /*if (name == TreeConverter.compiler_string_consts.read_procedure_name || name == TreeConverter.compiler_string_consts.readln_procedure_name)
                         {
-                            compiled_type_node ctn2 = compiled_type_node.get_type_node(NetHelper.NetHelper.PT4Type);
-                            TreeConverter.SymbolInfo si = ctn2.find_in_type(name);
-                            TreeConverter.SymbolInfo tmp = _notCreatedSymbolInfo;
+                            compiled_type_node ctn2 = compiled_type_node.get_type_node(NetHelper.PT4Type);
+                            SymbolInfo si = ctn2.find_in_type(name);
+                            SymbolInfo tmp = _notCreatedSymbolInfo;
                             while (tmp.Next != null)
                                 tmp = tmp.Next;
                             tmp.Next = si;
@@ -112,31 +116,31 @@ namespace PascalABCCompiler.SystemLibrary
                         
                         common_type_node tctn = symbolInfo.First().sym_info as common_type_node;
                         tctn.type_special_kind = SemanticTree.type_special_kind.base_set_type;
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.plus_name, SystemLibInitializer.SetUnionProcedure.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.mul_name, SystemLibInitializer.SetIntersectProcedure.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.in_name, SystemLibInitializer.InSetProcedure.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.minus_name, SystemLibInitializer.SetSubtractProcedure.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.gr_name, SystemLibInitializer.CompareSetGreater.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.greq_name, SystemLibInitializer.CompareSetGreaterEqual.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.sm_name, SystemLibInitializer.CompareSetLess.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.smeq_name, SystemLibInitializer.CompareSetLessEqual.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.eq_name, SystemLibInitializer.CompareSetEquals.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.noteq_name, SystemLibInitializer.CompareSetInEquals.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.plus_name, SystemLibInitializer.SetUnionProcedure.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.mul_name, SystemLibInitializer.SetIntersectProcedure.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.in_name, SystemLibInitializer.InSetProcedure.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.minus_name, SystemLibInitializer.SetSubtractProcedure.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.gr_name, SystemLibInitializer.CompareSetGreater.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.greq_name, SystemLibInitializer.CompareSetGreaterEqual.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.sm_name, SystemLibInitializer.CompareSetLess.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.smeq_name, SystemLibInitializer.CompareSetLessEqual.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.eq_name, SystemLibInitializer.CompareSetEquals.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.noteq_name, SystemLibInitializer.CompareSetInEquals.SymbolInfo.First());
                     }
                     else
                     {
                         compiled_type_node tctn = symbolInfo.First().sym_info as compiled_type_node;
                         tctn.type_special_kind = SemanticTree.type_special_kind.base_set_type;
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.plus_name, SystemLibInitializer.SetUnionProcedure.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.mul_name, SystemLibInitializer.SetIntersectProcedure.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.in_name, SystemLibInitializer.InSetProcedure.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.minus_name, SystemLibInitializer.SetSubtractProcedure.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.gr_name, SystemLibInitializer.CompareSetGreater.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.greq_name, SystemLibInitializer.CompareSetGreaterEqual.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.sm_name, SystemLibInitializer.CompareSetLess.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.smeq_name, SystemLibInitializer.CompareSetLessEqual.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.eq_name, SystemLibInitializer.CompareSetEquals.SymbolInfo.First());
-                        tctn.scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.noteq_name,SystemLibInitializer.CompareSetInEquals.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.plus_name, SystemLibInitializer.SetUnionProcedure.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.mul_name, SystemLibInitializer.SetIntersectProcedure.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.in_name, SystemLibInitializer.InSetProcedure.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.minus_name, SystemLibInitializer.SetSubtractProcedure.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.gr_name, SystemLibInitializer.CompareSetGreater.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.greq_name, SystemLibInitializer.CompareSetGreaterEqual.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.sm_name, SystemLibInitializer.CompareSetLess.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.smeq_name, SystemLibInitializer.CompareSetLessEqual.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.eq_name, SystemLibInitializer.CompareSetEquals.SymbolInfo.First());
+                        tctn.scope.AddSymbol(compiler_string_consts.noteq_name,SystemLibInitializer.CompareSetInEquals.SymbolInfo.First());
                     }
                 }
                 else if (symbolInfo != null && SystemLibInitializer.TextFileType.Equal(symbolInfo))
@@ -149,10 +153,10 @@ namespace PascalABCCompiler.SystemLibrary
                     else
                     {
                         compiled_type_node tctn = symbolInfo.First().sym_info as compiled_type_node;
-                        tctn.type_special_kind = PascalABCCompiler.SemanticTree.type_special_kind.text_file;
+                        tctn.type_special_kind = type_special_kind.text_file;
                     }
                 }
-                else if (symbolInfo != null && string.Compare(name,PascalSharp.Internal.TreeConverter.compiler_string_consts.ArrayCopyFunction,true)==0)
+                else if (symbolInfo != null && string.Compare(name,compiler_string_consts.ArrayCopyFunction,true)==0)
                 {
                     while ((symbolInfo[0].sym_info as function_node).parameters.Count != 1)
                     {
@@ -163,7 +167,7 @@ namespace PascalABCCompiler.SystemLibrary
                 return symbolInfo;
             }
         }
-        public bool Equal(TreeConverter.SymbolInfoList sil)
+        public bool Equal(SymbolInfoList sil)
         {
             if (dnu == null)
                 return notCreatedSymbolInfo.First() == sil.First();
@@ -316,9 +320,9 @@ namespace PascalABCCompiler.SystemLibrary
         public static UnitDefinitionItem ConfigVariable;
         public static function_node PointerOutputConstructor;
         
-        private static PascalSharp.Internal.TreeConverter.SymbolInfo _NewProcedure;
-        private static PascalSharp.Internal.TreeConverter.SymbolInfo _NewArrayProcedure;
-        private static PascalSharp.Internal.TreeConverter.SymbolInfo _DisposeProcedure;
+        private static SymbolInfo _NewProcedure;
+        private static SymbolInfo _NewArrayProcedure;
+        private static SymbolInfo _DisposeProcedure;
 
         private static common_namespace_function_node _NewProcedureDecl;
         private static common_namespace_function_node _NewArrayProcedureDecl;
@@ -381,7 +385,7 @@ namespace PascalABCCompiler.SystemLibrary
             }
         }
 
-        public static PascalSharp.Internal.TreeConverter.SymbolInfo NewProcedure
+        public static SymbolInfo NewProcedure
         {
             get
             {
@@ -392,7 +396,7 @@ namespace PascalABCCompiler.SystemLibrary
                 _NewProcedure = value;
             }
         }
-        public static PascalSharp.Internal.TreeConverter.SymbolInfo DisposeProcedure
+        public static SymbolInfo DisposeProcedure
         {
             get
             {
@@ -411,15 +415,15 @@ namespace PascalABCCompiler.SystemLibrary
             //SymbolTable.Scope sc = system_namespace.scope;
             SymbolTable.Scope sc = where_add;
             namespace_constant_definition _true_constant_definition = new namespace_constant_definition(
-                PascalSharp.Internal.TreeConverter.compiler_string_consts.true_const_name, SystemLibrary.true_constant, system_unit_location, system_namespace);
+                compiler_string_consts.true_const_name, SystemLibrary.true_constant, system_unit_location, system_namespace);
             system_namespace.constants.AddElement(_true_constant_definition);
 
             namespace_constant_definition _false_constant_definition = new namespace_constant_definition(
-                PascalSharp.Internal.TreeConverter.compiler_string_consts.false_const_name, SystemLibrary.false_constant, system_unit_location, system_namespace);
+                compiler_string_consts.false_const_name, SystemLibrary.false_constant, system_unit_location, system_namespace);
             system_namespace.constants.AddElement(_false_constant_definition);
 
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.true_const_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(_true_constant_definition));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.false_const_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(_false_constant_definition));
+            sc.AddSymbol(compiler_string_consts.true_const_name, new SymbolInfo(_true_constant_definition));
+            sc.AddSymbol(compiler_string_consts.false_const_name, new SymbolInfo(_false_constant_definition));
             
 
             //TODO: Сделано по быстрому. Переделать. Можно просто один раз сериализовать модуль system и не инициализировать его всякий раз подобным образом. Неплохо-бы использовать NetHelper.GetMethod.
@@ -433,18 +437,18 @@ namespace PascalABCCompiler.SystemLibrary
             cnfn.parameters.AddElement(new common_parameter("ptr", SystemLibrary.pointer_type, SemanticTree.parameter_type.value, cnfn,
                 concrete_parameter_type.cpt_var, null, null));
             cnfn.SpecialFunctionKind = SemanticTree.SpecialFunctionKind.New;
-            _NewProcedure = new PascalSharp.Internal.TreeConverter.SymbolInfo(cnfn);
+            _NewProcedure = new SymbolInfo(cnfn);
             _NewProcedure.symbol_kind = PascalSharp.Internal.TreeConverter.symbol_kind.sk_overload_function;
-            _NewProcedure.access_level = PascalSharp.Internal.TreeConverter.access_level.al_public;
+            _NewProcedure.access_level = PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_public;
             _NewProcedureDecl = cnfn;
             sc.AddSymbol(TreeConverter.compiler_string_consts.new_procedure_name,_NewProcedure);
 
             cnfn = new common_namespace_function_node(TreeConverter.compiler_string_consts.dispose_procedure_name, null, null, system_namespace, null);
             cnfn.parameters.AddElement(new common_parameter("ptr", SystemLibrary.pointer_type, SemanticTree.parameter_type.value,
                 cnfn, concrete_parameter_type.cpt_var, null, null));
-            _DisposeProcedure = new PascalSharp.Internal.TreeConverter.SymbolInfo(cnfn);
+            _DisposeProcedure = new SymbolInfo(cnfn);
             _DisposeProcedure.symbol_kind = PascalSharp.Internal.TreeConverter.symbol_kind.sk_overload_function;
-            _DisposeProcedure.access_level = PascalSharp.Internal.TreeConverter.access_level.al_public;
+            _DisposeProcedure.access_level = PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_public;
             _DisposeProcedureDecl = cnfn;
             cnfn.SpecialFunctionKind = SemanticTree.SpecialFunctionKind.Dispose;
             sc.AddSymbol(TreeConverter.compiler_string_consts.dispose_procedure_name, _DisposeProcedure);
@@ -455,27 +459,27 @@ namespace PascalABCCompiler.SystemLibrary
             cnfn.parameters.AddElement(new common_parameter("n", SystemLibrary.integer_type, SemanticTree.parameter_type.value, cnfn,
                 concrete_parameter_type.cpt_none, null, null));
             cnfn.SpecialFunctionKind = SemanticTree.SpecialFunctionKind.NewArray;
-            _NewArrayProcedure = new PascalSharp.Internal.TreeConverter.SymbolInfo(cnfn);
+            _NewArrayProcedure = new SymbolInfo(cnfn);
             _NewArrayProcedureDecl = cnfn;
             //sc.AddSymbol(TreeConverter.compiler_string_consts.new_procedure_name, _NewProcedure);
             
             basic_function_node break_procedure = new basic_function_node(SemanticTree.basic_function_type.none,
                 null, true);
             break_procedure.compile_time_executor = initialization_properties.break_executor;
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.break_procedure_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(break_procedure));
+            sc.AddSymbol(compiler_string_consts.break_procedure_name, new SymbolInfo(break_procedure));
             
             basic_function_node continue_procedure = new basic_function_node(SemanticTree.basic_function_type.none,
                 null, true);
             continue_procedure.compile_time_executor = initialization_properties.continue_executor;
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.continue_procedure_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(continue_procedure));
+            sc.AddSymbol(compiler_string_consts.continue_procedure_name, new SymbolInfo(continue_procedure));
 
             basic_function_node exit_procedure = new basic_function_node(SemanticTree.basic_function_type.none,
                 null, true);
             exit_procedure.compile_time_executor = initialization_properties.exit_executor;
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.exit_procedure_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(exit_procedure));
+            sc.AddSymbol(compiler_string_consts.exit_procedure_name, new SymbolInfo(exit_procedure));
 
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.set_length_procedure_name,
-                new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.resize_func, PascalSharp.Internal.TreeConverter.access_level.al_public, PascalSharp.Internal.TreeConverter.symbol_kind.sk_overload_function));
+            sc.AddSymbol(compiler_string_consts.set_length_procedure_name,
+                new SymbolInfo(SystemLibrary.resize_func, PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_public, PascalSharp.Internal.TreeConverter.symbol_kind.sk_overload_function));
         }
 
         public static common_unit_node make_system_unit(SymbolTable.TreeConverterSymbolTable symbol_table,
@@ -488,34 +492,34 @@ namespace PascalABCCompiler.SystemLibrary
                 new SymbolTable.Scope[0]);
             common_unit_node _system_unit = new common_unit_node(main_scope,impl_scope,null,null);
             
-            common_namespace_node cnn = new common_namespace_node(null, _system_unit, PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_name,
+            common_namespace_node cnn = new common_namespace_node(null, _system_unit, compiler_string_consts.system_unit_name,
                 symbol_table.CreateScope(main_scope),system_unit_location);
 
-            main_scope.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(cnn));
+            main_scope.AddSymbol(compiler_string_consts.system_unit_name, new SymbolInfo(cnn));
 
             //SymbolTable.Scope sc = cnn.scope;
             SymbolTable.Scope sc = main_scope;
 
             //Добавляем типы.
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.byte_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.byte_type));
-            //sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.decimal_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.decimal_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.sbyte_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.sbyte_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.short_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.short_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.ushort_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.ushort_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.integer_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.integer_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.uint_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.uint_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.long_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.int64_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.ulong_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.uint64_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.float_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.float_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.real_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.double_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.char_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.char_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.bool_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.bool_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.string_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.string_type));
-            //sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.object_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.object_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.pointer_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.pointer_type));
-            //sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.base_exception_class_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.exception_base_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.base_array_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.array_base_type));
-            sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.base_delegate_type_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(SystemLibrary.delegate_base_type));
+            sc.AddSymbol(compiler_string_consts.byte_type_name, new SymbolInfo(SystemLibrary.byte_type));
+            //sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.decimal_type_name, new SymbolInfo(SystemLibrary.decimal_type));
+            sc.AddSymbol(compiler_string_consts.sbyte_type_name, new SymbolInfo(SystemLibrary.sbyte_type));
+            sc.AddSymbol(compiler_string_consts.short_type_name, new SymbolInfo(SystemLibrary.short_type));
+            sc.AddSymbol(compiler_string_consts.ushort_type_name, new SymbolInfo(SystemLibrary.ushort_type));
+            sc.AddSymbol(compiler_string_consts.integer_type_name, new SymbolInfo(SystemLibrary.integer_type));
+            sc.AddSymbol(compiler_string_consts.uint_type_name, new SymbolInfo(SystemLibrary.uint_type));
+            sc.AddSymbol(compiler_string_consts.long_type_name, new SymbolInfo(SystemLibrary.int64_type));
+            sc.AddSymbol(compiler_string_consts.ulong_type_name, new SymbolInfo(SystemLibrary.uint64_type));
+            sc.AddSymbol(compiler_string_consts.float_type_name, new SymbolInfo(SystemLibrary.float_type));
+            sc.AddSymbol(compiler_string_consts.real_type_name, new SymbolInfo(SystemLibrary.double_type));
+            sc.AddSymbol(compiler_string_consts.char_type_name, new SymbolInfo(SystemLibrary.char_type));
+            sc.AddSymbol(compiler_string_consts.bool_type_name, new SymbolInfo(SystemLibrary.bool_type));
+            sc.AddSymbol(compiler_string_consts.string_type_name, new SymbolInfo(SystemLibrary.string_type));
+            //sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.object_type_name, new SymbolInfo(SystemLibrary.object_type));
+            sc.AddSymbol(compiler_string_consts.pointer_type_name, new SymbolInfo(SystemLibrary.pointer_type));
+            //sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.base_exception_class_name, new SymbolInfo(SystemLibrary.exception_base_type));
+            sc.AddSymbol(compiler_string_consts.base_array_type_name, new SymbolInfo(SystemLibrary.array_base_type));
+            sc.AddSymbol(compiler_string_consts.base_delegate_type_name, new SymbolInfo(SystemLibrary.delegate_base_type));
 
             //TODO: Переделать. Пусть таблица символов создается одна. Как статическая.
             compiled_type_node comp_byte_type = ((compiled_type_node)SystemLibrary.byte_type);
@@ -536,23 +540,23 @@ namespace PascalABCCompiler.SystemLibrary
             compiled_type_node comp_exception_type=((compiled_type_node)SystemLibrary.exception_base_type);
             compiled_type_node comp_array_type = ((compiled_type_node)SystemLibrary.array_base_type);
             compiled_type_node comp_delegate_type = ((compiled_type_node)SystemLibrary.delegate_base_type);
-            comp_byte_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_byte_type.compiled_type, symbol_table);
-            comp_sbyte_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_sbyte_type.compiled_type, symbol_table);
-            comp_short_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_short_type.compiled_type, symbol_table);
-            comp_ushort_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_ushort_type.compiled_type, symbol_table);
-            comp_integer_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_integer_type.compiled_type, symbol_table);
-            comp_uint_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_uint_type.compiled_type, symbol_table);
-            comp_long_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_long_type.compiled_type, symbol_table);
-            comp_ulong_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_ulong_type.compiled_type, symbol_table);
-            comp_real_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_real_type.compiled_type, symbol_table);
-            comp_char_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_char_type.compiled_type, symbol_table);
-            comp_bool_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_bool_type.compiled_type, symbol_table);
-            comp_string_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_string_type.compiled_type, symbol_table);
-            comp_object_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_object_type.compiled_type, symbol_table);
-            comp_pointer_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_pointer_type.compiled_type, symbol_table);
-            comp_exception_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_exception_type.compiled_type, symbol_table);
-            comp_array_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_array_type.compiled_type, symbol_table);
-            comp_delegate_type.scope = new PascalABCCompiler.NetHelper.NetTypeScope(comp_delegate_type.compiled_type, symbol_table);
+            comp_byte_type.scope = new NetTypeScope(comp_byte_type.compiled_type, symbol_table);
+            comp_sbyte_type.scope = new NetTypeScope(comp_sbyte_type.compiled_type, symbol_table);
+            comp_short_type.scope = new NetTypeScope(comp_short_type.compiled_type, symbol_table);
+            comp_ushort_type.scope = new NetTypeScope(comp_ushort_type.compiled_type, symbol_table);
+            comp_integer_type.scope = new NetTypeScope(comp_integer_type.compiled_type, symbol_table);
+            comp_uint_type.scope = new NetTypeScope(comp_uint_type.compiled_type, symbol_table);
+            comp_long_type.scope = new NetTypeScope(comp_long_type.compiled_type, symbol_table);
+            comp_ulong_type.scope = new NetTypeScope(comp_ulong_type.compiled_type, symbol_table);
+            comp_real_type.scope = new NetTypeScope(comp_real_type.compiled_type, symbol_table);
+            comp_char_type.scope = new NetTypeScope(comp_char_type.compiled_type, symbol_table);
+            comp_bool_type.scope = new NetTypeScope(comp_bool_type.compiled_type, symbol_table);
+            comp_string_type.scope = new NetTypeScope(comp_string_type.compiled_type, symbol_table);
+            comp_object_type.scope = new NetTypeScope(comp_object_type.compiled_type, symbol_table);
+            comp_pointer_type.scope = new NetTypeScope(comp_pointer_type.compiled_type, symbol_table);
+            comp_exception_type.scope = new NetTypeScope(comp_exception_type.compiled_type, symbol_table);
+            comp_array_type.scope = new NetTypeScope(comp_array_type.compiled_type, symbol_table);
+            comp_delegate_type.scope = new NetTypeScope(comp_delegate_type.compiled_type, symbol_table);
 
             init_temp_methods_and_consts(cnn,sc, initialization_properties,system_unit_location);
             return _system_unit;

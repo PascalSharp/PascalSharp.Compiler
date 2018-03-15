@@ -1,16 +1,12 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
-using System.IO;
-using PascalABCCompiler.ParserTools;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.Parsers;
-using System.Resources;
-using System.Reflection;
 using System.Collections.Generic;
 using System.Text;
+using PascalSharp.Internal.SyntaxTree;
 
-namespace PascalABCCompiler.Parsers
+namespace PascalSharp.Internal.ParserTools
 {
     public class CommentInfo
     {
@@ -1420,7 +1416,7 @@ namespace PascalABCCompiler.Parsers
         {
         }
 		
-		public override void visit(SyntaxTree.lambda_inferred_type lit) //lroman//
+		public override void visit(PascalABCCompiler.SyntaxTree.lambda_inferred_type lit) //lroman//
         {
         }
         #endregion

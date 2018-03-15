@@ -79,7 +79,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public virtual void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public virtual void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -103,7 +103,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -118,7 +118,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		public PascalABCCompiler.SemanticTree.IAttributeNode[] Attributes
+		public IAttributeNode[] Attributes
 		{
 			get
 			{
@@ -138,7 +138,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		string PascalABCCompiler.SemanticTree.IDefinitionNode.Documentation
+		string IDefinitionNode.Documentation
 		{
 			get
 			{
@@ -194,7 +194,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <summary>
         /// Расположение statement-а в программе.
         /// </summary>
-		PascalABCCompiler.SemanticTree.ILocation PascalABCCompiler.SemanticTree.ILocated.Location
+		ILocation ILocated.Location
 		{
 			get
 			{
@@ -217,7 +217,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -306,7 +306,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -314,7 +314,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <summary>
         /// Тип выражения. Используется посетителем при обходе дерева.
         /// </summary>
-		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IExpressionNode.type
+		ITypeNode IExpressionNode.type
 		{
 			get
 			{
@@ -322,7 +322,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IExpressionNode.conversion_type
+		ITypeNode IExpressionNode.conversion_type
 		{
 			get
 			{
@@ -381,7 +381,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -427,7 +427,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -482,7 +482,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Выражение, адрес которого мы получаем.
         /// Испоьзуется при обходе дерева посетителем.
         /// </summary>
-		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IGetAddrNode.addr_of_expr
+		IExpressionNode IGetAddrNode.addr_of_expr
 		{
 			get
 			{
@@ -494,7 +494,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -517,7 +517,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <param name="deref_expr">Выражение-указатель.</param>
         /// <param name="loc">Расположение выражения.</param>
 		public dereference_node(expression_node deref_expr, location loc) :
-           //base(PascalABCCompiler.SystemLibrary.SystemLibrary.get_pointed_type_by_type(deref_expr.type),loc)
+           //base(SystemLibrary.get_pointed_type_by_type(deref_expr.type),loc)
            base( (deref_expr.type as ref_type_node).pointed_type, loc)
 		{
 			_deref_expr = deref_expr;
@@ -554,7 +554,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Выражение-указатель, которое мы разыменовываем.
         /// Это свойство используется при обходе дерева посетителем.
         /// </summary>
-		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IDereferenceNode.derefered_expr
+		IExpressionNode IDereferenceNode.derefered_expr
 		{
 			get
 			{
@@ -566,7 +566,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}

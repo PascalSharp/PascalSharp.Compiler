@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using System.IO;
 using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.Errors;
 using PascalSharp.Internal.Errors;
 
 namespace SyntaxVisitors

@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -80,7 +81,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             /*System.Collections.Generic.Dictionary<string, common_namespace_node> namespaces =
                 new System.Collections.Generic.Dictionary<string, common_namespace_node>(
-                SystemLibrary.SystemLibrary.string_comparer);
+                SystemLibrary.string_comparer);
 
             foreach (common_unit_node un in units)
             {
@@ -183,7 +184,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Массив пространств имен, используемых в программе.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        public PascalABCCompiler.SemanticTree.ICommonNamespaceNode[] namespaces
+        public ICommonNamespaceNode[] namespaces
         {
             get
             {
@@ -195,7 +196,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Расположение конструкции program имя_программы, или главного модуля dll.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        public PascalABCCompiler.SemanticTree.ILocation Location
+        public ILocation Location
         {
             get
             {
@@ -207,7 +208,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -270,20 +271,20 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             sl = new statements_list(null);
             common_namespace_function_node init_func = new common_namespace_function_node("$_Init_",null,null,(common_namespace_node)_main_function.comprehensive_namespace,null);
             ((common_namespace_node)_main_function.comprehensive_namespace).functions.AddElement(init_func);
-            namespace_variable init_var = new namespace_variable("$is_init",PascalABCCompiler.SystemLibrary.SystemLibrary.bool_type,(common_namespace_node)_main_function.comprehensive_namespace,null);
+            namespace_variable init_var = new namespace_variable("$is_init",SystemLibrary.bool_type,(common_namespace_node)_main_function.comprehensive_namespace,null);
             ((common_namespace_node)_main_function.comprehensive_namespace).variables.AddElement(init_var);
-            if (PascalABCCompiler.SystemLibrary.SystemLibInitializer.ConfigVariable != null && PascalABCCompiler.SystemLibrary.SystemLibInitializer.ConfigVariable.Found)
+            if (SystemLibInitializer.ConfigVariable != null && SystemLibInitializer.ConfigVariable.Found)
             {
                 namespace_variable conf_nv = null;
                 compiled_variable_definition conf_cf = null;
-                if (PascalABCCompiler.SystemLibrary.SystemLibInitializer.ConfigVariable.sym_info is namespace_variable)
-                    conf_nv = PascalABCCompiler.SystemLibrary.SystemLibInitializer.ConfigVariable.sym_info as namespace_variable;
+                if (SystemLibInitializer.ConfigVariable.sym_info is namespace_variable)
+                    conf_nv = SystemLibInitializer.ConfigVariable.sym_info as namespace_variable;
                 else
-                    conf_cf = PascalABCCompiler.SystemLibrary.SystemLibInitializer.ConfigVariable.sym_info as compiled_variable_definition;
+                    conf_cf = SystemLibInitializer.ConfigVariable.sym_info as compiled_variable_definition;
                 foreach (string config_var in config.Keys)
                 {
                     var config_value = config[config_var];
-                    compiled_function_call cfc = new compiled_function_call(compiled_function_node.get_compiled_method(NetHelper.NetHelper.AddToDictionaryMethod), 
+                    compiled_function_call cfc = new compiled_function_call(compiled_function_node.get_compiled_method(NetHelper.AddToDictionaryMethod), 
                         (conf_nv != null) ? (expression_node)new namespace_variable_reference(conf_nv, null) : (expression_node)new static_compiled_variable_reference(conf_cf, null), null);
                     cfc.parameters.AddElement(new string_const_node(config_var, null));
                     switch (Type.GetTypeCode(config_value.GetType()))
@@ -319,7 +320,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             {
                 if (units[i].main_function != null)
                 {
-                	if (units[i].main_function.name != PascalSharp.Internal.TreeConverter.compiler_string_consts.temp_main_function_name)
+                	if (units[i].main_function.name != compiler_string_consts.temp_main_function_name)
                 	{
                 		common_namespace_function_call cnfc = new common_namespace_function_call(units[i].main_function, loc);
                     	sl.statements.AddElement(cnfc);
@@ -334,7 +335,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             //if (units.Count == 1)
             for (int i = 0; i < used_stand_modules.Length; i++)
             {
-                Type t = NetHelper.NetHelper.FindRtlType(used_stand_modules[i] + "." + used_stand_modules[i]);
+                Type t = NetHelper.FindRtlType(used_stand_modules[i] + "." + used_stand_modules[i]);
                 if (t == null)
                     continue;
                 compiled_type_node ctn = compiled_type_node.get_type_node(t);
@@ -357,7 +358,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             //if (units.Count == 1)
             for (int i = 0; i < used_stand_modules.Length; i++)
             {
-                Type t = NetHelper.NetHelper.FindRtlType(used_stand_modules[i] + "." + used_stand_modules[i]);
+                Type t = NetHelper.FindRtlType(used_stand_modules[i] + "." + used_stand_modules[i]);
                 if (t == null)
                     continue;
                 compiled_type_node ctn = compiled_type_node.get_type_node(t);
@@ -368,11 +369,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 sl2.statements.AddElement(csmc);
             }
             sl2 = new statements_list(loc);
-            basic_function_call bfc = new basic_function_call(PascalABCCompiler.SystemLibrary.SystemLibrary.bool_assign as basic_function_node,null);
+            basic_function_call bfc = new basic_function_call(SystemLibrary.bool_assign as basic_function_node,null);
             bfc.parameters.AddElement(new namespace_variable_reference(init_var,null));
             bfc.parameters.AddElement(new bool_const_node(true,null));
             sl.statements.AddElementFirst(bfc);
-            bfc = new basic_function_call(PascalABCCompiler.SystemLibrary.SystemLibrary.bool_not as basic_function_node,null);
+            bfc = new basic_function_call(SystemLibrary.bool_not as basic_function_node,null);
             bfc.parameters.AddElement(new namespace_variable_reference(init_var,null));
             sl2.statements.AddElement(new if_node(bfc,sl,null,null));
             init_func.function_code = sl2;
@@ -397,7 +398,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             sl = new statements_list(null);
             common_namespace_function_node init_func = new common_namespace_function_node("$_Init_", null, null, common_namespaces[0], null);
             common_namespaces[0].functions.AddElement(init_func);
-            namespace_variable init_var = new namespace_variable("$is_init", PascalABCCompiler.SystemLibrary.SystemLibrary.bool_type, common_namespaces[0], null);
+            namespace_variable init_var = new namespace_variable("$is_init", SystemLibrary.bool_type, common_namespaces[0], null);
             common_namespaces[0].variables.AddElement(init_var);
             for (int i = 0; i < units.Count; i++)
             {
@@ -416,11 +417,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 }
             }*/
             sl2 = new statements_list(loc);
-            basic_function_call bfc = new basic_function_call(PascalABCCompiler.SystemLibrary.SystemLibrary.bool_assign as basic_function_node, null);
+            basic_function_call bfc = new basic_function_call(SystemLibrary.bool_assign as basic_function_node, null);
             bfc.parameters.AddElement(new namespace_variable_reference(init_var, null));
             bfc.parameters.AddElement(new bool_const_node(true, null));
             sl.statements.AddElementFirst(bfc);
-            bfc = new basic_function_call(PascalABCCompiler.SystemLibrary.SystemLibrary.bool_not as basic_function_node, null);
+            bfc = new basic_function_call(SystemLibrary.bool_not as basic_function_node, null);
             bfc.parameters.AddElement(new namespace_variable_reference(init_var, null));
             sl2.statements.AddElement(new if_node(bfc, sl, null, null));
             init_func.function_code = sl2;
@@ -437,7 +438,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 {
                     if (!ctn.IsInterface && ctn.static_constr == null)
                     {
-                        ctn.static_constr = new common_method_node(PascalSharp.Internal.TreeConverter.compiler_string_consts.static_ctor_prefix + "Create", null, ctn, PascalABCCompiler.SemanticTree.polymorphic_state.ps_static, PascalABCCompiler.SemanticTree.field_access_level.fal_private, null);
+                        ctn.static_constr = new common_method_node(compiler_string_consts.static_ctor_prefix + "Create", null, ctn, polymorphic_state.ps_static, field_access_level.fal_private, null);
                         ctn.static_constr.is_constructor = true;
                         ctn.static_constr.function_code = new statements_list(null);
                         ctn.methods.AddElement(ctn.static_constr);
@@ -458,7 +459,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                     {
                         if (ctn.static_constr == null)
                         {
-                            ctn.static_constr = new common_method_node(PascalSharp.Internal.TreeConverter.compiler_string_consts.static_ctor_prefix + "Create", null, ctn, PascalABCCompiler.SemanticTree.polymorphic_state.ps_static, PascalABCCompiler.SemanticTree.field_access_level.fal_private, null);
+                            ctn.static_constr = new common_method_node(compiler_string_consts.static_ctor_prefix + "Create", null, ctn, polymorphic_state.ps_static, field_access_level.fal_private, null);
                             ctn.static_constr.is_constructor = true;
                             ctn.static_constr.function_code = new statements_list(null);
                             ctn.methods.AddElement(ctn.static_constr);
@@ -484,7 +485,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
         
-        PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IProgramNode.InitializationCode
+        IStatementNode IProgramNode.InitializationCode
         {
         	get
         	{
@@ -524,12 +525,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.IProgramNode.main_function
+		ICommonNamespaceFunctionNode IProgramNode.main_function
 		{
 			get
 			{
@@ -537,7 +538,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-        public System.Collections.Generic.List<PascalABCCompiler.SemanticTree.IGenericTypeInstance> generic_type_instances
+        public System.Collections.Generic.List<IGenericTypeInstance> generic_type_instances
         {
             get
             {
@@ -545,7 +546,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public System.Collections.Generic.List<PascalABCCompiler.SemanticTree.IGenericFunctionInstance> generic_function_instances
+        public System.Collections.Generic.List<IGenericFunctionInstance> generic_function_instances
         {
             get
             {
@@ -619,12 +620,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.IDllNode.initialization_function
+		ICommonNamespaceFunctionNode IDllNode.initialization_function
 		{
 			get
 			{
@@ -632,7 +633,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.IDllNode.finalization_function
+		ICommonNamespaceFunctionNode IDllNode.finalization_function
 		{
 			get
 			{

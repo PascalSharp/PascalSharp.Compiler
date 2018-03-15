@@ -234,7 +234,7 @@ namespace PascalSharp.Internal.Lexer
             errors.Add(new SyntaxError(message, CurrentFileName, loc, null));
         }
 
-        public void AddErrorFromResource(string res, PascalABCCompiler.SyntaxTree.SourceContext loc, params string[] pars)
+        public void AddErrorFromResource(string res, SourceContext loc, params string[] pars)
         {
             res = StringResources.Get(res);
             if (pars != null && pars.Length > 0)
@@ -242,7 +242,7 @@ namespace PascalSharp.Internal.Lexer
             errors.Add(new SyntaxError(res, CurrentFileName, loc, null));
         }
 
-        public void AddWarningFromResource(string res, PascalABCCompiler.SyntaxTree.SourceContext loc, params string[] pars)
+        public void AddWarningFromResource(string res, SourceContext loc, params string[] pars)
         {
             res = StringResources.Get(res);
             if (pars != null && pars.Length > 0)
@@ -429,7 +429,7 @@ namespace PascalSharp.Internal.Lexer
                 _function_header1.name.meth_name = id;
             }
 
-            formal_parameters fps = new PascalABCCompiler.SyntaxTree.formal_parameters();
+            formal_parameters fps = new formal_parameters();
             _function_header1.parameters = _function_lambda_definition.formal_parameters;//fps;
 
             /*SyntaxTree.named_type_reference _named_type_reference = new SyntaxTree.named_type_reference();

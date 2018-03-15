@@ -7,10 +7,15 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using PascalABCCompiler;
-using PascalABCCompiler.Parsers;
+using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Compiler.PCU;
+using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalSharp.Internal.CodeCompletion
 {
@@ -313,11 +318,11 @@ namespace PascalSharp.Internal.CodeCompletion
             //\ssyy
 			object low_val=null;
 			object upper_val=null;
-            PascalABCCompiler.SemanticTree.type_access_level tal = (PascalABCCompiler.SemanticTree.type_access_level)br.ReadByte();
-            PascalABCCompiler.SemanticTree.type_special_kind tsk = (PascalABCCompiler.SemanticTree.type_special_kind)br.ReadByte();
+            type_access_level tal = (type_access_level)br.ReadByte();
+            type_special_kind tsk = (type_special_kind)br.ReadByte();
             bool is_sealed = br.ReadBoolean();
             bool is_abstract = br.ReadBoolean();
-            if (tsk == PascalABCCompiler.SemanticTree.type_special_kind.diap_type)
+            if (tsk == type_special_kind.diap_type)
             {
             	low_val = CreateExpression();
             	upper_val = CreateExpression();
@@ -328,15 +333,15 @@ namespace PascalSharp.Internal.CodeCompletion
                 element_type = GetTypeReference();
             switch (tsk)
             {
-            	case PascalABCCompiler.SemanticTree.type_special_kind.none_kind : ctn = new TypeScope(SymbolKind.Class,cur_scope,base_type); break;
-            	case PascalABCCompiler.SemanticTree.type_special_kind.record : ctn = new TypeScope(SymbolKind.Struct,cur_scope,base_type); break;
-            	case PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper : ctn = new ArrayScope(); break;
-            	case PascalABCCompiler.SemanticTree.type_special_kind.enum_kind : ctn = new EnumScope(SymbolKind.Enum,cur_scope,base_type); break;
-            	case PascalABCCompiler.SemanticTree.type_special_kind.set_type : ctn = new SetScope(element_type); break;
-            	case PascalABCCompiler.SemanticTree.type_special_kind.array_kind : if (!in_scope) ctn = new ArrayScope(); else return null; break;
-            	case PascalABCCompiler.SemanticTree.type_special_kind.diap_type : ctn = new DiapasonScope(low_val,upper_val);break;
-            	case PascalABCCompiler.SemanticTree.type_special_kind.typed_file : ctn = new FileScope(element_type,null);break;
-            	case PascalABCCompiler.SemanticTree.type_special_kind.binary_file : ctn = new FileScope(null,null);break;
+            	case type_special_kind.none_kind : ctn = new TypeScope(SymbolKind.Class,cur_scope,base_type); break;
+            	case type_special_kind.record : ctn = new TypeScope(SymbolKind.Struct,cur_scope,base_type); break;
+            	case type_special_kind.array_wrapper : ctn = new ArrayScope(); break;
+            	case type_special_kind.enum_kind : ctn = new EnumScope(SymbolKind.Enum,cur_scope,base_type); break;
+            	case type_special_kind.set_type : ctn = new SetScope(element_type); break;
+            	case type_special_kind.array_kind : if (!in_scope) ctn = new ArrayScope(); else return null; break;
+            	case type_special_kind.diap_type : ctn = new DiapasonScope(low_val,upper_val);break;
+            	case type_special_kind.typed_file : ctn = new FileScope(element_type,null);break;
+            	case type_special_kind.binary_file : ctn = new FileScope(null,null);break;
            		
             }
             ctn.declaringUnit = root_scope;
@@ -402,22 +407,22 @@ namespace PascalSharp.Internal.CodeCompletion
             if (CanReadObject())
                 initv = CreateExpression();
             br.ReadInt32();
-            PascalABCCompiler.SemanticTree.field_access_level fal = (PascalABCCompiler.SemanticTree.field_access_level)br.ReadByte();
-            PascalABCCompiler.SemanticTree.polymorphic_state ps = (PascalABCCompiler.SemanticTree.polymorphic_state)br.ReadByte();
+            field_access_level fal = (field_access_level)br.ReadByte();
+            polymorphic_state ps = (polymorphic_state)br.ReadByte();
            	
             switch (fal)
             {
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_internal : field.acc_mod = access_modifer.internal_modifer; break;
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_private : field.acc_mod = access_modifer.private_modifer; return null;
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_protected : field.acc_mod = access_modifer.protected_modifer; break;
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_public : field.acc_mod = access_modifer.public_modifer; break;
+            	case field_access_level.fal_internal : field.acc_mod = access_modifer.internal_modifer; break;
+            	case field_access_level.fal_private : field.acc_mod = access_modifer.private_modifer; return null;
+            	case field_access_level.fal_protected : field.acc_mod = access_modifer.protected_modifer; break;
+            	case field_access_level.fal_public : field.acc_mod = access_modifer.public_modifer; break;
             	
             }
             
             switch (ps)
             {
-            	case PascalABCCompiler.SemanticTree.polymorphic_state.ps_static : field.is_static = true; break;
-            	case PascalABCCompiler.SemanticTree.polymorphic_state.ps_virtual : field.is_virtual = true; break;
+            	case polymorphic_state.ps_static : field.is_static = true; break;
+            	case polymorphic_state.ps_virtual : field.is_virtual = true; break;
             }
            
             //field = new class_field(name,type,cont,ps,fal,loc);
@@ -441,24 +446,24 @@ namespace PascalSharp.Internal.CodeCompletion
             for (int i = 0; i < num; i++)
             	prms.Add(GetParameter(null));
             br.ReadInt32();
-            PascalABCCompiler.SemanticTree.field_access_level fal = (PascalABCCompiler.SemanticTree.field_access_level)br.ReadByte();
-            PascalABCCompiler.SemanticTree.polymorphic_state ps = (PascalABCCompiler.SemanticTree.polymorphic_state)br.ReadByte();
+            field_access_level fal = (field_access_level)br.ReadByte();
+            polymorphic_state ps = (polymorphic_state)br.ReadByte();
             //ReadDebugInfo();
             prop = new ElementScope(new SymInfo(name, SymbolKind.Property,name),type,cur_scope);
             prop.declaringUnit = root_scope;
             switch (fal)
             {
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_internal : prop.acc_mod = access_modifer.internal_modifer; break;
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_private : prop.acc_mod = access_modifer.private_modifer; return null;
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_protected : prop.acc_mod = access_modifer.protected_modifer; break;
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_public : prop.acc_mod = access_modifer.public_modifer; break;
+            	case field_access_level.fal_internal : prop.acc_mod = access_modifer.internal_modifer; break;
+            	case field_access_level.fal_private : prop.acc_mod = access_modifer.private_modifer; return null;
+            	case field_access_level.fal_protected : prop.acc_mod = access_modifer.protected_modifer; break;
+            	case field_access_level.fal_public : prop.acc_mod = access_modifer.public_modifer; break;
             	
             }
             
             switch (ps)
             {
-            	case PascalABCCompiler.SemanticTree.polymorphic_state.ps_static : prop.is_static = true; break;
-            	case PascalABCCompiler.SemanticTree.polymorphic_state.ps_virtual : prop.is_virtual = true; break;
+            	case polymorphic_state.ps_static : prop.is_static = true; break;
+            	case polymorphic_state.ps_virtual : prop.is_virtual = true; break;
             }
             //members[offset] = prop;
             AddMember(prop, offset);
@@ -503,20 +508,20 @@ namespace PascalSharp.Internal.CodeCompletion
             cmn.is_constructor = br.ReadBoolean();
             cmn.is_forward = br.ReadBoolean();
             br.ReadBoolean();
-            PascalABCCompiler.SemanticTree.field_access_level fal = (PascalABCCompiler.SemanticTree.field_access_level)br.ReadByte();
-            PascalABCCompiler.SemanticTree.polymorphic_state ps = (PascalABCCompiler.SemanticTree.polymorphic_state)br.ReadByte();
+            field_access_level fal = (field_access_level)br.ReadByte();
+            polymorphic_state ps = (polymorphic_state)br.ReadByte();
             switch (fal)
             {
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_internal : cmn.acc_mod = access_modifer.internal_modifer; break;
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_private : cmn.acc_mod = access_modifer.private_modifer; return null;
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_protected : cmn.acc_mod = access_modifer.protected_modifer; break;
-            	case PascalABCCompiler.SemanticTree.field_access_level.fal_public : cmn.acc_mod = access_modifer.public_modifer; break;
+            	case field_access_level.fal_internal : cmn.acc_mod = access_modifer.internal_modifer; break;
+            	case field_access_level.fal_private : cmn.acc_mod = access_modifer.private_modifer; return null;
+            	case field_access_level.fal_protected : cmn.acc_mod = access_modifer.protected_modifer; break;
+            	case field_access_level.fal_public : cmn.acc_mod = access_modifer.public_modifer; break;
             }
             
             switch (ps)
             {
-            	case PascalABCCompiler.SemanticTree.polymorphic_state.ps_static : cmn.is_static = true; break;
-            	case PascalABCCompiler.SemanticTree.polymorphic_state.ps_virtual : cmn.is_virtual = true; break;
+            	case polymorphic_state.ps_static : cmn.is_static = true; break;
+            	case polymorphic_state.ps_virtual : cmn.is_virtual = true; break;
             }
             br.ReadInt32(); br.ReadInt32();
             cmn.is_override = br.ReadBoolean() == true;
@@ -757,11 +762,11 @@ namespace PascalSharp.Internal.CodeCompletion
                 string tmp = s.Substring(0, s.IndexOf(','));
                 string name_with_path = Compiler.Compiler.GetReferenceFileName(tmp+".dll");
                     //a = Assembly.LoadFrom(name_with_path);
-                a = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(name_with_path);
-                PascalABCCompiler.NetHelper.NetHelper.init_namespaces(a);
+                a = NetHelper.LoadAssembly(name_with_path);
+                NetHelper.init_namespaces(a);
                 assemblies[s] = a;
 			}
-			//Type t = NetHelper.NetHelper.FindTypeByHandle(a,br.ReadInt32());//íàõîäèì åãî ïî òîêåíó
+			//Type t = NetHelper.FindTypeByHandle(a,br.ReadInt32());//íàõîäèì åãî ïî òîêåíó
             Type t = FindTypeByHandle(br.ReadInt32());
             CompiledScope cs = TypeTable.get_compiled_type(new SymInfo(t.Name, SymbolKind.Class,t.FullName),t);
             return cs;
@@ -770,7 +775,7 @@ namespace PascalSharp.Internal.CodeCompletion
 		
 		private Type FindTypeByHandle(int off)
         {
-            Type t = PascalABCCompiler.NetHelper.NetHelper.FindTypeOrCreate(pcu_file.dotnet_names[off].name);
+            Type t = NetHelper.FindTypeOrCreate(pcu_file.dotnet_names[off].name);
             Type[] template_types = new Type[pcu_file.dotnet_names[off].addit.Length];
             for (int i = 0; i < template_types.Length; i++)
                 template_types[i] = FindTypeByHandle(pcu_file.dotnet_names[off].addit[i].offset);
@@ -786,10 +791,10 @@ namespace PascalSharp.Internal.CodeCompletion
 				string s = pcu_file.ref_assemblies[i];
 				string tmp = s.Substring(0, s.IndexOf(','));
 				tmp = Compiler.Compiler.GetReferenceFileName(tmp+".dll");
-				System.Reflection.Assembly assm = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(tmp);
-            	PascalABCCompiler.NetHelper.NetHelper.init_namespaces(assm);
+				System.Reflection.Assembly assm = NetHelper.LoadAssembly(tmp);
+            	NetHelper.init_namespaces(assm);
             	AssemblyDocCache.Load(assm,tmp);
-            	//namespaces.AddRange(PascalABCCompiler.NetHelper.NetHelper.GetNamespaces(assm));
+            	//namespaces.AddRange(NetHelper.GetNamespaces(assm));
             	(cur_scope as InterfaceUnitScope).AddReferencedAssembly(assm);
 			}
 		}

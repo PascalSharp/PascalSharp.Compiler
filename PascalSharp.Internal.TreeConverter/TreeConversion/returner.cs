@@ -10,8 +10,11 @@
 //Она приводится при необходимости к нужному типу.
 //Внешне при этом работа с классом returner не изменилась.
 using System;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter
 {
 	public class returner
 	{
@@ -34,19 +37,19 @@ namespace PascalSharp.Internal.TreeConverter.
             ret_semantic = null;
         }
 
-		public semantic_node visit(SyntaxTree.syntax_tree_node tn)
+		public semantic_node visit(syntax_tree_node tn)
 		{
             tn.visit(syntax_tree_visitor);
             return ret_semantic;
 		}
 
-		public statement_node visit(SyntaxTree.statement st)
+		public statement_node visit(statement st)
 		{
             st.visit(syntax_tree_visitor);
             return ret_semantic as statement_node;
 		}
 
-		public expression_node visit(SyntaxTree.expression expr)
+		public expression_node visit(expression expr)
 		{
             expr.visit(syntax_tree_visitor);
 
@@ -74,13 +77,13 @@ namespace PascalSharp.Internal.TreeConverter.
             return ret_semantic as expression_node;
 		}
 
-		public type_node visit(SyntaxTree.type_definition type_def)
+		public type_node visit(type_definition type_def)
 		{
             type_def.visit(syntax_tree_visitor);
             return ret_semantic as type_node;
 		}
 
-		public addressed_expression visit(SyntaxTree.addressed_value av)
+		public addressed_expression visit(addressed_value av)
 		{
             av.visit(syntax_tree_visitor);
             return ret_semantic as addressed_expression;

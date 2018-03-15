@@ -3,6 +3,8 @@
 //Интерпретатор константных выражений
 using System;
 using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalABCCompiler.SystemLibrary
 {

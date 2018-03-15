@@ -8,6 +8,7 @@
  ***************************************************************************/
 
 using System.Collections;
+using PascalABCCompiler.SemanticTree;
 
 namespace PascalSharp.Internal.EmitPE
 {
@@ -20,7 +21,7 @@ namespace PascalSharp.Internal.EmitPE
 	{
 		private ILConverter il_converter;//=new NETGenerator.ILConverter();
 
-		public void Compile(PascalABCCompiler.SemanticTree.IProgramNode ProgramTree,string TargetFileName,string SourceFileName ,
+		public void Compile(IProgramNode ProgramTree,string TargetFileName,string SourceFileName ,
             CompilerOptions options, Hashtable StandartDirectories, string[] ResourceFiles)
 		{
             il_converter = new ILConverter(StandartDirectories);

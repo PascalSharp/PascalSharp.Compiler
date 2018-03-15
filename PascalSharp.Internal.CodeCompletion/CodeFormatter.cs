@@ -17,6 +17,8 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SyntaxTree;
 
 namespace PascalSharp.Internal.CodeCompletion
 {
@@ -28,7 +30,7 @@ namespace PascalSharp.Internal.CodeCompletion
         public int AggressiveMode = 0;
     }
 
-    public class CodeFormatter : PascalABCCompiler.SyntaxTree.AbstractVisitor/*, PascalABCCompiler.Parsers.ICodeFormatter*/
+    public class CodeFormatter : AbstractVisitor/*, ICodeFormatter*/
     {
         private StringBuilder sb = new StringBuilder();
         private int tab = 2;//tabulacija
@@ -121,7 +123,7 @@ namespace PascalSharp.Internal.CodeCompletion
 
         public string FormatTree(string Text, compilation_unit cu, int cursor_line, int cursor_col)
         {
-            PascalABCCompiler.Parsers.CommentBinder binder = new PascalABCCompiler.Parsers.CommentBinder();
+            CommentBinder binder = new CommentBinder();
             //comments = binder.Bind(cu, Text);
             this.Text = Text;
             string[] lines = Text.Split('\n');

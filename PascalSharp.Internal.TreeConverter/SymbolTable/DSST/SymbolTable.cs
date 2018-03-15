@@ -5,9 +5,10 @@ using System.Linq;
 using PascalSharp.Internal.TreeConverter;
 using System.Collections.Generic;
 using System.Reflection;
-using PascalSharp.Internal.TreeConverter;SymbolTable;
-using PascalSharp.Internal.TreeConverter;SymbolTable.DSST;
-using PascalSharp.Internal.TreeConverter;TreeRealization;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using SymbolTable;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -850,7 +851,7 @@ namespace PascalSharp.Internal.TreeConverter.SymbolTable
                 if (FromScope is ClassScope)
                     FromScope = ((ClassScope)FromScope).BaseClassScope;
                 else
-                    FromScope = ((PascalABCCompiler.NetHelper.NetTypeScope)FromScope).TopScope;
+                    FromScope = ((NetTypeScope)FromScope).TopScope;
             }
             return false;
             
@@ -961,10 +962,10 @@ namespace PascalSharp.Internal.TreeConverter.SymbolTable
             {
                 if (sc is DotNETScope)
                 {
-                    if (sc is PascalABCCompiler.NetHelper.NetScope)
+                    if (sc is NetScope)
                     {
-                        PascalABCCompiler.NetHelper.NetScope netScope = sc as PascalABCCompiler.NetHelper.NetScope;
-                        if (PascalABCCompiler.NetHelper.NetHelper.PABCSystemType == null || netScope.Assembly != PascalABCCompiler.NetHelper.NetHelper.PABCSystemType.Assembly)
+                        NetScope netScope = sc as NetScope;
+                        if (NetHelper.PABCSystemType == null || netScope.Assembly != PABCSystemType.Assembly)
                         {
                             if (!assm_cache.Contains(netScope.Assembly))
                                 assm_cache.Add(netScope.Assembly);

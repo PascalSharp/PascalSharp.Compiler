@@ -1,12 +1,11 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
-using System.Text;
-using System.Collections.Generic;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.Errors;
 
-namespace PascalABCCompiler.Parsers
+using System;
+using System.Collections.Generic;
+using PascalSharp.Internal.SyntaxTree;
+
+namespace PascalSharp.Internal.ParserTools
 {
 	/// <summary>
 	/// Интерфейс, предоставляющий информацию интеллисенсу
@@ -56,7 +55,7 @@ namespace PascalABCCompiler.Parsers
     	string GetKeyword(SymbolKind kind);
     	string ConstructOverridedMethodHeader(IProcScope scope, out int off);
     	string GetSimpleDescriptionWithoutNamespace(ITypeScope scope);
-    	string GetClassKeyword(SyntaxTree.class_keyword keyw);
+    	string GetClassKeyword(class_keyword keyw);
     	
     	string[] GetIndexerString(IBaseScope scope);
     	/// <summary>
@@ -429,7 +428,7 @@ namespace PascalABCCompiler.Parsers
     		get;
     	}
     	
-    	PascalABCCompiler.SyntaxTree.access_modifer AccessModifier
+    	access_modifer AccessModifier
     	{
     		get;
     	}
@@ -570,7 +569,7 @@ namespace PascalABCCompiler.Parsers
     		get;
     	}
     	
-    	PascalABCCompiler.SyntaxTree.parametr_kind ParamKind
+    	parametr_kind ParamKind
     	{
     		get;
     	}

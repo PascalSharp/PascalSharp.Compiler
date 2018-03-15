@@ -3,6 +3,7 @@
 
 using System;
 using PascalABCCompiler;
+using PascalABCCompiler.SemanticTree;
 using PascalSharp.Internal.Errors;
 using PascalSharp.Internal.Localization;
 
@@ -17,7 +18,7 @@ namespace PascalSharp.Internal.CompilerTools.Errors
             this.fileName = fileName;
         }
 
-        public virtual PascalABCCompiler.SemanticTree.ILocation Location
+        public virtual ILocation Location
         {
             get
             {

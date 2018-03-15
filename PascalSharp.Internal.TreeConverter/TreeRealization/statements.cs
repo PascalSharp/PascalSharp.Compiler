@@ -36,7 +36,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -70,7 +70,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -84,14 +84,14 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
     [Serializable]
     public class runtime_statement : statement_node, IRuntimeManagedMethodBody
     {
-        private PascalABCCompiler.SemanticTree.runtime_statement_type _rts;
+        private runtime_statement_type _rts;
 
-        public runtime_statement(PascalABCCompiler.SemanticTree.runtime_statement_type rts,location loc) :base(loc)
+        public runtime_statement(runtime_statement_type rts,location loc) :base(loc)
         {
             _rts = rts;
         }
 
-        public PascalABCCompiler.SemanticTree.runtime_statement_type runtime_statement_type
+        public runtime_statement_type runtime_statement_type
         {
             get
             {
@@ -103,7 +103,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -188,7 +188,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -214,7 +214,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -312,12 +312,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IIfNode.else_body
+		IStatementNode IIfNode.else_body
 		{
 			get
 			{
@@ -325,7 +325,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IIfNode.condition
+		IExpressionNode IIfNode.condition
 		{
 			get
 			{
@@ -333,7 +333,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IIfNode.then_body
+		IStatementNode IIfNode.then_body
 		{
 			get
 			{
@@ -421,12 +421,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IWhileNode.condition
+		IExpressionNode IWhileNode.condition
 		{
 			get
 			{
@@ -434,7 +434,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IWhileNode.body
+		IStatementNode IWhileNode.body
 		{
 			get
 			{
@@ -525,12 +525,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IRepeatNode.condition
+		IExpressionNode IRepeatNode.condition
 		{
 			get
 			{
@@ -538,7 +538,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IRepeatNode.body
+		IStatementNode IRepeatNode.body
 		{
 			get
 			{
@@ -694,12 +694,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IForNode.initialization_statement
+		IStatementNode IForNode.initialization_statement
 		{
 			get
 			{
@@ -707,7 +707,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IForNode.body
+		IStatementNode IForNode.body
 		{
 			get
 			{
@@ -715,7 +715,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.IForNode.increment_statement
+		IStatementNode IForNode.increment_statement
 		{
 			get
 			{
@@ -723,7 +723,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IForNode.while_expr
+		IExpressionNode IForNode.while_expr
 		{
 			get
 			{
@@ -731,7 +731,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IForNode.init_while_expr
+		IExpressionNode IForNode.init_while_expr
 		{
 			get
 			{
@@ -739,7 +739,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		bool PascalABCCompiler.SemanticTree.IForNode.IsBoolCycle
+		bool IForNode.IsBoolCycle
 		{
 			get
 			{
@@ -790,7 +790,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Массив переменных, определенных в блоке.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        PascalABCCompiler.SemanticTree.ILocalBlockVariableNode[] PascalABCCompiler.SemanticTree.IStatementsListNode.LocalVariables
+        ILocalBlockVariableNode[] IStatementsListNode.LocalVariables
         {
             get
             {
@@ -824,7 +824,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <summary>
         /// Положение левой логической скобки
         /// </summary>
-        public PascalABCCompiler.SemanticTree.ILocation LeftLogicalBracketLocation
+        public ILocation LeftLogicalBracketLocation
         {
             get
             {
@@ -839,7 +839,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <summary>
         /// Положение правой логической скобки
         /// </summary>
-        public PascalABCCompiler.SemanticTree.ILocation RightLogicalBracketLocation
+        public ILocation RightLogicalBracketLocation
         {
             get
             {
@@ -866,12 +866,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.IStatementNode[] PascalABCCompiler.SemanticTree.IStatementsListNode.statements
+		IStatementNode[] IStatementsListNode.statements
 		{
 			get
 			{
@@ -916,7 +916,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public PascalABCCompiler.SemanticTree.IWhileNode while_node
+		public IWhileNode while_node
 		{
 			get
 			{
@@ -928,9 +928,9 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
-			visitor.visit((PascalABCCompiler.SemanticTree.IWhileBreakNode)this);
+			visitor.visit((IWhileBreakNode)this);
 		}
 	}
 
@@ -971,12 +971,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
-			visitor.visit((PascalABCCompiler.SemanticTree.IRepeatBreakNode)this);
+			visitor.visit((IRepeatBreakNode)this);
 		}
 
-		public PascalABCCompiler.SemanticTree.IRepeatNode repeat_node
+		public IRepeatNode repeat_node
 		{
 			get
 			{
@@ -1022,12 +1022,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
-			visitor.visit((PascalABCCompiler.SemanticTree.IForBreakNode)this);
+			visitor.visit((IForBreakNode)this);
 		}
 
-		public PascalABCCompiler.SemanticTree.IForNode for_node
+		public IForNode for_node
 		{
 			get
 			{
@@ -1070,12 +1070,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
-			visitor.visit((PascalABCCompiler.SemanticTree.IForeachBreakNode)this);
+			visitor.visit((IForeachBreakNode)this);
 		}
 
-		public PascalABCCompiler.SemanticTree.IForeachNode foreach_node
+		public IForeachNode foreach_node
 		{
 			get
 			{
@@ -1116,9 +1116,9 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
-            visitor.visit((PascalABCCompiler.SemanticTree.IExitProcedure)this);
+            visitor.visit((IExitProcedure)this);
         }
 
     }
@@ -1161,12 +1161,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
-			visitor.visit((PascalABCCompiler.SemanticTree.IWhileContinueNode)this);
+			visitor.visit((IWhileContinueNode)this);
 		}
 
-		public PascalABCCompiler.SemanticTree.IWhileNode while_node
+		public IWhileNode while_node
 		{
 			get
 			{
@@ -1212,12 +1212,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
-			visitor.visit((PascalABCCompiler.SemanticTree.IRepeatContinueNode)this);
+			visitor.visit((IRepeatContinueNode)this);
 		}
 
-		public PascalABCCompiler.SemanticTree.IRepeatNode repeat_node
+		public IRepeatNode repeat_node
 		{
 			get
 			{
@@ -1263,12 +1263,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
-            visitor.visit((PascalABCCompiler.SemanticTree.IForContinueNode)this);
+            visitor.visit((IForContinueNode)this);
         }
 
-		public PascalABCCompiler.SemanticTree.IForNode for_node
+		public IForNode for_node
 		{
 			get
 			{
@@ -1311,12 +1311,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
-            visitor.visit((PascalABCCompiler.SemanticTree.IForeachContinueNode)this);
+            visitor.visit((IForeachContinueNode)this);
         }
 
-		public PascalABCCompiler.SemanticTree.IForeachNode foreach_node
+		public IForeachNode foreach_node
 		{
 			get
 			{
@@ -1383,12 +1383,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        PascalABCCompiler.SemanticTree.ICaseVariantNode[] PascalABCCompiler.SemanticTree.ISwitchNode.case_variants
+        ICaseVariantNode[] ISwitchNode.case_variants
         {
             get
             {
@@ -1396,7 +1396,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.IStatementNode PascalABCCompiler.SemanticTree.ISwitchNode.default_statement
+        IStatementNode ISwitchNode.default_statement
         {
             get
             {
@@ -1404,7 +1404,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IExpressionNode case_expression
+        public IExpressionNode case_expression
         {
             get
             {
@@ -1468,12 +1468,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        public PascalABCCompiler.SemanticTree.IIntConstantNode[] elements
+        public IIntConstantNode[] elements
         {
             get
             {
@@ -1481,7 +1481,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.ICaseRangeNode[] ranges
+        public ICaseRangeNode[] ranges
         {
             get
             {
@@ -1489,7 +1489,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IStatementNode statement_to_execute
+        public IStatementNode statement_to_execute
         {
             get
             {
@@ -1541,12 +1541,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        PascalABCCompiler.SemanticTree.IIntConstantNode PascalABCCompiler.SemanticTree.ICaseRangeNode.lower_bound
+        IIntConstantNode ICaseRangeNode.lower_bound
         {
             get
             {
@@ -1554,7 +1554,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.IIntConstantNode PascalABCCompiler.SemanticTree.ICaseRangeNode.high_bound
+        IIntConstantNode ICaseRangeNode.high_bound
         {
             get
             {
@@ -1614,7 +1614,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.ITypeNode ExceptionType
+        public ITypeNode ExceptionType
         {
             get
             {
@@ -1622,7 +1622,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.ILocalBlockVariableReferenceNode ExceptionInstance
+        public ILocalBlockVariableReferenceNode ExceptionInstance
         {
             get
             {
@@ -1630,7 +1630,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IStatementNode ExceptionHandler
+        public IStatementNode ExceptionHandler
         {
             get
             {
@@ -1653,7 +1653,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -1714,12 +1714,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        public PascalABCCompiler.SemanticTree.IStatementNode TryStatements
+        public IStatementNode TryStatements
         {
             get
             {
@@ -1727,7 +1727,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IStatementNode FinallyStatements
+        public IStatementNode FinallyStatements
         {
             get
             {
@@ -1735,7 +1735,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IExceptionFilterBlockNode[] ExceptionFilters
+        public IExceptionFilterBlockNode[] ExceptionFilters
         {
             get
             {
@@ -1795,7 +1795,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IStatementNode Body
+        public IStatementNode Body
         {
             get
             {
@@ -1803,7 +1803,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IExpressionNode InWhatExpr
+        public IExpressionNode InWhatExpr
         {
             get
             {
@@ -1811,7 +1811,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IVAriableDefinitionNode VarIdent
+        public IVAriableDefinitionNode VarIdent
         {
             get
             {
@@ -1833,7 +1833,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -1877,7 +1877,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IStatementNode Body
+        public IStatementNode Body
         {
             get
             {
@@ -1885,7 +1885,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IExpressionNode LockObject
+        public IExpressionNode LockObject
         {
             get
             {
@@ -1909,7 +1909,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

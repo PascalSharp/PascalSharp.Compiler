@@ -1,6 +1,7 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
 using StringResources = PascalSharp.Internal.Localization.StringResources;
 
@@ -82,16 +83,16 @@ namespace PascalSharp.Compiler
 
 	public class UnitCompilationError : CompilationError
 	{
-		private PascalABCCompiler.SyntaxTree.unit_or_namespace _SyntaxUsesUnit;
+		private unit_or_namespace _SyntaxUsesUnit;
 		private string _file_name;
 
-		public UnitCompilationError(string fileName,PascalABCCompiler.SyntaxTree.unit_or_namespace syntaxUsesUnit)
+		public UnitCompilationError(string fileName,unit_or_namespace syntaxUsesUnit)
 		{
 			_SyntaxUsesUnit=syntaxUsesUnit;
 			_file_name=fileName;
 		}
 
-		public PascalABCCompiler.SyntaxTree.unit_or_namespace SyntaxUsesUnit
+		public unit_or_namespace SyntaxUsesUnit
 		{
 			get
 			{

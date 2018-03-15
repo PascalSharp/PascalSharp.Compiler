@@ -19,9 +19,9 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         private expression_node _inital_value;
         private bool _is_ret_value;
         private bool _is_special_name;
-        private PascalABCCompiler.SemanticTree.polymorphic_state _polymorphic_state = PascalABCCompiler.SemanticTree.polymorphic_state.ps_common;
+        private polymorphic_state _polymorphic_state = polymorphic_state.ps_common;
 
-        public virtual PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
+        public virtual polymorphic_state polymorphic_state
         {
             get
             {
@@ -37,7 +37,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return polymorphic_state == PascalABCCompiler.SemanticTree.polymorphic_state.ps_static;
+                return polymorphic_state == polymorphic_state.ps_static;
             }
         }
 
@@ -130,7 +130,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 _inital_value = value;
             }
         }
-        PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IVAriableDefinitionNode.inital_value
+        IExpressionNode IVAriableDefinitionNode.inital_value
         {
             get
             {
@@ -139,7 +139,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         }
 
 		//Раположение переменной.
-		public abstract PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
+		public abstract node_location_kind node_location_kind
 		{
 			get;
 		}
@@ -153,12 +153,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		}
 
 
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IVAriableDefinitionNode.type
+		ITypeNode IVAriableDefinitionNode.type
 		{
 			get
 			{
@@ -210,7 +210,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             _is_used_as_unlocal = true;
         }
 
-		public PascalABCCompiler.SemanticTree.ILocation Location
+		public ILocation Location
 		{
 			get
 			{
@@ -232,11 +232,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		}
 
 		//Раположение переменной - переменная расположена в функции.
-		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
+		public override node_location_kind node_location_kind
 		{
 			get
 			{
-				return PascalABCCompiler.SemanticTree.node_location_kind.in_function_location;
+				return node_location_kind.in_function_location;
 			}
 		}
 
@@ -248,12 +248,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.ICommonFunctionNode PascalABCCompiler.SemanticTree.IFunctionMemberNode.function
+		ICommonFunctionNode IFunctionMemberNode.function
 		{
 			get
 			{
@@ -296,7 +296,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
         
 
-        public PascalABCCompiler.SemanticTree.ILocation Location
+        public ILocation Location
         {
             get
             {
@@ -318,11 +318,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         }
 
         //Раположение переменной - переменная расположена в функции.
-        public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
+        public override node_location_kind node_location_kind
         {
             get
             {
-                return PascalABCCompiler.SemanticTree.node_location_kind.in_block_location;
+                return node_location_kind.in_block_location;
             }
         }
 
@@ -334,12 +334,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        PascalABCCompiler.SemanticTree.IStatementsListNode PascalABCCompiler.SemanticTree.ILocalBlockVariableNode.Block
+        IStatementsListNode ILocalBlockVariableNode.Block
         {
             get
             {
@@ -380,7 +380,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
 		}
 
-		public PascalABCCompiler.SemanticTree.ILocation Location
+		public ILocation Location
 		{
 			get
 			{
@@ -402,11 +402,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		}
 
 		//Раположение переменной - переменная расположена непосредственно в пространстве имен.
-		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
+		public override node_location_kind node_location_kind
 		{
 			get
 			{
-				return PascalABCCompiler.SemanticTree.node_location_kind.in_namespace_location;
+				return node_location_kind.in_namespace_location;
 			}
 		}
 
@@ -418,12 +418,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		public PascalABCCompiler.SemanticTree.ICommonNamespaceNode comprehensive_namespace
+		public ICommonNamespaceNode comprehensive_namespace
 		{
 			get
 			{
@@ -436,13 +436,13 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 	public class class_field : var_definition_node, ICommonClassFieldNode
 	{
 		private common_type_node _cont_class;
-		private PascalABCCompiler.SemanticTree.polymorphic_state _polymorphic_state;
-		private PascalABCCompiler.SemanticTree.field_access_level _field_access_level;
+		private polymorphic_state _polymorphic_state;
+		private field_access_level _field_access_level;
 
 		private location _loc;
 
         public class_field(string name, common_type_node cont_class,
-            PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state, PascalABCCompiler.SemanticTree.field_access_level field_access_level,
+            polymorphic_state polymorphic_state, field_access_level field_access_level,
             location loc) :
             base(name)
         {
@@ -454,7 +454,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
 
 		public class_field(string name,type_node type,common_type_node cont_class,
-			PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state, PascalABCCompiler.SemanticTree.field_access_level field_access_level,
+			polymorphic_state polymorphic_state, field_access_level field_access_level,
             location loc):
 			base(name,type)
 		{
@@ -476,7 +476,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public PascalABCCompiler.SemanticTree.ILocation Location
+		public ILocation Location
 		{
 			get
 			{
@@ -505,7 +505,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-        public override PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
+        public override polymorphic_state polymorphic_state
 		{
 			get
 			{
@@ -517,7 +517,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public PascalABCCompiler.SemanticTree.field_access_level field_access_level
+		public field_access_level field_access_level
 		{
 			get
 			{
@@ -530,11 +530,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		}
 
 		//Раположение переменной - переменная расположена в классе.
-		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
+		public override node_location_kind node_location_kind
 		{
 			get
 			{
-				return PascalABCCompiler.SemanticTree.node_location_kind.in_class_location;
+				return node_location_kind.in_class_location;
 			}
 		}
 
@@ -546,12 +546,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		public PascalABCCompiler.SemanticTree.ICommonTypeNode common_comprehensive_type
+		public ICommonTypeNode common_comprehensive_type
 		{
 			get
 			{
@@ -559,7 +559,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public PascalABCCompiler.SemanticTree.ITypeNode comperehensive_type
+		public ITypeNode comperehensive_type
 		{
 			get
 			{
@@ -567,7 +567,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.polymorphic_state PascalABCCompiler.SemanticTree.IClassMemberNode.polymorphic_state
+		polymorphic_state IClassMemberNode.polymorphic_state
 		{
 			get
 			{
@@ -590,11 +590,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			_cont_type=compiled_type_node.get_type_node(fi.DeclaringType);
 		}
 
-		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
+		public override node_location_kind node_location_kind
 		{
 			get
 			{
-				return PascalABCCompiler.SemanticTree.node_location_kind.in_class_location;
+				return node_location_kind.in_class_location;
 			}
 		}
 
@@ -615,15 +615,15 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		}
 
         //TODO: Вынести в NetHelper.
-		public PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state
+		public polymorphic_state polymorphic_state
 		{
 			get
 			{
 				if (_fi.IsStatic)
 				{
-					return PascalABCCompiler.SemanticTree.polymorphic_state.ps_static;
+					return polymorphic_state.ps_static;
 				}
-				return PascalABCCompiler.SemanticTree.polymorphic_state.ps_common;
+				return polymorphic_state.ps_common;
 			}
 		}
 		
@@ -644,11 +644,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		}
 		
         //TODO: Вынести в NetHelper.
-		public PascalABCCompiler.SemanticTree.field_access_level field_access_level
+		public field_access_level field_access_level
 		{
 			get
 			{
-                return NetHelper.NetHelper.GetFieldAccessLevel(_fi);
+                return NetHelper.GetFieldAccessLevel(_fi);
 			}
 		}
 
@@ -660,12 +660,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		public PascalABCCompiler.SemanticTree.ICompiledTypeNode comprehensive_type
+		public ICompiledTypeNode comprehensive_type
 		{
 			get
 			{
@@ -673,7 +673,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public PascalABCCompiler.SemanticTree.ITypeNode comperehensive_type
+		public ITypeNode comperehensive_type
 		{
 			get
 			{
@@ -685,7 +685,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 	[Serializable]
 	public abstract class parameter : var_definition_node, IParameterNode
 	{
-		protected PascalABCCompiler.SemanticTree.parameter_type _par_type;
+		protected parameter_type _par_type;
 
         public parameter(string name) : base(name)
         {
@@ -696,7 +696,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		}
 
 		//Тип параметра.
-		public abstract PascalABCCompiler.SemanticTree.parameter_type parameter_type
+		public abstract parameter_type parameter_type
 		{
 			get;
 		}
@@ -717,12 +717,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			get;
 		}
 
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.IFunctionNode PascalABCCompiler.SemanticTree.IParameterNode.function
+		IFunctionNode IParameterNode.function
 		{
 			get
 			{
@@ -730,7 +730,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		PascalABCCompiler.SemanticTree.parameter_type PascalABCCompiler.SemanticTree.IParameterNode.parameter_type
+		parameter_type IParameterNode.parameter_type
 		{
 			get
 			{
@@ -739,15 +739,15 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
+		public override node_location_kind node_location_kind
 		{
 			get
 			{
-				return PascalABCCompiler.SemanticTree.node_location_kind.in_function_location;
+				return node_location_kind.in_function_location;
 			}
 		}
 
-        PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.IParameterNode.default_value
+        IExpressionNode IParameterNode.default_value
         {
             get
             {
@@ -783,7 +783,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
         private bool _is_params;
 
-        public common_parameter(string name, PascalABCCompiler.SemanticTree.parameter_type pt,
+        public common_parameter(string name, parameter_type pt,
             common_function_node cont_function, concrete_parameter_type conc_par_type, location loc) :
             base(name)
         {
@@ -793,7 +793,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             _loc = loc;
         }
 
-        public common_parameter(string name, PascalABCCompiler.SemanticTree.parameter_type pt,
+        public common_parameter(string name, parameter_type pt,
             common_function_node cont_function, concrete_parameter_type conc_par_type, expression_node default_value,
             location loc) :
             base(name)
@@ -805,7 +805,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             _loc = loc;
         }
 
-		public common_parameter(string name,type_node tp,PascalABCCompiler.SemanticTree.parameter_type pt,
+		public common_parameter(string name,type_node tp,parameter_type pt,
 			common_function_node cont_function, concrete_parameter_type conc_par_type,expression_node default_value,
             location loc):
 			base(name,tp)
@@ -893,7 +893,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public PascalABCCompiler.SemanticTree.ILocation Location
+		public ILocation Location
 		{
 			get
 			{
@@ -902,7 +902,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		}
 
 		//Тип параметра.
-		public override PascalABCCompiler.SemanticTree.parameter_type parameter_type
+		public override parameter_type parameter_type
 		{
 			get
 			{
@@ -939,12 +939,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.ICommonFunctionNode PascalABCCompiler.SemanticTree.ICommonParameterNode.common_function
+		ICommonFunctionNode ICommonParameterNode.common_function
 		{
 			get
 			{
@@ -958,7 +958,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 	{
 		private basic_function_node _cont_function;
 
-		public basic_parameter(string name,type_node type,PascalABCCompiler.SemanticTree.parameter_type par_type,
+		public basic_parameter(string name,type_node type,parameter_type par_type,
 			basic_function_node cont_function) : base(name,type)
 		{
 			_cont_function=cont_function;
@@ -988,7 +988,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         }
 
 		//Тип параметра (по ссылке или по значению).
-		public override PascalABCCompiler.SemanticTree.parameter_type parameter_type
+		public override parameter_type parameter_type
 		{
 			get
 			{
@@ -1012,7 +1012,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -1115,12 +1115,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
 
-		PascalABCCompiler.SemanticTree.ICompiledMethodNode PascalABCCompiler.SemanticTree.ICompiledParameterNode.compiled_function
+		ICompiledMethodNode ICompiledParameterNode.compiled_function
 		{
 			get
 			{
@@ -1128,12 +1128,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-        public void SetParameterType(PascalABCCompiler.SemanticTree.parameter_type pt)
+        public void SetParameterType(parameter_type pt)
         {
             _par_type = pt;
         }
 
-		public override PascalABCCompiler.SemanticTree.parameter_type parameter_type
+		public override parameter_type parameter_type
 		{
 			get
 			{

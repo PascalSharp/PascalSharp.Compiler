@@ -8,9 +8,26 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using PascalABCCompiler;
-using PascalABCCompiler.Parsers;
 using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Compiler;
+using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
+using array_const = PascalSharp.Internal.SyntaxTree.array_const;
+using compiler_directive = PascalSharp.Internal.SyntaxTree.compiler_directive;
+using empty_statement = PascalSharp.Internal.SyntaxTree.empty_statement;
+using for_node = PascalSharp.Internal.SyntaxTree.for_node;
+using goto_statement = PascalSharp.Internal.SyntaxTree.goto_statement;
+using if_node = PascalSharp.Internal.SyntaxTree.if_node;
+using labeled_statement = PascalSharp.Internal.SyntaxTree.labeled_statement;
+using question_colon_expression = PascalSharp.Internal.SyntaxTree.question_colon_expression;
+using repeat_node = PascalSharp.Internal.SyntaxTree.repeat_node;
+using sizeof_operator = PascalSharp.Internal.SyntaxTree.sizeof_operator;
+using typeof_operator = PascalSharp.Internal.SyntaxTree.typeof_operator;
+using while_node = PascalSharp.Internal.SyntaxTree.while_node;
 
 namespace PascalSharp.Internal.CodeCompletion
 {
@@ -254,7 +271,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 if (tleft != null && tright != null)
                 {
                     RetValue tmp = cnst_val;
-                    string name = PascalSharp.Internal.TreeConverter.name_reflector.get_name(_bin_expr.operation_type);
+                    string name = name_reflector.get_name(_bin_expr.operation_type);
                     List<SymScope> lst = tleft.FindOverloadNamesOnlyInType(name);
                     List<SymScope> lst_right = tright.FindOverloadNamesOnlyInType(name);
                     if (lst.Count == 0 && !char.IsLetter(name[0]))
@@ -316,7 +333,7 @@ namespace PascalSharp.Internal.CodeCompletion
                         case Operators.BitwiseNOT:
                             ev.EvalNot(); break;
                         case Operators.LogicalNOT:
-                            ev.EvalNot(); returned_scope = entry_scope.FindName(PascalSharp.Internal.TreeConverter.compiler_string_consts.bool_type_name); break;
+                            ev.EvalNot(); returned_scope = entry_scope.FindName(compiler_string_consts.bool_type_name); break;
                         case Operators.Minus:
                             ev.EvalUnmin(); break;
                     }
@@ -544,7 +561,7 @@ namespace PascalSharp.Internal.CodeCompletion
                     if (tmp_scope != null && _var_def_statement.inital_value is function_lambda_definition)
                         returned_scope = tmp_scope;
                 }
-                // if (si == null) dn = compiled_type_node.get_type_node(PascalABCCompiler.NetHelper.NetHelper.FindType((_var_def_statement.vars_type as named_type_reference).names[0].name,unl));
+                // if (si == null) dn = compiled_type_node.get_type_node(NetHelper.FindType((_var_def_statement.vars_type as named_type_reference).names[0].name,unl));
 
                 if (returned_scope == null) return;
                 if (returned_scope is ProcScope)
@@ -663,7 +680,7 @@ namespace PascalSharp.Internal.CodeCompletion
             }
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.for_node _for_node)
+        public override void visit(for_node _for_node)
         {
             //throw new Exception("The method or operation is not implemented.");
             SymScope tmp = cur_scope;
@@ -704,19 +721,19 @@ namespace PascalSharp.Internal.CodeCompletion
             cur_scope = tmp;
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.repeat_node _repeat_node)
+        public override void visit(repeat_node _repeat_node)
         {
         	if (_repeat_node.statements != null)
         	_repeat_node.statements.visit(this);
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.while_node _while_node)
+        public override void visit(while_node _while_node)
         {
             if (_while_node.statements != null)
         	_while_node.statements.visit(this);
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.if_node _if_node)
+        public override void visit(if_node _if_node)
         {
             if (_if_node.then_body != null)
         	_if_node.then_body.visit(this);
@@ -796,7 +813,7 @@ namespace PascalSharp.Internal.CodeCompletion
             			indexes.Add(null);
             	}
             }
-            else indexes.Add((TypeScope)entry_scope.FindName(PascalSharp.Internal.TreeConverter.compiler_string_consts.integer_type_name));
+            else indexes.Add((TypeScope)entry_scope.FindName(compiler_string_consts.integer_type_name));
        
             returned_scope = new ArrayScope(of_type as TypeScope,indexes.ToArray());
             returned_scope.topScope = cur_scope;
@@ -1255,7 +1272,7 @@ namespace PascalSharp.Internal.CodeCompletion
         {
             foreach (procedure_attribute attr in attrs)
             {
-                if (attr.attribute_type == PascalABCCompiler.SyntaxTree.proc_attribute.attr_extension)
+                if (attr.attribute_type == proc_attribute.attr_extension)
                 {
                     return true;
                 }
@@ -1901,11 +1918,11 @@ namespace PascalSharp.Internal.CodeCompletion
         public override void visit(unit_module _unit_module)
         {
             string path = get_assembly_path("mscorlib.dll",_unit_module.file_name);
-        	Assembly _as = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(path);
+        	Assembly _as = NetHelper.LoadAssembly(path);
             AssemblyDocCache.Load(_as, path);
-            PascalABCCompiler.NetHelper.NetHelper.init_namespaces(_as);
+            NetHelper.init_namespaces(_as);
             List<string> namespaces = new List<string>();
-            namespaces.AddRange(PascalABCCompiler.NetHelper.NetHelper.GetNamespaces(_as));
+            namespaces.AddRange(NetHelper.GetNamespaces(_as));
             InterfaceUnitScope unit_scope = null;
             cur_scope = unit_scope= new InterfaceUnitScope(new SymInfo(_unit_module.unit_name.idunit_name.name, SymbolKind.Namespace,_unit_module.unit_name.idunit_name.name),null);
             this.cur_unit_file_name = _unit_module.file_name;
@@ -1921,15 +1938,15 @@ namespace PascalSharp.Internal.CodeCompletion
             {
             	IReferenceInfo[] refs = CodeCompletionController.comp.CompilerOptions.CurrentProject.References;
             	if (_unit_module.compiler_directives == null)
-            		_unit_module.compiler_directives = new List<PascalABCCompiler.SyntaxTree.compiler_directive>();
+            		_unit_module.compiler_directives = new List<compiler_directive>();
             	foreach (IReferenceInfo ri in refs)
             	{
             		_unit_module.compiler_directives.Add
-            			(new PascalABCCompiler.SyntaxTree.compiler_directive(new token_info("reference"),new token_info(ri.FullAssemblyName)));
+            			(new compiler_directive(new token_info("reference"),new token_info(ri.FullAssemblyName)));
             	}
             }
             if (_unit_module.compiler_directives != null)
-            foreach (PascalABCCompiler.SyntaxTree.compiler_directive dir in _unit_module.compiler_directives)
+            foreach (compiler_directive dir in _unit_module.compiler_directives)
             {
             	if (dir.Name.text.ToLower() == "reference")
                 {
@@ -1937,17 +1954,17 @@ namespace PascalSharp.Internal.CodeCompletion
                     {
                 		//System.Reflection.Assembly assm = System.Reflection.Assembly.LoadFrom(get_assembly_path(dir.Directive.text,_unit_module.file_name));
                 		path = get_assembly_path(dir.Directive.text,_unit_module.file_name);
-                    	System.Reflection.Assembly assm = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(path);
-                		PascalABCCompiler.NetHelper.NetHelper.init_namespaces(assm);
+                    	System.Reflection.Assembly assm = NetHelper.LoadAssembly(path);
+                		NetHelper.init_namespaces(assm);
                     	AssemblyDocCache.Load(assm, path);
-                    	namespaces.AddRange(PascalABCCompiler.NetHelper.NetHelper.GetNamespaces(assm));
+                    	namespaces.AddRange(NetHelper.GetNamespaces(assm));
                     	unit_scope.AddReferencedAssembly(assm);
                     }
                     catch (Exception e)
                     {
                     	
                     }
-                    //ns=new PascalABCCompiler.NetHelper.NetScope(unl,assm,tcst);
+                    //ns=new NetScope(unl,assm,tcst);
                 }
                 else
                 if (dir.Name.text.ToLower() == "region")
@@ -1984,7 +2001,7 @@ namespace PascalSharp.Internal.CodeCompletion
             	is_system_unit = true;
             	add_standart_types(entry_scope);
             }
-            if (_unit_module.unit_name.idunit_name.name == PascalSharp.Internal.TreeConverter.compiler_string_consts.extensions_unit_file_name)
+            if (_unit_module.unit_name.idunit_name.name == compiler_string_consts.extensions_unit_file_name)
             {
                 is_extensions_unit = true;
             }
@@ -2060,7 +2077,7 @@ namespace PascalSharp.Internal.CodeCompletion
                  		entry_scope.AddUsedUnit(dc.visitor.entry_scope);
                  		add_standart_types(dc.visitor.entry_scope);
                  		//get_standart_types(dc.stv);
-                 		entry_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_file_name,dc.visitor.entry_scope);
+                 		entry_scope.AddName(compiler_string_consts.system_unit_file_name,dc.visitor.entry_scope);
                  	}
                  	CodeCompletionController.comp_modules[unit_name] = dc;
                  	
@@ -2070,14 +2087,14 @@ namespace PascalSharp.Internal.CodeCompletion
                  	dc.visitor.entry_scope.InitAssemblies();
                  	entry_scope.AddUsedUnit(dc.visitor.entry_scope);
                  	//get_standart_types(dc.stv);
-                 	entry_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_file_name,dc.visitor.entry_scope);
+                 	entry_scope.AddName(compiler_string_consts.system_unit_file_name,dc.visitor.entry_scope);
                  }
             }
 		}
 
         private void add_extensions_unit()
         {
-            string unit_name = CodeCompletionNameHelper.FindSourceFileName(PascalSharp.Internal.TreeConverter.compiler_string_consts.extensions_unit_file_name);
+            string unit_name = CodeCompletionNameHelper.FindSourceFileName(compiler_string_consts.extensions_unit_file_name);
 
             if (unit_name != null)
             {
@@ -2090,7 +2107,7 @@ namespace PascalSharp.Internal.CodeCompletion
                     {
                         dc.visitor.entry_scope.InitAssemblies();
                         entry_scope.AddUsedUnit(dc.visitor.entry_scope);
-                        entry_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.extensions_unit_file_name, dc.visitor.entry_scope);
+                        entry_scope.AddName(compiler_string_consts.extensions_unit_file_name, dc.visitor.entry_scope);
                     }
                     CodeCompletionController.comp_modules[unit_name] = dc;
                 }
@@ -2098,7 +2115,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 {
                     dc.visitor.entry_scope.InitAssemblies();
                     entry_scope.AddUsedUnit(dc.visitor.entry_scope);
-                    entry_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.extensions_unit_file_name, dc.visitor.entry_scope);
+                    entry_scope.AddName(compiler_string_consts.extensions_unit_file_name, dc.visitor.entry_scope);
                 }
             }
         }
@@ -2107,14 +2124,14 @@ namespace PascalSharp.Internal.CodeCompletion
         {
             //Assembly _as = System.Reflection.Assembly.LoadFrom(get_assembly_path("mscorlib.dll",_program_module.file_name));
             string path = get_assembly_path("mscorlib.dll", _program_module.file_name);
-            System.Reflection.Assembly _as = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(path);
+            System.Reflection.Assembly _as = NetHelper.LoadAssembly(path);
             List<string> namespaces = new List<string>();
-            PascalABCCompiler.NetHelper.NetHelper.init_namespaces(_as);
+            NetHelper.init_namespaces(_as);
             AssemblyDocCache.Load(_as, path);
 
-            namespaces.AddRange(PascalABCCompiler.NetHelper.NetHelper.GetNamespaces(_as));
+            namespaces.AddRange(NetHelper.GetNamespaces(_as));
             //List<Scope> netScopes = new List<Scope>();
-            //PascalABCCompiler.NetHelper.NetScope ns=new PascalABCCompiler.NetHelper.NetScope(unl,_as,tcst);
+            //NetScope ns=new NetScope(unl,_as,tcst);
             InterfaceUnitScope unit_scope = null;
             cur_scope = unit_scope = new InterfaceUnitScope(new SymInfo("", SymbolKind.Namespace, "program"), null);
             CodeCompletionController.comp_modules[_program_module.file_name] = this.converter;
@@ -2123,16 +2140,16 @@ namespace PascalSharp.Internal.CodeCompletion
             {
                 IReferenceInfo[] refs = CodeCompletionController.comp.CompilerOptions.CurrentProject.References;
                 if (_program_module.compiler_directives == null)
-                    _program_module.compiler_directives = new List<PascalABCCompiler.SyntaxTree.compiler_directive>();
+                    _program_module.compiler_directives = new List<compiler_directive>();
                 foreach (IReferenceInfo ri in refs)
                 {
                     _program_module.compiler_directives.Add
-                        (new PascalABCCompiler.SyntaxTree.compiler_directive(new token_info("reference"), new token_info(ri.FullAssemblyName)));
+                        (new compiler_directive(new token_info("reference"), new token_info(ri.FullAssemblyName)));
                 }
             }
             List<string> included_files = new List<string>();
             if (_program_module.compiler_directives != null)
-                foreach (PascalABCCompiler.SyntaxTree.compiler_directive dir in _program_module.compiler_directives)
+                foreach (compiler_directive dir in _program_module.compiler_directives)
                 {
 #if DEBUG
                     // SSM test 05.08.17
@@ -2145,12 +2162,12 @@ namespace PascalSharp.Internal.CodeCompletion
                         {
                             //System.Reflection.Assembly assm = System.Reflection.Assembly.LoadFrom(get_assembly_path(dir.Directive.text,_program_module.file_name));
                             path = get_assembly_path(dir.Directive.text, _program_module.file_name);
-                            System.Reflection.Assembly assm = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(path);
+                            System.Reflection.Assembly assm = NetHelper.LoadAssembly(path);
                             if (assm != null)
                             {
-                                PascalABCCompiler.NetHelper.NetHelper.init_namespaces(assm);
+                                NetHelper.init_namespaces(assm);
                                 AssemblyDocCache.Load(assm, path);
-                                namespaces.AddRange(PascalABCCompiler.NetHelper.NetHelper.GetNamespaces(assm));
+                                namespaces.AddRange(NetHelper.GetNamespaces(assm));
                                 unit_scope.AddReferencedAssembly(assm);
                             }
                         }
@@ -2268,7 +2285,7 @@ namespace PascalSharp.Internal.CodeCompletion
                                     }
                                     else
                                     {
-                                        if (PascalABCCompiler.NetHelper.NetHelper.IsNetNamespace(str))
+                                        if (NetHelper.IsNetNamespace(str))
                                         {
                                             ns_scope = new NamespaceScope(str);
                                             ns_cache[str] = str;
@@ -2276,25 +2293,25 @@ namespace PascalSharp.Internal.CodeCompletion
                                             if (s.name.idents.Count == 1)
                                                 cur_scope.AddUsedUnit(ns_scope);
                                         }
-                                        else if (PascalABCCompiler.NetHelper.NetHelper.IsType(str) && semantic_options.allow_import_types)
+                                        else if (NetHelper.IsType(str) && semantic_options.allow_import_types)
                                         {
-                                            Type t = PascalABCCompiler.NetHelper.NetHelper.FindType(str);
+                                            Type t = NetHelper.FindType(str);
                                             cur_scope.AddUsedUnit(new NamespaceTypeScope(TypeTable.get_compiled_type(new SymInfo(t.Name, SymbolKind.Class, t.FullName), t)));
                                         }
                                     }
                                     //unit_name = System.IO.Path.GetDirectoryName(_program_module.file_name)+"\\"+str+System.IO.Path.GetExtension(_program_module.file_name);
                                 }
                             }
-                            if (i == s.name.idents.Count - 1 && i > 0 /*&& PascalABCCompiler.NetHelper.NetHelper.IsNetNamespace(str)*/)
+                            if (i == s.name.idents.Count - 1 && i > 0 /*&& NetHelper.IsNetNamespace(str)*/)
                                 //possible_namespaces.Add(str);
                                 cur_scope.AddUsedUnit(new NamespaceScope(str));
                             if (i < s.name.idents.Count - 1)
                                 str += ".";
 
                         }
-                        if (string.Compare(str, PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_name, true) == 0)
+                        if (string.Compare(str, compiler_string_consts.system_unit_name, true) == 0)
                             has_system_unit = true;
-                        if (string.Compare(str, PascalSharp.Internal.TreeConverter.compiler_string_consts.extensions_unit_file_name, true) == 0)
+                        if (string.Compare(str, compiler_string_consts.extensions_unit_file_name, true) == 0)
                             has_extensions_unit = true;
                         unl.AddElement(new PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace(str));
                     }
@@ -2352,83 +2369,83 @@ namespace PascalSharp.Internal.CodeCompletion
         {
         	string type_name = null;
         	//obj_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.object_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.object_type_name),typeof(object));
-        	cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.object_type_name,TypeTable.obj_type);
+        	cur_scope.AddName(compiler_string_consts.object_type_name,TypeTable.obj_type);
         	//int_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.integer_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.integer_type_name),typeof(int));
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.integer_type_name, int_type);
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.IntType);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.IntType);
         	if (type_name != null) cur_scope.AddName(type_name, TypeTable.int_type);
         	//real_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.real_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.real_type_name),typeof(double));
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.real_type_name,real_type);
-            type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.DoubleType);
+            type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.DoubleType);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.real_type);
         	//string_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.string_type_name, SymbolKind.Class,PascalSharp.Internal.TreeConverter.compiler_string_consts.string_type_name),typeof(string));
-        	cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.string_type_name,TypeTable.string_type);
+        	cur_scope.AddName(compiler_string_consts.string_type_name,TypeTable.string_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.string_type_name,
         	//new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.string_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.ShortStringTypeName),typeof(string)));
         	//char_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.char_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.char_type_name),typeof(char));
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.CharType);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.CharType);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.char_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.char_type_name,char_type);
         	//bool_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.bool_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.bool_type_name),typeof(bool));
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.BoolType);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.BoolType);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.bool_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.bool_type_name,bool_type);
         	//byte_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.byte_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.byte_type_name),typeof(byte));
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.ByteType);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.ByteType);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.byte_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.byte_type_name,byte_type);
         	//int16_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.short_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.short_type_name),typeof(short));
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.ShortType);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.ShortType);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.int16_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.short_type_name,int16_type);
         	//sbyte_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.sbyte_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.sbyte_type_name),typeof(sbyte));
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.SByteType);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.SByteType);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.sbyte_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.sbyte_type_name,sbyte_type);
         	//uint16_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.ushort_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.ushort_type_name),typeof(ushort));
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.UShortType);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.UShortType);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.uint16_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.ushort_type_name,uint16_type);
         	//uint32_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.uint_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.uint_type_name),typeof(uint));
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.UIntType);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.UIntType);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.uint32_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.uint_type_name,uint32_type);
         	//int64_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.long_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.long_type_name),typeof(long));
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.Int64Type);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.Int64Type);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.int64_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.long_type_name,int64_type);
         	//uint64_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.ulong_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.ulong_type_name),typeof(ulong));
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.UInt64Type);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.UInt64Type);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.uint64_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.ulong_type_name,uint64_type);
         	//float_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.float_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.float_type_name),typeof(float));
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.FloatType);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.FloatType);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.float_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.float_type_name,float_type);
         	//ptr_type = new CompiledScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.pointer_type_name, SymbolKind.Type,PascalSharp.Internal.TreeConverter.compiler_string_consts.pointer_type_name),Type.GetType("System.Void*"));
-        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(PascalABCCompiler.Parsers.KeywordKind.PointerType);
+        	type_name = this.converter.controller.Parser.LanguageInformation.GetStandardTypeByKeyword(ParserTools.KeywordKind.PointerType);
             if (type_name != null) cur_scope.AddName(type_name, TypeTable.ptr_type);
         	//cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.pointer_type_name,ptr_type);
-        	ProcScope ps = new ProcScope(PascalSharp.Internal.TreeConverter.compiler_string_consts.set_length_procedure_name,null);
+        	ProcScope ps = new ProcScope(compiler_string_consts.set_length_procedure_name,null);
         	ps.AddParameter(new ElementScope(new SymInfo("arr", SymbolKind.Parameter,"arr"),new ArrayScope(),null,ps));
         	ps.parameters[0].param_kind = parametr_kind.var_parametr;
         	ps.AddParameter(new ElementScope(new SymInfo("length", SymbolKind.Parameter,"length"),TypeTable.int_type,null,ps));
         	ps.Complete();
-        	cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.set_length_procedure_name,ps);
-        	cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.true_const_name,new ElementScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.true_const_name, SymbolKind.Constant,PascalSharp.Internal.TreeConverter.compiler_string_consts.true_const_name),TypeTable.bool_type,true,null));
-        	cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.false_const_name,new ElementScope(new SymInfo(PascalSharp.Internal.TreeConverter.compiler_string_consts.false_const_name, SymbolKind.Constant,PascalSharp.Internal.TreeConverter.compiler_string_consts.false_const_name),TypeTable.bool_type,false,null));
-       		ps = new ProcScope(PascalSharp.Internal.TreeConverter.compiler_string_consts.new_procedure_name,null);
+        	cur_scope.AddName(compiler_string_consts.set_length_procedure_name,ps);
+        	cur_scope.AddName(compiler_string_consts.true_const_name,new ElementScope(new SymInfo(compiler_string_consts.true_const_name, SymbolKind.Constant,compiler_string_consts.true_const_name),TypeTable.bool_type,true,null));
+        	cur_scope.AddName(compiler_string_consts.false_const_name,new ElementScope(new SymInfo(compiler_string_consts.false_const_name, SymbolKind.Constant,compiler_string_consts.false_const_name),TypeTable.bool_type,false,null));
+       		ps = new ProcScope(compiler_string_consts.new_procedure_name,null);
        		ElementScope prm = new ElementScope(new SymInfo("p", SymbolKind.Parameter,"p"),TypeTable.ptr_type,null,ps);
        		prm.param_kind = parametr_kind.var_parametr;
        		ps.AddParameter(prm);
        		ps.Complete();
-       		cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.new_procedure_name,ps);
-       		ps = new ProcScope(PascalSharp.Internal.TreeConverter.compiler_string_consts.dispose_procedure_name,null);
+       		cur_scope.AddName(compiler_string_consts.new_procedure_name,ps);
+       		ps = new ProcScope(compiler_string_consts.dispose_procedure_name,null);
        		prm = new ElementScope(new SymInfo("p", SymbolKind.Parameter,"p"),TypeTable.ptr_type,null,ps);
        		prm.param_kind = parametr_kind.var_parametr;
        		ps.AddParameter(prm);
        		ps.Complete();
-       		cur_scope.AddName(PascalSharp.Internal.TreeConverter.compiler_string_consts.dispose_procedure_name,ps);
+       		cur_scope.AddName(compiler_string_consts.dispose_procedure_name,ps);
        }
         
         public override void visit(hex_constant _hex_constant)
@@ -2554,17 +2571,17 @@ namespace PascalSharp.Internal.CodeCompletion
 			}
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.empty_statement _empty_statement)
+        public override void visit(empty_statement _empty_statement)
         {
             //throw new Exception("The method or operation is not implemented.");
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.goto_statement _goto_statement)
+        public override void visit(goto_statement _goto_statement)
         {
             //throw new Exception("The method or operation is not implemented.");
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.labeled_statement _labeled_statement)
+        public override void visit(labeled_statement _labeled_statement)
         {
             //throw new Exception("The method or operation is not implemented.");
             if (_labeled_statement.to_statement != null)
@@ -2953,11 +2970,11 @@ namespace PascalSharp.Internal.CodeCompletion
             if (element_type != null)
                 returned_scope = new SetScope(element_type);
             else
-                returned_scope = cur_scope.FindName(PascalSharp.Internal.TreeConverter.compiler_string_consts.set_name);
+                returned_scope = cur_scope.FindName(compiler_string_consts.set_name);
             cnst_val.prim_val = null;
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.array_const _array_const)
+        public override void visit(array_const _array_const)
         {
             //throw new Exception("The method or operation is not implemented.");
             cnst_val.prim_val = null;
@@ -3174,7 +3191,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 ss.body_loc = get_location(_class_definition);
                 ss.real_body_loc = get_location(_class_definition.body);
                 ss.AddDefaultConstructorIfNeed();
-                if (((_class_definition.attribute & PascalABCCompiler.SyntaxTree.class_attribute.Auto) == class_attribute.Auto))
+                if (((_class_definition.attribute & class_attribute.Auto) == class_attribute.Auto))
                 {
                     ProcScope ps = new ProcScope("Create", ss, true);
                     foreach (class_members members in _class_definition.body.class_def_blocks)
@@ -3783,7 +3800,7 @@ namespace PascalSharp.Internal.CodeCompletion
                                     }
                                     else
                                     {
-                                        if (PascalABCCompiler.NetHelper.NetHelper.IsNetNamespace(str))
+                                        if (NetHelper.IsNetNamespace(str))
                                         {
                                             ns_scope = new NamespaceScope(str);
                                             ns_cache[str] = str;
@@ -3791,9 +3808,9 @@ namespace PascalSharp.Internal.CodeCompletion
                                             if (s.name.idents.Count == 1)
                                                 cur_scope.AddUsedUnit(ns_scope);
                                         }
-                                        else if (PascalABCCompiler.NetHelper.NetHelper.IsType(str) && semantic_options.allow_import_types)
+                                        else if (NetHelper.IsType(str) && semantic_options.allow_import_types)
                                         {
-                                            Type t = PascalABCCompiler.NetHelper.NetHelper.FindType(str);
+                                            Type t = NetHelper.FindType(str);
                                             cur_scope.AddUsedUnit(new NamespaceTypeScope(TypeTable.get_compiled_type(new SymInfo(t.Name, SymbolKind.Class, t.FullName), t)));
                                         }
                                     }
@@ -3805,14 +3822,14 @@ namespace PascalSharp.Internal.CodeCompletion
 
                             }
                         }
-                        if (i == s.name.idents.Count - 1 && i > 0 /*&& PascalABCCompiler.NetHelper.NetHelper.IsNetNamespace(str)*/)
+                        if (i == s.name.idents.Count - 1 && i > 0 /*&& NetHelper.IsNetNamespace(str)*/)
                             cur_scope.AddUsedUnit(new NamespaceScope(str));
                         if (i < s.name.idents.Count - 1) str += ".";
 
                     }
-                    if (string.Compare(str, PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_name, true) == 0)
+                    if (string.Compare(str, compiler_string_consts.system_unit_name, true) == 0)
                         has_system_unit = true;
-                    if (string.Compare(str, PascalSharp.Internal.TreeConverter.compiler_string_consts.extensions_unit_file_name, true) == 0)
+                    if (string.Compare(str, compiler_string_consts.extensions_unit_file_name, true) == 0)
                         has_extensions_unit = true;
                     unl.AddElement(new PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace(str));
                 }
@@ -3898,16 +3915,16 @@ namespace PascalSharp.Internal.CodeCompletion
                                     }
                                     else
                                     {
-                                        if (PascalABCCompiler.NetHelper.NetHelper.IsNetNamespace(str))
+                                        if (NetHelper.IsNetNamespace(str))
                                         {
                                             ns_scope = new NamespaceScope(str);
                                             cur_scope.AddName(str, ns_scope);
                                             if (s.name.idents.Count == 1)
                                                 cur_scope.AddUsedUnit(ns_scope);
                                         }
-                                        else if (PascalABCCompiler.NetHelper.NetHelper.IsType(str) && semantic_options.allow_import_types)
+                                        else if (NetHelper.IsType(str) && semantic_options.allow_import_types)
                                         {
-                                            Type t = PascalABCCompiler.NetHelper.NetHelper.FindType(str);
+                                            Type t = NetHelper.FindType(str);
                                             cur_scope.AddUsedUnit(new NamespaceTypeScope(TypeTable.get_compiled_type(new SymInfo(t.Name, SymbolKind.Class, t.FullName), t)));
                                         }
                                     }
@@ -3921,7 +3938,7 @@ namespace PascalSharp.Internal.CodeCompletion
 #endif
                             }
                         }
-                        if (i == s.name.idents.Count - 1 && i > 0 /*&& PascalABCCompiler.NetHelper.NetHelper.IsNetNamespace(str)*/)
+                        if (i == s.name.idents.Count - 1 && i > 0 /*&& NetHelper.IsNetNamespace(str)*/)
                             cur_scope.AddUsedUnit(new NamespaceScope(str));
                         if (i < s.name.idents.Count - 1)
                             str += ".";
@@ -4329,18 +4346,18 @@ namespace PascalSharp.Internal.CodeCompletion
             //throw new Exception("The method or operation is not implemented.");
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.sizeof_operator _sizeof_operator)
+        public override void visit(sizeof_operator _sizeof_operator)
         {
            returned_scope = TypeTable.int_type;
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.typeof_operator _typeof_operator)
+        public override void visit(typeof_operator _typeof_operator)
         {
             //throw new Exception("The method or operation is not implemented.");
             returned_scope = TypeTable.get_compiled_type(new SymInfo(null, SymbolKind.Class,null),typeof(Type));
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.compiler_directive _compiler_directive)
+        public override void visit(compiler_directive _compiler_directive)
         {
             //throw new Exception("The method or operation is not implemented.");
         }
@@ -4349,26 +4366,26 @@ namespace PascalSharp.Internal.CodeCompletion
         {
         	switch(op)
         	{
-        		case Operators.Plus : return PascalSharp.Internal.TreeConverter.compiler_string_consts.plus_name;
-        		case Operators.Minus : return PascalSharp.Internal.TreeConverter.compiler_string_consts.minus_name;
-        		case Operators.Division : return PascalSharp.Internal.TreeConverter.compiler_string_consts.div_name;
-                case Operators.IntegerDivision: return PascalSharp.Internal.TreeConverter.compiler_string_consts.div_name;
-                case Operators.Multiplication : return PascalSharp.Internal.TreeConverter.compiler_string_consts.mul_name;
-        		case Operators.ModulusRemainder : return PascalSharp.Internal.TreeConverter.compiler_string_consts.mod_name;
-        		case Operators.Less : return PascalSharp.Internal.TreeConverter.compiler_string_consts.sm_name;
-        		case Operators.LessEqual : return PascalSharp.Internal.TreeConverter.compiler_string_consts.smeq_name;
-        		case Operators.Greater : return PascalSharp.Internal.TreeConverter.compiler_string_consts.gr_name;
-        		case Operators.GreaterEqual : return PascalSharp.Internal.TreeConverter.compiler_string_consts.greq_name;
-        		case Operators.Equal : return PascalSharp.Internal.TreeConverter.compiler_string_consts.eq_name;
-        		case Operators.NotEqual : return PascalSharp.Internal.TreeConverter.compiler_string_consts.noteq_name;
-        		case Operators.AssignmentAddition : return PascalSharp.Internal.TreeConverter.compiler_string_consts.plusassign_name;
-        		case Operators.AssignmentMultiplication : return PascalSharp.Internal.TreeConverter.compiler_string_consts.multassign_name;
-        		case Operators.AssignmentSubtraction : return PascalSharp.Internal.TreeConverter.compiler_string_consts.minusassign_name;
-        		case Operators.AssignmentDivision : return PascalSharp.Internal.TreeConverter.compiler_string_consts.divassign_name;
+        		case Operators.Plus : return compiler_string_consts.plus_name;
+        		case Operators.Minus : return compiler_string_consts.minus_name;
+        		case Operators.Division : return compiler_string_consts.div_name;
+                case Operators.IntegerDivision: return compiler_string_consts.div_name;
+                case Operators.Multiplication : return compiler_string_consts.mul_name;
+        		case Operators.ModulusRemainder : return compiler_string_consts.mod_name;
+        		case Operators.Less : return compiler_string_consts.sm_name;
+        		case Operators.LessEqual : return compiler_string_consts.smeq_name;
+        		case Operators.Greater : return compiler_string_consts.gr_name;
+        		case Operators.GreaterEqual : return compiler_string_consts.greq_name;
+        		case Operators.Equal : return compiler_string_consts.eq_name;
+        		case Operators.NotEqual : return compiler_string_consts.noteq_name;
+        		case Operators.AssignmentAddition : return compiler_string_consts.plusassign_name;
+        		case Operators.AssignmentMultiplication : return compiler_string_consts.multassign_name;
+        		case Operators.AssignmentSubtraction : return compiler_string_consts.minusassign_name;
+        		case Operators.AssignmentDivision : return compiler_string_consts.divassign_name;
         		case Operators.Implicit : return "implicit";
         		case Operators.Explicit : return "explicit";
-                case Operators.In: return PascalSharp.Internal.TreeConverter.compiler_string_consts.in_name;
-                case Operators.Power: return PascalSharp.Internal.TreeConverter.compiler_string_consts.power_name;
+                case Operators.In: return compiler_string_consts.in_name;
+                case Operators.Power: return compiler_string_consts.power_name;
             }
         	return "";
         }
@@ -4388,7 +4405,7 @@ namespace PascalSharp.Internal.CodeCompletion
             _var_statement.var_def.visit(this);
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.question_colon_expression _question_colon_expression)
+        public override void visit(question_colon_expression _question_colon_expression)
         {
         	_question_colon_expression.ret_if_true.visit(this);
         }
@@ -4423,20 +4440,20 @@ namespace PascalSharp.Internal.CodeCompletion
         {
             //Assembly _as = System.Reflection.Assembly.LoadFrom(get_assembly_path("mscorlib.dll",_c_module.file_name));
             System.Reflection.Assembly _as = System.Reflection.Assembly.LoadFrom(get_assembly_path("mscorlib.dll",_c_module.file_name));
-            PascalABCCompiler.NetHelper.NetHelper.init_namespaces(_as);
+            NetHelper.init_namespaces(_as);
             //add_standart_types_simple();
             //List<Scope> netScopes = new List<Scope>();
-            //PascalABCCompiler.NetHelper.NetScope ns=new PascalABCCompiler.NetHelper.NetScope(unl,_as,tcst);
+            //NetScope ns=new NetScope(unl,_as,tcst);
             if (_c_module.compiler_directives != null)
-            foreach (PascalABCCompiler.SyntaxTree.compiler_directive dir in _c_module.compiler_directives)
+            foreach (compiler_directive dir in _c_module.compiler_directives)
             {
                 if (dir.Name.text == "reference")
                 {
                     try
                     {
                 		//System.Reflection.Assembly assm = System.Reflection.Assembly.LoadFrom(get_assembly_path(dir.Directive.text,_c_module.file_name));
-                    	System.Reflection.Assembly assm = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(get_assembly_path(dir.Directive.text,_c_module.file_name));
-                		PascalABCCompiler.NetHelper.NetHelper.init_namespaces(assm);
+                    	System.Reflection.Assembly assm = NetHelper.LoadAssembly(get_assembly_path(dir.Directive.text,_c_module.file_name));
+                		NetHelper.init_namespaces(assm);
                     }
                     catch (Exception e)
                     {
@@ -4464,7 +4481,7 @@ namespace PascalSharp.Internal.CodeCompletion
                             NamespaceScope ns_scope = null;
                             if (i == 0)
                             {
-                                if (PascalABCCompiler.NetHelper.NetHelper.IsNetNamespace(str))
+                                if (NetHelper.IsNetNamespace(str))
                                 {
                                     ns_scope = new NamespaceScope(str);
                                     cur_scope.AddName(str, ns_scope);

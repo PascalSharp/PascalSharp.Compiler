@@ -6,6 +6,7 @@ using System.Linq;
 using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace TreeConverter.LambdaExpressions.Closure
 {

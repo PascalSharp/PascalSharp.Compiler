@@ -7,6 +7,7 @@ PascalABC.NET: syntax tree generator  v1.5(с) Водолазов Н., Ткач�
 using System;
 using System.IO;
 using System.Collections.Generic;
+using PascalSharp.Internal.SyntaxTree;
 
 namespace PascalABCCompiler.SyntaxTree
 {

@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Text;
 using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.SyntaxTree;
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter
 {
-
     internal class CompilerDirectivesToSyntaxTreeNodesLinker
     {
         public static Dictionary<syntax_tree_node, compiler_directive> BuildLinks(SyntaxTree.compilation_unit unit, List<Error> ErrorsList)

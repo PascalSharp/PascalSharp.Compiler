@@ -23,7 +23,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public PascalABCCompiler.SemanticTree.IExpressionNode exception_expresion
+        public IExpressionNode exception_expresion
         {
             get
             {
@@ -39,7 +39,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -61,7 +61,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

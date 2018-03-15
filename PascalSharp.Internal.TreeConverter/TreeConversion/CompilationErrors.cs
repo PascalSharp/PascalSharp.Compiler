@@ -7,7 +7,8 @@ using PascalABCCompiler.SemanticTree;
 using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.CompilerTools.Errors;
 using PascalSharp.Internal.Errors;
-using PascalSharp.Internal.TreeConverter;TreeRealization;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalSharp.Internal.TreeConverter
 {

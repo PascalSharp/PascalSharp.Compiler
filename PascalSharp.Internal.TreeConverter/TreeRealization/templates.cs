@@ -5,7 +5,10 @@
 
 using System;
 using System.Collections.Generic;
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -16,10 +19,10 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         public common_namespace_node nspace;
 
         //Сам метод в виде синтаксического дерева
-        public PascalABCCompiler.SyntaxTree.procedure_definition proc;
+        public procedure_definition proc;
 
         public procedure_definition_info(common_namespace_node _nspace,
-            PascalABCCompiler.SyntaxTree.procedure_definition _proc)
+            procedure_definition _proc)
         {
             nspace = _nspace;
             proc = _proc;
@@ -27,7 +30,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
     }
 
 
-    public class template_class : definition_node, PascalABCCompiler.SemanticTree.ITemplateClass
+    public class template_class : definition_node, ITemplateClass
     {
         public static bool check_template_definitions = true;
 
@@ -44,9 +47,9 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
             switch (tn.type_special_kind)
             {
-                case PascalABCCompiler.SemanticTree.type_special_kind.array_kind:
-                case PascalABCCompiler.SemanticTree.type_special_kind.set_type:
-                //case PascalABCCompiler.SemanticTree.type_special_kind.typed_file:
+                case type_special_kind.array_kind:
+                case type_special_kind.set_type:
+                //case type_special_kind.typed_file:
                     return TypeDependedFromTemplate(tn.element_type);
             }
             return false;
@@ -58,7 +61,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             if (ups == null) return;
             foreach (PascalSharp.Internal.TreeConverter.SymbolTable.Scope sc in ups.TopScopeArray)
             {
-                NetHelper.NetScope netsc = sc as NetHelper.NetScope;
+                NetScope netsc = sc as NetScope;
                 if (netsc != null && netsc.used_namespaces.Count == 0)
                 {
                     using_namespace_list new_unl = new using_namespace_list();
@@ -145,7 +148,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        private PascalABCCompiler.SyntaxTree.type_declaration _type_decl; //Синтаксическое дерево шаблона
+        private type_declaration _type_decl; //Синтаксическое дерево шаблона
         private string _name;                           //Имя шаблона
         private common_namespace_node _cnn;             //Пространство, где описан шаблон
         private document _doc;                          //Документ, т.е. файл, где описан шаблон
@@ -169,8 +172,8 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
         public string CreateTemplateInstance(List<type_node> instance_params, location loc)
         {
-            PascalABCCompiler.SyntaxTree.class_definition cl_def = _type_decl.type_def as PascalABCCompiler.SyntaxTree.class_definition;
-            PascalABCCompiler.SyntaxTree.template_type_name ttn = _type_decl.type_name as PascalABCCompiler.SyntaxTree.template_type_name;
+            class_definition cl_def = _type_decl.type_def as class_definition;
+            template_type_name ttn = _type_decl.type_name as template_type_name;
             //if (cl_def == null)
             //{
             //    throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("No body definition in template class.");
@@ -179,7 +182,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             //{
             //    throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("No template arguments in syntax tree.");
             //}
-            List<PascalABCCompiler.SyntaxTree.ident> template_formals = (_is_synonym) ?
+            List<ident> template_formals = (_is_synonym) ?
                 ttn.template_args.idents : cl_def.template_args.idents;
             if (instance_params.Count != template_formals.Count)
             {
@@ -189,7 +192,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
              
         }
 
-        public PascalABCCompiler.SyntaxTree.type_declaration type_dec
+        public type_declaration type_dec
         {
             get
             {
@@ -277,7 +280,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public template_class(PascalABCCompiler.SyntaxTree.type_declaration type_decl, string name,common_namespace_node cnn,/*common_type_node ctn,location loc,*/document doc,using_namespace_list unl)
+        public template_class(type_declaration type_decl, string name,common_namespace_node cnn,/*common_type_node ctn,location loc,*/document doc,using_namespace_list unl)
         {
             _cnn = cnn;
             _type_decl = type_decl;
@@ -312,7 +315,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("Template class can't be visit.");
         }
@@ -328,7 +331,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 if (tree == null)
                 try
                 {
-                    PascalABCCompiler.SyntaxTree.SyntaxTreeStreamWriter stw = new PascalABCCompiler.SyntaxTree.SyntaxTreeStreamWriter();
+                    SyntaxTreeStreamWriter stw = new SyntaxTreeStreamWriter();
                     byte[] buf = new byte[10000];
                     stw.bw = new System.IO.BinaryWriter(new System.IO.MemoryStream(buf));
                     this.type_dec.visit(stw);
@@ -381,14 +384,14 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             get { return semantic_node_type.indefinite_definition_node; }
         }
 
-        public override PascalABCCompiler.SemanticTree.node_kind node_kind
+        public override node_kind node_kind
         {
-            get { return PascalABCCompiler.SemanticTree.node_kind.indefinite; }
+            get { return node_kind.indefinite; }
         }
 
-        public override PascalABCCompiler.SemanticTree.node_location_kind node_location_kind
+        public override node_location_kind node_location_kind
         {
-            get { return PascalABCCompiler.SemanticTree.node_location_kind.indefinite; }
+            get { return node_location_kind.indefinite; }
         }
     }
 
@@ -518,7 +521,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
         public override type_node base_type
         {
-            get { return PascalABCCompiler.SystemLibrary.SystemLibrary.object_type; }
+            get { return SystemLibrary.object_type; }
         }
 
         public override string name
@@ -536,9 +539,9 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             get { return null; }
         }
 
-        public override PascalABCCompiler.SemanticTree.node_kind node_kind
+        public override node_kind node_kind
         {
-            get { return PascalABCCompiler.SemanticTree.node_kind.indefinite; }
+            get { return node_kind.indefinite; }
         }
 
         public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
@@ -563,11 +566,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             get { return false; }
         }
 
-        public override PascalABCCompiler.SemanticTree.type_special_kind type_special_kind
+        public override type_special_kind type_special_kind
         {
             get
             {
-                return PascalABCCompiler.SemanticTree.type_special_kind.none_kind;
+                return type_special_kind.none_kind;
             }
             set
             {

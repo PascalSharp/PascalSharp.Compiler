@@ -6,9 +6,29 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using PascalABCCompiler.SemanticTree;
+using PascalABCCompiler.SyntaxTree;
+using PascalABCCompiler.SystemLibrary;
 using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
+using array_const = PascalSharp.Internal.TreeConverter.TreeRealization.array_const;
+using compiler_directive = PascalSharp.Internal.TreeConverter.TreeRealization.compiler_directive;
 using CompilerInternalError = PascalSharp.Internal.TreeConverter.CompilerInternalError;
+using empty_statement = PascalSharp.Internal.TreeConverter.TreeRealization.empty_statement;
+using for_node = PascalSharp.Internal.TreeConverter.TreeRealization.for_node;
+using goto_statement = PascalSharp.Internal.TreeConverter.TreeRealization.goto_statement;
+using if_node = PascalSharp.Internal.TreeConverter.TreeRealization.if_node;
+using labeled_statement = PascalSharp.Internal.TreeConverter.TreeRealization.labeled_statement;
+using question_colon_expression = PascalSharp.Internal.TreeConverter.TreeRealization.question_colon_expression;
+using repeat_node = PascalSharp.Internal.TreeConverter.TreeRealization.repeat_node;
+using sizeof_operator = PascalSharp.Internal.TreeConverter.TreeRealization.sizeof_operator;
+using typeof_operator = PascalSharp.Internal.TreeConverter.TreeRealization.typeof_operator;
+using while_node = PascalSharp.Internal.TreeConverter.TreeRealization.while_node;
 
 namespace PascalSharp.Compiler.PCU
 {
@@ -201,7 +221,7 @@ namespace PascalSharp.Compiler.PCU
 
         public void CloseUnit()
         {
-            //SystemLibrary.SystemLibInitializer.RestoreStandardFunctions();
+            //SystemLibInitializer.RestoreStandardFunctions();
             AllReaders.Remove(this);
             if (br != null)
                 br.Close();
@@ -251,7 +271,7 @@ namespace PascalSharp.Compiler.PCU
                 
                 //TODO сохранить в PCU
                 cun.scope.CaseSensitive = false;
-                if (string.Compare(unit_name,PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_file_name)==0)
+                if (string.Compare(unit_name,compiler_string_consts.system_unit_file_name)==0)
                 	PascalSharp.Internal.TreeConverter.syntax_tree_visitor.init_system_module(cun);
                 //ssyy
                 //Создаём область видимости для implementation - части
@@ -455,7 +475,7 @@ namespace PascalSharp.Compiler.PCU
             AddNames(pcu_file.implementation_names, cun.implementation_scope);
         }
 
-        private void AddNames(NameRef[] names, SymbolTable.Scope Scope)
+        private void AddNames(NameRef[] names, Scope Scope)
         {
             for (int i = 0; i < names.Length; i++)
             {
@@ -489,7 +509,7 @@ namespace PascalSharp.Compiler.PCU
                     {
                         (tn as common_type_node).scope.AddSymbol(names[i].name, si);
                         if (tn.IsDelegate)
-                            PascalABCCompiler.SystemLibrary.SystemLibrary.system_delegate_type.Scope.AddSymbol(names[i].name, si);
+                            SystemLibrary.system_delegate_type.Scope.AddSymbol(names[i].name, si);
                     }
                         
                     else
@@ -632,8 +652,8 @@ namespace PascalSharp.Compiler.PCU
                 //{
                 string name_with_path = Compiler.GetReferenceFileName(tmp + ".dll");
                 //Assembly a = Assembly.LoadFrom(name_with_path);
-                Assembly a = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(name_with_path);
-                PascalABCCompiler.NetHelper.NetHelper.init_namespaces(a);
+                Assembly a = NetHelper.LoadAssembly(name_with_path);
+                NetHelper.init_namespaces(a);
                 //}
                 //else 
                 //  a = Assembly.Load(s);
@@ -680,7 +700,7 @@ namespace PascalSharp.Compiler.PCU
             Type t = null;
             if (!dot_net_type_cache.TryGetValue(off, out t))
             { 
-                t = PascalABCCompiler.NetHelper.NetHelper.FindTypeOrCreate(pcu_file.dotnet_names[off].name);
+                t = NetHelper.FindTypeOrCreate(pcu_file.dotnet_names[off].name);
                 dot_net_type_cache[off] = t;
             }
             Type[] template_types = new Type[pcu_file.dotnet_names[off].addit.Length];
@@ -702,7 +722,7 @@ namespace PascalSharp.Compiler.PCU
             Type t = null;
             string type_name = pcu_file.dotnet_names[off].name;
             //if (!type_name.EndsWith("]"))
-                t = PascalABCCompiler.NetHelper.NetHelper.FindTypeOrCreate(type_name);
+                t = NetHelper.FindTypeOrCreate(type_name);
             if (t == null)
             {
                 ts.name = type_name;
@@ -839,7 +859,7 @@ namespace PascalSharp.Compiler.PCU
 
         private MethodInfo FindMethodByHandle(Type t, int off)
         {
-            //MemberInfo[] mis = NetHelper.NetHelper.GetMembers(t,pcu_file.dotnet_names[off].name);
+            //MemberInfo[] mis = NetHelper.GetMembers(t,pcu_file.dotnet_names[off].name);
             MemberInfo mbi = null;
             if (dot_net_cache.TryGetValue(off, out mbi))
                 return mbi as MethodInfo;
@@ -852,7 +872,7 @@ namespace PascalSharp.Compiler.PCU
             if (pcu_file.dotnet_names[off].name != "op_Explicit")
             {
                 //mi = t.GetMethod(pcu_file.dotnet_names[off].name, param_types);
-                List<MemberInfo> mis = PascalABCCompiler.NetHelper.NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
+                List<MemberInfo> mis = NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
                 mi = ChooseMethod(t, mis, param_types);
             }
             else
@@ -862,7 +882,7 @@ namespace PascalSharp.Compiler.PCU
                     if (mi2.Name == "op_Explicit" && mi2.GetParameters()[0].ParameterType == param_types[0].t && mi2.ReturnType == param_types[1].t) mi = mi2;
                 if (mi == null)
                 {
-                    List<MemberInfo> mis2 = PascalABCCompiler.NetHelper.NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
+                    List<MemberInfo> mis2 = NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
                     mi = ChooseMethod(t, mis2, param_types);
                     //mi = t.GetMethod(pcu_file.dotnet_names[off].name, new Type[1] { param_types[0].t });
                 }
@@ -873,12 +893,12 @@ namespace PascalSharp.Compiler.PCU
 
         private FieldInfo FindFieldByHandle(Type t, int off)
         {
-            //MemberInfo[] mis = NetHelper.NetHelper.GetMembers(t,pcu_file.dotnet_names[off].name);
+            //MemberInfo[] mis = NetHelper.GetMembers(t,pcu_file.dotnet_names[off].name);
             MemberInfo mi = null;
             if (dot_net_cache.TryGetValue(off, out mi))
                 return mi as FieldInfo;
             //FieldInfo mi = t.GetField(pcu_file.dotnet_names[off].name);
-            List<MemberInfo> mis = PascalABCCompiler.NetHelper.NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
+            List<MemberInfo> mis = NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
             FieldInfo fi = (FieldInfo)mis[0];
             dot_net_cache[off] = fi;
             return fi;
@@ -886,7 +906,7 @@ namespace PascalSharp.Compiler.PCU
 
         private ConstructorInfo FindConstructorByHandle(Type t, int off)
         {
-            //MemberInfo[] mis = NetHelper.NetHelper.GetMembers(t,pcu_file.dotnet_names[off].name);
+            //MemberInfo[] mis = NetHelper.GetMembers(t,pcu_file.dotnet_names[off].name);
             MemberInfo mi = null;
             if (dot_net_cache.TryGetValue(off, out mi))
                 return mi as ConstructorInfo;
@@ -896,7 +916,7 @@ namespace PascalSharp.Compiler.PCU
                 param_types[i] = FindSpecTypeByHandle(pcu_file.dotnet_names[off].addit[i].offset);
             }
             //ConstructorInfo mi = t.GetConstructor(param_types);
-            //MemberInfo[] mis = NetHelper.NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
+            //MemberInfo[] mis = NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
             ConstructorInfo ci = ChooseConstructor(t, param_types);
             dot_net_cache[off] = ci;
             return ci;
@@ -904,12 +924,12 @@ namespace PascalSharp.Compiler.PCU
 
         private PropertyInfo FindPropertyByHandle(Type t, int off)
         {
-            //MemberInfo[] mis = NetHelper.NetHelper.GetMembers(t,pcu_file.dotnet_names[off].name);
+            //MemberInfo[] mis = NetHelper.GetMembers(t,pcu_file.dotnet_names[off].name);
             MemberInfo mi = null;
             if (dot_net_cache.TryGetValue(off, out mi))
                 return mi as PropertyInfo;
             //FieldInfo mi = t.GetField(pcu_file.dotnet_names[off].name);
-            List<MemberInfo> mis = PascalABCCompiler.NetHelper.NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
+            List<MemberInfo> mis = NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
             PropertyInfo pi = (PropertyInfo)mis[0];
             dot_net_cache[off] = pi;
             return pi;
@@ -921,7 +941,7 @@ namespace PascalSharp.Compiler.PCU
             if (dot_net_cache.TryGetValue(off, out mi))
                 return mi as EventInfo;
             //FieldInfo mi = t.GetField(pcu_file.dotnet_names[off].name);
-            List<MemberInfo> mis = PascalABCCompiler.NetHelper.NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
+            List<MemberInfo> mis = NetHelper.GetMembers(t, pcu_file.dotnet_names[off].name);
             EventInfo ei = (EventInfo)mis[0];
             dot_net_cache[off] = ei;
             return ei;
@@ -1004,21 +1024,21 @@ namespace PascalSharp.Compiler.PCU
                 //{
                 string name_with_path = Compiler.GetReferenceFileName(tmp + ".dll");
                     //a = Assembly.LoadFrom(name_with_path);
-                    a = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(name_with_path);
-                    PascalABCCompiler.NetHelper.NetHelper.init_namespaces(a);
+                    a = NetHelper.LoadAssembly(name_with_path);
+                    NetHelper.init_namespaces(a);
                 //}
                 //else 
                   //  a = Assembly.Load(s);
                 assemblies[s] = a;
 			}
-			//Type t = NetHelper.NetHelper.FindTypeByHandle(a,br.ReadInt32());//находим его по токену
+			//Type t = NetHelper.FindTypeByHandle(a,br.ReadInt32());//находим его по токену
             Type t = FindTypeByHandle(br.ReadInt32());
             compiled_type_node ctn = compiled_type_node.get_type_node(t);
             
             //Исправление ошибки 0000186
             if (ctn.scope == null) 
             // это условие вроде нужно чтоб не персоздавать стандартные сопы
-                ctn.scope = new PascalABCCompiler.NetHelper.NetTypeScope(t, PascalABCCompiler.SystemLibrary.SystemLibrary.symtab);
+                ctn.scope = new NetTypeScope(t, SystemLibrary.symtab);
             return ctn;
 
 		}
@@ -1043,16 +1063,16 @@ namespace PascalSharp.Compiler.PCU
                 //{
                 string name_with_path = Compiler.GetReferenceFileName(str_tmp + ".dll");
                     //a = Assembly.LoadFrom(name_with_path);
-                    a = PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(name_with_path);
+                    a = NetHelper.LoadAssembly(name_with_path);
                 //}
                 //else a = Assembly.Load(s);
-                PascalABCCompiler.NetHelper.NetHelper.init_namespaces(a);
+                NetHelper.init_namespaces(a);
                 assemblies[s] = a;
 			}
 			Type t = FindTypeByHandle(br.ReadInt32());
 			ctn = compiled_type_node.get_type_node(t);
 			if (ctn.scope == null)
-            ctn.scope = new PascalABCCompiler.NetHelper.NetTypeScope(t, PascalABCCompiler.SystemLibrary.SystemLibrary.symtab);
+            ctn.scope = new NetTypeScope(t, SystemLibrary.symtab);
 			ext_members[offset] = ctn;
 			br.BaseStream.Seek(tmp,SeekOrigin.Begin);
 			return ctn;
@@ -1392,7 +1412,7 @@ namespace PascalSharp.Compiler.PCU
             //    parameters.Add(GetTypeReference());
             //}
             List<type_node> parameters = GetTypesList();
-            return PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.instance(tc, parameters, null);
+            return SystemLibrary.syn_visitor.instance(tc, parameters, null);
         }
 		
         private generic_instance_type_node GetGenericInstance()
@@ -1454,7 +1474,7 @@ namespace PascalSharp.Compiler.PCU
             br.ReadByte();
             compiled_type_node ctn = GetNetExtType(br.ReadInt32());
             int handle = br.ReadInt32();
-            compiled_event cvd = PascalABCCompiler.NetHelper.NetHelper.GetEvent(FindEventByHandle(ctn.compiled_type, handle));
+            compiled_event cvd = NetHelper.GetEvent(FindEventByHandle(ctn.compiled_type, handle));
             br.BaseStream.Seek(tmp, SeekOrigin.Begin);
             return cvd;
         }
@@ -1483,7 +1503,7 @@ namespace PascalSharp.Compiler.PCU
 			br.ReadByte();
 			compiled_type_node ctn = GetNetExtType(br.ReadInt32());
 			int handle = br.ReadInt32();
-			compiled_constructor_node ccn = PascalABCCompiler.NetHelper.NetHelper.GetConstructorNode(FindConstructorByHandle(ctn.compiled_type,handle));
+			compiled_constructor_node ccn = NetHelper.GetConstructorNode(FindConstructorByHandle(ctn.compiled_type,handle));
 			br.BaseStream.Seek(tmp,SeekOrigin.Begin);
 			return ccn;
 		}
@@ -1495,7 +1515,7 @@ namespace PascalSharp.Compiler.PCU
 			br.ReadByte();
 			compiled_type_node ctn = GetNetExtType(br.ReadInt32());
 			int handle = br.ReadInt32();
-			compiled_variable_definition cvd = PascalABCCompiler.NetHelper.NetHelper.GetFieldNode(FindFieldByHandle(ctn.compiled_type,handle));
+			compiled_variable_definition cvd = NetHelper.GetFieldNode(FindFieldByHandle(ctn.compiled_type,handle));
 			br.BaseStream.Seek(tmp,SeekOrigin.Begin);
 			return cvd;
 		}
@@ -1507,7 +1527,7 @@ namespace PascalSharp.Compiler.PCU
             br.ReadByte();
             compiled_type_node ctn = GetNetExtType(br.ReadInt32());
             int handle = br.ReadInt32();
-            compiled_property_node cpn = PascalABCCompiler.NetHelper.NetHelper.GetPropertyNode(FindPropertyByHandle(ctn.compiled_type, handle));
+            compiled_property_node cpn = NetHelper.GetPropertyNode(FindPropertyByHandle(ctn.compiled_type, handle));
             br.BaseStream.Seek(tmp, SeekOrigin.Begin);
             return cpn;
         }
@@ -1529,7 +1549,7 @@ namespace PascalSharp.Compiler.PCU
         {
         	type_node tn = GetTypeReference();
         	function_node fn = GetMethodReference();
-        	PascalABCCompiler.SemanticTree.attribute_qualifier_kind quaifier = (PascalABCCompiler.SemanticTree.attribute_qualifier_kind)br.ReadByte();
+        	attribute_qualifier_kind quaifier = (attribute_qualifier_kind)br.ReadByte();
         	int count = br.ReadInt32();
         	List<constant_node> args = new List<constant_node>();
         	for (int i=0; i<count; i++)
@@ -1687,7 +1707,7 @@ namespace PascalSharp.Compiler.PCU
             type_node type = GetTypeReference();
             common_type_node cont = (common_type_node)GetTypeReference(br.ReadInt32());
             constant_node expr = (constant_node)CreateExpressionWithOffset();
-            PascalABCCompiler.SemanticTree.field_access_level fal = (PascalABCCompiler.SemanticTree.field_access_level)br.ReadByte();
+            field_access_level fal = (field_access_level)br.ReadByte();
             location loc = ReadDebugInfo();
             ccd = new class_constant_definition(name, expr, loc, cont, fal);
             AddMember(ccd, offset);
@@ -1731,9 +1751,9 @@ namespace PascalSharp.Compiler.PCU
             cmn.is_constructor = br.ReadBoolean();
             cmn.is_forward = br.ReadBoolean();
             cmn.is_overload = br.ReadBoolean();
-            cmn.set_access_level((PascalABCCompiler.SemanticTree.field_access_level)br.ReadByte());
-            cmn.polymorphic_state = (PascalABCCompiler.SemanticTree.polymorphic_state)br.ReadByte();
-            if (cmn.is_constructor && cmn.polymorphic_state == PascalABCCompiler.SemanticTree.polymorphic_state.ps_static)
+            cmn.set_access_level((field_access_level)br.ReadByte());
+            cmn.polymorphic_state = (polymorphic_state)br.ReadByte();
+            if (cmn.is_constructor && cmn.polymorphic_state == polymorphic_state.ps_static)
                 cmn.cont_type.static_constr = cmn;
             cmn.num_of_default_variables = br.ReadInt32();
             cmn.num_of_for_cycles = br.ReadInt32();
@@ -1838,8 +1858,8 @@ namespace PascalSharp.Compiler.PCU
             common_type_node cont = (common_type_node)GetTypeReference(br.ReadInt32());
             if (name==null)
                 name = GetStringInClass(cont, name_ref);
-            PascalABCCompiler.SemanticTree.field_access_level fal = (PascalABCCompiler.SemanticTree.field_access_level)br.ReadByte();
-            PascalABCCompiler.SemanticTree.polymorphic_state ps = (PascalABCCompiler.SemanticTree.polymorphic_state)br.ReadByte();
+            field_access_level fal = (field_access_level)br.ReadByte();
+            polymorphic_state ps = (polymorphic_state)br.ReadByte();
             attributes_list attrs = GetAttributes();
             location loc = ReadDebugInfo();
             ce = new common_event(name,type,cont,add_meth,remove_meth,raise_meth,fal,ps,loc);
@@ -1899,8 +1919,8 @@ namespace PascalSharp.Compiler.PCU
             for (int i = 0; i < num; i++)
                 pl.AddElement(GetParameter());
             common_type_node cont = (common_type_node)GetTypeReference(br.ReadInt32());
-            PascalABCCompiler.SemanticTree.field_access_level fal = (PascalABCCompiler.SemanticTree.field_access_level)br.ReadByte();
-            PascalABCCompiler.SemanticTree.polymorphic_state ps = (PascalABCCompiler.SemanticTree.polymorphic_state)br.ReadByte();
+            field_access_level fal = (field_access_level)br.ReadByte();
+            polymorphic_state ps = (polymorphic_state)br.ReadByte();
             attributes_list attrs = GetAttributes();
             location loc = ReadDebugInfo();
             if (name==null) 
@@ -1939,7 +1959,7 @@ namespace PascalSharp.Compiler.PCU
             class_field field = null;
             int name_off = br.ReadInt32();
             type_node type = GetTypeReference();
-            field = new class_field(name,type,null,PascalABCCompiler.SemanticTree.polymorphic_state.ps_common,PascalABCCompiler.SemanticTree.field_access_level.fal_internal,null);
+            field = new class_field(name,type,null,polymorphic_state.ps_common,field_access_level.fal_internal,null);
             AddMember(field, offset);
             expression_node initv = null;
             if (CanReadObject())
@@ -1947,8 +1967,8 @@ namespace PascalSharp.Compiler.PCU
             common_type_node cont = (common_type_node)GetTypeReference(br.ReadInt32());
             if (name==null)
                 name = GetStringInClass(cont, name_off);
-            PascalABCCompiler.SemanticTree.field_access_level fal = (PascalABCCompiler.SemanticTree.field_access_level)br.ReadByte();
-            PascalABCCompiler.SemanticTree.polymorphic_state ps = (PascalABCCompiler.SemanticTree.polymorphic_state)br.ReadByte();
+            field_access_level fal = (field_access_level)br.ReadByte();
+            polymorphic_state ps = (polymorphic_state)br.ReadByte();
             attributes_list attrs = GetAttributes();
             location loc = ReadDebugInfo();
             field.name = name;
@@ -1984,17 +2004,17 @@ namespace PascalSharp.Compiler.PCU
 		
         private void AddEnumOperators(common_type_node tctn)
         {
-        	/*basic_function_node enum_gr = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.gr_name,tctn,SemanticTree.basic_function_type.enumgr,SystemLibrary.SystemLibrary.bool_type);
-            basic_function_node enum_greq = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.greq_name,tctn,SemanticTree.basic_function_type.enumgreq,SystemLibrary.SystemLibrary.bool_type);
-            basic_function_node enum_sm = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.sm_name,tctn,SemanticTree.basic_function_type.enumsm,SystemLibrary.SystemLibrary.bool_type);
-            basic_function_node enum_smeq = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.smeq_name,tctn,SemanticTree.basic_function_type.enumsmeq,SystemLibrary.SystemLibrary.bool_type);*/
+        	/*basic_function_node enum_gr = SystemLibrary.make_binary_operator(compiler_string_consts.gr_name,tctn,SemanticTree.basic_function_type.enumgr,SystemLibrary.bool_type);
+            basic_function_node enum_greq = SystemLibrary.make_binary_operator(compiler_string_consts.greq_name,tctn,SemanticTree.basic_function_type.enumgreq,SystemLibrary.bool_type);
+            basic_function_node enum_sm = SystemLibrary.make_binary_operator(compiler_string_consts.sm_name,tctn,SemanticTree.basic_function_type.enumsm,SystemLibrary.bool_type);
+            basic_function_node enum_smeq = SystemLibrary.make_binary_operator(compiler_string_consts.smeq_name,tctn,SemanticTree.basic_function_type.enumsmeq,SystemLibrary.bool_type);*/
             compilation_context.add_convertions_to_enum_type(tctn);
         }
 
-        private List<PascalABCCompiler.SemanticTree.ITypeNode> ReadImplementingInterfaces()
+        private List<ITypeNode> ReadImplementingInterfaces()
         {
             int interf_count = br.ReadInt32();
-            List<PascalABCCompiler.SemanticTree.ITypeNode> interf_implemented = new List<PascalABCCompiler.SemanticTree.ITypeNode>(interf_count);
+            List<ITypeNode> interf_implemented = new List<ITypeNode>(interf_count);
             for (int i = 0; i < interf_count; i++)
             {
                 interf_implemented.Add(GetTypeReference());
@@ -2002,29 +2022,29 @@ namespace PascalSharp.Compiler.PCU
             return interf_implemented;
         }
 
-        private List<PascalABCCompiler.SemanticTree.ICommonTypeNode> ReadGenericParams(common_namespace_node cur_nn)
+        private List<ICommonTypeNode> ReadGenericParams(common_namespace_node cur_nn)
         {
             if (SemanticRules.RuntimeInitVariablesOfGenericParameters)
             {
-                if (!PascalABCCompiler.SystemLibrary.SystemLibInitializer.NeedsToRestore.Contains(
-                    PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction))
+                if (!SystemLibInitializer.NeedsToRestore.Contains(
+                    SystemLibInitializer.RuntimeInitializeFunction))
                 {
-                    PascalABCCompiler.SystemLibrary.SystemLibInitializer.NeedsToRestore.Add(
-                        PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction);
+                    SystemLibInitializer.NeedsToRestore.Add(
+                        SystemLibInitializer.RuntimeInitializeFunction);
                 }
             }
             //common_namespace_node cur_nn = (is_interface) ? cun.namespaces[0] : cun.namespaces[1];
             int param_count = br.ReadInt32();
-            List<PascalABCCompiler.SemanticTree.ICommonTypeNode> type_params = new List<PascalABCCompiler.SemanticTree.ICommonTypeNode>(param_count);
+            List<ICommonTypeNode> type_params = new List<ICommonTypeNode>(param_count);
             for (int i = 0; i < param_count; i++)
             {
                 string par_name = br.ReadString();
                 common_type_node par = new common_type_node(
-                    par_name, PascalABCCompiler.SemanticTree.type_access_level.tal_public, cur_nn,
-                    PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.convertion_data_and_alghoritms.symbol_table.CreateInterfaceScope(null, PascalABCCompiler.SystemLibrary.SystemLibrary.object_type.Scope, null),
+                    par_name, type_access_level.tal_public, cur_nn,
+                    SystemLibrary.syn_visitor.convertion_data_and_alghoritms.symbol_table.CreateInterfaceScope(null, SystemLibrary.object_type.Scope, null),
                     null);
-                PascalABCCompiler.SystemLibrary.SystemLibrary.init_reference_type(par);
-                par.SetBaseType(PascalABCCompiler.SystemLibrary.SystemLibrary.object_type);
+                SystemLibrary.init_reference_type(par);
+                par.SetBaseType(SystemLibrary.object_type);
                 type_params.Add(par);
             }
             return type_params;
@@ -2081,7 +2101,7 @@ namespace PascalSharp.Compiler.PCU
             //Читаем, является ли тип описанием дженерика
             bool type_is_generic_definition = (br.ReadByte() == 1);
 
-            List<PascalABCCompiler.SemanticTree.ICommonTypeNode> type_params = null;
+            List<ICommonTypeNode> type_params = null;
             if (type_is_generic_definition)
             {
                 type_params = ReadGenericParams((is_interface) ? cun.namespaces[0] : cun.namespaces[1]);
@@ -2098,7 +2118,7 @@ namespace PascalSharp.Compiler.PCU
             {
                 scope = new WrappedClassScope(this, cun.scope, null);
             }
-            ctn = new wrapped_common_type_node(this, null, name, PascalABCCompiler.SemanticTree.type_access_level.tal_public, cun.namespaces[0], scope, null, offset);
+            ctn = new wrapped_common_type_node(this, null, name, type_access_level.tal_public, cun.namespaces[0], scope, null, offset);
             if (is_interface)
                 AddTypeToOrderList(ctn, ind);
             else
@@ -2116,7 +2136,7 @@ namespace PascalSharp.Compiler.PCU
             bool is_value_type = br.ReadBoolean();
 
             //Читаем поддерживаемые интерфейсы
-            List<PascalABCCompiler.SemanticTree.ITypeNode> interf_implemented = ReadImplementingInterfaces();
+            List<ITypeNode> interf_implemented = ReadImplementingInterfaces();
             //int interf_count = br.ReadInt32();
             //List<SemanticTree.ITypeNode> interf_implemented = new List<SemanticTree.ITypeNode>(interf_count);
             //for (int i = 0; i < interf_count; i++)
@@ -2125,13 +2145,13 @@ namespace PascalSharp.Compiler.PCU
             //}
 			constant_node low_val=null;
 			constant_node upper_val=null;
-            PascalABCCompiler.SemanticTree.type_access_level tal = (PascalABCCompiler.SemanticTree.type_access_level)br.ReadByte();
-            PascalABCCompiler.SemanticTree.type_special_kind tsk = (PascalABCCompiler.SemanticTree.type_special_kind)br.ReadByte();
+            type_access_level tal = (type_access_level)br.ReadByte();
+            type_special_kind tsk = (type_special_kind)br.ReadByte();
             ctn.SetIsSealed(br.ReadBoolean());
             ctn.SetIsAbstract(br.ReadBoolean());
             ctn.IsPartial = br.ReadBoolean();
             
-            if (tsk == PascalABCCompiler.SemanticTree.type_special_kind.diap_type)
+            if (tsk == type_special_kind.diap_type)
             {
             	low_val = CreateExpression() as constant_node;
             	upper_val = CreateExpression() as constant_node;
@@ -2140,7 +2160,7 @@ namespace PascalSharp.Compiler.PCU
             if (type_is_interface)
             {
                 //Добавляем ссылки на области видимости предков интерфейса
-                List<SymbolTable.Scope> interf_scopes = new List<SymbolTable.Scope>();
+                List<Scope> interf_scopes = new List<Scope>();
                 foreach (type_node tnode in interf_implemented)
                 {
                     interf_scopes.Add(tnode.Scope);
@@ -2157,7 +2177,7 @@ namespace PascalSharp.Compiler.PCU
             ctn.internal_is_value = is_value_type;
             ctn.type_special_kind = tsk;
             if (ctn.full_name == "PABCSystem.BinaryFile")
-                ctn.type_special_kind = PascalABCCompiler.SemanticTree.type_special_kind.binary_file;
+                ctn.type_special_kind = type_special_kind.binary_file;
             if (type_is_generic_definition)
             {
                 foreach (common_type_node par in type_params)
@@ -2170,15 +2190,15 @@ namespace PascalSharp.Compiler.PCU
             if (CanReadObject())
                 elemnet_type = GetTypeReference();
             ctn.element_type = elemnet_type;
-			if (ctn.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.set_type)
+			if (ctn.type_special_kind != type_special_kind.set_type)
             {
-            	PascalABCCompiler.SystemLibrary.SystemLibrary.init_reference_type(ctn);
+            	SystemLibrary.init_reference_type(ctn);
             }
-            if (ctn.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type)
+            if (ctn.type_special_kind == type_special_kind.set_type)
             {
             	ctn = compilation_context.AddTypeToSetTypeList(ctn);
             }
-            if (ctn.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.typed_file)
+            if (ctn.type_special_kind == type_special_kind.typed_file)
             {
             	ctn = compilation_context.AddTypeToTypedFileList(ctn);
             }
@@ -2195,7 +2215,7 @@ namespace PascalSharp.Compiler.PCU
             ctn.loc = loc;
             if (type_is_delegate)
             {
-                PascalABCCompiler.SystemLibrary.SystemLibrary.type_constructor.AddOperatorsToDelegate(ctn, loc);
+                SystemLibrary.type_constructor.AddOperatorsToDelegate(ctn, loc);
             }
 			
             //создаем scope для класса
@@ -2211,11 +2231,11 @@ namespace PascalSharp.Compiler.PCU
             	MakeTypeAsOrdinal(ctn,0,class_names.Count);
             	ctn.add_additional_enum_operations();
             }
-            if (ctn.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.diap_type)
+            if (ctn.type_special_kind == type_special_kind.diap_type)
             {
             	type_constructor.add_convertions_to_diap(ctn,low_val,upper_val);
             }
-            if (ctn.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_kind)
+            if (ctn.type_special_kind == type_special_kind.array_kind)
             {
             	if (!(ctn.element_type is compiled_type_node))
             	{
@@ -2237,7 +2257,7 @@ namespace PascalSharp.Compiler.PCU
                 ctn.add_internal_interface(dii);
             }
             
-            /*if (ctn.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper)
+            /*if (ctn.type_special_kind == type_special_kind.array_wrapper)
             {
             	bounded_array_interface bai = new bounded_array_interface(oti_indexer, ctn.element_type, cpn, oti_indexer.lower_value.type, int_arr);
 				ctn.add_internal_interface(bai);
@@ -2271,7 +2291,7 @@ namespace PascalSharp.Compiler.PCU
 
         private void MakeTypeAsOrdinal(common_type_node ctn, int low_val, int upper_val)
         {
-            internal_interface ii = PascalABCCompiler.SystemLibrary.SystemLibrary.integer_type.get_internal_interface(internal_interface_kind.ordinal_interface);
+            internal_interface ii = SystemLibrary.integer_type.get_internal_interface(internal_interface_kind.ordinal_interface);
             ordinal_type_interface oti_old = (ordinal_type_interface)ii;
             enum_const_node lower_value = new enum_const_node(low_val, ctn, ctn.loc);
             enum_const_node upper_value = new enum_const_node(upper_val - 1, ctn, ctn.loc);
@@ -2366,9 +2386,9 @@ namespace PascalSharp.Compiler.PCU
                 doc = new document(Path.Combine(Path.GetDirectoryName(cur_doc.file_name),br.ReadString()));
             }
 
-            PascalABCCompiler.SyntaxTree.SyntaxTreeStreamReader str = new PascalABCCompiler.SyntaxTree.SyntaxTreeStreamReader();
+            var str = new SyntaxTreeStreamReader();
             str.br = br;
-            PascalABCCompiler.SyntaxTree.type_declaration t_d = str._read_node() as PascalABCCompiler.SyntaxTree.type_declaration;
+            type_declaration t_d = str._read_node() as type_declaration;
 
             int ext_count = br.ReadInt32();
             List<procedure_definition_info> pdi_list = new List<procedure_definition_info>(ext_count);
@@ -2376,8 +2396,8 @@ namespace PascalSharp.Compiler.PCU
             {
                 byte num = br.ReadByte();
                 common_namespace_node c_m_n = cun.namespaces[num];
-                PascalABCCompiler.SyntaxTree.syntax_tree_node stn = str._read_node();
-                PascalABCCompiler.SyntaxTree.procedure_definition p_d = stn as PascalABCCompiler.SyntaxTree.procedure_definition;
+                var stn = str._read_node();
+                procedure_definition p_d = stn as procedure_definition;
                 pdi_list.Add(new procedure_definition_info(c_m_n, p_d));
             }
 
@@ -2436,7 +2456,7 @@ namespace PascalSharp.Compiler.PCU
             return tn;
         }
         
-        private void AddTypeSynonyms(int offset, SymbolTable.Scope scope)
+        private void AddTypeSynonyms(int offset, Scope scope)
         {
             int pos = (int)br.BaseStream.Position;
             br.BaseStream.Seek(start_pos + offset, SeekOrigin.Begin);
@@ -2453,16 +2473,16 @@ namespace PascalSharp.Compiler.PCU
             br.BaseStream.Seek(pos, SeekOrigin.Begin);
         }
 
-        public SymbolTable.Scope[] MakeTopScopeArray(using_namespace_list unl, int uses_count)
+        public Scope[] MakeTopScopeArray(using_namespace_list unl, int uses_count)
         {
-            List<SymbolTable.Scope> top_scopes = new List<SymbolTable.Scope>();
+            List<Scope> top_scopes = new List<Scope>();
 
             //Добавляем внутренний системный модуль
-            top_scopes.Add(PascalABCCompiler.SystemLibrary.SystemLibrary.system_unit.scope);
+            top_scopes.Add(SystemLibrary.system_unit.scope);
 
             //Добавляем .NET - пространство
             System.Reflection.Assembly _as = typeof(string).Assembly;
-            PascalABCCompiler.NetHelper.NetScope ns = new PascalABCCompiler.NetHelper.NetScope(unl, _as, PascalABCCompiler.SystemLibrary.SystemLibrary.symtab);
+            NetScope ns = new NetScope(unl, _as, SystemLibrary.symtab);
             top_scopes.Add(ns);
 
             //Добавляем подключенные модули
@@ -2476,7 +2496,7 @@ namespace PascalSharp.Compiler.PCU
             }
 
             //Добавляем внутренний системный модуль
-            //top_scopes.Add(SystemLibrary.SystemLibrary.system_unit.scope);
+            //top_scopes.Add(SystemLibrary.system_unit.scope);
 
             return top_scopes.ToArray();
         }
@@ -2497,8 +2517,8 @@ namespace PascalSharp.Compiler.PCU
             {
                 if (ctn.fields[0].type is simple_array)
                 {
-                    ctn.find(PascalSharp.Internal.TreeConverter.compiler_string_consts.upper_array_const_name);
-                    ctn.find(PascalSharp.Internal.TreeConverter.compiler_string_consts.lower_array_const_name);
+                    ctn.find(compiler_string_consts.upper_array_const_name);
+                    ctn.find(compiler_string_consts.lower_array_const_name);
                     constant_node lower_bound = ctn.const_defs[1].const_value;
                     constant_node upper_bound = ctn.const_defs[0].const_value;
 
@@ -2808,7 +2828,7 @@ namespace PascalSharp.Compiler.PCU
             cnfn.function_code = GetCode(br.ReadInt32());
 			int_members.Add(cnfn);
             cnfn.ConnectedToType = ConnectedToType;
-            if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_kind && cnfn.ConnectedToType.element_type.is_generic_parameter)
+            if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.type_special_kind == type_special_kind.array_kind && cnfn.ConnectedToType.element_type.is_generic_parameter)
                 cnfn.ConnectedToType.base_type.Scope.AddSymbol(cnfn.name, new SymbolInfo(cnfn));
             else if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.is_generic_parameter)
                 cnfn.ConnectedToType.base_type.Scope.AddSymbol(cnfn.name, new SymbolInfo(cnfn));
@@ -2822,8 +2842,8 @@ namespace PascalSharp.Compiler.PCU
             }
             else if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.IsDelegate && cnfn.ConnectedToType.base_type.IsDelegate)
                 compiled_type_node.get_type_node(typeof(Delegate)).Scope.AddSymbol(cnfn.name, new SymbolInfo(cnfn));
-            else if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.typed_file && cnfn.ConnectedToType.element_type.is_generic_parameter && PascalABCCompiler.SystemLibrary.SystemLibInitializer.TypedFileType.sym_info != null)
-                (PascalABCCompiler.SystemLibrary.SystemLibInitializer.TypedFileType.sym_info as type_node).Scope.AddSymbol(cnfn.name, new SymbolInfo(cnfn));
+            else if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.type_special_kind == type_special_kind.typed_file && cnfn.ConnectedToType.element_type.is_generic_parameter && SystemLibInitializer.TypedFileType.sym_info != null)
+                (SystemLibInitializer.TypedFileType.sym_info as type_node).Scope.AddSymbol(cnfn.name, new SymbolInfo(cnfn));
             return cnfn;
 		}
 
@@ -2915,7 +2935,7 @@ namespace PascalSharp.Compiler.PCU
 			cnfn.loc = ReadDebugInfo();
             cnfn.function_code = (restore_code /*|| cnfn.is_generic_function*/) ? GetCode(br.ReadInt32()) : new wrapped_function_body(this, br.ReadInt32());
             cnfn.ConnectedToType = ConnectedToType;
-            if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_kind && cnfn.ConnectedToType.element_type.is_generic_parameter)
+            if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.type_special_kind == type_special_kind.array_kind && cnfn.ConnectedToType.element_type.is_generic_parameter)
                 cnfn.ConnectedToType.base_type.Scope.AddSymbol(cnfn.name, new SymbolInfo(cnfn));
             else if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.is_generic_parameter)
                 cnfn.ConnectedToType.base_type.Scope.AddSymbol(cnfn.name, new SymbolInfo(cnfn));
@@ -2929,8 +2949,8 @@ namespace PascalSharp.Compiler.PCU
             }
             else if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.IsDelegate && cnfn.ConnectedToType.base_type.IsDelegate)
                 compiled_type_node.get_type_node(typeof(Delegate)).Scope.AddSymbol(cnfn.name, new SymbolInfo(cnfn));
-            else if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.typed_file && (cnfn.ConnectedToType.element_type == null || cnfn.ConnectedToType.element_type.is_generic_parameter) && PascalABCCompiler.SystemLibrary.SystemLibInitializer.TypedFileType.sym_info != null)
-                (PascalABCCompiler.SystemLibrary.SystemLibInitializer.TypedFileType.sym_info as type_node).Scope.AddSymbol(cnfn.name, new SymbolInfo(cnfn));
+            else if (cnfn.ConnectedToType != null && cnfn.ConnectedToType.type_special_kind == type_special_kind.typed_file && (cnfn.ConnectedToType.element_type == null || cnfn.ConnectedToType.element_type.is_generic_parameter) && SystemLibInitializer.TypedFileType.sym_info != null)
+                (SystemLibInitializer.TypedFileType.sym_info as type_node).Scope.AddSymbol(cnfn.name, new SymbolInfo(cnfn));
             br.BaseStream.Seek(pos,SeekOrigin.Begin);
 			return cnfn;
 		}
@@ -3074,12 +3094,12 @@ namespace PascalSharp.Compiler.PCU
 			string s = br.ReadString();
 			type_node tn = GetTypeReference();
 			concrete_parameter_type cpt = (concrete_parameter_type)br.ReadByte();
-            PascalABCCompiler.SemanticTree.parameter_type pt = PascalABCCompiler.SemanticTree.parameter_type.value;
+            parameter_type pt = parameter_type.value;
             switch (cpt)
             {
-                case concrete_parameter_type.cpt_const: pt = PascalABCCompiler.SemanticTree.parameter_type.value; break;
-                case concrete_parameter_type.cpt_var: pt = PascalABCCompiler.SemanticTree.parameter_type.var; break;
-                case concrete_parameter_type.cpt_none: pt = PascalABCCompiler.SemanticTree.parameter_type.value; break;
+                case concrete_parameter_type.cpt_const: pt = parameter_type.value; break;
+                case concrete_parameter_type.cpt_var: pt = parameter_type.var; break;
+                case concrete_parameter_type.cpt_none: pt = parameter_type.value; break;
             }
             common_parameter p = new common_parameter(s,pt,func,cpt,null);
 			p.type = tn;
@@ -3104,12 +3124,12 @@ namespace PascalSharp.Compiler.PCU
             string s = br.ReadString();
             type_node tn = GetTypeReference();
             concrete_parameter_type cpt = (concrete_parameter_type)br.ReadByte();
-            PascalABCCompiler.SemanticTree.parameter_type pt = PascalABCCompiler.SemanticTree.parameter_type.value;
+            parameter_type pt = parameter_type.value;
             switch (cpt)
             {
-                case concrete_parameter_type.cpt_const: pt = PascalABCCompiler.SemanticTree.parameter_type.value; break;
-                case concrete_parameter_type.cpt_var: pt = PascalABCCompiler.SemanticTree.parameter_type.var; break;
-                case concrete_parameter_type.cpt_none: pt = PascalABCCompiler.SemanticTree.parameter_type.value; break;
+                case concrete_parameter_type.cpt_const: pt = parameter_type.value; break;
+                case concrete_parameter_type.cpt_var: pt = parameter_type.var; break;
+                case concrete_parameter_type.cpt_none: pt = parameter_type.value; break;
             }
             common_parameter p = new common_parameter(s, pt, null, cpt, null);
             p.type = tn;
@@ -3298,7 +3318,7 @@ namespace PascalSharp.Compiler.PCU
 
         private runtime_statement CreateRuntimeStatement()
         {
-            return new runtime_statement((PascalABCCompiler.SemanticTree.runtime_statement_type)br.ReadInt32(),null);
+            return new runtime_statement((runtime_statement_type)br.ReadInt32(),null);
         }
 
         private external_statement CreateExternalStatement()
@@ -3878,8 +3898,8 @@ namespace PascalSharp.Compiler.PCU
 		
 		private expression_node CreateBasicFunctionCall()
 		{
-            PascalABCCompiler.SemanticTree.basic_function_type bft = (PascalABCCompiler.SemanticTree.basic_function_type)br.ReadInt16();
-            basic_function_node bfn = PascalABCCompiler.SystemLibrary.SystemLibrary.find_operator(bft);
+            basic_function_type bft = (basic_function_type)br.ReadInt16();
+            basic_function_node bfn = SystemLibrary.find_operator(bft);
             if (bfn == null) throw new CompilerInternalError("[PCUREADER] Function not defined: "+bft.ToString());//Console.WriteLine(bft);
 
             type_node _tn = GetTypeReference();
@@ -3911,15 +3931,15 @@ namespace PascalSharp.Compiler.PCU
                 case 1:
                     return GetNamespaceFunctionByOffset(br.ReadInt32());
                 case 2:
-                    PascalABCCompiler.SemanticTree.SpecialFunctionKind sfk = (PascalABCCompiler.SemanticTree.SpecialFunctionKind)br.ReadByte();
+                    SpecialFunctionKind sfk = (SpecialFunctionKind)br.ReadByte();
                     switch (sfk)
                     {
-                        case PascalABCCompiler.SemanticTree.SpecialFunctionKind.New:
-                            return PascalABCCompiler.SystemLibrary.SystemLibInitializer.NewProcedureDecl;
-                        case PascalABCCompiler.SemanticTree.SpecialFunctionKind.Dispose:
-                            return PascalABCCompiler.SystemLibrary.SystemLibInitializer.DisposeProcedureDecl;
-                        case PascalABCCompiler.SemanticTree.SpecialFunctionKind.NewArray:
-                            return PascalABCCompiler.SystemLibrary.SystemLibInitializer.NewArrayProcedureDecl;
+                        case SpecialFunctionKind.New:
+                            return SystemLibInitializer.NewProcedureDecl;
+                        case SpecialFunctionKind.Dispose:
+                            return SystemLibInitializer.DisposeProcedureDecl;
+                        case SpecialFunctionKind.NewArray:
+                            return SystemLibInitializer.NewArrayProcedureDecl;
                         default:
                             throw new CompilerInternalError("CreateCommonNamespaceFunctionCall: SpecialFunctionKind BAD");
                     }

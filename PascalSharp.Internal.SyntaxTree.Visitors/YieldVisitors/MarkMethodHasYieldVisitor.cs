@@ -7,8 +7,7 @@ using System.Text;
 
 using PascalABCCompiler;
 using PascalABCCompiler.SyntaxTree;
-
-using PascalABCCompiler.Errors;
+using PascalSharp.Internal.SyntaxTree;
 
 namespace SyntaxVisitors
 {

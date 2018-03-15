@@ -5,7 +5,11 @@ using System;
 using System.IO;
 using System.Text;
 using System.Xml;
+using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalSharp.Compiler
 {
@@ -21,7 +25,7 @@ namespace PascalSharp.Compiler
             try
             {
                 this.cu = cu;
-                is_assembly = cu.SyntaxTree is PascalABCCompiler.SyntaxTree.program_module || Compiler.is_dll(cu.SyntaxTree);
+                is_assembly = cu.SyntaxTree is program_module || Compiler.is_dll(cu.SyntaxTree);
                 XmlWriterSettings settings = new XmlWriterSettings();
                 settings.Encoding = Encoding.UTF8;
                 settings.Indent = true;
@@ -285,7 +289,7 @@ namespace PascalSharp.Compiler
 				for (int i=0; i<cfn.parameters.Count; i++)
 				{
 					sb.Append(get_name(cfn.parameters[i].type));
-					if (cfn.parameters[i].parameter_type == PascalABCCompiler.SemanticTree.parameter_type.var)
+					if (cfn.parameters[i].parameter_type == parameter_type.var)
 						sb.Append('@');
 					if (i<cfn.parameters.Count-1)
 						sb.Append(",");
@@ -333,13 +337,13 @@ namespace PascalSharp.Compiler
 			}
 			switch (tn.type_special_kind)
 			{
-				case PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper : return get_array_name(tn as common_type_node);
-				case PascalABCCompiler.SemanticTree.type_special_kind.set_type : return get_set_type_name(tn as common_type_node);
-				case PascalABCCompiler.SemanticTree.type_special_kind.short_string : return get_shortstring_name(tn as short_string_type_node);
-				case PascalABCCompiler.SemanticTree.type_special_kind.diap_type : return get_diap_name(tn as common_type_node);
-				case PascalABCCompiler.SemanticTree.type_special_kind.binary_file: return get_binary_file_name(tn as common_type_node);
-				case PascalABCCompiler.SemanticTree.type_special_kind.typed_file : return get_typed_file_name(tn as common_type_node);
-				case PascalABCCompiler.SemanticTree.type_special_kind.array_kind : return get_dyn_array_name(tn as common_type_node);
+				case type_special_kind.array_wrapper : return get_array_name(tn as common_type_node);
+				case type_special_kind.set_type : return get_set_type_name(tn as common_type_node);
+				case type_special_kind.short_string : return get_shortstring_name(tn as short_string_type_node);
+				case type_special_kind.diap_type : return get_diap_name(tn as common_type_node);
+				case type_special_kind.binary_file: return get_binary_file_name(tn as common_type_node);
+				case type_special_kind.typed_file : return get_typed_file_name(tn as common_type_node);
+				case type_special_kind.array_kind : return get_dyn_array_name(tn as common_type_node);
 				default : return tn.full_name;
 			}
 		}
@@ -372,7 +376,7 @@ namespace PascalSharp.Compiler
 				for (int i=0; i<cmn.parameters.Count; i++)
 				{
 					sb.Append(get_name(cmn.parameters[i].type));
-					if (cmn.parameters[i].parameter_type == PascalABCCompiler.SemanticTree.parameter_type.var)
+					if (cmn.parameters[i].parameter_type == parameter_type.var)
 						sb.Append('@');
 					if (i<cmn.parameters.Count-1)
 						sb.Append(',');
@@ -402,7 +406,7 @@ namespace PascalSharp.Compiler
 		{
 			type_node tn = ctn.element_type;
 			int i=1;
-			while (tn.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_kind)
+			while (tn.type_special_kind == type_special_kind.array_kind)
 			{
 				i++;
 				tn = tn.element_type;

@@ -3,7 +3,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
-using PascalSharp.Internal.TreeConverter;TreeRealization;
+using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalSharp.Internal.TreeConverter.SymbolTable
 {
@@ -199,15 +200,15 @@ namespace PascalSharp.Internal.TreeConverter.SymbolTable
             return symbol_kind.sk_none;
         }
 
-        private access_level get_class_member_access_level(SemanticTree.IClassMemberNode icmn)
+        private access_level get_class_member_access_level(IClassMemberNode icmn)
         {
             access_level al;
             switch (icmn.field_access_level)
             {
-                case SemanticTree.field_access_level.fal_public: al = access_level.al_public; break;
-                case SemanticTree.field_access_level.fal_protected: al = access_level.al_protected; break;
-                case SemanticTree.field_access_level.fal_private: al = access_level.al_private; break;
-                case SemanticTree.field_access_level.fal_internal: al = access_level.al_internal; break;
+                case field_access_level.fal_public: al = access_level.al_public; break;
+                case field_access_level.fal_protected: al = access_level.al_protected; break;
+                case field_access_level.fal_private: al = access_level.al_private; break;
+                case field_access_level.fal_internal: al = access_level.al_internal; break;
                 default:
                     al = access_level.al_private; break;
             }
@@ -751,15 +752,15 @@ namespace PascalSharp.Internal.TreeConverter.SymbolTable
             return symbol_kind.sk_none;
         }
 
-        private access_level get_class_member_access_level(SemanticTree.IClassMemberNode icmn)
+        private access_level get_class_member_access_level(IClassMemberNode icmn)
         {
             access_level al;
             switch (icmn.field_access_level)
             {
-                case SemanticTree.field_access_level.fal_public: al = access_level.al_public; break;
-                case SemanticTree.field_access_level.fal_protected: al = access_level.al_protected; break;
-                case SemanticTree.field_access_level.fal_private: al = access_level.al_private; break;
-                case SemanticTree.field_access_level.fal_internal: al = access_level.al_internal; break;
+                case field_access_level.fal_public: al = access_level.al_public; break;
+                case field_access_level.fal_protected: al = access_level.al_protected; break;
+                case field_access_level.fal_private: al = access_level.al_private; break;
+                case field_access_level.fal_internal: al = access_level.al_internal; break;
                 default:
                     al = access_level.al_private; break;
             }

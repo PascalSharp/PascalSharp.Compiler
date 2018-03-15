@@ -30,7 +30,7 @@ namespace TreeConverter.LambdaExpressions
                 return GetTemplateParametersTypeDependsOn(typeIi.element_type);
             }
 
-            if (type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type)
+            if (type.type_special_kind == type_special_kind.set_type)
             {
                 return GetTemplateParametersTypeDependsOn(type.element_type);
             }

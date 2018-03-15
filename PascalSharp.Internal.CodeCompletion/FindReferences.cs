@@ -4,10 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using PascalABCCompiler.Parsers;
 using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SyntaxTree;
+
 //using ICSharpCode.SharpDevelop.Dom;
-//using PascalSharp.Internal.TreeConverter;TreeRealization;
+//using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalSharp.Internal.CodeCompletion
 {

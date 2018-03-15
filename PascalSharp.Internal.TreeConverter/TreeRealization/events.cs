@@ -25,7 +25,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	get;
         }
         
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -61,8 +61,8 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
     	private string _name;
     	private type_node del_type;
     	private location _loc;
-    	private PascalABCCompiler.SemanticTree.field_access_level _field_access_level;
-    	private PascalABCCompiler.SemanticTree.polymorphic_state _polymorphic_state;
+    	private field_access_level _field_access_level;
+    	private polymorphic_state _polymorphic_state;
     	private common_type_node _cont_type;
     	private common_method_node _add_method;
     	private common_method_node _remove_method;
@@ -70,7 +70,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
     	private class_field _field;
     	
     	public common_event(string name, type_node del_type, common_type_node cont_type, common_method_node add_method, common_method_node remove_method, common_method_node raise_method, 
-    	                    PascalABCCompiler.SemanticTree.field_access_level fal, PascalABCCompiler.SemanticTree.polymorphic_state ps, location loc)
+    	                    field_access_level fal, polymorphic_state ps, location loc)
     	{
     		this._name = name;
     		this.del_type = del_type;
@@ -103,7 +103,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
     		}
     	}
     	
-    	public PascalABCCompiler.SemanticTree.field_access_level field_access_level
+    	public field_access_level field_access_level
     	{
     		get
     		{
@@ -120,7 +120,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		}
     	
 		public override bool is_static {
-			get { return _polymorphic_state == PascalABCCompiler.SemanticTree.polymorphic_state.ps_static; }
+			get { return _polymorphic_state == polymorphic_state.ps_static; }
 		}
     	
     	public location loc
@@ -202,7 +202,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
         
-        string PascalABCCompiler.SemanticTree.ICommonEventNode.Name
+        string ICommonEventNode.Name
         {
         	get
         	{
@@ -210,7 +210,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
 
-        PascalABCCompiler.SemanticTree.ICommonClassFieldNode PascalABCCompiler.SemanticTree.ICommonEventNode.Field
+        ICommonClassFieldNode ICommonEventNode.Field
         {
             get
             {
@@ -218,7 +218,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ICommonMethodNode PascalABCCompiler.SemanticTree.ICommonEventNode.AddMethod
+        ICommonMethodNode ICommonEventNode.AddMethod
         {
         	get
         	{
@@ -226,7 +226,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
         
-        PascalABCCompiler.SemanticTree.ICommonMethodNode PascalABCCompiler.SemanticTree.ICommonEventNode.RemoveMethod
+        ICommonMethodNode ICommonEventNode.RemoveMethod
         {
         	get
         	{
@@ -234,7 +234,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
         
-        PascalABCCompiler.SemanticTree.ICommonMethodNode PascalABCCompiler.SemanticTree.ICommonEventNode.RaiseMethod
+        ICommonMethodNode ICommonEventNode.RaiseMethod
         {
         	get
         	{
@@ -242,7 +242,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
         
-        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ICommonEventNode.DelegateType
+        ITypeNode ICommonEventNode.DelegateType
         {
         	get
         	{
@@ -250,7 +250,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
         
-        bool PascalABCCompiler.SemanticTree.ICommonEventNode.IsStatic
+        bool ICommonEventNode.IsStatic
         {
         	get
         	{
@@ -258,19 +258,19 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
         
-		public PascalABCCompiler.SemanticTree.ICommonTypeNode common_comprehensive_type {
+		public ICommonTypeNode common_comprehensive_type {
 			get {
 				return _cont_type;
 			}
 		}
     	
-		public PascalABCCompiler.SemanticTree.ITypeNode comperehensive_type {
+		public ITypeNode comperehensive_type {
 			get {
 				return _cont_type;
 			}
 		}
     	
-		public PascalABCCompiler.SemanticTree.polymorphic_state polymorphic_state {
+		public polymorphic_state polymorphic_state {
 			get {
         		return _polymorphic_state;
 			}
@@ -280,7 +280,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
 		}
         
-        public PascalABCCompiler.SemanticTree.ILocation Location
+        public ILocation Location
 		{
 			get
 			{
@@ -288,7 +288,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
         
-    	public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+    	public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -427,7 +427,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
         
-        string PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.Name
+        string ICommonNamespaceEventNode.Name
         {
         	get
         	{
@@ -435,7 +435,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
 
-        PascalABCCompiler.SemanticTree.ICommonNamespaceVariableNode PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.Field
+        ICommonNamespaceVariableNode ICommonNamespaceEventNode.Field
         {
             get
             {
@@ -443,7 +443,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.AddFunction
+        ICommonNamespaceFunctionNode ICommonNamespaceEventNode.AddFunction
         {
         	get
         	{
@@ -451,7 +451,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
 
-        PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.RemoveFunction
+        ICommonNamespaceFunctionNode ICommonNamespaceEventNode.RemoveFunction
         {
         	get
         	{
@@ -459,7 +459,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
 
-        PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.RaiseFunction
+        ICommonNamespaceFunctionNode ICommonNamespaceEventNode.RaiseFunction
         {
         	get
         	{
@@ -467,7 +467,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
         
-        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode.DelegateType
+        ITypeNode ICommonNamespaceEventNode.DelegateType
         {
         	get
         	{
@@ -475,7 +475,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
         
-        public PascalABCCompiler.SemanticTree.ILocation Location
+        public ILocation Location
 		{
 			get
 			{
@@ -483,7 +483,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
         
-    	public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+    	public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -548,7 +548,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -605,7 +605,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 		
-        PascalABCCompiler.SemanticTree.IEventNode PascalABCCompiler.SemanticTree.IStaticEventReference.Event
+        IEventNode IStaticEventReference.Event
         {
         	get
         	{
@@ -621,7 +621,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
         
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}
@@ -645,7 +645,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 		
-        PascalABCCompiler.SemanticTree.IExpressionNode PascalABCCompiler.SemanticTree.INonStaticEventReference.obj
+        IExpressionNode INonStaticEventReference.obj
         {
         	get
         	{
@@ -653,7 +653,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         	}
         }
         
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

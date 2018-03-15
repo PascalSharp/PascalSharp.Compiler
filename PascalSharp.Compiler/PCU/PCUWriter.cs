@@ -6,7 +6,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using PascalABCCompiler.SemanticTree;
+using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalSharp.Compiler.PCU
 {
@@ -32,7 +36,7 @@ namespace PascalSharp.Compiler.PCU
     //класс, хранящий информацию об имени интерфейсной сущности и ее смещении в модуле
     public class NameRef {
 		public string name;//имя сущности
-        public PascalSharp.Internal.TreeConverter.access_level access_level;//модификатор видимости
+        public PascalSharp.Internal.TreeConverter.SymbolTable.access_level access_level;//модификатор видимости
         public symbol_kind symbol_kind = symbol_kind.sk_none;
 		public int offset;//смещение в модуле
         public byte special_scope=0;//говорит о том что этот символ добавляется не в пространсво имен модуля
@@ -40,7 +44,7 @@ namespace PascalSharp.Compiler.PCU
         public semantic_node_type semantic_node_type;
         public bool virtual_slot = false;
 
-        public NameRef(string name, int index, PascalSharp.Internal.TreeConverter.access_level access_level, semantic_node_type semantic_node_type)
+        public NameRef(string name, int index, PascalSharp.Internal.TreeConverter.SymbolTable.access_level access_level, semantic_node_type semantic_node_type)
 		{
 			this.name = name;
 			this.index = index;//4
@@ -51,7 +55,7 @@ namespace PascalSharp.Compiler.PCU
         {
             this.name = name;
             this.index = index;
-            this.access_level = PascalSharp.Internal.TreeConverter.access_level.al_none;
+            this.access_level = PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_none;
         }
         public int Size
         {
@@ -1403,7 +1407,7 @@ namespace PascalSharp.Compiler.PCU
         private void WriteUnsizedArrayType(type_node type,array_internal_interface aii)
         {
             bw.Write((byte)TypeKind.UnsizedArray);
-            WriteDebugInfo((type as PascalABCCompiler.SemanticTree.ILocated).Location);
+            WriteDebugInfo((type as ILocated).Location);
             WriteTypeReference(aii.element_type);
             bw.Write(aii.rank);
         }
@@ -1512,12 +1516,12 @@ namespace PascalSharp.Compiler.PCU
             }
 			byte is_def = 0;
             int offset=0;
-            if (fn.SpecialFunctionKind == PascalABCCompiler.SemanticTree.SpecialFunctionKind.None)
+            if (fn.SpecialFunctionKind == SpecialFunctionKind.None)
                 offset = GetFunctionReference(fn, ref is_def);
             else
                 is_def = 2;
 			bw.Write(is_def);
-            if (fn.SpecialFunctionKind == PascalABCCompiler.SemanticTree.SpecialFunctionKind.None)            
+            if (fn.SpecialFunctionKind == SpecialFunctionKind.None)            
 			    bw.Write(offset);
             else
                 bw.Write((byte)fn.SpecialFunctionKind);
@@ -2248,17 +2252,17 @@ namespace PascalSharp.Compiler.PCU
         	WriteDebugInfo(attr.location);
         }
         
-        private access_level convert_field_access_level(PascalABCCompiler.SemanticTree.field_access_level fal)
+        private access_level convert_field_access_level(field_access_level fal)
         {
             switch (fal)
             {
-                case PascalABCCompiler.SemanticTree.field_access_level.fal_private:
+                case field_access_level.fal_private:
                     return access_level.al_private;
-                case PascalABCCompiler.SemanticTree.field_access_level.fal_public:
+                case field_access_level.fal_public:
                     return access_level.al_public;
-                case PascalABCCompiler.SemanticTree.field_access_level.fal_protected:
+                case field_access_level.fal_protected:
                     return access_level.al_protected;
-                case PascalABCCompiler.SemanticTree.field_access_level.fal_internal:
+                case field_access_level.fal_internal:
                     return access_level.al_internal;
                 default:
                     return access_level.al_none;
@@ -2274,7 +2278,7 @@ namespace PascalSharp.Compiler.PCU
             }
         }
 
-        private void WriteTypeParamsEliminations(List<PascalABCCompiler.SemanticTree.ICommonTypeNode> tpars)
+        private void WriteTypeParamsEliminations(List<ICommonTypeNode> tpars)
         {
             foreach (common_type_node par in tpars)
             {
@@ -2398,7 +2402,7 @@ namespace PascalSharp.Compiler.PCU
             bw.Seek(GetSizeOfReference(type.base_type), SeekOrigin.Current);
 			
             //(ssyy) На кой чёрт это надо?
-            //WriteTypeReference(SystemLibrary.SystemLibrary.object_type);
+            //WriteTypeReference(SystemLibrary.object_type);
             //WriteTypeReference(type.base_type);
             bw.Write(type.internal_is_value);
 
@@ -2415,7 +2419,7 @@ namespace PascalSharp.Compiler.PCU
             bw.Write(type.IsSealed);
             bw.Write(type.IsAbstract);
             bw.Write(type.IsPartial);
-            if (type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.diap_type)
+            if (type.type_special_kind == type_special_kind.diap_type)
             {
             	ordinal_type_interface oti = type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
             	VisitExpression(oti.lower_value);
@@ -2475,7 +2479,7 @@ namespace PascalSharp.Compiler.PCU
                 name_pool[type.methods[i - j]] = names[i];
                 if (type.methods[i - j].is_overload)
                     names[i].symbol_kind = symbol_kind.sk_overload_function;
-                names[i].virtual_slot = type.methods[i - j].newslot_awaited || type.methods[i - j].polymorphic_state == PascalABCCompiler.SemanticTree.polymorphic_state.ps_virtual || type.methods[i - j].polymorphic_state == PascalABCCompiler.SemanticTree.polymorphic_state.ps_virtual_abstract || type.methods[i - j].is_constructor;
+                names[i].virtual_slot = type.methods[i - j].newslot_awaited || type.methods[i - j].polymorphic_state == polymorphic_state.ps_virtual || type.methods[i - j].polymorphic_state == polymorphic_state.ps_virtual_abstract || type.methods[i - j].is_constructor;
                 size += names[i].Size;
 			}
 			j=i;
@@ -2556,7 +2560,7 @@ namespace PascalSharp.Compiler.PCU
                 bw.Write((byte)1);
                 bw.Write(Path.GetFileName(tclass.cur_document.file_name));
             }
-            PascalABCCompiler.SyntaxTree.SyntaxTreeStreamWriter stw = new PascalABCCompiler.SyntaxTree.SyntaxTreeStreamWriter();
+            var stw = new SyntaxTreeStreamWriter();
             stw.bw = bw;
             if (tclass.type_dec == null)
             {
@@ -2571,7 +2575,7 @@ namespace PascalSharp.Compiler.PCU
             bw.Write(tclass.external_methods.Count);
             foreach (procedure_definition_info pdi in tclass.external_methods)
             {
-                if (pdi.nspace.scope is SymbolTable.UnitImplementationScope)
+                if (pdi.nspace.scope is UnitImplementationScope)
                 {
                     bw.Write((byte)1);
                 }
@@ -3156,13 +3160,13 @@ namespace PascalSharp.Compiler.PCU
 		}
 		
 		//сохранение отлад. информации
-		private void WriteDebugInfo(PascalABCCompiler.SemanticTree.ILocation loc)
+		private void WriteDebugInfo(ILocation loc)
 		{
             WriteDebugInfo(bw,loc);
 		}
         
 		//сохранение отлад. информации
-        private void WriteDebugInfo(BinaryWriter bw,PascalABCCompiler.SemanticTree.ILocation loc)
+        private void WriteDebugInfo(BinaryWriter bw,ILocation loc)
         {
             if (pcu_file.IncludeDebugInfo)
             {

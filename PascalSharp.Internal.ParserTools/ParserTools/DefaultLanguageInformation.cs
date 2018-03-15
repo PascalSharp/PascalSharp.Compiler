@@ -1,16 +1,14 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
-using System.Text;
 using System.Collections;
 using System.Collections.Generic;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.Errors;
 using System.Reflection;
-using System.Text.RegularExpressions;
+using System.Text;
 using PascalSharp.Internal.Localization;
 
-namespace PascalABCCompiler.Parsers
+namespace PascalSharp.Internal.ParserTools
 {
 	public class DefaultLanguageInformation : ILanguageInformation
 	{
@@ -556,7 +554,7 @@ namespace PascalABCCompiler.Parsers
                 line = ln;
                 col = 1;
             }
-            string doc = CodeCompletionTools.AssemblyDocCache.GetDocumentation(t);
+            string doc = AssemblyDocCache.GetDocumentation(t);
             if (!string.IsNullOrEmpty(doc))
             {
                 doc = doc.Trim(' ', '\n', '\t', '\r').Replace(Environment.NewLine, Environment.NewLine + "  /// ");
@@ -628,7 +626,7 @@ namespace PascalABCCompiler.Parsers
                 {
                     if (fields[i].DeclaringType == t && !fields[i].IsPrivate && !fields[i].IsAssembly)
                     {
-                        doc = CodeCompletionTools.AssemblyDocCache.GetDocumentation(fields[i]);
+                        doc = AssemblyDocCache.GetDocumentation(fields[i]);
                         if (!string.IsNullOrEmpty(doc))
                         {
                             doc = doc.Trim(' ', '\n', '\t', '\r').Replace(Environment.NewLine, Environment.NewLine + "  /// ");
@@ -664,7 +662,7 @@ namespace PascalABCCompiler.Parsers
                     MethodInfo add_meth = events[i].GetAddMethod(true);
                     if (add_meth != null && add_meth.DeclaringType == t && !add_meth.IsPrivate && !add_meth.IsAssembly)
                     {
-                        doc = CodeCompletionTools.AssemblyDocCache.GetDocumentation(events[i]);
+                        doc = AssemblyDocCache.GetDocumentation(events[i]);
                         if (!string.IsNullOrEmpty(doc))
                         {
                             doc = doc.Trim(' ', '\n', '\t', '\r').Replace(Environment.NewLine, Environment.NewLine + "  /// ");
@@ -700,7 +698,7 @@ namespace PascalABCCompiler.Parsers
                     MethodInfo get_meth = props[i].GetGetMethod(true);
                     if (get_meth != null && get_meth.DeclaringType == t && !get_meth.IsPrivate && !get_meth.IsAssembly)
                     {
-                        doc = CodeCompletionTools.AssemblyDocCache.GetDocumentation(props[i]);
+                        doc = AssemblyDocCache.GetDocumentation(props[i]);
                         if (!string.IsNullOrEmpty(doc))
                         {
                             doc = doc.Trim(' ', '\n', '\t', '\r').Replace(Environment.NewLine, Environment.NewLine + "  /// ");
@@ -733,7 +731,7 @@ namespace PascalABCCompiler.Parsers
                 {
                     if (constrs[i].DeclaringType == t && !constrs[i].IsPrivate && !constrs[i].IsAssembly)
                     {
-                        doc = CodeCompletionTools.AssemblyDocCache.GetDocumentation(constrs[i]);
+                        doc = AssemblyDocCache.GetDocumentation(constrs[i]);
                         if (!string.IsNullOrEmpty(doc))
                         {
                             doc = doc.Trim(' ', '\n', '\t', '\r').Replace(Environment.NewLine, Environment.NewLine + "  /// ");
@@ -765,7 +763,7 @@ namespace PascalABCCompiler.Parsers
                 {
                     if (meths[i].DeclaringType == t && !meths[i].IsPrivate && !meths[i].IsAssembly && !meths[i].Name.StartsWith("get_") && !meths[i].Name.StartsWith("set_") && !meths[i].Name.StartsWith("add_") && !meths[i].Name.StartsWith("remove_"))
                     {
-                        doc = CodeCompletionTools.AssemblyDocCache.GetDocumentation(meths[i]);
+                        doc = AssemblyDocCache.GetDocumentation(meths[i]);
                         if (!string.IsNullOrEmpty(doc))
                         {
                             doc = doc.Trim(' ', '\n', '\t', '\r').Replace(Environment.NewLine, Environment.NewLine + "  /// ");
@@ -843,16 +841,16 @@ namespace PascalABCCompiler.Parsers
             return "";
         }
 
-		public virtual string GetClassKeyword(PascalABCCompiler.SyntaxTree.class_keyword keyw)
+		public virtual string GetClassKeyword(class_keyword keyw)
 		{
 			switch(keyw)
 			{
-				case PascalABCCompiler.SyntaxTree.class_keyword.Class : return "class";
-				case PascalABCCompiler.SyntaxTree.class_keyword.Interface : return "interface";
-				case PascalABCCompiler.SyntaxTree.class_keyword.Record : return "record";
-				case PascalABCCompiler.SyntaxTree.class_keyword.TemplateClass : return "template class";
-				case PascalABCCompiler.SyntaxTree.class_keyword.TemplateRecord : return "template record";
-				case PascalABCCompiler.SyntaxTree.class_keyword.TemplateInterface : return "template interface";
+				case class_keyword.Class : return "class";
+				case class_keyword.Interface : return "interface";
+				case class_keyword.Record : return "record";
+				case class_keyword.TemplateClass : return "template class";
+				case class_keyword.TemplateRecord : return "template record";
+				case class_keyword.TemplateInterface : return "template interface";
 			}
 			return null;
 		}
@@ -1362,10 +1360,10 @@ namespace PascalABCCompiler.Parsers
 		{
 			switch (scope.ParamKind)
 			{
-				case PascalABCCompiler.SyntaxTree.parametr_kind.const_parametr : return "const ";
-				case PascalABCCompiler.SyntaxTree.parametr_kind.var_parametr : return "var ";
-				case PascalABCCompiler.SyntaxTree.parametr_kind.params_parametr : return "params ";
-				case PascalABCCompiler.SyntaxTree.parametr_kind.out_parametr : return "out ";
+				case parametr_kind.const_parametr : return "const ";
+				case parametr_kind.var_parametr : return "var ";
+				case parametr_kind.params_parametr : return "params ";
+				case parametr_kind.out_parametr : return "out ";
 			}
 			return "";
 		}
@@ -3041,23 +3039,23 @@ namespace PascalABCCompiler.Parsers
                 j++;
             }
             j = i;
-            if (kav_stack.Count != 0 || in_keyw) return PascalABCCompiler.Parsers.KeywordKind.Punkt;
-            if (j >= 0 && Text[j] == '.') return PascalABCCompiler.Parsers.KeywordKind.Punkt;
+            if (kav_stack.Count != 0 || in_keyw) return KeywordKind.Punkt;
+            if (j >= 0 && Text[j] == '.') return KeywordKind.Punkt;
             while (j >= 0)
             {
-                //if (Text[j] == '{') return PascalABCCompiler.Parsers.KeywordKind.Punkt;
+                //if (Text[j] == '{') return KeywordKind.Punkt;
                 if (!in_keyw && (Text[j] == '\'' || Text[j] == '\n'))
                     break;
                 if (Text[j] == '}')
                     in_keyw = true;
                 else
                 if (Text[j] == '/' && !in_keyw)
-                    if (j > 0 && Text[j - 1] == '/') return PascalABCCompiler.Parsers.KeywordKind.Punkt;
+                    if (j > 0 && Text[j - 1] == '/') return KeywordKind.Punkt;
                 j--;
             }
             //if (j>= 0 && Text[j] == '\'') return CodeCompletion.KeywordKind.kw_punkt;
             while (i >= 0 && (Text[i] == ' ' || char.IsControl(Text[i]))) i--;
-            if (i >= 0 && Text[i] == ':') return PascalABCCompiler.Parsers.KeywordKind.Colon;
+            if (i >= 0 && Text[i] == ':') return KeywordKind.Colon;
 
             if (i >= 0 && Text[i] == ',')
             {
@@ -3068,11 +3066,11 @@ namespace PascalABCCompiler.Parsers
                         sb.Insert(0, Text[i]);
                     else
                     {
-                        PascalABCCompiler.Parsers.KeywordKind keyw = GetKeywordKind(sb.ToString());
-                        if (keyw == PascalABCCompiler.Parsers.KeywordKind.Uses)
-                            return PascalABCCompiler.Parsers.KeywordKind.Uses;
-                        else if (keyw == PascalABCCompiler.Parsers.KeywordKind.Var)
-                            return PascalABCCompiler.Parsers.KeywordKind.Var;
+                        KeywordKind keyw = GetKeywordKind(sb.ToString());
+                        if (keyw == KeywordKind.Uses)
+                            return KeywordKind.Uses;
+                        else if (keyw == KeywordKind.Var)
+                            return KeywordKind.Var;
                         else sb.Remove(0, sb.Length);
                     }
                     i--;
@@ -3458,22 +3456,22 @@ namespace PascalABCCompiler.Parsers
 		
 		public virtual bool IsDefinitionIdentifierAfterKeyword(KeywordKind keyw)
 		{
-			if (keyw == PascalABCCompiler.Parsers.KeywordKind.Function || keyw == PascalABCCompiler.Parsers.KeywordKind.Constructor || keyw == PascalABCCompiler.Parsers.KeywordKind.Destructor || keyw == PascalABCCompiler.Parsers.KeywordKind.Type || keyw == PascalABCCompiler.Parsers.KeywordKind.Var
-           		|| keyw == PascalABCCompiler.Parsers.KeywordKind.Unit || keyw == PascalABCCompiler.Parsers.KeywordKind.Const || keyw == PascalABCCompiler.Parsers.KeywordKind.Program || keyw == PascalABCCompiler.Parsers.KeywordKind.Punkt)
+			if (keyw == KeywordKind.Function || keyw == KeywordKind.Constructor || keyw == KeywordKind.Destructor || keyw == KeywordKind.Type || keyw == KeywordKind.Var
+           		|| keyw == KeywordKind.Unit || keyw == KeywordKind.Const || keyw == KeywordKind.Program || keyw == KeywordKind.Punkt)
            	return true;
 			return false;
 		}
 		
 		public virtual bool IsTypeAfterKeyword(KeywordKind keyw)
 		{
-			if (keyw == PascalABCCompiler.Parsers.KeywordKind.Colon || keyw == PascalABCCompiler.Parsers.KeywordKind.Of || keyw == PascalABCCompiler.Parsers.KeywordKind.TypeDecl)
+			if (keyw == KeywordKind.Colon || keyw == KeywordKind.Of || keyw == KeywordKind.TypeDecl)
 				return true;
 			return false;
 		}
 		
 		public virtual bool IsNamespaceAfterKeyword(KeywordKind keyw)
 		{
-			if (keyw == PascalABCCompiler.Parsers.KeywordKind.Uses) return true;
+			if (keyw == KeywordKind.Uses) return true;
 			return false;
 		}
 		

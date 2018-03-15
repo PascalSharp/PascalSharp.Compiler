@@ -1,14 +1,13 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Строковые константы.
+
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
-
     public static class compiler_string_consts
     {
 

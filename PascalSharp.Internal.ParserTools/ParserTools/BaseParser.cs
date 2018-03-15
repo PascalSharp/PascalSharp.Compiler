@@ -1,13 +1,10 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
+
 using System.Collections.Generic;
-using System.Text;
-using PascalABCCompiler.Errors;
-using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.Errors;
 
-namespace PascalABCCompiler.Parsers
+namespace PascalSharp.Internal.ParserTools
 {
     public abstract class BaseParser: IParser
     {
@@ -116,7 +113,7 @@ namespace PascalABCCompiler.Parsers
             }
         }
 
-        public virtual PascalABCCompiler.SyntaxTree.syntax_tree_node BuildTree(string FileName, string Text, ParseMode ParseMode, List<string> DefinesList = null)
+        public virtual syntax_tree_node BuildTree(string FileName, string Text, ParseMode ParseMode, List<string> DefinesList = null)
         {
             syntax_tree_node root = null;
 

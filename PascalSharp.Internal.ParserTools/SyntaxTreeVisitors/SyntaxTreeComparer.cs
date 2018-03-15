@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
-using System.Collections.Generic;
-using System.Reflection;
 
-namespace PascalABCCompiler.SyntaxTree
+using System;
+using PascalSharp.Internal.SyntaxTree;
+
+namespace PascalSharp.Internal.ParserTools.SyntaxTreeVisitors
 {
     public class SyntaxNodesNotEqual : Exception
     {

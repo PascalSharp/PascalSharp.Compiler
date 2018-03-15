@@ -150,19 +150,30 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using ICSharpCode.NRefactory;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
 using PascalABCCompiler;
+using PascalABCCompiler.SemanticTree;
+using PascalABCCompiler.SystemLibrary;
 using PascalSharp.Compiler.PCU;
 using PascalSharp.Compiler.SemanticTreeConverters;
 using PascalSharp.Internal.CompilerTools.Errors;
 using PascalSharp.Internal.EmitPE;
 using PascalSharp.Internal.Errors;
 using PascalSharp.Internal.Localization;
+using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.SyntaxTree.Converters;
-using PascalSharp.Internal.TreeConverter;TreeRealization;
+using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using compiler_directive = PascalSharp.Internal.TreeConverter.TreeRealization.compiler_directive;
+using CompilerInternalError = PascalSharp.Internal.Errors.CompilerInternalError;
+using Controller = PascalSharp.Internal.ParserTools.Controller;
+using IParser = ICSharpCode.NRefactory.IParser;
 using SourceLocation = PascalSharp.Internal.Errors.SourceLocation;
+using StringResources = PascalSharp.Internal.Localization.StringResources;
 
 
 namespace PascalSharp.Compiler
@@ -193,7 +204,7 @@ namespace PascalSharp.Compiler
 
     public class ProgramModuleExpected : CompilerCompilationError
     {
-        public ProgramModuleExpected(string FileName, PascalABCCompiler.SyntaxTree.SourceContext sc)
+        public ProgramModuleExpected(string FileName, SourceContext sc)
             : base(StringResources.Get("COMPILATIONERROR_PROGRAM_MODULE_EXPECTED"), FileName)
         {
             this.source_context = sc;
@@ -202,7 +213,7 @@ namespace PascalSharp.Compiler
 
     public class UnitModuleExpected : CompilerCompilationError
     {
-        public UnitModuleExpected(string FileName, PascalABCCompiler.SyntaxTree.SourceContext sc)
+        public UnitModuleExpected(string FileName, SourceContext sc)
             : base(StringResources.Get("COMPILATIONERROR_UNIT_MODULE_EXPECTED"), FileName)
         {
             this.source_context = sc;
@@ -211,7 +222,7 @@ namespace PascalSharp.Compiler
 
     public class UnitModuleExpectedLibraryFound : CompilerCompilationError
     {
-        public UnitModuleExpectedLibraryFound(string FileName, PascalABCCompiler.SyntaxTree.SourceContext sc)
+        public UnitModuleExpectedLibraryFound(string FileName, SourceContext sc)
             : base(StringResources.Get("COMPILATIONERROR_UNIT_MODULE_EXPECTED_LIBRARY_FOUND"), FileName)
         {
             this.source_context = sc;
@@ -221,7 +232,7 @@ namespace PascalSharp.Compiler
     public class AssemblyNotFound : CompilerCompilationError
     {
         public string AssemblyFileName;
-        public AssemblyNotFound(string FileName,string AssemblyFileName, PascalABCCompiler.SyntaxTree.SourceContext sc)
+        public AssemblyNotFound(string FileName,string AssemblyFileName, SourceContext sc)
             : base(string.Format(StringResources.Get("COMPILATIONERROR_ASSEMBLY_{0}_NOT_FOUND"), AssemblyFileName), FileName)
         {
             this.AssemblyFileName = AssemblyFileName;
@@ -233,7 +244,7 @@ namespace PascalSharp.Compiler
     public class AssemblyReadingError : CompilerCompilationError
     {
     	public string AssemblyFileName;
-    	public AssemblyReadingError(string FileName,string AssemblyFileName, PascalABCCompiler.SyntaxTree.SourceContext sc)
+    	public AssemblyReadingError(string FileName,string AssemblyFileName, SourceContext sc)
             : base(string.Format(StringResources.Get("COMPILATIONERROR_ASSEMBLY_{0}_READING_ERROR"), AssemblyFileName), FileName)
         {
             this.AssemblyFileName = AssemblyFileName;
@@ -243,7 +254,7 @@ namespace PascalSharp.Compiler
 
     public class InvalidAssemblyPathError : CompilerCompilationError
     {
-        public InvalidAssemblyPathError(string FileName,PascalABCCompiler.SyntaxTree.SourceContext sc)
+        public InvalidAssemblyPathError(string FileName,SourceContext sc)
             : base(string.Format(StringResources.Get("COMPILATIONERROR_INVALID_ASSEMBLY_PATH")), FileName)
         {
             this.source_context = sc;
@@ -267,7 +278,7 @@ namespace PascalSharp.Compiler
 
     public class IncludeNamespaceInUnit: CompilerCompilationError
     {
-        public IncludeNamespaceInUnit(string FileName, PascalABCCompiler.SyntaxTree.SourceContext sc)
+        public IncludeNamespaceInUnit(string FileName, SourceContext sc)
             : base(string.Format(StringResources.Get("COMPILATIONERROR_INCLUDE_NAMESPACE_IN_UNIT")), FileName)
         {
             this.source_context = sc;
@@ -276,7 +287,7 @@ namespace PascalSharp.Compiler
 
     public class NamespaceModuleExpected : CompilerCompilationError
     {
-        public NamespaceModuleExpected(PascalABCCompiler.SyntaxTree.SourceContext sc)
+        public NamespaceModuleExpected(SourceContext sc)
             : base(string.Format(StringResources.Get("COMPILATIONERROR_NAMESPACE_MODULE_EXPECTED")))
         {
             this.source_context = sc;
@@ -296,7 +307,7 @@ namespace PascalSharp.Compiler
     public class DuplicateUsesUnit : CompilerCompilationError
     {
         public string UnitName;
-        public DuplicateUsesUnit(string FileName, string UnitName, PascalABCCompiler.SyntaxTree.SourceContext sc)
+        public DuplicateUsesUnit(string FileName, string UnitName, SourceContext sc)
             : base(string.Format(StringResources.Get("COMPILATIONERROR_DUPLICATE_USES_UNIT{0}"), UnitName), FileName)
         {
             this.UnitName = UnitName;
@@ -307,7 +318,7 @@ namespace PascalSharp.Compiler
     public class UnitNotFound : CompilerCompilationError
     {
         public string UnitName;
-        public UnitNotFound(string FileName, string UnitName, PascalABCCompiler.SyntaxTree.SourceContext sc)
+        public UnitNotFound(string FileName, string UnitName, SourceContext sc)
             : base(string.Format(StringResources.Get("COMPILATIONERROR_UNIT_{0}_NOT_FOUND"), UnitName), FileName)
         {
             this.UnitName = UnitName;
@@ -332,9 +343,9 @@ namespace PascalSharp.Compiler
     }
     public class CycleUnitReference : CompilerCompilationError
     {
-        public PascalABCCompiler.SyntaxTree.unit_or_namespace SyntaxUsesUnit;
-        public CycleUnitReference(string FileName, PascalABCCompiler.SyntaxTree.unit_or_namespace SyntaxUsesUnit)
-            : base(string.Format(StringResources.Get("COMPILATIONERROR_CYCLIC_UNIT_REFERENCE_WITH_UNIT_{0}"), PascalABCCompiler.SyntaxTree.Utils.IdentListToString(SyntaxUsesUnit.name.idents,".")), FileName)
+        public unit_or_namespace SyntaxUsesUnit;
+        public CycleUnitReference(string FileName, unit_or_namespace SyntaxUsesUnit)
+            : base(string.Format(StringResources.Get("COMPILATIONERROR_CYCLIC_UNIT_REFERENCE_WITH_UNIT_{0}"), Utils.IdentListToString(SyntaxUsesUnit.name.idents,".")), FileName)
         {
             this.SyntaxUsesUnit = SyntaxUsesUnit;
             this.source_context = SyntaxUsesUnit.source_context;
@@ -352,7 +363,7 @@ namespace PascalSharp.Compiler
         public string UnitName;
 		public List<Error> ErrorList=new List<Error>();
 		public bool Documented;
-        internal List<PascalABCCompiler.SyntaxTree.unit_or_namespace> PossibleNamespaces = new List<PascalABCCompiler.SyntaxTree.unit_or_namespace>();
+        internal List<unit_or_namespace> PossibleNamespaces = new List<unit_or_namespace>();
         //internal List<CompilationUnit> AssemblyReferences = new List<CompilationUnit>();
 
 		//private SemanticTree.compilation_unitArrayList _interfaceUsedUnits=new SemanticTree.compilation_unitArrayList();
@@ -369,8 +380,8 @@ namespace PascalSharp.Compiler
 			get {return _implementationUsedUnits;}
 		}
 
-		private PascalABCCompiler.SyntaxTree.compilation_unit _syntaxTree=null;
-		public PascalABCCompiler.SyntaxTree.compilation_unit SyntaxTree
+		private compilation_unit _syntaxTree=null;
+		public compilation_unit SyntaxTree
 		{
 			get {return _syntaxTree;}
 			set {_syntaxTree=value;}
@@ -383,8 +394,8 @@ namespace PascalSharp.Compiler
 			set {_semanticTree=value;}
 		}
 
-		private PascalABCCompiler.SyntaxTree.unit_or_namespace _syntaxUnitName=null;
-		public PascalABCCompiler.SyntaxTree.unit_or_namespace SyntaxUnitName
+		private unit_or_namespace _syntaxUnitName=null;
+		public unit_or_namespace SyntaxUnitName
 		{
 			get {return _syntaxUnitName;}
 			set {_syntaxUnitName=value;}
@@ -517,7 +528,7 @@ namespace PascalSharp.Compiler
             set
             {
                 useDllForSystemUnits = value;
-                PascalABCCompiler.NetHelper.NetHelper.UsePABCRtl = value;
+                NetHelper.UsePABCRtl = value;
             }
         }
 
@@ -529,13 +540,13 @@ namespace PascalSharp.Compiler
         {
             public string Name = null;
             public StandartModuleAddMethod AddMethod = StandartModuleAddMethod.LeftToAll;
-            public PascalABCCompiler.SyntaxTree.LanguageId AddToLanguages = PascalABCCompiler.SyntaxTree.LanguageId.PascalABCNET;
+            public LanguageId AddToLanguages = LanguageId.PascalABCNET;
             public StandartModule(string Name, StandartModuleAddMethod AddMethod)
             {
                 this.Name = Name;
                 this.AddMethod = AddMethod;
             }
-            public StandartModule(string Name, StandartModuleAddMethod AddMethod, PascalABCCompiler.SyntaxTree.LanguageId AddToLanguages)
+            public StandartModule(string Name, StandartModuleAddMethod AddMethod, LanguageId AddToLanguages)
             {
                 this.Name = Name;
                 this.AddToLanguages = AddToLanguages;
@@ -545,7 +556,7 @@ namespace PascalSharp.Compiler
             {
                 this.Name = Name;
             }
-            public StandartModule(string Name, PascalABCCompiler.SyntaxTree.LanguageId AddToLanguages)
+            public StandartModule(string Name, LanguageId AddToLanguages)
             {
                 this.AddToLanguages = AddToLanguages;
                 this.Name = Name;
@@ -597,8 +608,8 @@ namespace PascalSharp.Compiler
         private void SetStandartModules()
         {
             StandartModules=new List<StandartModule>();
-            StandartModules.Add(new StandartModule("PABCSystem", PascalABCCompiler.SyntaxTree.LanguageId.PascalABCNET | PascalABCCompiler.SyntaxTree.LanguageId.C));
-            StandartModules.Add(new StandartModule("PABCExtensions", PascalABCCompiler.SyntaxTree.LanguageId.PascalABCNET | PascalABCCompiler.SyntaxTree.LanguageId.C));
+            StandartModules.Add(new StandartModule("PABCSystem", LanguageId.PascalABCNET | LanguageId.C));
+            StandartModules.Add(new StandartModule("PABCExtensions", LanguageId.PascalABCNET | LanguageId.C));
         }
 
         private void SetDirectories()
@@ -680,11 +691,11 @@ namespace PascalSharp.Compiler
         {
             this.extensions = extensions; languageName = lname;
         }
-        public static SupportedSourceFile Make(PascalABCCompiler.Parsers.IParser parser)
+        public static SupportedSourceFile Make(Internal.ParserTools.IParser parser)
         {
             List<string> ext = new List<string>();
             foreach (string ex in parser.FilesExtensions)
-                if (ex[ex.Length - 1] != PascalABCCompiler.Parsers.Controller.HideParserExtensionPostfixChar)
+                if (ex[ex.Length - 1] != Controller.HideParserExtensionPostfixChar)
                     ext.Add(ex);
             if (ext.Count > 0)
                 return new SupportedSourceFile(ext.ToArray(), parser.Name);
@@ -756,7 +767,7 @@ namespace PascalSharp.Compiler
         private Hashtable BadNodesInSyntaxTree = new Hashtable();
 
         PascalSharp.Internal.TreeConverter.TreeRealization.program_node _semantic_tree = null;
-        public PascalABCCompiler.SemanticTree.IProgramNode SemanticTree
+        public IProgramNode SemanticTree
         {
             get
             {
@@ -856,8 +867,8 @@ namespace PascalSharp.Compiler
 
         internal Dictionary<string,CompilationUnit> DLLCashe = new Dictionary<string,CompilationUnit>();
 
-        private PascalABCCompiler.Parsers.Controller parsersController = null;
-        public PascalABCCompiler.Parsers.Controller ParsersController
+        private Controller parsersController = null;
+        public Controller ParsersController
         {
             get
             {
@@ -868,11 +879,11 @@ namespace PascalSharp.Compiler
                 parsersController = value;
             }
         }
-        public PascalSharp.Internal.TreeConverter.SyntaxTreeToSemanticTreeConverter SyntaxTreeToSemanticTreeConverter = null;
+        public SyntaxTreeToSemanticTreeConverter SyntaxTreeToSemanticTreeConverter = null;
         public Controller CodeGeneratorsController = null;
         //public LLVMConverter.Controller LLVMCodeGeneratorsController = null;
         //public PascalToCppConverter.Controller PABCToCppCodeGeneratorsController = null;
-        private PascalABCCompiler.SyntaxTree.unit_or_namespace CurrentSyntaxUnit;
+        private unit_or_namespace CurrentSyntaxUnit;
 		private List<CompilationUnit> UnitsToCompile = new List<CompilationUnit>();
         public Hashtable RecompileList = new Hashtable(StringComparer.OrdinalIgnoreCase);
         private PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list Units;
@@ -1015,17 +1026,17 @@ namespace PascalSharp.Compiler
             OnChangeCompilerState(this, CompilerState.Reloading, null);
 
             //А это что?
-            type_node tn = PascalABCCompiler.SystemLibrary.SystemLibrary.void_type;
+            type_node tn = SystemLibrary.void_type;
 
             ClearAll();
             errorsList.Clear();
             Warnings.Clear();
             InternalDebug = new CompilerInternalDebug();
-            ParsersController = new PascalABCCompiler.Parsers.Controller();
-            ParsersController.ParserConnected += new PascalABCCompiler.Parsers.Controller.ParserConnectedDeleagte(ParsersController_ParserConnected);
+            ParsersController = new Controller();
+            ParsersController.ParserConnected += new Controller.ParserConnectedDeleagte(ParsersController_ParserConnected);
             ParsersController.SourceFilesProvider = sourceFilesProvider;
             ParsersController.Reload();
-            SyntaxTreeToSemanticTreeConverter = new PascalSharp.Internal.TreeConverter.SyntaxTreeToSemanticTreeConverter();
+            SyntaxTreeToSemanticTreeConverter = new SyntaxTreeToSemanticTreeConverter();
             CodeGeneratorsController = new Controller();
             //PABCToCppCodeGeneratorsController = new PascalToCppConverter.Controller();
             SetSupportedSourceFiles();
@@ -1042,7 +1053,7 @@ namespace PascalSharp.Compiler
             OnChangeCompilerState(this, CompilerState.Ready, null);    
         }
 
-        void ParsersController_ParserConnected(PascalABCCompiler.Parsers.IParser Parser)
+        void ParsersController_ParserConnected(Internal.ParserTools.IParser Parser)
         {
             if (OnChangeCompilerState != null)
                 OnChangeCompilerState(this, CompilerState.ParserConnected, Parser.GetType().Assembly.ManifestModule.FullyQualifiedName);
@@ -1102,7 +1113,7 @@ namespace PascalSharp.Compiler
             return Directives;
         }
         
-        private PascalSharp.Internal.TreeConverter.TreeRealization.location get_location_from_treenode(PascalABCCompiler.SyntaxTree.syntax_tree_node tn, string FileName)
+        private PascalSharp.Internal.TreeConverter.TreeRealization.location get_location_from_treenode(syntax_tree_node tn, string FileName)
         {
             if (tn.source_context == null)
             {
@@ -1112,10 +1123,10 @@ namespace PascalSharp.Compiler
                 tn.source_context.end_position.line_num, tn.source_context.end_position.column_num, new PascalSharp.Internal.TreeConverter.TreeRealization.document(FileName));
         }
         
-        private System.Collections.Generic.List<compiler_directive> ConvertDirectives(PascalABCCompiler.SyntaxTree.compilation_unit cu)
+        private System.Collections.Generic.List<compiler_directive> ConvertDirectives(compilation_unit cu)
         {
             System.Collections.Generic.List<compiler_directive> list = new System.Collections.Generic.List<compiler_directive>();
-            foreach (PascalABCCompiler.SyntaxTree.compiler_directive sncd in cu.compiler_directives)
+            foreach (var sncd in cu.compiler_directives)
             {
             	list.Add(new compiler_directive(sncd.Name.text, sncd.Directive!=null?sncd.Directive.text:"", get_location_from_treenode(sncd,cu.file_name)));
             }
@@ -1684,7 +1695,7 @@ namespace PascalSharp.Compiler
 			
 			if (info != null && info.modules.Count > 0)
 			{
-				comp_opt.ReferencedAssemblies.Add(Path.Combine(Path.GetDirectoryName(CompilerOptions.SourceFileName),PascalSharp.Internal.TreeConverter.compiler_string_consts.pabc_rtl_dll_name));
+				comp_opt.ReferencedAssemblies.Add(Path.Combine(Path.GetDirectoryName(CompilerOptions.SourceFileName),compiler_string_consts.pabc_rtl_dll_name));
 				string mod_file_name = FindSourceFileInDirectories("PABCRtl.dll",Path.Combine(this.CompilerOptions.SystemDirectory,"Lib"));
 				File.Copy(mod_file_name,Path.Combine(Path.GetDirectoryName(CompilerOptions.SourceFileName),"PABCRtl.dll"),true);
 				/*foreach (string mod in info.modules)
@@ -1780,7 +1791,7 @@ namespace PascalSharp.Compiler
                 }
                 Environment.CurrentDirectory = CompilerOptions.SourceFileDirectory; // нужно для подключения *.inc и *.resources
                 Units = new PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list();
-                CurrentSyntaxUnit = new PascalABCCompiler.SyntaxTree.uses_unit_in(new PascalABCCompiler.SyntaxTree.string_const(CompilerOptions.SourceFileName));
+                CurrentSyntaxUnit = new uses_unit_in(new string_const(CompilerOptions.SourceFileName));
                 CompileUnit(Units, CurrentSyntaxUnit);
                 //Console.WriteLine(timer.ElapsedMilliseconds / 1000.0);  //////
                 foreach (CompilationUnit CurrentUnit in UnitsToCompile)
@@ -1790,7 +1801,7 @@ namespace PascalSharp.Compiler
                         string UnitName = GetUnitFileName(CurrentUnit.SyntaxUnitName);
                         //if(CurrentUnit.State!=UnitState.InterfaceCompiled)													//DEBUG
                         //Console.WriteLine("ERROR! interface not compiled "+GetUnitFileName(CurrentUnit.SyntaxUnitName));//DEBUG
-                        System.Collections.Generic.List<PascalABCCompiler.SyntaxTree.unit_or_namespace> SyntaxUsesList = GetSyntaxImplementationUsesList(CurrentUnit.SyntaxTree);
+                        System.Collections.Generic.List<unit_or_namespace> SyntaxUsesList = GetSyntaxImplementationUsesList(CurrentUnit.SyntaxTree);
                         CurrentUnit.PossibleNamespaces.Clear();
                         if (SyntaxUsesList != null)
                         {
@@ -1819,7 +1830,7 @@ namespace PascalSharp.Compiler
 #endif
                         {
                             OnChangeCompilerState(this, CompilerState.CompileImplementation, UnitName);
-                            PascalSharp.Internal.TreeConverter.SemanticRules.SymbolTableCaseSensitive = CurrentUnit.CaseSensitive;
+                            SemanticRules.SymbolTableCaseSensitive = CurrentUnit.CaseSensitive;
                             SyntaxTreeToSemanticTreeConverter.CompileImplementation(
                                 (PascalSharp.Internal.TreeConverter.TreeRealization.common_unit_node)CurrentUnit.SemanticTree,
                                 CurrentUnit.SyntaxTree,
@@ -1849,9 +1860,9 @@ namespace PascalSharp.Compiler
 
                 compiler_directive compilerDirective;
                 //TODO сделать это понормальному!!!!!
-                if (compilerDirectives.ContainsKey(PascalSharp.Internal.TreeConverter.compiler_string_consts.compiler_directive_apptype))
+                if (compilerDirectives.ContainsKey(compiler_string_consts.compiler_directive_apptype))
                 {
-                    string directive = compilerDirectives[PascalSharp.Internal.TreeConverter.compiler_string_consts.compiler_directive_apptype][0].directive;
+                    string directive = compilerDirectives[compiler_string_consts.compiler_directive_apptype][0].directive;
                     if (string.Compare(directive,"console",true)==0)
                         CompilerOptions.OutputFileType = CompilerOptions.OutputType.ConsoleApplicaton;
                     else
@@ -1875,7 +1886,7 @@ namespace PascalSharp.Compiler
                 PascalSharp.Internal.TreeConverter.TreeRealization.program_node pn = null;
                 PascalSharp.Internal.EmitPE.CompilerOptions cdo = new PascalSharp.Internal.EmitPE.CompilerOptions();
                 List<compiler_directive> cds;
-                if (compilerDirectives.TryGetValue(PascalSharp.Internal.TreeConverter.compiler_string_consts.compiler_directive_platformtarget, out cds))
+                if (compilerDirectives.TryGetValue(compiler_string_consts.compiler_directive_platformtarget, out cds))
                 {
                     string plt = cds[0].directive.ToLower();
                     if (plt.Equals("x86"))
@@ -1887,32 +1898,32 @@ namespace PascalSharp.Compiler
                 }
                 if (this.compilerOptions.Only32Bit)
                     cdo.platformtarget = PascalSharp.Internal.EmitPE.CompilerOptions.PlatformTarget.x86;
-                if (compilerDirectives.TryGetValue(PascalSharp.Internal.TreeConverter.compiler_string_consts.product_string, out cds))
+                if (compilerDirectives.TryGetValue(compiler_string_consts.product_string, out cds))
                 {
                     cdo.Product = cds[0].directive;
                 }
-                if (compilerDirectives.TryGetValue(PascalSharp.Internal.TreeConverter.compiler_string_consts.version_string, out cds))
+                if (compilerDirectives.TryGetValue(compiler_string_consts.version_string, out cds))
                 {
                     cdo.ProductVersion = cds[0].directive;
                 }
-                if (compilerDirectives.TryGetValue(PascalSharp.Internal.TreeConverter.compiler_string_consts.company_string, out cds))
+                if (compilerDirectives.TryGetValue(compiler_string_consts.company_string, out cds))
                 {
                     cdo.Company = cds[0].directive;
                 }
-                if (compilerDirectives.TryGetValue(PascalSharp.Internal.TreeConverter.compiler_string_consts.trademark_string, out cds))
+                if (compilerDirectives.TryGetValue(compiler_string_consts.trademark_string, out cds))
                 {
                     cdo.TradeMark = cds[0].directive;
                 }
-                if (compilerDirectives.TryGetValue(PascalSharp.Internal.TreeConverter.compiler_string_consts.copyright_string, out cds))
+                if (compilerDirectives.TryGetValue(compiler_string_consts.copyright_string, out cds))
                 {
                     cdo.Copyright = cds[0].directive;
                 }
-                if (compilerDirectives.TryGetValue(PascalSharp.Internal.TreeConverter.compiler_string_consts.main_resource_string, out cds))
+                if (compilerDirectives.TryGetValue(compiler_string_consts.main_resource_string, out cds))
                 {
-                    if (compilerDirectives.ContainsKey(PascalSharp.Internal.TreeConverter.compiler_string_consts.product_string) ||
-                        compilerDirectives.ContainsKey(PascalSharp.Internal.TreeConverter.compiler_string_consts.version_string) ||
-                        compilerDirectives.ContainsKey(PascalSharp.Internal.TreeConverter.compiler_string_consts.company_string) ||
-                        compilerDirectives.ContainsKey(PascalSharp.Internal.TreeConverter.compiler_string_consts.trademark_string))
+                    if (compilerDirectives.ContainsKey(compiler_string_consts.product_string) ||
+                        compilerDirectives.ContainsKey(compiler_string_consts.version_string) ||
+                        compilerDirectives.ContainsKey(compiler_string_consts.company_string) ||
+                        compilerDirectives.ContainsKey(compiler_string_consts.trademark_string))
                     {
                         ErrorsList.Add(new MainResourceNotAllowed(cds[0].location));
                     }
@@ -1924,10 +1935,10 @@ namespace PascalSharp.Compiler
                 }
 
                 List<string> ResourceFiles = null;
-                if (compilerDirectives.ContainsKey(PascalSharp.Internal.TreeConverter.compiler_string_consts.compiler_directive_resource))
+                if (compilerDirectives.ContainsKey(compiler_string_consts.compiler_directive_resource))
                 {
                     ResourceFiles = new List<string>();
-                    List<compiler_directive> ResourceDirectives = compilerDirectives[PascalSharp.Internal.TreeConverter.compiler_string_consts.compiler_directive_resource];
+                    List<compiler_directive> ResourceDirectives = compilerDirectives[compiler_string_consts.compiler_directive_resource];
                     foreach (compiler_directive cd in ResourceDirectives)
                         if (!File.Exists(cd.directive))
                         {
@@ -2044,8 +2055,8 @@ namespace PascalSharp.Compiler
                         pn.units.AddElement(UnitsSortedList[i].SemanticTree as PascalSharp.Internal.TreeConverter.TreeRealization.common_unit_node);
 
                     //(ssyy) Добавил в условие c_module
-                    if (FirstCompilationUnit.SyntaxTree is PascalABCCompiler.SyntaxTree.program_module ||
-                        FirstCompilationUnit.SyntaxTree is PascalABCCompiler.SyntaxTree.c_module)
+                    if (FirstCompilationUnit.SyntaxTree is program_module ||
+                        FirstCompilationUnit.SyntaxTree is c_module)
                     {
                         if ((cdo.target == TargetType.Exe) || (cdo.target == TargetType.WinExe))
                         {
@@ -2082,7 +2093,7 @@ namespace PascalSharp.Compiler
                             }
                         }
                     }
-                    else if (FirstCompilationUnit.SyntaxTree is PascalABCCompiler.SyntaxTree.unit_module && cdo.target == TargetType.Dll)
+                    else if (FirstCompilationUnit.SyntaxTree is unit_module && cdo.target == TargetType.Dll)
                     {
                     	pn.create_main_function_as_in_module();
                     }
@@ -2090,7 +2101,7 @@ namespace PascalSharp.Compiler
 
                     _semantic_tree = pn;
 
-                    if (FirstCompilationUnit.SyntaxTree is PascalABCCompiler.SyntaxTree.unit_module && CompilerOptions.OutputFileType != CompilerOptions.OutputType.ClassLibrary)
+                    if (FirstCompilationUnit.SyntaxTree is unit_module && CompilerOptions.OutputFileType != CompilerOptions.OutputType.ClassLibrary)
                     {
                         //если мы комилируем PCU
                         CompilerOptions.OutputFileType = CompilerOptions.OutputType.PascalCompiledUnit;
@@ -2270,7 +2281,7 @@ namespace PascalSharp.Compiler
             	foreach (PCUReader p in PCUReader.AllReaders)
             	{
                 	p.AddInitFinalMethods();
-                    PascalABCCompiler.SystemLibrary.SystemLibInitializer.RestoreStandardFunctions();
+                    SystemLibInitializer.RestoreStandardFunctions();
                     p.ProcessWaitedToRestoreFields();
             	}
             	bool rest = true;
@@ -2312,14 +2323,14 @@ namespace PascalSharp.Compiler
             }
         }
 		
-        void checkDuplicateUsesUnit(List<PascalABCCompiler.SyntaxTree.unit_or_namespace> usesList)
+        void checkDuplicateUsesUnit(List<unit_or_namespace> usesList)
         {
             if(usesList==null)
                 return;
             List<string> names = new List<string>();
-            foreach (PascalABCCompiler.SyntaxTree.unit_or_namespace un in usesList)
+            foreach (unit_or_namespace un in usesList)
             {
-                string name=PascalABCCompiler.SyntaxTree.Utils.IdentListToString(un.name.idents,".").ToLower();
+                string name=Utils.IdentListToString(un.name.idents,".").ToLower();
                 if (un.source_context != null)
                 {
                     if (names.Contains(name))
@@ -2330,43 +2341,43 @@ namespace PascalSharp.Compiler
             }
         }
 		
-        public List<PascalABCCompiler.SyntaxTree.unit_or_namespace> GetSyntaxInterfaceUsesList(PascalABCCompiler.SyntaxTree.compilation_unit CurrentSyntaxUnit)
+        public List<unit_or_namespace> GetSyntaxInterfaceUsesList(compilation_unit CurrentSyntaxUnit)
 		{
-            List<PascalABCCompiler.SyntaxTree.unit_or_namespace> result = null;
-			if(CurrentSyntaxUnit is PascalABCCompiler.SyntaxTree.unit_module)
+            List<unit_or_namespace> result = null;
+			if(CurrentSyntaxUnit is unit_module)
             {
-                PascalABCCompiler.SyntaxTree.interface_node intp = (CurrentSyntaxUnit as PascalABCCompiler.SyntaxTree.unit_module).interface_part;
+                interface_node intp = (CurrentSyntaxUnit as unit_module).interface_part;
                 if (intp.uses_modules == null)
                     if (CompilerOptions.StandartModules.Count > 0)//если есть стандартые модули то создать список
                     {
-                        intp.uses_modules = new PascalABCCompiler.SyntaxTree.uses_list();
-                        intp.uses_modules.source_context = new PascalABCCompiler.SyntaxTree.SourceContext(1, 1, 1, 1, 1, 1);
+                        intp.uses_modules = new uses_list();
+                        intp.uses_modules.source_context = new SourceContext(1, 1, 1, 1, 1, 1);
                     }
                     else
                         return null;
                 result = intp.uses_modules.units;
             }
-            if (CurrentSyntaxUnit is PascalABCCompiler.SyntaxTree.program_module)
+            if (CurrentSyntaxUnit is program_module)
             {
-                PascalABCCompiler.SyntaxTree.program_module pm = (CurrentSyntaxUnit as PascalABCCompiler.SyntaxTree.program_module);
+                program_module pm = (CurrentSyntaxUnit as program_module);
                 if (pm.used_units == null)
                     if (CompilerOptions.StandartModules.Count > 0)//если есть стандартые модули то создать список
                     {
-                        pm.used_units = new PascalABCCompiler.SyntaxTree.uses_list();
-                        pm.used_units.source_context = new PascalABCCompiler.SyntaxTree.SourceContext(1, 1, 1, 1, 1, 1);
+                        pm.used_units = new uses_list();
+                        pm.used_units.source_context = new SourceContext(1, 1, 1, 1, 1, 1);
                     }
                     else
                         return null;
                 result = pm.used_units.units;
             }
-            if (CurrentSyntaxUnit is PascalABCCompiler.SyntaxTree.c_module)
+            if (CurrentSyntaxUnit is c_module)
             {
-                PascalABCCompiler.SyntaxTree.c_module pm = (CurrentSyntaxUnit as PascalABCCompiler.SyntaxTree.c_module);
+                c_module pm = (CurrentSyntaxUnit as c_module);
                 if (pm.used_units == null)
                     if (CompilerOptions.StandartModules.Count > 0)//если есть стандартые модули то создать список
                     {
-                        pm.used_units = new PascalABCCompiler.SyntaxTree.uses_list();
-                        pm.used_units.source_context = new PascalABCCompiler.SyntaxTree.SourceContext(1, 1, 1, 1, 1, 1);
+                        pm.used_units = new uses_list();
+                        pm.used_units.source_context = new SourceContext(1, 1, 1, 1, 1, 1);
                     }
                     else
                         return null;
@@ -2376,18 +2387,18 @@ namespace PascalSharp.Compiler
             return result;
 		}
 
-        private List<PascalABCCompiler.SyntaxTree.unit_or_namespace> GetSyntaxImplementationUsesList(PascalABCCompiler.SyntaxTree.compilation_unit CurrentSyntaxUnit)
+        private List<unit_or_namespace> GetSyntaxImplementationUsesList(compilation_unit CurrentSyntaxUnit)
 		{
-            List<PascalABCCompiler.SyntaxTree.unit_or_namespace> result = null;
-			if(CurrentSyntaxUnit is PascalABCCompiler.SyntaxTree.unit_module)
-				if ((CurrentSyntaxUnit as PascalABCCompiler.SyntaxTree.unit_module).implementation_part!=null)
-                    if ((CurrentSyntaxUnit as PascalABCCompiler.SyntaxTree.unit_module).implementation_part.uses_modules != null)
+            List<unit_or_namespace> result = null;
+			if(CurrentSyntaxUnit is unit_module)
+				if ((CurrentSyntaxUnit as unit_module).implementation_part!=null)
+                    if ((CurrentSyntaxUnit as unit_module).implementation_part.uses_modules != null)
                     {
-                        result = (CurrentSyntaxUnit as PascalABCCompiler.SyntaxTree.unit_module).implementation_part.uses_modules.units;
+                        result = (CurrentSyntaxUnit as unit_module).implementation_part.uses_modules.units;
                         checkDuplicateUsesUnit(result);
                         return result;
                     }
-			if(CurrentSyntaxUnit is PascalABCCompiler.SyntaxTree.program_module)
+			if(CurrentSyntaxUnit is program_module)
 				return null;
 			return null;
 		}
@@ -2503,14 +2514,14 @@ namespace PascalSharp.Compiler
             }
         }
         
-        private string GetReferenceFileName(string FileName, PascalABCCompiler.SyntaxTree.SourceContext sc)
+        private string GetReferenceFileName(string FileName, SourceContext sc)
         {
             if (standart_assembly_dict.ContainsKey(FileName))
                 return standart_assembly_dict[FileName];
 
             // Наверное, этот код MikhailoMMX лишний
             //MikhailoMMX PABCRtl.dll будем искать сначала в GAC, а потом в папке с программой
-            if (FileName == PascalSharp.Internal.TreeConverter.compiler_string_consts.pabc_rtl_dll_name)
+            if (FileName == compiler_string_consts.pabc_rtl_dll_name)
             {
 
                 string name = get_assembly_path(FileName, true);
@@ -2537,7 +2548,7 @@ namespace PascalSharp.Compiler
             }
         }
         
-        public string GetUnitFileName(PascalABCCompiler.SyntaxTree.unit_or_namespace SyntaxUsesUnit)
+        public string GetUnitFileName(unit_or_namespace SyntaxUsesUnit)
 		{
             string PCUFileName = null;
             bool PCUFileExists = false;
@@ -2545,9 +2556,9 @@ namespace PascalSharp.Compiler
             bool SourceFileExists = false;
             string UnitName = null;
 
-            if (SyntaxUsesUnit is PascalABCCompiler.SyntaxTree.uses_unit_in)
+            if (SyntaxUsesUnit is uses_unit_in)
             {
-                PascalABCCompiler.SyntaxTree.uses_unit_in uui = (SyntaxUsesUnit as PascalABCCompiler.SyntaxTree.uses_unit_in);
+                uses_unit_in uui = (SyntaxUsesUnit as uses_unit_in);
                 string file_ext = System.IO.Path.GetExtension(uui.in_file.Value).ToLower();
                 if (file_ext == ".dll" || file_ext == ".exe")
                     return GetReferenceFileName(uui.in_file.Value, uui.in_file.source_context);
@@ -2607,14 +2618,14 @@ namespace PascalSharp.Compiler
             return Path.GetDirectoryName(FileName).ToLower() == CompilerOptions.SearchDirectory.ToLower();
         }
         
-        public void AddStandartUnitsToUsesSection(PascalABCCompiler.SyntaxTree.compilation_unit cu)
+        public void AddStandartUnitsToUsesSection(compilation_unit cu)
         {
             //if (FileInSearchDirectory(cu.file_name)) return;
             
             string ModuleName = null;
-            PascalABCCompiler.SyntaxTree.uses_unit_in uses_unit_in = null;
-            PascalABCCompiler.SyntaxTree.unit_or_namespace uses_unit = null;
-            List<PascalABCCompiler.SyntaxTree.unit_or_namespace> UsesList = GetSyntaxInterfaceUsesList(cu);
+            uses_unit_in uses_unit_in = null;
+            unit_or_namespace uses_unit = null;
+            List<unit_or_namespace> UsesList = GetSyntaxInterfaceUsesList(cu);
             if (UsesList == null) 
                 return;
             string cu_module_name = Path.GetFileNameWithoutExtension(cu.file_name).ToLower();
@@ -2633,27 +2644,27 @@ namespace PascalSharp.Compiler
                 ModuleName = Path.GetFileNameWithoutExtension(Module.Name);
                 if (Module.AddMethod == CompilerOptions.StandartModuleAddMethod.RightToMain && CurrentCompilationUnit != FirstCompilationUnit)
                     continue;
-                foreach (PascalABCCompiler.SyntaxTree.unit_or_namespace curunit in UsesList)
+                foreach (unit_or_namespace curunit in UsesList)
                 {
                     if (curunit.name.idents.Count == 1 && curunit.name.idents[0].name.ToLower() == ModuleName.ToLower())
                         continue;
                 }
 
-                PascalABCCompiler.SyntaxTree.unit_or_namespace to_add;
+                unit_or_namespace to_add;
                 if (Path.GetExtension(Module.Name) != "" /*&& Path.GetExtension(ModuleFileName).ToLower() != ".dll"*/)
                 {
-                    uses_unit_in = new PascalABCCompiler.SyntaxTree.uses_unit_in();
-                    uses_unit_in.in_file = new PascalABCCompiler.SyntaxTree.string_const(Module.Name);
-                    uses_unit_in.name = new PascalABCCompiler.SyntaxTree.ident_list();
-                    uses_unit_in.name.idents.Add(new PascalABCCompiler.SyntaxTree.ident(ModuleName));
+                    uses_unit_in = new uses_unit_in();
+                    uses_unit_in.in_file = new string_const(Module.Name);
+                    uses_unit_in.name = new ident_list();
+                    uses_unit_in.name.idents.Add(new ident(ModuleName));
                     //uses_unit_in.source_context = uses_unit_in.in_file.source_context = uses_unit_in.name.source_context = new SyntaxTree.SourceContext(1, 1, 1, 1);
                     to_add = uses_unit_in;
                 }
                 else
                 {
-                    uses_unit = new PascalABCCompiler.SyntaxTree.unit_or_namespace();
-                    uses_unit.name = new PascalABCCompiler.SyntaxTree.ident_list();
-                    uses_unit.name.idents.Add(new PascalABCCompiler.SyntaxTree.ident(ModuleName));
+                    uses_unit = new unit_or_namespace();
+                    uses_unit.name = new ident_list();
+                    uses_unit.name.idents.Add(new ident(ModuleName));
                     //uses_unit.source_context = uses_unit.name.source_context = new SyntaxTree.SourceContext(1, 1, 1, 1);
                     to_add = uses_unit;
                 }
@@ -2673,9 +2684,9 @@ namespace PascalSharp.Compiler
         private CompilationUnit CompileReference(PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list Units, compiler_directive cd)
         {
             PascalSharp.Internal.TreeConverter.TreeRealization.location loc = cd.location;
-            PascalABCCompiler.SyntaxTree.SourceContext sc = null;
+            SourceContext sc = null;
             if (loc != null)
-                sc = new PascalABCCompiler.SyntaxTree.SourceContext(loc.begin_line_num, loc.begin_column_num, loc.end_line_num, loc.end_column_num, 0, 0);
+                sc = new SourceContext(loc.begin_line_num, loc.begin_column_num, loc.end_line_num, loc.end_column_num, 0, 0);
             string UnitName = null;
             try
             {
@@ -2707,7 +2718,7 @@ namespace PascalSharp.Compiler
             var directives = ConvertDirectives(Unit.SyntaxTree);
             foreach (compiler_directive cd in directives)
             {
-                if (cd.name.ToLower() == PascalSharp.Internal.TreeConverter.compiler_string_consts.include_namespace_directive)
+                if (cd.name.ToLower() == compiler_string_consts.include_namespace_directive)
                 {
                     return true;
                 }
@@ -2715,18 +2726,18 @@ namespace PascalSharp.Compiler
             return false;
         }
 
-        private Dictionary<string, PascalABCCompiler.SyntaxTree.syntax_namespace_node> IncludeNamespaces(CompilationUnit Unit)
+        private Dictionary<string, syntax_namespace_node> IncludeNamespaces(CompilationUnit Unit)
         {
-            if (HasIncludeNamespacesDirective(Unit) && Unit.SyntaxTree is PascalABCCompiler.SyntaxTree.unit_module && (Unit.SyntaxTree as PascalABCCompiler.SyntaxTree.unit_module).unit_name.HeaderKeyword != PascalABCCompiler.SyntaxTree.UnitHeaderKeyword.Library)
+            if (HasIncludeNamespacesDirective(Unit) && Unit.SyntaxTree is unit_module && (Unit.SyntaxTree as unit_module).unit_name.HeaderKeyword != UnitHeaderKeyword.Library)
                 throw new IncludeNamespaceInUnit(CurrentCompilationUnit.SyntaxTree.file_name, CurrentCompilationUnit.SyntaxTree.source_context);
             var directives = ConvertDirectives(Unit.SyntaxTree);
-            PascalABCCompiler.SyntaxTree.unit_module main_library = Unit.SyntaxTree as PascalABCCompiler.SyntaxTree.unit_module;
-            PascalABCCompiler.SyntaxTree.program_module main_program = Unit.SyntaxTree as PascalABCCompiler.SyntaxTree.program_module;
+            unit_module main_library = Unit.SyntaxTree as unit_module;
+            program_module main_program = Unit.SyntaxTree as program_module;
             List<string> files = new List<string>();
             
             foreach (compiler_directive cd in directives)
             {
-                if (cd.name.ToLower() == PascalSharp.Internal.TreeConverter.compiler_string_consts.include_namespace_directive)
+                if (cd.name.ToLower() == compiler_string_consts.include_namespace_directive)
                 {
                     string directive = cd.directive.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
 
@@ -2742,17 +2753,17 @@ namespace PascalSharp.Compiler
 
                 }
             }
-            Dictionary<string, PascalABCCompiler.SyntaxTree.syntax_namespace_node> namespaces = new Dictionary<string, PascalABCCompiler.SyntaxTree.syntax_namespace_node>();
-            List<PascalABCCompiler.SyntaxTree.unit_or_namespace> namespace_modules = new List<PascalABCCompiler.SyntaxTree.unit_or_namespace>();
+            Dictionary<string, syntax_namespace_node> namespaces = new Dictionary<string, syntax_namespace_node>();
+            List<unit_or_namespace> namespace_modules = new List<unit_or_namespace>();
             foreach (string file in files)
             {
                 if (!File.Exists(file))
                     throw new FileNotFound(file);
-                PascalABCCompiler.SyntaxTree.compilation_unit tree = GetNamespaceSyntaxTree(file);
-                if (!(tree is PascalABCCompiler.SyntaxTree.unit_module))
+                compilation_unit tree = GetNamespaceSyntaxTree(file);
+                if (!(tree is unit_module))
                     throw new NamespaceModuleExpected(tree.source_context);
-                PascalABCCompiler.SyntaxTree.unit_module unit = tree as PascalABCCompiler.SyntaxTree.unit_module;
-                if (unit.unit_name.HeaderKeyword != PascalABCCompiler.SyntaxTree.UnitHeaderKeyword.Namespace)
+                unit_module unit = tree as unit_module;
+                if (unit.unit_name.HeaderKeyword != UnitHeaderKeyword.Namespace)
                     throw new NamespaceModuleExpected(unit.unit_name.source_context);
                 if (unit.implementation_part != null)
                     throw new NamespaceModuleExpected(unit.implementation_part.source_context);
@@ -2760,23 +2771,23 @@ namespace PascalSharp.Compiler
                     throw new NamespaceModuleExpected(unit.finalization_part.source_context);
                 if (unit.initialization_part != null && unit.initialization_part.list.Count > 0)
                     throw new NamespaceModuleExpected(unit.initialization_part.source_context);
-                PascalABCCompiler.SyntaxTree.syntax_namespace_node ns = null;
+                syntax_namespace_node ns = null;
                 if (!namespaces.TryGetValue(unit.unit_name.idunit_name.name, out ns))
                 {
-                    ns = new PascalABCCompiler.SyntaxTree.syntax_namespace_node(unit.unit_name.idunit_name.name);
+                    ns = new syntax_namespace_node(unit.unit_name.idunit_name.name);
                     ns.referenced_units = new PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list();
                     namespaces[unit.unit_name.idunit_name.name] = ns;
                 }
                 if (unit.interface_part.interface_definitions != null)
                 {
-                    foreach (PascalABCCompiler.SyntaxTree.declaration decl in unit.interface_part.interface_definitions.defs)
+                    foreach (declaration decl in unit.interface_part.interface_definitions.defs)
                     {
                         ns.defs.Add(decl);
                     }
                     if (unit.interface_part.uses_modules != null)
                     {
                         checkDuplicateUsesUnit(unit.interface_part.uses_modules.units);
-                        foreach (PascalABCCompiler.SyntaxTree.unit_or_namespace name_space in unit.interface_part.uses_modules.units)
+                        foreach (unit_or_namespace name_space in unit.interface_part.uses_modules.units)
                         {
                             if (IsPossibleNamespace(name_space, false))
                             {
@@ -2797,7 +2808,7 @@ namespace PascalSharp.Compiler
                 else
                     main_program.program_block.defs.Insert(0, namespaces[s]);
             }
-            PascalABCCompiler.SyntaxTree.uses_list main_uses = null;
+            uses_list main_uses = null;
             if (main_library != null)
             {
                 if (main_library.interface_part.uses_modules != null)
@@ -2806,11 +2817,11 @@ namespace PascalSharp.Compiler
             else if (main_program.used_units != null)
                 main_uses = main_program.used_units;
             if (main_uses == null)
-                main_uses = new PascalABCCompiler.SyntaxTree.uses_list();
+                main_uses = new uses_list();
             Dictionary<string, string> dict = new Dictionary<string, string>();
-            foreach (PascalABCCompiler.SyntaxTree.unit_or_namespace name_space in namespace_modules)
+            foreach (unit_or_namespace name_space in namespace_modules)
             {
-                string name = PascalABCCompiler.SyntaxTree.Utils.IdentListToString(name_space.name.idents, ".").ToLower();
+                string name = Utils.IdentListToString(name_space.name.idents, ".").ToLower();
                 if (!dict.ContainsKey(name))
                 {
                     main_uses.Add(name_space);
@@ -2824,7 +2835,7 @@ namespace PascalSharp.Compiler
             return namespaces;
         }
 
-        private PascalABCCompiler.SyntaxTree.compilation_unit GetNamespaceSyntaxTree(string FileName)
+        private compilation_unit GetNamespaceSyntaxTree(string FileName)
         {
             string SourceText = GetSourceFileText(FileName);
             List<string> DefinesList = new List<string>();
@@ -2832,10 +2843,10 @@ namespace PascalSharp.Compiler
                 DefinesList.Add("RELEASE");
             else
                 DefinesList.Add("DEBUG");
-            PascalABCCompiler.SyntaxTree.compilation_unit SyntaxTree = InternalParseText(FileName, SourceText, errorsList, warnings, DefinesList);
+            compilation_unit SyntaxTree = InternalParseText(FileName, SourceText, errorsList, warnings, DefinesList);
             if (errorsList.Count > 0)
                 throw errorsList[0];
-            SyntaxTree = syntaxTreeConvertersController.Convert(SyntaxTree) as PascalABCCompiler.SyntaxTree.compilation_unit;
+            SyntaxTree = syntaxTreeConvertersController.Convert(SyntaxTree) as compilation_unit;
             return SyntaxTree;
         }
 
@@ -2857,8 +2868,8 @@ namespace PascalSharp.Compiler
                 directives.Add(new compiler_directive("reference", "%GAC%\\System.Numerics.dll", null));
                 directives.Add(new compiler_directive("reference", "%GAC%\\System.Windows.Forms.dll", null));
                 directives.Add(new compiler_directive("reference", "%GAC%\\System.Drawing.dll", null));
-                if (Unit.SyntaxTree is PascalABCCompiler.SyntaxTree.program_module && (Unit.SyntaxTree as PascalABCCompiler.SyntaxTree.program_module).used_units != null)
-                foreach (PascalABCCompiler.SyntaxTree.unit_or_namespace uui in (Unit.SyntaxTree as PascalABCCompiler.SyntaxTree.program_module).used_units.units)
+                if (Unit.SyntaxTree is program_module && (Unit.SyntaxTree as program_module).used_units != null)
+                foreach (unit_or_namespace uui in (Unit.SyntaxTree as program_module).used_units.units)
                 {
                     if (uui.name.ToString() == "Graph3D")
                     {
@@ -2872,7 +2883,7 @@ namespace PascalSharp.Compiler
             }
             foreach (compiler_directive cd in directives)
             {
-                if (cd.name.ToLower() == PascalSharp.Internal.TreeConverter.compiler_string_consts.compiler_directive_reference)
+                if (cd.name.ToLower() == compiler_string_consts.compiler_directive_reference)
                 {
                     if (string.IsNullOrEmpty(cd.directive))
                         throw new PascalSharp.Internal.TreeConverter.SimpleSemanticError(cd.location, "EXPECTED_ASSEMBLY_NAME");
@@ -2890,9 +2901,9 @@ namespace PascalSharp.Compiler
             return res;
         }
 
-        private bool IsPossibleNamespace(PascalABCCompiler.SyntaxTree.unit_or_namespace name_space, bool add_to_standard_modules)
+        private bool IsPossibleNamespace(unit_or_namespace name_space, bool add_to_standard_modules)
         {
-            if (name_space is PascalABCCompiler.SyntaxTree.uses_unit_in)
+            if (name_space is uses_unit_in)
                 return false;
             if (name_space.name.idents.Count > 1)
                 return true;
@@ -2936,14 +2947,14 @@ namespace PascalSharp.Compiler
             return false;
         }
 
-        public PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace GetNamespace(PascalABCCompiler.SyntaxTree.unit_or_namespace _name_space)
+        public PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace GetNamespace(unit_or_namespace _name_space)
         {
-            return new PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace(PascalABCCompiler.SyntaxTree.Utils.IdentListToString(_name_space.name.idents, "."));
+            return new PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace(Utils.IdentListToString(_name_space.name.idents, "."));
         }
 
-        private PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace GetNamespace(PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace_list using_list, string full_namespace_name, PascalABCCompiler.SyntaxTree.unit_or_namespace _name_space, bool possible_is_unit, Dictionary<string, PascalABCCompiler.SyntaxTree.syntax_namespace_node> pabc_namespaces)
+        private PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace GetNamespace(PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace_list using_list, string full_namespace_name, unit_or_namespace _name_space, bool possible_is_unit, Dictionary<string, syntax_namespace_node> pabc_namespaces)
         {
-            if (!PascalABCCompiler.NetHelper.NetHelper.NamespaceExists(full_namespace_name) && !(pabc_namespaces != null && pabc_namespaces.ContainsKey(full_namespace_name)))
+            if (!NetHelper.NamespaceExists(full_namespace_name) && !(pabc_namespaces != null && pabc_namespaces.ContainsKey(full_namespace_name)))
             {
             	if (possible_is_unit)
                     if (!full_namespace_name.Contains("."))
@@ -2953,32 +2964,32 @@ namespace PascalSharp.Compiler
             return new PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace(full_namespace_name);
         }
 
-        public void AddNamespaces(PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace_list using_list, List<PascalABCCompiler.SyntaxTree.unit_or_namespace> namespaces, bool possible_is_units, Dictionary<string, PascalABCCompiler.SyntaxTree.syntax_namespace_node> pabc_namespaces)
+        public void AddNamespaces(PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace_list using_list, List<unit_or_namespace> namespaces, bool possible_is_units, Dictionary<string, syntax_namespace_node> pabc_namespaces)
         {
-            foreach (PascalABCCompiler.SyntaxTree.unit_or_namespace ns in namespaces)
-                using_list.AddElement(GetNamespace(using_list, PascalABCCompiler.SyntaxTree.Utils.IdentListToString(ns.name.idents, "."), ns, possible_is_units, pabc_namespaces));
+            foreach (unit_or_namespace ns in namespaces)
+                using_list.AddElement(GetNamespace(using_list, Utils.IdentListToString(ns.name.idents, "."), ns, possible_is_units, pabc_namespaces));
         }
         
-        public void AddNamespaces(PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace_list using_list, PascalABCCompiler.SyntaxTree.using_list ul)
+        public void AddNamespaces(PascalSharp.Internal.TreeConverter.TreeRealization.using_namespace_list using_list, using_list ul)
         {
             if (ul != null) 
                 AddNamespaces(using_list, ul.namespaces, false, null);
         }
 
-        public PascalABCCompiler.SyntaxTree.using_list GetInterfaceSyntaxUsingList(PascalABCCompiler.SyntaxTree.compilation_unit cu)
+        public using_list GetInterfaceSyntaxUsingList(compilation_unit cu)
         {
-            if (cu is PascalABCCompiler.SyntaxTree.unit_module)
-                return (cu as PascalABCCompiler.SyntaxTree.unit_module).interface_part.using_namespaces;
-            if (cu is PascalABCCompiler.SyntaxTree.program_module)
-                return (cu as PascalABCCompiler.SyntaxTree.program_module).using_namespaces;
+            if (cu is unit_module)
+                return (cu as unit_module).interface_part.using_namespaces;
+            if (cu is program_module)
+                return (cu as program_module).using_namespaces;
             return null;
         }
         
-        private PascalABCCompiler.SyntaxTree.using_list GetImplementationSyntaxUsingList(PascalABCCompiler.SyntaxTree.compilation_unit cu)
+        private using_list GetImplementationSyntaxUsingList(compilation_unit cu)
         {
-            if (cu is PascalABCCompiler.SyntaxTree.unit_module)
-                if ((cu as PascalABCCompiler.SyntaxTree.unit_module).implementation_part!=null)
-                    return (cu as PascalABCCompiler.SyntaxTree.unit_module).implementation_part.using_namespaces;
+            if (cu is unit_module)
+                if ((cu as unit_module).implementation_part!=null)
+                    return (cu as unit_module).implementation_part.using_namespaces;
             return null;
         }
 
@@ -2988,19 +2999,19 @@ namespace PascalSharp.Compiler
         }
 
 
-        public PascalABCCompiler.SyntaxTree.compilation_unit ParseText(string FileName, string Text, List<Error> ErrorList, List<CompilerWarning> Warnings)
+        public compilation_unit ParseText(string FileName, string Text, List<Error> ErrorList, List<CompilerWarning> Warnings)
         {
             Reset();
             OnChangeCompilerState(this, CompilerState.CompilationStarting, FileName);
-            PascalABCCompiler.SyntaxTree.compilation_unit cu = InternalParseText(FileName, Text, ErrorsList, Warnings);
+            compilation_unit cu = InternalParseText(FileName, Text, ErrorsList, Warnings);
             OnChangeCompilerState(this, CompilerState.Ready, FileName);
             return cu;
         }
 
-        private PascalABCCompiler.SyntaxTree.compilation_unit InternalParseText(string FileName, string Text, List<Error> ErrorList, List<CompilerWarning> Warnings, List<string> DefinesList = null)
+        private compilation_unit InternalParseText(string FileName, string Text, List<Error> ErrorList, List<CompilerWarning> Warnings, List<string> DefinesList = null)
         {
             OnChangeCompilerState(this, CompilerState.BeginParsingFile, FileName);
-            PascalABCCompiler.SyntaxTree.compilation_unit cu = ParsersController.GetCompilationUnit(FileName, Text, ErrorsList, Warnings, DefinesList);
+            compilation_unit cu = ParsersController.GetCompilationUnit(FileName, Text, ErrorsList, Warnings, DefinesList);
             OnChangeCompilerState(this, CompilerState.EndParsingFile, FileName);
             //Вычисляем сколько строк скомпилировали
             if (ErrorList.Count == 0 && cu != null && cu.source_context!=null)
@@ -3008,7 +3019,7 @@ namespace PascalSharp.Compiler
             return cu;            
         }
 
-        private bool IsAssemblyReference(PascalABCCompiler.SyntaxTree.unit_or_namespace SyntaxUsesUnit)
+        private bool IsAssemblyReference(unit_or_namespace SyntaxUsesUnit)
         {
             string UnitName = GetUnitFileName(SyntaxUsesUnit);
             if (UnitName.ToLower().LastIndexOf(".dll") >= 0 || UnitName.ToLower().LastIndexOf(".exe") >= 0)
@@ -3017,7 +3028,7 @@ namespace PascalSharp.Compiler
             return false;
         }
 
-        private CompilationUnit GetAssemblyReference(PascalABCCompiler.SyntaxTree.unit_or_namespace SyntaxUsesUnit)
+        private CompilationUnit GetAssemblyReference(unit_or_namespace SyntaxUsesUnit)
         {
             string UnitName = GetUnitFileName(SyntaxUsesUnit);
             if (UnitTable.Count == 0) 
@@ -3040,15 +3051,15 @@ namespace PascalSharp.Compiler
         	return false;
         }*/
         
-        public static bool is_dll(PascalABCCompiler.SyntaxTree.compilation_unit cu)
+        public static bool is_dll(compilation_unit cu)
         {
-        	foreach (PascalABCCompiler.SyntaxTree.compiler_directive cd in cu.compiler_directives)
+        	foreach (var cd in cu.compiler_directives)
         		if (string.Compare(cd.Name.text, "apptype",true)==0 && string.Compare(cd.Directive.text,"dll",true)==0)
         		return true;
         	return false;
         }
 
-        public CompilationUnit CompileUnit(PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list Units, PascalABCCompiler.SyntaxTree.unit_or_namespace SyntaxUsesUnit)
+        public CompilationUnit CompileUnit(PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list Units, unit_or_namespace SyntaxUsesUnit)
         {
             string UnitName = GetUnitFileName(SyntaxUsesUnit);
             //if (UnitName == null) throw new UnitNotFound(SyntaxUsesUnit.name,
@@ -3120,7 +3131,7 @@ namespace PascalSharp.Compiler
                         UnitName = SourceFileName;
                 }
             string SourceText = null;
-            Dictionary<PascalABCCompiler.SyntaxTree.syntax_tree_node, string> docs = null;
+            Dictionary<syntax_tree_node, string> docs = null;
             if (CurrentUnit == null)
             {
 
@@ -3143,7 +3154,7 @@ namespace PascalSharp.Compiler
 
                 if (errorsList.Count == 0) // SSM 2/05/16 - для преобразования синтаксических деревьев извне
                 {
-                    CurrentUnit.SyntaxTree = syntaxTreeConvertersController.Convert(CurrentUnit.SyntaxTree) as PascalABCCompiler.SyntaxTree.compilation_unit;
+                    CurrentUnit.SyntaxTree = syntaxTreeConvertersController.Convert(CurrentUnit.SyntaxTree) as compilation_unit;
                     
                 }
 
@@ -3156,7 +3167,7 @@ namespace PascalSharp.Compiler
                             CurrentUnit.Documented = true;
                     }
                 }
-                if (CurrentUnit.SyntaxTree is PascalABCCompiler.SyntaxTree.unit_module)
+                if (CurrentUnit.SyntaxTree is unit_module)
                     compilerOptions.UseDllForSystemUnits = false;
                 if (is_dll(CurrentUnit.SyntaxTree))
                     compilerOptions.OutputFileType = CompilerOptions.OutputType.ClassLibrary;
@@ -3185,7 +3196,7 @@ namespace PascalSharp.Compiler
                 UnitTable[UnitName] = CurrentUnit;
 
                 if (UnitTable.Count > 1)//если это не главный модуль
-                    if (CurrentUnit.SyntaxTree is PascalABCCompiler.SyntaxTree.program_module)
+                    if (CurrentUnit.SyntaxTree is program_module)
                         throw new UnitModuleExpected(UnitName, CurrentUnit.SyntaxTree.source_context.LeftSourceContext);
                     else if (is_dll(CurrentUnit.SyntaxTree))
                         throw new UnitModuleExpectedLibraryFound(UnitName, CurrentUnit.SyntaxTree.source_context.LeftSourceContext);
@@ -3204,7 +3215,7 @@ namespace PascalSharp.Compiler
             //TODO переделать, слишком сложно, некоторый код дублируется
             
 
-            System.Collections.Generic.List<PascalABCCompiler.SyntaxTree.unit_or_namespace> SyntaxUsesList;
+            System.Collections.Generic.List<unit_or_namespace> SyntaxUsesList;
             SyntaxUsesList = GetSyntaxInterfaceUsesList(CurrentUnit.SyntaxTree);
 
             if (SyntaxUsesList != null)
@@ -3273,7 +3284,7 @@ namespace PascalSharp.Compiler
 #endif
             {
                 OnChangeCompilerState(this, CompilerState.CompileInterface, UnitName);
-                PascalSharp.Internal.TreeConverter.SemanticRules.SymbolTableCaseSensitive = CurrentUnit.CaseSensitive;
+                SemanticRules.SymbolTableCaseSensitive = CurrentUnit.CaseSensitive;
                 CurrentUnit.SemanticTree = SyntaxTreeToSemanticTreeConverter.CompileInterface(
                     CurrentUnit.SyntaxTree,
                     CurrentUnit.InterfaceUsedUnits,
@@ -3345,14 +3356,14 @@ namespace PascalSharp.Compiler
             }
 
             //Console.WriteLine("Compile Implementation "+UnitName);//DEBUG
-            if (CurrentUnit.SyntaxTree is PascalABCCompiler.SyntaxTree.unit_module)
+            if (CurrentUnit.SyntaxTree is unit_module)
             {
 #if DEBUG
                 if (InternalDebug.SemanticAnalysis)
 #endif
                 {
                     OnChangeCompilerState(this, CompilerState.CompileImplementation, UnitName);
-                    PascalSharp.Internal.TreeConverter.SemanticRules.SymbolTableCaseSensitive = CurrentUnit.CaseSensitive;
+                    SemanticRules.SymbolTableCaseSensitive = CurrentUnit.CaseSensitive;
                     SyntaxTreeToSemanticTreeConverter.CompileImplementation(
                         (PascalSharp.Internal.TreeConverter.TreeRealization.common_unit_node)CurrentUnit.SemanticTree,
                         CurrentUnit.SyntaxTree,
@@ -3401,18 +3412,18 @@ namespace PascalSharp.Compiler
             }*/
         }
 		
-        private Dictionary<PascalABCCompiler.SyntaxTree.syntax_tree_node,string> AddDocumentationToNodes(PascalABCCompiler.SyntaxTree.compilation_unit cu, string Text)
+        private Dictionary<syntax_tree_node,string> AddDocumentationToNodes(compilation_unit cu, string Text)
         {
         	List<Error> errors = new List<Error>();
             List<CompilerWarning> warnings = new List<CompilerWarning>();
-        	string doctagsParserExtension = Path.GetExtension(cu.file_name)+"dt"+PascalABCCompiler.Parsers.Controller.HideParserExtensionPostfixChar;
-        	PascalABCCompiler.SyntaxTree.documentation_comment_list dt = ParsersController.Compile(System.IO.Path.ChangeExtension(cu.file_name, doctagsParserExtension), Text, errors, warnings, PascalABCCompiler.Parsers.ParseMode.Normal) as PascalABCCompiler.SyntaxTree.documentation_comment_list;
+        	string doctagsParserExtension = Path.GetExtension(cu.file_name)+"dt"+Controller.HideParserExtensionPostfixChar;
+        	documentation_comment_list dt = ParsersController.Compile(System.IO.Path.ChangeExtension(cu.file_name, doctagsParserExtension), Text, errors, warnings, ParseMode.Normal) as documentation_comment_list;
         	if (errors.Count > 0) return null;
-        	PascalABCCompiler.DocumentationConstructor docconst = new PascalABCCompiler.DocumentationConstructor();
+        	DocumentationConstructor docconst = new DocumentationConstructor();
             return docconst.Construct(cu, dt);
         }
         
-        private bool need_gen_doc(PascalABCCompiler.SyntaxTree.compilation_unit cu)
+        private bool need_gen_doc(compilation_unit cu)
         {
             if (project != null && project.generate_xml_doc)
                 return true;
@@ -3420,7 +3431,7 @@ namespace PascalSharp.Compiler
         		return false;
         	if (cu.file_name != null && internalDebug.DocumentedUnits.Contains(cu.file_name.ToLower()))
         		return true;
-        	foreach (PascalABCCompiler.SyntaxTree.compiler_directive cd in cu.compiler_directives)
+        	foreach (var cd in cu.compiler_directives)
         		if (string.Compare(cd.Name.text, "gendoc",true)==0 && string.Compare(cd.Directive.text,"true",true)==0)
         		return true;
         	return false; 
@@ -3443,12 +3454,12 @@ namespace PascalSharp.Compiler
 //#if DEBUG
             try
             {
-                if (Unit.SyntaxTree != null && Unit.SyntaxTree is PascalABCCompiler.SyntaxTree.unit_module)
+                if (Unit.SyntaxTree != null && Unit.SyntaxTree is unit_module)
                 {
-                    if (((PascalABCCompiler.SyntaxTree.unit_module)Unit.SyntaxTree).unit_name.HeaderKeyword == PascalABCCompiler.SyntaxTree.UnitHeaderKeyword.Library)
+                    if (((unit_module)Unit.SyntaxTree).unit_name.HeaderKeyword == UnitHeaderKeyword.Library)
                         return;
-                    foreach (PascalABCCompiler.SyntaxTree.compiler_directive cd in Unit.SyntaxTree.compiler_directives)
-                        if (cd.Name.text.ToLower() == PascalSharp.Internal.TreeConverter.compiler_string_consts.compiler_savepcu)
+                    foreach (var cd in Unit.SyntaxTree.compiler_directives)
+                        if (cd.Name.text.ToLower() == compiler_string_consts.compiler_savepcu)
                             if (!Convert.ToBoolean(cd.Directive.text))
                                 return;
                 }
@@ -3664,13 +3675,13 @@ namespace PascalSharp.Compiler
             try
             {
                 PascalSharp.Internal.TreeConverter.TreeRealization.dot_net_unit_node un =
-                    new PascalSharp.Internal.TreeConverter.TreeRealization.dot_net_unit_node(new PascalABCCompiler.NetHelper.NetScope(using_namespaces,
+                    new PascalSharp.Internal.TreeConverter.TreeRealization.dot_net_unit_node(new NetScope(using_namespaces,
                     /*System.Reflection.Assembly.LoadFrom(FileName)*/
-                    PascalABCCompiler.NetHelper.NetHelper.LoadAssembly(FileName), SyntaxTreeToSemanticTreeConverter.SymbolTable));
+                    NetHelper.LoadAssembly(FileName), SyntaxTreeToSemanticTreeConverter.SymbolTable));
                 CompilationUnit cu = new CompilationUnit();
                 cu.SemanticTree = un;
 
-                //un.dotNetScope=new PascalABCCompiler.NetHelper.NetScope(using_namespaces,
+                //un.dotNetScope=new NetScope(using_namespaces,
                 //	System.Reflection.Assembly.LoadFrom(FileName),SyntaxTreeToSemanticTreeConverter.SymbolTable);
                 DLLCashe[FileName] = cu;
 
@@ -3769,7 +3780,7 @@ namespace PascalSharp.Compiler
             PCUReader.AllReaders.Clear();
             project = null;
             StandarModules.Clear();
-            //SystemLibrary.SystemLibrary.RestoreStandartNames();
+            //SystemLibrary.RestoreStandartNames();
         }
         
         public CompilerType CompilerType

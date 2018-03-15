@@ -2,6 +2,7 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -260,23 +261,23 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
             switch (tn.type_special_kind)
             {
-                case PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper:
-                case PascalABCCompiler.SemanticTree.type_special_kind.binary_file:
-                case PascalABCCompiler.SemanticTree.type_special_kind.diap_type:
-                case PascalABCCompiler.SemanticTree.type_special_kind.enum_kind:
-                case PascalABCCompiler.SemanticTree.type_special_kind.set_type:
-                case PascalABCCompiler.SemanticTree.type_special_kind.short_string:
-                case PascalABCCompiler.SemanticTree.type_special_kind.text_file:
-                case PascalABCCompiler.SemanticTree.type_special_kind.typed_file:
+                case type_special_kind.array_wrapper:
+                case type_special_kind.binary_file:
+                case type_special_kind.diap_type:
+                case type_special_kind.enum_kind:
+                case type_special_kind.set_type:
+                case type_special_kind.short_string:
+                case type_special_kind.text_file:
+                case type_special_kind.typed_file:
                     return false;
                 default:
-                    if (tn == PascalABCCompiler.SystemLibrary.SystemLibInitializer.AbstractBinaryFileNode)
+                    if (tn == SystemLibInitializer.AbstractBinaryFileNode)
                     {
                         return false;
                     }
                     if (tn.is_generic_parameter)
                     {
-                        return (tn.is_class || tn.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.object_type && tn.base_type.is_class);
+                        return (tn.is_class || tn.base_type != SystemLibrary.object_type && tn.base_type.is_class);
                     }
                     else if (tn is ref_type_node)
                     {
@@ -356,22 +357,22 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                     return true;
                 else
                     return false;
-            if (base_class.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.short_string && derived_class.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.short_string) return true;
-            else if (derived_class == PascalABCCompiler.SystemLibrary.SystemLibrary.string_type && base_class.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.short_string) return true;
-            else if (base_class == PascalABCCompiler.SystemLibrary.SystemLibrary.string_type && derived_class.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.short_string) return true;
-            if (PascalABCCompiler.SystemLibrary.SystemLibInitializer.TypedSetType != null && PascalABCCompiler.SystemLibrary.SystemLibInitializer.TypedSetType.Found &&
-                base_class.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type && derived_class == PascalABCCompiler.SystemLibrary.SystemLibInitializer.TypedSetType.sym_info as type_node
+            if (base_class.type_special_kind == type_special_kind.short_string && derived_class.type_special_kind == type_special_kind.short_string) return true;
+            else if (derived_class == SystemLibrary.string_type && base_class.type_special_kind == type_special_kind.short_string) return true;
+            else if (base_class == SystemLibrary.string_type && derived_class.type_special_kind == type_special_kind.short_string) return true;
+            if (SystemLibInitializer.TypedSetType != null && SystemLibInitializer.TypedSetType.Found &&
+                base_class.type_special_kind == type_special_kind.set_type && derived_class == SystemLibInitializer.TypedSetType.sym_info as type_node
                 )
                 return true;
-            if (base_class.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type && derived_class.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type)
+            if (base_class.type_special_kind == type_special_kind.set_type && derived_class.type_special_kind == type_special_kind.set_type)
             {
                 if (base_class.element_type == derived_class.element_type) return true;
                 type_compare tc = get_table_type_compare(base_class.element_type, derived_class.element_type);
                 if (tc == type_compare.non_comparable_type)
                 {
-                    if (base_class.element_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.diap_type)
+                    if (base_class.element_type.type_special_kind == type_special_kind.diap_type)
                     {
-                        if (derived_class.element_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.diap_type)
+                        if (derived_class.element_type.type_special_kind == type_special_kind.diap_type)
                         {
                             if (base_class.element_type.base_type == derived_class.element_type.base_type) return true;
                             tc = get_table_type_compare(base_class.element_type.base_type, derived_class.element_type.base_type);
@@ -379,16 +380,16 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                             type_intersection_node tin = base_class.element_type.base_type.get_type_intersection(derived_class.element_type.base_type);
                             if (tin == null || tin.this_to_another == null)
                             {
-                                if (base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type)
+                                if (base_class.element_type.base_type != SystemLibrary.double_type && base_class.element_type.base_type != SystemLibrary.float_type)
                                 {
-                                    if ((derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                                    if ((derived_class.element_type.base_type == SystemLibrary.double_type || derived_class.element_type.base_type == SystemLibrary.float_type))
                                         return false;
                                     else return false;
                                 }
                                 else return true;
                             }
-                            if (base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type
-                                 && (derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                            if (base_class.element_type.base_type != SystemLibrary.double_type && base_class.element_type.base_type != SystemLibrary.float_type
+                                 && (derived_class.element_type.base_type == SystemLibrary.double_type || derived_class.element_type.base_type == SystemLibrary.float_type))
                                 return false;
                             return !tin.this_to_another.is_explicit;
                         }
@@ -400,22 +401,22 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                             type_intersection_node tin = base_class.element_type.base_type.get_type_intersection(derived_class.element_type);
                             if (tin == null || tin.this_to_another == null)
                             {
-                                if (base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type)
+                                if (base_class.element_type.base_type != SystemLibrary.double_type && base_class.element_type.base_type != SystemLibrary.float_type)
                                 {
-                                    if ((derived_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                                    if ((derived_class.element_type == SystemLibrary.double_type || derived_class.element_type == SystemLibrary.float_type))
                                         return false;
                                     else return false;
                                 }
                                 else return true;
                             }
-                            if (base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type
-                                 && (derived_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                            if (base_class.element_type.base_type != SystemLibrary.double_type && base_class.element_type.base_type != SystemLibrary.float_type
+                                 && (derived_class.element_type == SystemLibrary.double_type || derived_class.element_type == SystemLibrary.float_type))
                                 return false;
                             return !tin.this_to_another.is_explicit;
                         }
                     }
                     else
-                     if (derived_class.element_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.diap_type)
+                     if (derived_class.element_type.type_special_kind == type_special_kind.diap_type)
                     {
                         if (base_class.element_type == derived_class.element_type.base_type) return true;
                         tc = get_table_type_compare(base_class.element_type, derived_class.element_type.base_type);
@@ -423,21 +424,21 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                         type_intersection_node tin = base_class.element_type.get_type_intersection(derived_class.element_type.base_type);
                         if (tin == null || tin.this_to_another == null)
                         {
-                            if (base_class.element_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type)
+                            if (base_class.element_type != SystemLibrary.double_type && base_class.element_type != SystemLibrary.float_type)
                             {
-                                if ((derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                                if ((derived_class.element_type.base_type == SystemLibrary.double_type || derived_class.element_type.base_type == SystemLibrary.float_type))
                                     return false;
                                 else return false;
                             }
                             else return true;
                         }
-                        if (base_class.element_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type
-                                 && (derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                        if (base_class.element_type != SystemLibrary.double_type && base_class.element_type != SystemLibrary.float_type
+                                 && (derived_class.element_type.base_type == SystemLibrary.double_type || derived_class.element_type.base_type == SystemLibrary.float_type))
                             return false;
                         return !tin.this_to_another.is_explicit;
                     }
-                    else if (base_class.element_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.short_string && derived_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.string_type
-                            || derived_class.element_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.short_string && base_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.string_type)
+                    else if (base_class.element_type.type_special_kind == type_special_kind.short_string && derived_class.element_type == SystemLibrary.string_type
+                            || derived_class.element_type.type_special_kind == type_special_kind.short_string && base_class.element_type == SystemLibrary.string_type)
                         return true;
                     else return false;
 
@@ -448,9 +449,9 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                     if (tin == null || tin.this_to_another == null)
                     {
                         //proverka na diapasony
-                        if (base_class.element_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.diap_type)
+                        if (base_class.element_type.type_special_kind == type_special_kind.diap_type)
                         {
-                            if (derived_class.element_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.diap_type)
+                            if (derived_class.element_type.type_special_kind == type_special_kind.diap_type)
                             {
                                 if (base_class.element_type.base_type == derived_class.element_type.base_type) return true;
                                 tc = get_table_type_compare(base_class.element_type.base_type, derived_class.element_type.base_type);
@@ -458,16 +459,16 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                                 type_intersection_node tin2 = base_class.element_type.base_type.get_type_intersection(derived_class.element_type.base_type);
                                 if (tin == null || tin.this_to_another == null)
                                 {
-                                    if (base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type)
+                                    if (base_class.element_type.base_type != SystemLibrary.double_type && base_class.element_type.base_type != SystemLibrary.float_type)
                                     {
-                                        if ((derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                                        if ((derived_class.element_type.base_type == SystemLibrary.double_type || derived_class.element_type.base_type == SystemLibrary.float_type))
                                             return false;
                                         else return false;
                                     }
                                     else return true;
                                 }
-                                if (base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type
-                                     && (derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                                if (base_class.element_type.base_type != SystemLibrary.double_type && base_class.element_type.base_type != SystemLibrary.float_type
+                                     && (derived_class.element_type.base_type == SystemLibrary.double_type || derived_class.element_type.base_type == SystemLibrary.float_type))
                                     return false;
                                 return !tin.this_to_another.is_explicit;
                             }
@@ -479,22 +480,22 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                                 type_intersection_node tin2 = base_class.element_type.base_type.get_type_intersection(derived_class.element_type);
                                 if (tin == null || tin.this_to_another == null)
                                 {
-                                    if (base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type)
+                                    if (base_class.element_type.base_type != SystemLibrary.double_type && base_class.element_type.base_type != SystemLibrary.float_type)
                                     {
-                                        if ((derived_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                                        if ((derived_class.element_type == SystemLibrary.double_type || derived_class.element_type == SystemLibrary.float_type))
                                             return false;
                                         else return false;
                                     }
                                     else return true;
                                 }
-                                if (base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type.base_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type
-                                     && (derived_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                                if (base_class.element_type.base_type != SystemLibrary.double_type && base_class.element_type.base_type != SystemLibrary.float_type
+                                     && (derived_class.element_type == SystemLibrary.double_type || derived_class.element_type == SystemLibrary.float_type))
                                     return false;
                                 return !tin.this_to_another.is_explicit;
                             }
                         }
                         else
-                     if (derived_class.element_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.diap_type)
+                     if (derived_class.element_type.type_special_kind == type_special_kind.diap_type)
                         {
                             if (base_class.element_type == derived_class.element_type.base_type) return true;
                             tc = get_table_type_compare(base_class.element_type, derived_class.element_type.base_type);
@@ -502,22 +503,22 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                             type_intersection_node tin2 = base_class.element_type.get_type_intersection(derived_class.element_type.base_type);
                             if (tin == null || tin.this_to_another == null)
                             {
-                                if (base_class.element_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type)
+                                if (base_class.element_type != SystemLibrary.double_type && base_class.element_type != SystemLibrary.float_type)
                                 {
-                                    if ((derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                                    if ((derived_class.element_type.base_type == SystemLibrary.double_type || derived_class.element_type.base_type == SystemLibrary.float_type))
                                         return false;
                                     else return false;
                                 }
                                 else return true;
                             }
-                            if (base_class.element_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type
-                                     && (derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type.base_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                            if (base_class.element_type != SystemLibrary.double_type && base_class.element_type != SystemLibrary.float_type
+                                     && (derived_class.element_type.base_type == SystemLibrary.double_type || derived_class.element_type.base_type == SystemLibrary.float_type))
                                 return false;
                             return !tin.this_to_another.is_explicit;
                         }
-                        if (base_class.element_type != PascalABCCompiler.SystemLibrary.SystemLibrary.double_type && base_class.element_type != PascalABCCompiler.SystemLibrary.SystemLibrary.float_type)
+                        if (base_class.element_type != SystemLibrary.double_type && base_class.element_type != SystemLibrary.float_type)
                         {
-                            if ((derived_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.double_type || derived_class.element_type == PascalABCCompiler.SystemLibrary.SystemLibrary.float_type))
+                            if ((derived_class.element_type == SystemLibrary.double_type || derived_class.element_type == SystemLibrary.float_type))
                                 return false;
                             else return false;
                         }
@@ -540,7 +541,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
             //\ssyy
 
-            if (base_class.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.diap_type && derived_class.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.diap_type)
+            if (base_class.type_special_kind == type_special_kind.diap_type && derived_class.type_special_kind == type_special_kind.diap_type)
             {
                 if (base_class.base_type == derived_class.base_type) return true;
                 type_compare tc = get_table_type_compare(base_class.base_type, derived_class.base_type);
@@ -774,7 +775,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 null_const_node ncn = new null_const_node(_to, call_location);
                 null_const_node ncn2 = new null_const_node(_to, call_location);
 
-                PascalSharp.Internal.TreeConverter.SymbolInfo si = pr.type.find_first_in_type(PascalSharp.Internal.TreeConverter.compiler_string_consts.eq_name);
+                SymbolInfo si = pr.type.find_first_in_type(compiler_string_consts.eq_name);
 
                 basic_function_node fn = si.sym_info as basic_function_node;
                 expression_node condition = null;
@@ -818,8 +819,8 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
             if (left.is_generic_parameter)
                 return true;
-            if (left.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type && right == PascalABCCompiler.SystemLibrary.SystemLibInitializer.TypedSetType.sym_info
-                || right.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type && left == PascalABCCompiler.SystemLibrary.SystemLibInitializer.TypedSetType.sym_info)
+            if (left.type_special_kind == type_special_kind.set_type && right == SystemLibInitializer.TypedSetType.sym_info
+                || right.type_special_kind == type_special_kind.set_type && left == SystemLibInitializer.TypedSetType.sym_info)
                 return true;
             return left == right;
         }
@@ -864,10 +865,10 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 return ret;
             }
 
-            if (is_derived(to, from) || (from.IsInterface && to == PascalABCCompiler.SystemLibrary.SystemLibrary.object_type))
+            if (is_derived(to, from) || (from.IsInterface && to == SystemLibrary.object_type))
             {
                 add_conversion(ret, PascalSharp.Internal.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(from, to, true), from, to);
-                //add_conversion(ret, SystemLibrary.SystemLibrary.empty_method, from, to);
+                //add_conversion(ret, SystemLibrary.empty_method, from, to);
             }
 
             if (ret.second != null)

@@ -1,6 +1,8 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
+using PascalABCCompiler.SemanticTree;
+
 namespace PascalSharp.Compiler.SemanticTreeConverters
 {
     public enum ConverterType
@@ -43,7 +45,7 @@ namespace PascalSharp.Compiler.SemanticTreeConverters
             get;
         }
 
-        PascalABCCompiler.SemanticTree.IProgramNode Convert(ICompiler Compiler, PascalABCCompiler.SemanticTree.IProgramNode ProgramNode);
+        IProgramNode Convert(ICompiler Compiler, IProgramNode ProgramNode);
 
     }
 }

@@ -3,10 +3,14 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
+using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
-using PascalSharp.Internal.TreeConverter;TreeRealization;
-using for_node = PascalABCCompiler.SyntaxTree.for_node;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
+using for_node = PascalSharp.Internal.TreeConverter.TreeRealization.for_node;
 
 //Визитор предназначен для обхода поддерева синтаксического дерева и поиска
 //обращений к константам и элементам массива - их не получится найти в семантическом дереве.
@@ -17,20 +21,20 @@ using for_node = PascalABCCompiler.SyntaxTree.for_node;
 //- Список локальных блочных переменных. Если они есть - генерировать объект-функцию и включать в нее все локальные переменные,
 //      иначе можно обойтись просто локальной функцией и переменные не включать.
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter
 {
-    class VarFinderSyntaxVisitor : SyntaxTree.WalkingVisitorNew
+    class VarFinderSyntaxVisitor : WalkingVisitorNew
     {
         /// <summary>
         /// Содержит список определений констант, объявленных внутри функций [и класса].
         /// </summary>
-        public List<SemanticTree.IConstantDefinitionNode> Constants =
-            new List<SemanticTree.IConstantDefinitionNode>();
+        public List<IConstantDefinitionNode> Constants =
+            new List<IConstantDefinitionNode>();
         /// <summary>
         /// Содержит список определений переменных
         /// </summary>
-        public List<SemanticTree.IVAriableDefinitionNode> Variables = 
-            new List<SemanticTree.IVAriableDefinitionNode>();
+        public List<IVAriableDefinitionNode> Variables = 
+            new List<IVAriableDefinitionNode>();
         /// <summary>
         /// Необходимо инициализировать для правильного поиска.
         /// </summary>
@@ -89,20 +93,20 @@ namespace PascalSharp.Internal.TreeConverter.
             if (si == null)
                 return;     //ничего не нашли => переменная совсем локальная, никуда добавлять не нужно
 
-            if ((si.sym_info is SemanticTree.ICommonParameterNode)      //параметр или
-                || (si.sym_info is SemanticTree.ILocalVariableNode)     //локальная переменная
-                || (si.sym_info is SemanticTree.ICommonClassFieldNode)  //поле класса
-                || (si.sym_info is SemanticTree.ILocalBlockVariableNode)//локальная блочная переменная
+            if ((si.sym_info is ICommonParameterNode)      //параметр или
+                || (si.sym_info is ILocalVariableNode)     //локальная переменная
+                || (si.sym_info is ICommonClassFieldNode)  //поле класса
+                || (si.sym_info is ILocalBlockVariableNode)//локальная блочная переменная
                 || isLoopVariable)                                      //счетчик цикла
             {
-                if (!Variables.Contains(si.sym_info as SemanticTree.IVAriableDefinitionNode))
-                    Variables.Add(si.sym_info as SemanticTree.IVAriableDefinitionNode);
+                if (!Variables.Contains(si.sym_info as IVAriableDefinitionNode))
+                    Variables.Add(si.sym_info as IVAriableDefinitionNode);
             }
-            else if ((si.sym_info is SemanticTree.ICommonFunctionConstantDefinitionNode)//константа из функции
-                     ||(si.sym_info is SemanticTree.IClassConstantDefinitionNode)) //константа из класса
+            else if ((si.sym_info is ICommonFunctionConstantDefinitionNode)//константа из функции
+                     ||(si.sym_info is IClassConstantDefinitionNode)) //константа из класса
             {
-                if (!Constants.Contains(si.sym_info as SemanticTree.IConstantDefinitionNode))
-                    Constants.Add(si.sym_info as SemanticTree.IConstantDefinitionNode);
+                if (!Constants.Contains(si.sym_info as IConstantDefinitionNode))
+                    Constants.Add(si.sym_info as IConstantDefinitionNode);
             }
         }
         public override void visit(dot_node _dot_node)
@@ -110,9 +114,9 @@ namespace PascalSharp.Internal.TreeConverter.
             ProcessNode(_dot_node.left);
             //правую часть не обходим
         }
-        public override void visit(for_node _for_node)
+        public override void visit(SyntaxTree.for_node _for_node)
         {
-            if (!_for_node.create_loop_variable && (_for_node.type_name == null))
+            if (!for_node.create_loop_variable && (_for_node.type_name == null))
                 throw new OpenMPException("Счетчик цикла должен быть обьявлен в заголовке цикла", _for_node.source_context);
 
             bool _isForNode = isForNode;

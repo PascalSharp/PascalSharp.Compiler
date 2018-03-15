@@ -1,7 +1,9 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
-namespace PascalSharp.Internal.TreeConverter.
+using PascalSharp.Internal.TreeConverter.TreeRealization;
+
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
     public enum VariableInitializationParams { ConstantOnly, ConstructorCall, Expression }
     public enum PoinerRealization { VoidStar, IntPtr}

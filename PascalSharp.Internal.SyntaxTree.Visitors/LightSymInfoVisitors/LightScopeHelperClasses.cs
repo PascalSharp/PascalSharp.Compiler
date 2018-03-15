@@ -29,7 +29,7 @@ namespace PascalABCCompiler.SyntaxTree
             string typepart = "";
             if (SK == SymKind.var || SK == SymKind.field || SK == SymKind.field || SK == SymKind.param)
                 typepart = ": " + (Td == null ? "NOTYPE" : Td.ToString());
-            typepart = typepart.Replace("PascalABCCompiler.SyntaxTree.", "");
+            typepart = typepart.Replace("", "");
             var attrstr = Attr != 0 ? "[" + Attr.ToString() + "]" : "";
             var s = "(" + Id.ToString() + "{" + SK.ToString() + "}" + typepart + attrstr + ")";
             return s;

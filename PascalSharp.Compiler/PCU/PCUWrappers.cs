@@ -1,7 +1,11 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
+using PascalABCCompiler.SemanticTree;
+using PascalABCCompiler.SystemLibrary;
 using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 using SymbolTable;
 
 namespace PascalSharp.Compiler.PCU
@@ -26,7 +30,7 @@ namespace PascalSharp.Compiler.PCU
         protected PCUReader pr;
 
         public WrappedUnitInterfaceScope(PCUReader pr)
-            : base(PascalABCCompiler.SystemLibrary.SystemLibrary.symtab, null, new Scope[0] { })
+            : base(SystemLibrary.symtab, null, new Scope[0] { })
         {
             this.pr = pr;
         }
@@ -81,7 +85,7 @@ namespace PascalSharp.Compiler.PCU
         protected PCUReader pr;
 
         public WrappedUnitImplementationScope(PCUReader pr, Scope TopScope)
-            : base(PascalABCCompiler.SystemLibrary.SystemLibrary.symtab, TopScope, new Scope[0] { })
+            : base(SystemLibrary.symtab, TopScope, new Scope[0] { })
         {
             this.pr = pr;
         }
@@ -137,7 +141,7 @@ namespace PascalSharp.Compiler.PCU
         protected PCUReader pr;
         
         public WrappedClassScope(PCUReader pr, Scope top_scope, Scope up_scope)
-            : base(PascalABCCompiler.SystemLibrary.SystemLibrary.symtab, top_scope, up_scope)
+            : base(SystemLibrary.symtab, top_scope, up_scope)
         {
             this.pr = pr;
         }
@@ -293,8 +297,8 @@ namespace PascalSharp.Compiler.PCU
 
         public int offset;
 
-        public wrapped_common_type_node(PCUReader pr, type_node base_type, string name, PascalABCCompiler.SemanticTree.type_access_level type_access_level,
-            common_namespace_node comprehensive_namespace, SymbolTable.ClassScope cs, location loc, int offset) :
+        public wrapped_common_type_node(PCUReader pr, type_node base_type, string name, type_access_level type_access_level,
+            common_namespace_node comprehensive_namespace, ClassScope cs, location loc, int offset) :
             base(base_type, name, type_access_level, comprehensive_namespace, cs, loc)
         {
             this.pr = pr;

@@ -18,7 +18,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		private List<var_definition_node> _field_names = new List<var_definition_node>();
 		private List<constant_node> _field_initializers = new List<constant_node>();
 		private location _loc;
-		private PascalABCCompiler.SemanticTree.attribute_qualifier_kind _qualifier;
+		private attribute_qualifier_kind _qualifier;
 		
 		public attribute_node(function_node _attr_constr, type_node _attr_type, location _loc)
 		{
@@ -39,7 +39,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		public PascalABCCompiler.SemanticTree.attribute_qualifier_kind qualifier
+		public attribute_qualifier_kind qualifier
 		{
 			get
 			{
@@ -103,7 +103,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		public PascalABCCompiler.SemanticTree.IConstantNode[] Arguments
+		public IConstantNode[] Arguments
 		{
 			get
 			{
@@ -111,7 +111,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		public PascalABCCompiler.SemanticTree.IPropertyNode[] PropertyNames
+		public IPropertyNode[] PropertyNames
 		{
 			get
 			{
@@ -119,7 +119,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		public PascalABCCompiler.SemanticTree.IConstantNode[] PropertyInitializers
+		public IConstantNode[] PropertyInitializers
 		{
 			get
 			{
@@ -127,7 +127,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		public PascalABCCompiler.SemanticTree.IVAriableDefinitionNode[] FieldNames
+		public IVAriableDefinitionNode[] FieldNames
 		{
 			get
 			{
@@ -135,7 +135,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		public PascalABCCompiler.SemanticTree.IConstantNode[] FieldInitializers
+		public IConstantNode[] FieldInitializers
 		{
 			get
 			{
@@ -143,7 +143,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		public PascalABCCompiler.SemanticTree.ITypeNode AttributeType
+		public ITypeNode AttributeType
 		{
 			get
 			{
@@ -151,7 +151,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		public PascalABCCompiler.SemanticTree.IFunctionNode AttributeConstructor
+		public IFunctionNode AttributeConstructor
 		{
 			get
 			{
@@ -171,7 +171,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 		
-		PascalABCCompiler.SemanticTree.ILocation PascalABCCompiler.SemanticTree.ILocated.Location
+		ILocation ILocated.Location
 		{
 			get
 			{
@@ -193,7 +193,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 		
-		public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+		public override void visit(ISemanticVisitor visitor)
 		{
 			visitor.visit(this);
 		}

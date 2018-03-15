@@ -5,7 +5,9 @@ using System;
 using System.Collections.Generic;
 using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -42,7 +44,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
@@ -209,7 +211,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
         
-        bool PascalABCCompiler.SemanticTree.ICommonNamespaceNode.IsMain
+        bool ICommonNamespaceNode.IsMain
         {
             get
             {
@@ -246,7 +248,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Расположения заголовка пространства имен.
         /// Используется при обходе дерева посетителем.
         /// </summary>
-        public PascalABCCompiler.SemanticTree.ILocation Location
+        public ILocation Location
         {
             get
             {
@@ -477,12 +479,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }
 
-        PascalABCCompiler.SemanticTree.ICommonNamespaceNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.nested_namespaces
+        ICommonNamespaceNode[] ICommonNamespaceNode.nested_namespaces
         {
             get
             {
@@ -490,7 +492,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ICommonTypeNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.types
+        ICommonTypeNode[] ICommonNamespaceNode.types
         {
             get
             {
@@ -498,7 +500,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 		
-        PascalABCCompiler.SemanticTree.ITypeSynonym[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.type_synonims
+        ITypeSynonym[] ICommonNamespaceNode.type_synonims
         {
             get
             {
@@ -506,7 +508,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ITemplateClass[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.templates
+        ITemplateClass[] ICommonNamespaceNode.templates
         {
             get
             {
@@ -514,7 +516,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ICommonNamespaceVariableNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.variables
+        ICommonNamespaceVariableNode[] ICommonNamespaceNode.variables
         {
             get
             {
@@ -522,7 +524,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ICommonNamespaceEventNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.events
+        ICommonNamespaceEventNode[] ICommonNamespaceNode.events
         {
             get
             {
@@ -530,7 +532,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.functions
+        ICommonNamespaceFunctionNode[] ICommonNamespaceNode.functions
         {
             get
             {
@@ -538,7 +540,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.INamespaceNode PascalABCCompiler.SemanticTree.ICommonNamespaceNode.comprehensive_namespace
+        INamespaceNode ICommonNamespaceNode.comprehensive_namespace
         {
             get
             {
@@ -546,7 +548,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.INamespaceConstantDefinitionNode[] PascalABCCompiler.SemanticTree.ICommonNamespaceNode.constants
+        INamespaceConstantDefinitionNode[] ICommonNamespaceNode.constants
         {
             get
             {
@@ -674,7 +676,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// <returns>Первый элемент списка найденных имен. null если ни чего не найдено.</returns>
         public override SymbolInfoList find(string name)
         {
-            bool is_ns = NetHelper.NetHelper.IsNetNamespace(_name + "." + name);
+            bool is_ns = NetHelper.IsNetNamespace(_name + "." + name);
             SymbolInfoList sil = null;
             if (is_ns)
             {
@@ -691,25 +693,25 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                     if (sil != null)
                         return sil;
                 }
-                Type t = NetHelper.NetHelper.FindType(_name + "." + name);
+                Type t = NetHelper.FindType(_name + "." + name);
                 if (t != null)
                 {
                     sil = new SymbolInfoList(new SymbolInfo(compiled_type_node.get_type_node(t,_tcst)));
                 }
                 else
                 {
-                    t = NetHelper.NetHelper.FindType(_name+"."+_name);
-                    if (t != null && NetHelper.NetHelper.IsEntryType(t))
+                    t = NetHelper.FindType(_name+"."+_name);
+                    if (t != null && NetHelper.IsEntryType(t))
                     {
-                        sil = NetHelper.NetHelper.FindName(t,name);
+                        sil = NetHelper.FindName(t,name);
                         if (sil == null)
                         {
-                            type_node tn = NetHelper.NetHelper.FindCompiledPascalType(_name + "." + name);
+                            type_node tn = NetHelper.FindCompiledPascalType(_name + "." + name);
                             if (tn != null)
                                 sil = new SymbolInfoList(new SymbolInfo(tn));
                             else
                             {
-                                template_class tc = NetHelper.NetHelper.FindCompiledTemplateType(_name + "." + name);
+                                template_class tc = NetHelper.FindCompiledTemplateType(_name + "." + name);
                                 if (tc != null)
                                     sil = new SymbolInfoList(new SymbolInfo(tc));
                             }
@@ -736,7 +738,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

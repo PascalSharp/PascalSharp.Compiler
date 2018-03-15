@@ -15,6 +15,7 @@ using System.Threading;
 using PascalABCCompiler;
 using PascalABCCompiler.SemanticTree;
 using PascalSharp.Internal.CompilerTools;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalSharp.Internal.EmitPE
 {
@@ -133,7 +134,7 @@ namespace PascalSharp.Internal.EmitPE
         protected bool save_debug_info = false;
         protected bool add_special_debug_variables = false;
         protected bool make_next_spoint = true;
-        protected PascalABCCompiler.SemanticTree.ILocation EntryPointLocation;
+        protected ILocation EntryPointLocation;
         protected Label ExitLabel;//метка для выхода из процедуры
         protected bool ExitProcedureCall = false; //призна того что всертиласть exit и надо пометиь коней процедуры
         protected Dictionary<IConstantNode, FieldBuilder> ConvertedConstants = new Dictionary<IConstantNode, FieldBuilder>();
@@ -159,7 +160,7 @@ namespace PascalSharp.Internal.EmitPE
         private ISymbolDocumentWriter new_doc;
         private List<LocalBuilder> pinned_variables = new List<LocalBuilder>();
 
-        private void CheckLocation(PascalABCCompiler.SemanticTree.ILocation Location)
+        private void CheckLocation(ILocation Location)
         {
             if (Location != null)
             {
@@ -207,7 +208,7 @@ namespace PascalSharp.Internal.EmitPE
             safe_block = value;
         }
 
-        protected void MarkSequencePoint(PascalABCCompiler.SemanticTree.ILocation Location)
+        protected void MarkSequencePoint(ILocation Location)
         {
             CheckLocation(Location);
             if (Location != null && OnNextLine(Location))
@@ -219,7 +220,7 @@ namespace PascalSharp.Internal.EmitPE
             MarkSequencePoint(ilg, EntryPointLocation);
         }
 
-        protected void MarkSequencePoint(ILGenerator ilg, PascalABCCompiler.SemanticTree.ILocation Location)
+        protected void MarkSequencePoint(ILGenerator ilg, ILocation Location)
         {
             if (Location != null)
             {
@@ -268,7 +269,7 @@ namespace PascalSharp.Internal.EmitPE
             get
             {
                 if (fileOfAttributeConstructor != null) return fileOfAttributeConstructor;
-                TypeBuilder tb = mb.DefineType(PascalSharp.Internal.TreeConverter.compiler_string_consts.file_of_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
+                TypeBuilder tb = mb.DefineType(compiler_string_consts.file_of_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
                 types.Add(tb);
                 fileOfAttributeConstructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[1] { TypeFactory.ObjectType });
                 FieldBuilder fld = tb.DefineField("Type", TypeFactory.ObjectType, FieldAttributes.Public);
@@ -288,7 +289,7 @@ namespace PascalSharp.Internal.EmitPE
             get
             {
                 if (setOfAttributeConstructor != null) return setOfAttributeConstructor;
-                TypeBuilder tb = mb.DefineType(PascalSharp.Internal.TreeConverter.compiler_string_consts.set_of_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
+                TypeBuilder tb = mb.DefineType(compiler_string_consts.set_of_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
                 types.Add(tb);
                 setOfAttributeConstructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[1] { TypeFactory.ObjectType });
                 FieldBuilder fld = tb.DefineField("Type", TypeFactory.ObjectType, FieldAttributes.Public);
@@ -309,7 +310,7 @@ namespace PascalSharp.Internal.EmitPE
             get
             {
                 if (templateClassAttributeConstructor != null) return templateClassAttributeConstructor;
-                TypeBuilder tb = mb.DefineType(PascalSharp.Internal.TreeConverter.compiler_string_consts.template_class_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
+                TypeBuilder tb = mb.DefineType(compiler_string_consts.template_class_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
                 types.Add(tb);
                 templateClassAttributeConstructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[1] { TypeFactory.ByteType.MakeArrayType() });
                 FieldBuilder fld = tb.DefineField("Tree", TypeFactory.ByteType.MakeArrayType(), FieldAttributes.Public);
@@ -330,7 +331,7 @@ namespace PascalSharp.Internal.EmitPE
             get
             {
                 if (typeSynonimAttributeConstructor != null) return typeSynonimAttributeConstructor;
-                TypeBuilder tb = mb.DefineType(PascalSharp.Internal.TreeConverter.compiler_string_consts.type_synonim_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
+                TypeBuilder tb = mb.DefineType(compiler_string_consts.type_synonim_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
                 types.Add(tb);
                 typeSynonimAttributeConstructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[1] { TypeFactory.ObjectType });
                 FieldBuilder fld = tb.DefineField("Type", TypeFactory.ObjectType, FieldAttributes.Public);
@@ -351,7 +352,7 @@ namespace PascalSharp.Internal.EmitPE
             get
             {
                 if (shortStringAttributeConstructor != null) return shortStringAttributeConstructor;
-                TypeBuilder tb = mb.DefineType(PascalSharp.Internal.TreeConverter.compiler_string_consts.short_string_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
+                TypeBuilder tb = mb.DefineType(compiler_string_consts.short_string_attr_name, TypeAttributes.Public | TypeAttributes.BeforeFieldInit, typeof(Attribute));
                 types.Add(tb);
                 shortStringAttributeConstructor = tb.DefineConstructor(MethodAttributes.Public, CallingConventions.HasThis, new Type[1] { TypeFactory.Int32Type });
                 FieldBuilder fld = tb.DefineField("Length", TypeFactory.Int32Type, FieldAttributes.Public);
@@ -421,9 +422,9 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //Метод, переводящий семантическое дерево в сборку .NET
-        public void ConvertFromTree(PascalABCCompiler.SemanticTree.IProgramNode p, string TargetFileName, string SourceFileName, CompilerOptions options, string[] ResourceFiles)
+        public void ConvertFromTree(IProgramNode p, string TargetFileName, string SourceFileName, CompilerOptions options, string[] ResourceFiles)
         {
-            //SystemLibrary.SystemLibInitializer.RestoreStandardFunctions();
+            //SystemLibInitializer.RestoreStandardFunctions();
             bool RunOnly = false;
             string fname = TargetFileName;
             comp_opt = options;
@@ -687,7 +688,7 @@ namespace PascalSharp.Internal.EmitPE
                 cur_type = NamespacesTypes[cnns[iii]];
                 cur_unit_type = NamespacesTypes[cnns[iii]];
                 //генерим инциализацию для полей
-                foreach (PascalABCCompiler.SemanticTree.ICommonTypeNode ctn in cnns[iii].types)
+                foreach (ICommonTypeNode ctn in cnns[iii].types)
                     GenerateInitCodeForFields(ctn);
             }
 
@@ -780,7 +781,7 @@ namespace PascalSharp.Internal.EmitPE
                 cur_type = NamespacesTypes[cnns[iii]];
                 cur_unit_type = NamespacesTypes[cnns[iii]];
                 //вставляем ret в int_meth
-                foreach (PascalABCCompiler.SemanticTree.ICommonTypeNode ctn in cnns[iii].types)
+                foreach (ICommonTypeNode ctn in cnns[iii].types)
                     GenerateRetForInitMeth(ctn);
                 ModulesInitILGenerators[cur_type].Emit(OpCodes.Ret);
             }
@@ -1548,7 +1549,7 @@ namespace PascalSharp.Internal.EmitPE
             IAttributeNode[] attrs = ctn.Attributes;
             for (int i = 0; i < attrs.Length; i++)
             {
-                //if (attrs[i].AttributeType == SystemLibrary.SystemLibrary.comimport_type)
+                //if (attrs[i].AttributeType == SystemLibrary.comimport_type)
                 //	continue;
 
                 CustomAttributeBuilder cab = new CustomAttributeBuilder
@@ -1786,7 +1787,7 @@ namespace PascalSharp.Internal.EmitPE
         {
             IAttributeNode[] attrs = value.Attributes;
             foreach (IAttributeNode attr in attrs)
-                if (attr.AttributeType == PascalABCCompiler.SystemLibrary.SystemLibrary.comimport_type)
+                if (attr.AttributeType == SystemLibrary.comimport_type)
                     return true;
             return false;
         }
@@ -2438,7 +2439,7 @@ namespace PascalSharp.Internal.EmitPE
                 AddSpecialDebugVariables();
             }
             //\ivan for debug
-            if (func.return_value_type == null || func.return_value_type == PascalABCCompiler.SystemLibrary.SystemLibrary.void_type)
+            if (func.return_value_type == null || func.return_value_type == SystemLibrary.void_type)
                 il.Emit(OpCodes.Ret);
             cur_meth = tmp;
             cur_type = tmp_type;
@@ -2860,10 +2861,10 @@ namespace PascalSharp.Internal.EmitPE
             il.Emit(OpCodes.Ldloc, lb);
             il.Emit(OpCodes.Box, tinfo);
             MethodInfo rif = null;
-            if (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
-                rif = (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
+            if (SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
+                rif = (SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
             else
-                rif = helper.GetMethod(PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
+                rif = helper.GetMethod(SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
             il.EmitCall(OpCodes.Call, rif, null);
             il.Emit(OpCodes.Unbox_Any, tinfo);
             il.Emit(OpCodes.Stloc, lb);
@@ -2895,10 +2896,10 @@ namespace PascalSharp.Internal.EmitPE
             }
             il.Emit(OpCodes.Box, tinfo);
             MethodInfo rif = null;
-            if (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
-                rif = (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
+            if (SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
+                rif = (SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
             else
-                rif = helper.GetMethod(PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
+                rif = helper.GetMethod(SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
             il.EmitCall(OpCodes.Call, rif, null);
             il.Emit(OpCodes.Unbox_Any, tinfo);
             if (fb.IsStatic)
@@ -3455,10 +3456,10 @@ namespace PascalSharp.Internal.EmitPE
                 lab = il.DefineLabel();
                 il.Emit(OpCodes.Ldsfld, finfo);
                 il.Emit(OpCodes.Brfalse, lab);
-                if (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
-                    rif = (PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
+                if (SystemLibInitializer.RuntimeInitializeFunction.sym_info is ICompiledMethodNode)
+                    rif = (SystemLibInitializer.RuntimeInitializeFunction.sym_info as ICompiledMethodNode).method_info;
                 else
-                    rif = helper.GetMethod(PascalABCCompiler.SystemLibrary.SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
+                    rif = helper.GetMethod(SystemLibInitializer.RuntimeInitializeFunction.sym_info as IFunctionNode).mi;
             }
             if (ti.tp.IsValueType && ti.init_meth != null || ti.is_arr || ti.is_set || ti.is_typed_file || ti.is_text_file || ti.tp == TypeFactory.StringType ||
                 (generic_param))
@@ -4278,12 +4279,12 @@ namespace PascalSharp.Internal.EmitPE
             il = ilgn;
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICompiledPropertyNode value)
+        public override void visit(ICompiledPropertyNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IBasicPropertyNode value)
+        public override void visit(IBasicPropertyNode value)
         {
 
         }
@@ -4292,7 +4293,7 @@ namespace PascalSharp.Internal.EmitPE
         private string cur_prop_name;
 
         //перевод свойства класса
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonPropertyNode value)
+        public override void visit(ICommonPropertyNode value)
         {
             //получаем тип свойства
             Type ret_type = helper.GetTypeReference(value.property_type).tp;
@@ -4328,43 +4329,43 @@ namespace PascalSharp.Internal.EmitPE
             MakeAttribute(value);
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IPropertyNode value)
+        public override void visit(IPropertyNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IConstantDefinitionNode value)
+        public override void visit(IConstantDefinitionNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICompiledParameterNode value)
+        public override void visit(ICompiledParameterNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IBasicParameterNode value)
+        public override void visit(IBasicParameterNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonParameterNode value)
+        public override void visit(ICommonParameterNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IParameterNode value)
+        public override void visit(IParameterNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICompiledClassFieldNode value)
+        public override void visit(ICompiledClassFieldNode value)
         {
 
         }
 
         //добавление методов копирования и проч. в массив
-        private void AddSpecialMembersToArray(PascalABCCompiler.SemanticTree.ICommonClassFieldNode value, FieldAttributes fattr)
+        private void AddSpecialMembersToArray(ICommonClassFieldNode value, FieldAttributes fattr)
         {
             TypeInfo aux_ti = helper.GetTypeReference(value.comperehensive_type);
             if (aux_ti.clone_meth != null) return;
@@ -4603,7 +4604,7 @@ namespace PascalSharp.Internal.EmitPE
 
 
         //перевод поля класса
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonClassFieldNode value)
+        public override void visit(ICommonClassFieldNode value)
         {
             //if (is_in_unit && helper.IsUsed(value)==false) return;
             FieldAttributes fattr = ConvertFALToFieldAttributes(value.field_access_level);
@@ -4639,14 +4640,14 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        internal void GenerateInitCodeForFields(PascalABCCompiler.SemanticTree.ICommonTypeNode ctn)
+        internal void GenerateInitCodeForFields(ICommonTypeNode ctn)
         {
             TypeInfo ti = helper.GetTypeReference(ctn);
             //(ssyy) 16.05.08 добавил проверку, это надо для ф-ций, зависящих от generic-параметров.
             if (ti == null) return;
             if (!ctn.IsInterface && ti.init_meth != null)
             {
-                foreach (PascalABCCompiler.SemanticTree.ICommonClassFieldNode ccf in ctn.fields)
+                foreach (ICommonClassFieldNode ccf in ctn.fields)
                     if (ccf.polymorphic_state != polymorphic_state.ps_static)
                         GenerateInitCodeForField(ccf);
                     else
@@ -4654,7 +4655,7 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        internal void GenerateRetForInitMeth(PascalABCCompiler.SemanticTree.ICommonTypeNode ctn)
+        internal void GenerateRetForInitMeth(ICommonTypeNode ctn)
         {
             TypeInfo ti = helper.GetTypeReference(ctn);
             if (ti == null)
@@ -4665,7 +4666,7 @@ namespace PascalSharp.Internal.EmitPE
                 (ti.init_meth as MethodBuilder).GetILGenerator().Emit(OpCodes.Ret);
         }
 
-        internal void GenerateInitCodeForStaticField(PascalABCCompiler.SemanticTree.ICommonClassFieldNode value)
+        internal void GenerateInitCodeForStaticField(ICommonClassFieldNode value)
         {
             TypeInfo ti = helper.GetTypeReference(value.type), cur_ti = helper.GetTypeReference(value.comperehensive_type);
             FieldBuilder fb = helper.GetField(value).fi as FieldBuilder;
@@ -4692,7 +4693,7 @@ namespace PascalSharp.Internal.EmitPE
             in_var_init = false;
         }
 
-        internal void GenerateInitCodeForField(PascalABCCompiler.SemanticTree.ICommonClassFieldNode value)
+        internal void GenerateInitCodeForField(ICommonClassFieldNode value)
         {
             TypeInfo ti = helper.GetTypeReference(value.type), cur_ti = helper.GetTypeReference(value.comperehensive_type);
             FieldBuilder fb = helper.GetField(value).fi as FieldBuilder;
@@ -4719,17 +4720,17 @@ namespace PascalSharp.Internal.EmitPE
             in_var_init = false;
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonNamespaceVariableNode value)
+        public override void visit(ICommonNamespaceVariableNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ILocalVariableNode value)
+        public override void visit(ILocalVariableNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IVAriableDefinitionNode value)
+        public override void visit(IVAriableDefinitionNode value)
         {
 
         }
@@ -4738,7 +4739,7 @@ namespace PascalSharp.Internal.EmitPE
         //команда ldc_i4_s
         //is_dot_expr - признак того, что после этого выражения
         //идет точка (например 'a'.ToString)
-        public override void visit(PascalABCCompiler.SemanticTree.ICharConstantNode value)
+        public override void visit(ICharConstantNode value)
         {
             NETGeneratorTools.LdcIntConst(il, value.constant_value);
 
@@ -4753,14 +4754,14 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IFloatConstantNode value)
+        public override void visit(IFloatConstantNode value)
         {
             il.Emit(OpCodes.Ldc_R4, value.constant_value);
             if (is_dot_expr)
                 NETGeneratorTools.CreateLocalAndLdloca(il, TypeFactory.SingleType);
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IDoubleConstantNode value)
+        public override void visit(IDoubleConstantNode value)
         {
             il.Emit(OpCodes.Ldc_R8, value.constant_value);
             if (is_dot_expr)
@@ -4856,14 +4857,14 @@ namespace PascalSharp.Internal.EmitPE
                 il.Emit(OpCodes.Ldc_I4_0);
         }
         //\ivan
-        public override void visit(PascalABCCompiler.SemanticTree.IIntConstantNode value)
+        public override void visit(IIntConstantNode value)
         {
             PushIntConst(value.constant_value);
         }
 
         //перевод long константы
         //команда ldc_i8
-        public override void visit(PascalABCCompiler.SemanticTree.ILongConstantNode value)
+        public override void visit(ILongConstantNode value)
         {
             il.Emit(OpCodes.Ldc_I8, (long)value.constant_value);
             if (is_dot_expr == true)
@@ -4876,7 +4877,7 @@ namespace PascalSharp.Internal.EmitPE
         }
         //перевод byte константы
         //команда ldc_i4_S
-        public override void visit(PascalABCCompiler.SemanticTree.IByteConstantNode value)
+        public override void visit(IByteConstantNode value)
         {
             NETGeneratorTools.LdcIntConst(il, value.constant_value);
             if (is_dot_expr == true)
@@ -4888,7 +4889,7 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IShortConstantNode value)
+        public override void visit(IShortConstantNode value)
         {
             NETGeneratorTools.LdcIntConst(il, value.constant_value);
             if (is_dot_expr == true)
@@ -4900,7 +4901,7 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IUShortConstantNode value)
+        public override void visit(IUShortConstantNode value)
         {
             NETGeneratorTools.LdcIntConst(il, value.constant_value);
             if (is_dot_expr == true)
@@ -4912,7 +4913,7 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IUIntConstantNode value)
+        public override void visit(IUIntConstantNode value)
         {
             NETGeneratorTools.LdcIntConst(il, (int)value.constant_value);
             if (is_dot_expr == true)
@@ -4924,7 +4925,7 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IULongConstantNode value)
+        public override void visit(IULongConstantNode value)
         {
             long l = (long)(value.constant_value & 0x7FFFFFFFFFFFFFFF);
             if ((value.constant_value & 0x8000000000000000) != 0)
@@ -4942,7 +4943,7 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISByteConstantNode value)
+        public override void visit(ISByteConstantNode value)
         {
             //il.Emit(OpCodes.Ldc_I4, (int)value.constant_value);
             NETGeneratorTools.LdcIntConst(il, value.constant_value);
@@ -4957,7 +4958,7 @@ namespace PascalSharp.Internal.EmitPE
 
         //перевод булевской константы
         //команда ldc_i4_0/1
-        public override void visit(PascalABCCompiler.SemanticTree.IBoolConstantNode value)
+        public override void visit(IBoolConstantNode value)
         {
             if (value.constant_value == true)
                 il.Emit(OpCodes.Ldc_I4_1);
@@ -4971,7 +4972,7 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IConstantNode value)
+        public override void visit(IConstantNode value)
         {
 
         }
@@ -5003,7 +5004,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //перевод ссылки на параметр
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonParameterReferenceNode value)
+        public override void visit(ICommonParameterReferenceNode value)
         {
             bool must_push_addr = false;//должен ли упаковываться, но это если после идет точка
             if (is_dot_expr == true)//если после идет точка
@@ -5084,7 +5085,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //доступ к статическому откомпилированному типу
-        public override void visit(PascalABCCompiler.SemanticTree.IStaticCompiledFieldReferenceNode value)
+        public override void visit(IStaticCompiledFieldReferenceNode value)
         {
             //если у поля нет постоянное значение
             if (!value.static_field.compiled_field.IsLiteral)
@@ -5113,7 +5114,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //доступ к откомпилированному нестатическому полю
-        public override void visit(PascalABCCompiler.SemanticTree.ICompiledFieldReferenceNode value)
+        public override void visit(ICompiledFieldReferenceNode value)
         {
             bool tmp_dot = is_dot_expr;
             if (!tmp_dot)
@@ -5145,7 +5146,7 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IStaticCommonClassFieldReferenceNode value)
+        public override void visit(IStaticCommonClassFieldReferenceNode value)
         {
             bool tmp_dot = is_dot_expr;
             FldInfo fi_info = helper.GetField(value.static_field);
@@ -5168,7 +5169,7 @@ namespace PascalSharp.Internal.EmitPE
                 il.Emit(OpCodes.Ldsflda, fi);
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonClassFieldReferenceNode value)
+        public override void visit(ICommonClassFieldReferenceNode value)
         {
             bool tmp_dot = is_dot_expr;
             if (!tmp_dot)
@@ -5203,7 +5204,7 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.INamespaceVariableReferenceNode value)
+        public override void visit(INamespaceVariableReferenceNode value)
         {
             VarInfo vi = helper.GetVariable(value.variable);
             if (vi == null)
@@ -5231,7 +5232,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //чтобы перевести переменную, нужно до фига проверок
-        public override void visit(PascalABCCompiler.SemanticTree.ILocalVariableReferenceNode value)
+        public override void visit(ILocalVariableReferenceNode value)
         {
             VarInfo vi = helper.GetVariable(value.variable);
             if (vi == null)
@@ -5294,37 +5295,37 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IAddressedExpressionNode value)
+        public override void visit(IAddressedExpressionNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IProgramNode value)
+        public override void visit(IProgramNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IDllNode value)
+        public override void visit(IDllNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICompiledNamespaceNode value)
+        public override void visit(ICompiledNamespaceNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonNamespaceNode value)
+        public override void visit(ICommonNamespaceNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.INamespaceNode value)
+        public override void visit(INamespaceNode value)
         {
 
         }
 
-        private void ConvertStatementsListWithoutFirstStatement(PascalABCCompiler.SemanticTree.IStatementsListNode value)
+        private void ConvertStatementsListWithoutFirstStatement(IStatementsListNode value)
         {
             if (save_debug_info)
             {
@@ -5354,7 +5355,7 @@ namespace PascalSharp.Internal.EmitPE
             }
 
             if (save_debug_info)
-                if (statements[statements.Length - 1] is PascalABCCompiler.SemanticTree.IReturnNode)
+                if (statements[statements.Length - 1] is IReturnNode)
                     //если return не имеет location то метим точку на месте закрывающей логической скобки
                     if (statements[statements.Length - 1].Location == null)
                         MarkSequencePoint(value.RightLogicalBracketLocation);
@@ -5362,7 +5363,7 @@ namespace PascalSharp.Internal.EmitPE
             ConvertStatement(statements[statements.Length - 1]);
 
             //TODO: переделать. сдель функцию которая ложет ret и MarkSequencePoint
-            if (save_debug_info && !(statements[statements.Length - 1] is PascalABCCompiler.SemanticTree.IReturnNode))
+            if (save_debug_info && !(statements[statements.Length - 1] is IReturnNode))
             {
                 //если почледний оператор не Return то пометить закрывающуюю логическую скобку
                 if (gen_right_brackets)
@@ -5371,7 +5372,7 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IStatementsListNode value)
+        public override void visit(IStatementsListNode value)
         {
             IStatementNode[] statements = value.statements;
             if (save_debug_info)
@@ -5408,7 +5409,7 @@ namespace PascalSharp.Internal.EmitPE
             }
 
             if (save_debug_info)
-                if (statements[statements.Length - 1] is PascalABCCompiler.SemanticTree.IReturnNode)
+                if (statements[statements.Length - 1] is IReturnNode)
                     //если return не имеет location то метим точку на месте закрывающей логической скобки
                     if (statements[statements.Length - 1].Location == null)
                         MarkSequencePoint(value.RightLogicalBracketLocation);
@@ -5416,7 +5417,7 @@ namespace PascalSharp.Internal.EmitPE
             ConvertStatement(statements[statements.Length - 1]);
 
             //TODO: переделать. сдель функцию которая ложет ret и MarkSequencePoint
-            if (save_debug_info && !(statements[statements.Length - 1] is PascalABCCompiler.SemanticTree.IReturnNode))
+            if (save_debug_info && !(statements[statements.Length - 1] is IReturnNode))
             {
                 //если почледний оператор не Return то пометить закрывающуюю логическую скобку
                 if (gen_right_brackets)
@@ -5490,7 +5491,7 @@ namespace PascalSharp.Internal.EmitPE
 
         private bool gen_right_brackets = true;
         private bool gen_left_brackets = true;
-        public override void visit(PascalABCCompiler.SemanticTree.IForNode value)
+        public override void visit(IForNode value)
         {
             Label l1 = il.DefineLabel();
             Label l2 = il.DefineLabel();
@@ -5550,7 +5551,7 @@ namespace PascalSharp.Internal.EmitPE
             clabels.Pop();
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IRepeatNode value)
+        public override void visit(IRepeatNode value)
         {
             Label TrueLabel, FalseLabel;
             TrueLabel = il.DefineLabel();
@@ -5573,7 +5574,7 @@ namespace PascalSharp.Internal.EmitPE
                 if (loc.begin_line_num == body_loc.end_line_num) MarkSequencePoint(il, body_loc);
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IWhileNode value)
+        public override void visit(IWhileNode value)
         {
             Label TrueLabel, FalseLabel;
             TrueLabel = il.DefineLabel();
@@ -5593,7 +5594,7 @@ namespace PascalSharp.Internal.EmitPE
             labels.Pop();
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ITryBlockNode value)
+        public override void visit(ITryBlockNode value)
         {
             Label exBl = il.BeginExceptionBlock();
             var safe_block = EnterSafeBlock();
@@ -5601,7 +5602,7 @@ namespace PascalSharp.Internal.EmitPE
             LeaveSafeBlock(safe_block);
             if (value.ExceptionFilters.Length != 0)
             {
-                foreach (PascalABCCompiler.SemanticTree.IExceptionFilterBlockNode iefbn in value.ExceptionFilters)
+                foreach (IExceptionFilterBlockNode iefbn in value.ExceptionFilters)
                 {
                     Type typ;
                     if (iefbn.ExceptionType != null)
@@ -5661,7 +5662,7 @@ namespace PascalSharp.Internal.EmitPE
                 ((stmt as IStatementsListNode).statements[0] is IIfNode || (stmt as IStatementsListNode).statements[0] is ISwitchNode);
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IIfNode value)
+        public override void visit(IIfNode value)
         {
             Label FalseLabel, EndLabel;
             FalseLabel = il.DefineLabel();
@@ -5774,13 +5775,13 @@ namespace PascalSharp.Internal.EmitPE
                 il.Emit(OpCodes.Br, l);
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICompiledMethodNode value)
+        public override void visit(ICompiledMethodNode value)
         {
 
         }
 
         //перевод тела конструктора
-        private void ConvertConstructorBody(PascalABCCompiler.SemanticTree.ICommonMethodNode value)
+        private void ConvertConstructorBody(ICommonMethodNode value)
         {
             num_scope++;
             //получаем билдер конструктора
@@ -5795,7 +5796,7 @@ namespace PascalSharp.Internal.EmitPE
             }
             if (value.functions_nodes.Length == 0)
             {
-                if (!(value.function_code is PascalABCCompiler.SemanticTree.IRuntimeManagedMethodBody))
+                if (!(value.function_code is IRuntimeManagedMethodBody))
                 {
                     il = cnstr.GetILGenerator();
                     //переводим локальные переменные
@@ -5852,7 +5853,7 @@ namespace PascalSharp.Internal.EmitPE
             num_scope--;
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonMethodNode value)
+        public override void visit(ICommonMethodNode value)
         {
             if (value.is_constructor == true)
             {
@@ -5882,7 +5883,7 @@ namespace PascalSharp.Internal.EmitPE
             //если нет вложенных процедур
             if (value.functions_nodes.Length == 0)
             {
-                if (!(value.function_code is PascalABCCompiler.SemanticTree.IRuntimeManagedMethodBody))
+                if (!(value.function_code is IRuntimeManagedMethodBody))
                 {
                     //ssyy!!! добавил условие для интерфейсов
                     if (value.function_code != null)
@@ -5926,7 +5927,7 @@ namespace PascalSharp.Internal.EmitPE
             num_scope--;
         }
 
-        private MethInfo ConvertMethodWithNested(PascalABCCompiler.SemanticTree.ICommonMethodNode meth, ConstructorBuilder methodb)
+        private MethInfo ConvertMethodWithNested(ICommonMethodNode meth, ConstructorBuilder methodb)
         {
             num_scope++; //увеличиваем глубину обл. видимости
             TypeBuilder tb = null, tmp_type = cur_type;
@@ -6023,7 +6024,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //перевод метода с вложенными процедурами
-        private MethInfo ConvertMethodWithNested(PascalABCCompiler.SemanticTree.ICommonMethodNode meth, MethodBuilder methodb)
+        private MethInfo ConvertMethodWithNested(ICommonMethodNode meth, MethodBuilder methodb)
         {
             num_scope++; //увеличиваем глубину обл. видимости
             TypeBuilder tb = null, tmp_type = cur_type;
@@ -6279,7 +6280,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //получение атрибутов метода
-        private MethodAttributes GetMethodAttributes(PascalABCCompiler.SemanticTree.ICommonMethodNode value, bool is_accessor)
+        private MethodAttributes GetMethodAttributes(ICommonMethodNode value, bool is_accessor)
         {
             MethodAttributes attrs = ConvertFALToMethodAttributes(value.field_access_level);
             if (is_accessor)
@@ -6297,7 +6298,7 @@ namespace PascalSharp.Internal.EmitPE
             return attrs;
         }
 
-        private MethodAttributes GetConstructorAttributes(PascalABCCompiler.SemanticTree.ICommonMethodNode value)
+        private MethodAttributes GetConstructorAttributes(ICommonMethodNode value)
         {
             MethodAttributes attrs = ConvertFALToMethodAttributes(value.field_access_level);
             switch (value.polymorphic_state)
@@ -6308,7 +6309,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //перевод заголовка конструктора
-        private void ConvertConstructorHeader(PascalABCCompiler.SemanticTree.ICommonMethodNode value)
+        private void ConvertConstructorHeader(ICommonMethodNode value)
         {
             if (helper.GetConstructor(value) != null) return;
 
@@ -6328,7 +6329,7 @@ namespace PascalSharp.Internal.EmitPE
                 irmmb = value.function_code as IRuntimeManagedMethodBody;
                 if (irmmb != null)
                 {
-                    if (irmmb.runtime_statement_type == PascalABCCompiler.SemanticTree.runtime_statement_type.ctor_delegate)
+                    if (irmmb.runtime_statement_type == runtime_statement_type.ctor_delegate)
                     {
                         attrs = MethodAttributes.Public | MethodAttributes.HideBySig;
                         param_types = new Type[2];
@@ -6366,7 +6367,7 @@ namespace PascalSharp.Internal.EmitPE
             return comp_opt.target == TargetType.Dll && prop_accessors.ContainsKey(value);
         }
 
-        private void ConvertExternalMethod(PascalABCCompiler.SemanticTree.ICommonMethodNode meth)
+        private void ConvertExternalMethod(ICommonMethodNode meth)
         {
             IStatementsListNode sl = (IStatementsListNode)meth.function_code;
             IStatementNode[] statements = sl.statements;
@@ -6399,7 +6400,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //перевод заголовка метода
-        private void ConvertMethodHeader(PascalABCCompiler.SemanticTree.ICommonMethodNode value)
+        private void ConvertMethodHeader(ICommonMethodNode value)
         {
             if (value.is_constructor == true)
             {
@@ -6425,9 +6426,9 @@ namespace PascalSharp.Internal.EmitPE
             IRuntimeManagedMethodBody irmmb = value.function_code as IRuntimeManagedMethodBody;
             if (irmmb != null)
             {
-                if ((irmmb.runtime_statement_type == PascalABCCompiler.SemanticTree.runtime_statement_type.invoke_delegate) ||
-                    (irmmb.runtime_statement_type == PascalABCCompiler.SemanticTree.runtime_statement_type.begin_invoke_delegate) ||
-                    (irmmb.runtime_statement_type == PascalABCCompiler.SemanticTree.runtime_statement_type.end_invoke_delegate))
+                if ((irmmb.runtime_statement_type == runtime_statement_type.invoke_delegate) ||
+                    (irmmb.runtime_statement_type == runtime_statement_type.begin_invoke_delegate) ||
+                    (irmmb.runtime_statement_type == runtime_statement_type.end_invoke_delegate))
                 {
                     attrs = MethodAttributes.Public | MethodAttributes.HideBySig | MethodAttributes.NewSlot |
                         MethodAttributes.Virtual;
@@ -6580,7 +6581,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //вызов откомпилированного статического метода
-        public override void visit(PascalABCCompiler.SemanticTree.ICompiledStaticMethodCallNode value)
+        public override void visit(ICompiledStaticMethodCallNode value)
         {
             if (comp_opt.dbg_attrs == DebugAttributes.Release && has_debug_conditional_attr(value.static_method.method_info))
                 return;
@@ -6681,9 +6682,9 @@ namespace PascalSharp.Internal.EmitPE
                 ICompiledTypeNode ctn2 = parameters[i].type as ICompiledTypeNode;
                 ITypeNode ctn3 = real_parameters[i].type;
                 ITypeNode ctn4 = real_parameters[i].conversion_type;
-                if (ctn2 != null && !(real_parameters[i] is PascalABCCompiler.SemanticTree.INullConstantNode) && (ctn3.is_value_type || ctn3.is_generic_parameter) && ctn2.compiled_type == TypeFactory.ObjectType)
+                if (ctn2 != null && !(real_parameters[i] is INullConstantNode) && (ctn3.is_value_type || ctn3.is_generic_parameter) && ctn2.compiled_type == TypeFactory.ObjectType)
                     il.Emit(OpCodes.Box, helper.GetTypeReference(ctn3).tp);
-                else if (ctn2 != null && !(real_parameters[i] is PascalABCCompiler.SemanticTree.INullConstantNode) && ctn4 != null && (ctn4.is_value_type || ctn4.is_generic_parameter) && ctn2.compiled_type == TypeFactory.ObjectType)
+                else if (ctn2 != null && !(real_parameters[i] is INullConstantNode) && ctn4 != null && (ctn4.is_value_type || ctn4.is_generic_parameter) && ctn2.compiled_type == TypeFactory.ObjectType)
                     il.Emit(OpCodes.Box, helper.GetTypeReference(ctn4).tp);
                 is_addr = false;
             }
@@ -6732,7 +6733,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //вызов откомпилированного метода
-        public override void visit(PascalABCCompiler.SemanticTree.ICompiledMethodCallNode value)
+        public override void visit(ICompiledMethodCallNode value)
         {
             IExpressionNode[] real_parameters = value.real_parameters;
             IParameterNode[] parameters = value.compiled_method.parameters;
@@ -6806,7 +6807,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //вызов статического метода
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonStaticMethodCallNode value)
+        public override void visit(ICommonStaticMethodCallNode value)
         {
             //if (save_debug_info)
             //MarkSequencePoint(value.Location);
@@ -6895,7 +6896,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //вызов нестатического метода
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonMethodCallNode value)
+        public override void visit(ICommonMethodCallNode value)
         {
             MethInfo meth = helper.GetMethod(value.method);
             MethodInfo mi = meth.mi;
@@ -7006,7 +7007,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //вызов вложенной процедуры
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonNestedInFunctionFunctionCallNode value)
+        public override void visit(ICommonNestedInFunctionFunctionCallNode value)
         {
             IExpressionNode[] real_parameters = value.real_parameters;
             //if (save_debug_info)
@@ -7059,7 +7060,7 @@ namespace PascalSharp.Internal.EmitPE
                 //(ssyy) 07.12.2007 При боксировке нужно вызывать Ldsfld вместо Ldsflda.
                 //Дополнительная проверка введена именно для этого.
                 bool box_awaited =
-                    (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is PascalABCCompiler.SemanticTree.INullConstantNode) && (ctn3.is_value_type || ctn3.is_generic_parameter);
+                    (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is INullConstantNode) && (ctn3.is_value_type || ctn3.is_generic_parameter);
 
                 if (ti != null && ti.clone_meth != null && ti.tp != null && ti.tp.IsValueType && !box_awaited && !parameters[i].is_const)
                     is_dot_expr = true;
@@ -7214,7 +7215,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //вызов глобальной процедуры
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionCallNode value)
+        public override void visit(ICommonNamespaceFunctionCallNode value)
         {
             MethInfo meth = helper.GetMethod(value.namespace_function);
             IExpressionNode[] real_parameters = value.real_parameters;
@@ -7252,7 +7253,7 @@ namespace PascalSharp.Internal.EmitPE
                     }
                     else if (tn.type_special_kind == type_special_kind.set_type)
                     {
-                        ICommonNamespaceFunctionNode cnfn = PascalABCCompiler.SystemLibrary.SystemLibInitializer.TypedSetInitProcedureWithBounds.sym_info as ICommonNamespaceFunctionNode;
+                        ICommonNamespaceFunctionNode cnfn = SystemLibInitializer.TypedSetInitProcedureWithBounds.sym_info as ICommonNamespaceFunctionNode;
                         real_parameters[0].visit(this);
                         IConstantNode cn1 = (tn as ICommonTypeNode).lower_value;
                         IConstantNode cn2 = (tn as ICommonTypeNode).upper_value;
@@ -7363,9 +7364,9 @@ namespace PascalSharp.Internal.EmitPE
                 //(ssyy) 07.12.2007 При боксировке нужно вызывать Ldsfld вместо Ldsflda.
                 //Дополнительная проверка введена именно для этого.
                 bool box_awaited =
-                    (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is PascalABCCompiler.SemanticTree.INullConstantNode) 
+                    (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is INullConstantNode) 
                 	&& (ctn3.is_value_type || ctn3.is_generic_parameter);
-                if (!box_awaited && (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is PascalABCCompiler.SemanticTree.INullConstantNode) 
+                if (!box_awaited && (ctn2 != null && ctn2.compiled_type == TypeFactory.ObjectType || tn2.IsInterface) && !(real_parameters[i] is INullConstantNode) 
                 	&& ctn4 != null && ctn4.is_value_type)
                 {
                 	box_awaited = true;
@@ -7474,12 +7475,12 @@ namespace PascalSharp.Internal.EmitPE
 
         private bool EmitBox(IExpressionNode from, Type LocalType)
         {
-            if ((from.type.is_value_type || from.type.is_generic_parameter) && !(from is PascalABCCompiler.SemanticTree.INullConstantNode) && (LocalType == TypeFactory.ObjectType || TypeIsInterface(LocalType)))
+            if ((from.type.is_value_type || from.type.is_generic_parameter) && !(from is INullConstantNode) && (LocalType == TypeFactory.ObjectType || TypeIsInterface(LocalType)))
             {
                 il.Emit(OpCodes.Box, helper.GetTypeReference(from.type).tp);//упаковка
                 return true;
             }
-            if (from.conversion_type != null && from.conversion_type.is_value_type && !(from is PascalABCCompiler.SemanticTree.INullConstantNode) && (LocalType == TypeFactory.ObjectType || TypeIsInterface(LocalType)))
+            if (from.conversion_type != null && from.conversion_type.is_value_type && !(from is INullConstantNode) && (LocalType == TypeFactory.ObjectType || TypeIsInterface(LocalType)))
             {
             	il.Emit(OpCodes.Box, helper.GetTypeReference(from.conversion_type).tp);
             }
@@ -8385,7 +8386,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //перевод бинарных, унарных и проч. выражений
-        public override void visit(PascalABCCompiler.SemanticTree.IBasicFunctionCallNode value)
+        public override void visit(IBasicFunctionCallNode value)
         {
             make_next_spoint = true;
             bool tmp_dot = is_dot_expr;
@@ -8930,7 +8931,7 @@ namespace PascalSharp.Internal.EmitPE
                         //(ssyy) Вставил 15.05.08
                         Type from_val_type = null;
                         IExpressionNode par0 = fn.real_parameters[0];
-                        if (!(par0 is PascalABCCompiler.SemanticTree.INullConstantNode) && (par0.type.is_value_type || par0.type.is_generic_parameter))
+                        if (!(par0 is INullConstantNode) && (par0.type.is_value_type || par0.type.is_generic_parameter))
                         {
                             from_val_type = helper.GetTypeReference(par0.type).tp;
                         }
@@ -8945,28 +8946,28 @@ namespace PascalSharp.Internal.EmitPE
 
 
 
-        public override void visit(PascalABCCompiler.SemanticTree.IFunctionCallNode value)
+        public override void visit(IFunctionCallNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IExpressionNode value)
+        public override void visit(IExpressionNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IStatementNode value)
+        public override void visit(IStatementNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICompiledTypeNode value)
+        public override void visit(ICompiledTypeNode value)
         {
 
         }
 
         //перевод оболочки для массива
-        public void ConvertArrayWrapperType(PascalABCCompiler.SemanticTree.ICommonTypeNode value)
+        public void ConvertArrayWrapperType(ICommonTypeNode value)
         {
             ISimpleArrayNode arrt = value.fields[0].type as ISimpleArrayNode;
             TypeInfo elem_ti = helper.GetTypeReference(arrt.element_type);
@@ -9011,7 +9012,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //перевод реализации типа
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonTypeNode value)
+        public override void visit(ICommonTypeNode value)
         {
             if (value is ISimpleArrayNode || value.type_special_kind == type_special_kind.array_kind) return;
             MakeAttribute(value);
@@ -9029,18 +9030,18 @@ namespace PascalSharp.Internal.EmitPE
             cur_ti = tmp_ti;
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IBasicTypeNode value)
+        public override void visit(IBasicTypeNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISimpleArrayNode value)
+        public override void visit(ISimpleArrayNode value)
         {
 
         }
 
         //доступ к элементам массива
-        public override void visit(PascalABCCompiler.SemanticTree.ISimpleArrayIndexingNode value)
+        public override void visit(ISimpleArrayIndexingNode value)
         {
             //Console.WriteLine(value.array.type);
             bool temp_is_addr = is_addr;
@@ -9194,22 +9195,22 @@ namespace PascalSharp.Internal.EmitPE
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ITypeNode value)
+        public override void visit(ITypeNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IDefinitionNode value)
+        public override void visit(IDefinitionNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticNode value)
+        public override void visit(ISemanticNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IReturnNode value)
+        public override void visit(IReturnNode value)
         {
             if (save_debug_info)
                 MarkSequencePoint(value.Location);
@@ -9228,13 +9229,13 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //строковая константа
-        public override void visit(PascalABCCompiler.SemanticTree.IStringConstantNode value)
+        public override void visit(IStringConstantNode value)
         {
             il.Emit(OpCodes.Ldstr, value.constant_value);
         }
 
         //реализация this
-        public override void visit(PascalABCCompiler.SemanticTree.IThisNode value)
+        public override void visit(IThisNode value)
         {
             il.Emit(OpCodes.Ldarg_0);
             if (value.type.is_value_type && !is_dot_expr && !is_addr)
@@ -9243,15 +9244,15 @@ namespace PascalSharp.Internal.EmitPE
             }
         }
 
-        private void PushObjectCommand(PascalABCCompiler.SemanticTree.IFunctionCallNode ifc)
+        private void PushObjectCommand(IFunctionCallNode ifc)
         {
-            PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionCallNode cncall = ifc as PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionCallNode;
+            ICommonNamespaceFunctionCallNode cncall = ifc as ICommonNamespaceFunctionCallNode;
             if (cncall != null)
             {
                 il.Emit(OpCodes.Ldnull);
                 return;
             }
-            PascalABCCompiler.SemanticTree.ICommonMethodCallNode cmcall = ifc as PascalABCCompiler.SemanticTree.ICommonMethodCallNode;
+            ICommonMethodCallNode cmcall = ifc as ICommonMethodCallNode;
             if (cmcall != null)
             {
                 cmcall.obj.visit(this);
@@ -9261,13 +9262,13 @@ namespace PascalSharp.Internal.EmitPE
                 	il.Emit(OpCodes.Box, helper.GetTypeReference(cmcall.obj.conversion_type).tp);
                 return;
             }
-            PascalABCCompiler.SemanticTree.ICommonStaticMethodCallNode csmcall = ifc as PascalABCCompiler.SemanticTree.ICommonStaticMethodCallNode;
+            ICommonStaticMethodCallNode csmcall = ifc as ICommonStaticMethodCallNode;
             if (csmcall != null)
             {
                 il.Emit(OpCodes.Ldnull);
                 return;
             }
-            PascalABCCompiler.SemanticTree.ICompiledMethodCallNode cmccall = ifc as PascalABCCompiler.SemanticTree.ICompiledMethodCallNode;
+            ICompiledMethodCallNode cmccall = ifc as ICompiledMethodCallNode;
             if (cmccall != null)
             {
                 cmccall.obj.visit(this);
@@ -9277,13 +9278,13 @@ namespace PascalSharp.Internal.EmitPE
                 	il.Emit(OpCodes.Box, helper.GetTypeReference(cmccall.obj.conversion_type).tp);
                 return;
             }
-            PascalABCCompiler.SemanticTree.ICompiledStaticMethodCallNode csmcall2 = ifc as PascalABCCompiler.SemanticTree.ICompiledStaticMethodCallNode;
+            ICompiledStaticMethodCallNode csmcall2 = ifc as ICompiledStaticMethodCallNode;
             if (csmcall2 != null)
             {
                 il.Emit(OpCodes.Ldnull);
                 return;
             }
-            PascalABCCompiler.SemanticTree.ICommonNestedInFunctionFunctionCallNode cnffcall = ifc as PascalABCCompiler.SemanticTree.ICommonNestedInFunctionFunctionCallNode;
+            ICommonNestedInFunctionFunctionCallNode cnffcall = ifc as ICommonNestedInFunctionFunctionCallNode;
             if (cnffcall != null)
             {
                 //cnffcall.
@@ -9302,7 +9303,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //вызов конструктора
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonConstructorCall value)
+        public override void visit(ICommonConstructorCall value)
         {
             bool tmp_dot = is_dot_expr;
             //if (save_debug_info)
@@ -9317,12 +9318,12 @@ namespace PascalSharp.Internal.EmitPE
             MethInfo ci = helper.GetConstructor(value.static_method);
             ConstructorInfo cnstr = ci.cnstr;
 
-            PascalABCCompiler.SemanticTree.IRuntimeManagedMethodBody irmmb = value.static_method.function_code as PascalABCCompiler.SemanticTree.IRuntimeManagedMethodBody;
+            IRuntimeManagedMethodBody irmmb = value.static_method.function_code as IRuntimeManagedMethodBody;
             if (irmmb != null)
             {
-                if (irmmb.runtime_statement_type == PascalABCCompiler.SemanticTree.runtime_statement_type.ctor_delegate)
+                if (irmmb.runtime_statement_type == runtime_statement_type.ctor_delegate)
                 {
-                    PascalABCCompiler.SemanticTree.IFunctionCallNode ifc = real_parameters[0] as PascalABCCompiler.SemanticTree.IFunctionCallNode;
+                    IFunctionCallNode ifc = real_parameters[0] as IFunctionCallNode;
                     MethodInfo mi = null;
                     ICompiledMethodCallNode icmcn = ifc as ICompiledMethodCallNode;
                     if (icmcn != null)
@@ -9431,7 +9432,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //вызов откомпилированного конструктора
-        public override void visit(PascalABCCompiler.SemanticTree.ICompiledConstructorCall value)
+        public override void visit(ICompiledConstructorCall value)
         {
             //if (save_debug_info) MarkSequencePoint(value.Location);
             bool tmp_dot = is_dot_expr;
@@ -9441,7 +9442,7 @@ namespace PascalSharp.Internal.EmitPE
             Type cons_type11 = value.constructor.comprehensive_type.compiled_type;
             if (cons_type11.BaseType == TypeFactory.MulticastDelegateType)
             {
-                PascalABCCompiler.SemanticTree.IFunctionCallNode ifc = real_parameters[0] as PascalABCCompiler.SemanticTree.IFunctionCallNode;
+                IFunctionCallNode ifc = real_parameters[0] as IFunctionCallNode;
                 ICompiledMethodCallNode icmcn = ifc as ICompiledMethodCallNode;
                 if (icmcn != null)
                 {
@@ -9534,7 +9535,7 @@ namespace PascalSharp.Internal.EmitPE
         }
 
         //перевод @
-        public override void visit(PascalABCCompiler.SemanticTree.IGetAddrNode value)
+        public override void visit(IGetAddrNode value)
         {
             IExpressionNode to = value.addr_of_expr;
             if (to is INamespaceVariableReferenceNode)
@@ -9754,7 +9755,7 @@ namespace PascalSharp.Internal.EmitPE
             is_dot_expr = temp_is_dot_expr;
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IDereferenceNode value)
+        public override void visit(IDereferenceNode value)
         {
             bool tmp = false;
             if (is_addr == true)
@@ -10057,58 +10058,58 @@ namespace PascalSharp.Internal.EmitPE
             return ltfl.ToArray();
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonNestedInFunctionFunctionNode value)
+        public override void visit(ICommonNestedInFunctionFunctionNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonNamespaceFunctionNode value)
+        public override void visit(ICommonNamespaceFunctionNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonFunctionNode value)
+        public override void visit(ICommonFunctionNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IBasicFunctionNode value)
+        public override void visit(IBasicFunctionNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.INamespaceMemberNode value)
+        public override void visit(INamespaceMemberNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IFunctionMemberNode value)
+        public override void visit(IFunctionMemberNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICommonClassMemberNode value)
+        public override void visit(ICommonClassMemberNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ICompiledClassMemberNode value)
+        public override void visit(ICompiledClassMemberNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IClassMemberNode value)
+        public override void visit(IClassMemberNode value)
         {
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IFunctionNode value)
+        public override void visit(IFunctionNode value)
         {
 
         }
 
 
-        public override void visit(PascalABCCompiler.SemanticTree.IIsNode value)
+        public override void visit(IIsNode value)
         {
             bool idexpr = is_dot_expr;
             is_dot_expr = false;
@@ -10125,14 +10126,14 @@ namespace PascalSharp.Internal.EmitPE
 
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.IAsNode value)
+        public override void visit(IAsNode value)
         {
             bool idexpr = is_dot_expr;
             is_dot_expr = false;
             value.left.visit(this);
             is_dot_expr = idexpr;
             Type right = helper.GetTypeReference(value.right).tp;
-            if (!(value.left is PascalABCCompiler.SemanticTree.INullConstantNode) && (value.left.type.is_value_type || value.left.type.is_generic_parameter))
+            if (!(value.left is INullConstantNode) && (value.left.type.is_value_type || value.left.type.is_generic_parameter))
             {
                 il.Emit(OpCodes.Box, helper.GetTypeReference(value.left.type).tp);
             }
@@ -10615,11 +10616,11 @@ namespace PascalSharp.Internal.EmitPE
                 il.Emit(OpCodes.Ldsfld, helper.GetVariable((value.Event as ICommonNamespaceEventNode).Field).fb);
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ILambdaFunctionNode value)
+        public override void visit(ILambdaFunctionNode value)
         {
         }
 
-        public override void visit(PascalABCCompiler.SemanticTree.ILambdaFunctionCallNode value)
+        public override void visit(ILambdaFunctionCallNode value)
         {
         }
     }

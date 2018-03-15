@@ -9,7 +9,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace PascalABCCompiler
+namespace PascalSharp.Internal.ParserTools
 {
 	/// <summary>
 	/// Class that can open text files with auto-detection of the encoding.

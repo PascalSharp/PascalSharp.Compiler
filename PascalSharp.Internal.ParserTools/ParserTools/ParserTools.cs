@@ -4,15 +4,12 @@
 
 using System;
 using System.IO;
-using System.Resources;
-using System.Reflection;
-using System.Globalization;
-using System.Threading;
-using PascalABCCompiler.Errors;
 using System.IO.Compression;
+using System.Resources;
+using System.Threading;
 using PascalSharp.Internal.Errors;
 
-namespace PascalABCCompiler.ParserTools
+namespace PascalSharp.Internal.ParserTools
 {
 
     public class CGTResourceExtractor

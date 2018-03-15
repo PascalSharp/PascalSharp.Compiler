@@ -8,10 +8,6 @@ using System.Threading.Tasks;
 
 using PascalABCCompiler;
 using PascalABCCompiler.SyntaxTree;
-
-using PascalABCCompiler.ParserTools;
-using PascalABCCompiler.Errors;
-
 using PascalABCCompiler.YieldHelpers;
 using PascalSharp.Internal.Errors;
 

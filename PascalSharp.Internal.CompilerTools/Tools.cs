@@ -6,14 +6,16 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
+using PascalABCCompiler.SemanticTree;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.SyntaxTree;
 
 namespace PascalSharp.Internal.CompilerTools
 {
     public class Tools
     {
 
-        public static SourceLocation ConvertSourceContextToSourceLocation(string FileName, PascalABCCompiler.SyntaxTree.SourceContext sc)
+        public static SourceLocation ConvertSourceContextToSourceLocation(string FileName, SourceContext sc)
         {
             if (sc.FileName != null)
                 FileName = sc.FileName;
@@ -31,10 +33,10 @@ namespace PascalSharp.Internal.CompilerTools
 
 
         //ssyy
-        public static string GetFullMethodHeaderString(PascalABCCompiler.SemanticTree.IFunctionNode member)
+        public static string GetFullMethodHeaderString(IFunctionNode member)
         {
             string s = member.name;
-            PascalABCCompiler.SemanticTree.IParameterNode[] ps = member.parameters;
+            IParameterNode[] ps = member.parameters;
             if (ps.Length > 0)
             {
                 s += '(';

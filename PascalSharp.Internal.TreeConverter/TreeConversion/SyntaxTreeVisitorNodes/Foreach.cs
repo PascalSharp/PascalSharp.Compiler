@@ -1,9 +1,10 @@
 ﻿using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 using TreeConverter.LambdaExpressions;
-using for_node = PascalABCCompiler.SyntaxTree.for_node;
+using for_node = PascalSharp.Internal.SyntaxTree.for_node;
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter
 {
     public partial class syntax_tree_visitor // SSM 02.01.17 менять на визитор с другим порядком обхода можно, но бессмысленно
     {

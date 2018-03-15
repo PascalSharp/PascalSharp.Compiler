@@ -3,8 +3,11 @@
 
 using System.Collections.Generic;
 using PascalABCCompiler;
+using PascalABCCompiler.SemanticTree;
 using PascalSharp.Compiler.SemanticTreeConverters;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SyntaxTree;
 
 ///В разработке DarkStar
 
@@ -22,12 +25,12 @@ namespace PascalSharp.Compiler
             get;
         }
         
-        PascalABCCompiler.Parsers.Controller ParsersController
+        Controller ParsersController
         {
             get;
         }
 
-        PascalABCCompiler.SemanticTree.IProgramNode SemanticTree
+        IProgramNode SemanticTree
         {
             get;
         }
@@ -106,7 +109,7 @@ namespace PascalSharp.Compiler
 
         void AddWarnings(List<CompilerWarning> WarningList);
 
-        PascalABCCompiler.SyntaxTree.compilation_unit ParseText(string FileName, string Text, List<Error> ErrorList, List<CompilerWarning> Warnings);
+        compilation_unit ParseText(string FileName, string Text, List<Error> ErrorList, List<CompilerWarning> Warnings);
 
         string GetSourceFileText(string FileName);
 

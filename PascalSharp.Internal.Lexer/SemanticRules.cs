@@ -7,8 +7,6 @@ using System.Text;
 using QUT.Gppg;
 using PascalABCCompiler.SyntaxTree;
 using PascalABCSavParser;
-using PascalABCCompiler.ParserTools;
-using PascalABCCompiler.Errors;
 
 namespace GPPGParserScanner
 {

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 using PascalABCCompiler;
 using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SyntaxTree;
 
 namespace PascalABCCompiler.SyntaxTree
 {

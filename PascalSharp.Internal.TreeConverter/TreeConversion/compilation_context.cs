@@ -5,18 +5,24 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections;
+using PascalABCCompiler.SemanticTree;
+using PascalABCCompiler.SyntaxTree;
+using PascalABCCompiler.SystemLibrary;
 using PascalSharp.Internal.CompilerTools;
 using PascalSharp.Internal.Errors;
-using PascalSharp.Internal.TreeConverter;TreeConversion;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter
 {
-
 	public enum block_type {function_block,type_block,namespace_block,compiled_type_block, lambda_block}; //lroman//
 
     public class ContextState
     {
-        // Stack<PascalSharp.Internal.TreeConverter.SymbolTable.Scope> _scope_stack; не трогать - работать с ним аккуратно при переходе в другой Scope
+        // Stack<PascalSharp.Internal.TreeConverter.Scope> _scope_stack; не трогать - работать с ним аккуратно при переходе в другой Scope
 
         public common_namespace_node cmn; // текущий namespace
         public common_type_node ctn;      // текущий разбираемый тип
@@ -37,15 +43,15 @@ namespace PascalSharp.Internal.TreeConverter.
 		public SymbolInfo last_created_function;
     	public statement_node_stack cycles_stack;
         public int num_of_for_cycles;
-        public SemanticTree.field_access_level _fal;
+        public field_access_level _fal;
         public System.Collections.Hashtable member_decls;
         public List<common_type_node> types_predefined;
         public Stack<common_type_node> type_stack; // Для вложенных типов
         public statement_list_stack stlist_stack;
         public semantic_node ret_value; // Возвращаемое значение класса returner
         public bool WithSection;
-        public Dictionary<SymbolTable.Scope, expression_node> WithVariables;
-        public Stack<SymbolTable.Scope> WithTypes;
+        public Dictionary<Scope, expression_node> WithVariables;
+        public Stack<Scope> WithTypes;
         //LambdaHelper.Reset(); // Пока не знаю, что с этим делать
 
     }
@@ -128,7 +134,7 @@ namespace PascalSharp.Internal.TreeConverter.
 		    last_created_function = null;
     	    _cycles_stack = new statement_node_stack();
             _num_of_for_cycles = 0;
-            _fal = SemanticTree.field_access_level.fal_private;
+            _fal = field_access_level.fal_private;
             member_decls = new Hashtable();
             _types_predefined = new List<common_type_node>();
             syntax_tree_visitor.ret.return_value(null);
@@ -177,8 +183,8 @@ namespace PascalSharp.Internal.TreeConverter.
 		private common_function_node_stack _func_stack=new common_function_node_stack();
         private type_node _explicit_interface_type;
         internal bool WithSection = false;
-        internal Dictionary<SymbolTable.Scope, expression_node> WithVariables = new Dictionary<SymbolTable.Scope, expression_node>();
-        internal Stack<SymbolTable.Scope> WithTypes = new Stack<SymbolTable.Scope>();
+        internal Dictionary<Scope, expression_node> WithVariables = new Dictionary<Scope, expression_node>();
+        internal Stack<Scope> WithTypes = new Stack<Scope>();
 
         internal common_function_node_stack func_stack
         {
@@ -208,8 +214,8 @@ namespace PascalSharp.Internal.TreeConverter.
         internal List<local_variable> _special_local_vars =
             new List<local_variable>();
 
-        internal Stack<SymbolTable.Scope> _scope_stack
-            = new Stack<SymbolTable.Scope>();
+        internal Stack<Scope> _scope_stack
+            = new Stack<Scope>();
 
         internal List<type_instance_and_location> possible_incorrect_instances = new List<type_instance_and_location>();
         internal bool skip_check_where_sections = false;
@@ -246,7 +252,7 @@ namespace PascalSharp.Internal.TreeConverter.
 
         internal convertion_data_and_alghoritms convertion_data_and_alghoritms;
 
-		private SemanticTree.field_access_level _fal;
+		private field_access_level _fal;
         private bool _has_nested_functions;
         internal syntax_tree_visitor syntax_tree_visitor;
 		
@@ -305,7 +311,7 @@ namespace PascalSharp.Internal.TreeConverter.
             _last_created_function = null;
             _cycles_stack.clear();
             _num_of_for_cycles = 0;
-            _fal = SemanticTree.field_access_level.fal_private;
+            _fal = field_access_level.fal_private;
             _num_for_delegates = 0;
             rec_num = 1;
             var_defs_stack.Clear();
@@ -361,13 +367,13 @@ namespace PascalSharp.Internal.TreeConverter.
             return false;
         }
 
-        public SymbolTable.Scope CurrentScope
+        public Scope CurrentScope
         {
             get
             {
                 if (!syntax_tree_visitor.convertion_data_and_alghoritms.statement_list_stack.Empty)
                 {
-                    SymbolTable.Scope sc = syntax_tree_visitor.convertion_data_and_alghoritms.statement_list_stack.top().Scope;
+                    Scope sc = syntax_tree_visitor.convertion_data_and_alghoritms.statement_list_stack.top().Scope;
                     if (sc != null)
                     {
                         if (top_function != null && LambdaHelper.IsLambdaName(top_function.name)) //lroman
@@ -473,17 +479,17 @@ namespace PascalSharp.Internal.TreeConverter.
         {
         	if (instance.TypedSets.ContainsKey(tctn.element_type)) return instance.TypedSets[tctn.element_type];
         	instance.TypedSets.Add(tctn.element_type,tctn);
-        	tctn.add_name(compiler_string_consts.assign_name,new SymbolInfo(SystemLibrary.SystemLibrary.make_assign_operator(tctn,PascalABCCompiler.SemanticTree.basic_function_type.objassign)));
-        	tctn.scope.AddSymbol(compiler_string_consts.plus_name, SystemLibrary.SystemLibInitializer.SetUnionProcedure.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.mul_name, SystemLibrary.SystemLibInitializer.SetIntersectProcedure.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.in_name, SystemLibrary.SystemLibInitializer.InSetProcedure.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.minus_name, SystemLibrary.SystemLibInitializer.SetSubtractProcedure.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.eq_name, SystemLibrary.SystemLibInitializer.CompareSetEquals.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.noteq_name, SystemLibrary.SystemLibInitializer.CompareSetInEquals.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.sm_name, SystemLibrary.SystemLibInitializer.CompareSetLess.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.smeq_name, SystemLibrary.SystemLibInitializer.CompareSetLessEqual.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.gr_name, SystemLibrary.SystemLibInitializer.CompareSetGreater.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.greq_name, SystemLibrary.SystemLibInitializer.CompareSetGreaterEqual.SymbolInfo.First());
+        	tctn.add_name(compiler_string_consts.assign_name,new SymbolInfo(SystemLibrary.make_assign_operator(tctn,basic_function_type.objassign)));
+        	tctn.scope.AddSymbol(compiler_string_consts.plus_name, SystemLibInitializer.SetUnionProcedure.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.mul_name, SystemLibInitializer.SetIntersectProcedure.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.in_name, SystemLibInitializer.InSetProcedure.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.minus_name, SystemLibInitializer.SetSubtractProcedure.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.eq_name, SystemLibInitializer.CompareSetEquals.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.noteq_name, SystemLibInitializer.CompareSetInEquals.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.sm_name, SystemLibInitializer.CompareSetLess.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.smeq_name, SystemLibInitializer.CompareSetLessEqual.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.gr_name, SystemLibInitializer.CompareSetGreater.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.greq_name, SystemLibInitializer.CompareSetGreaterEqual.SymbolInfo.First());
             tctn.scope.AddSymbol(compiler_string_consts.plusassign_name,new SymbolInfo(make_set_plus_assign(tctn)));
             tctn.scope.AddSymbol(compiler_string_consts.minusassign_name,new SymbolInfo(make_set_minus_assign(tctn)));
             tctn.scope.AddSymbol(compiler_string_consts.multassign_name,new SymbolInfo(make_set_mult_assign(tctn)));
@@ -493,7 +499,7 @@ namespace PascalSharp.Internal.TreeConverter.
         public static void AddTypeToShortStringTypeList(type_node tn)
         {
         	instance.ShortStringTypes.Add((tn as short_string_type_node).Length,tn as short_string_type_node);
-        	tn.add_name(compiler_string_consts.plus_name,new SymbolInfo(SystemLibrary.SystemLibrary.string_add));
+        	tn.add_name(compiler_string_consts.plus_name,new SymbolInfo(SystemLibrary.string_add));
         }
         
         public void pop_top_function()
@@ -541,7 +547,7 @@ namespace PascalSharp.Internal.TreeConverter.
             clear_special_local_vars();
         }
 
-        public void enter_scope(PascalSharp.Internal.TreeConverter.SymbolTable.Scope new_scope)
+        public void enter_scope(Scope new_scope)
         {
             switch (converting_block())
             {
@@ -568,10 +574,10 @@ namespace PascalSharp.Internal.TreeConverter.
             }
         }
 
-        /*private List<PascalSharp.Internal.TreeConverter.SymbolTable.Scope> with_stack = new List<PascalSharp.Internal.TreeConverter.SymbolTable.Scope>();
+        /*private List<PascalSharp.Internal.TreeConverter.Scope> with_stack = new List<PascalSharp.Internal.TreeConverter.Scope>();
         private List<expression_node> with_expr_stack = new List<expression_node>();
 
-        public void enter_scope(PascalSharp.Internal.TreeConverter.SymbolTable.Scope new_scope, expression_node en)
+        public void enter_scope(PascalSharp.Internal.TreeConverter.Scope new_scope, expression_node en)
         {
             with_stack.Add(new_scope);
             with_expr_stack.Add(en);
@@ -615,12 +621,12 @@ namespace PascalSharp.Internal.TreeConverter.
 			}
 		}
 
-		public void set_field_access_level(SemanticTree.field_access_level fal)
+		public void set_field_access_level(field_access_level fal)
 		{
 			_fal=fal;
 		}
 
-        public SemanticTree.field_access_level get_field_access_level()
+        public field_access_level get_field_access_level()
         {
             return _fal;
         }
@@ -728,9 +734,9 @@ namespace PascalSharp.Internal.TreeConverter.
 		}
 
 		public common_namespace_node create_namespace(common_namespace_node comprehensive_namespace,string namespace_name,
-            common_unit_node cont_unit,SymbolTable.Scope _scope,location loc)
+            common_unit_node cont_unit,Scope _scope,location loc)
 		{
-            SymbolTable.Scope scope;
+            Scope scope;
             if (comprehensive_namespace == null)
             {
                 //scope = convertion_data_and_alghoritms.symbol_table.CreateScope(cont_unit.scope);
@@ -746,7 +752,7 @@ namespace PascalSharp.Internal.TreeConverter.
 			return _cmn;
 		}
 
-        public common_namespace_node create_namespace(string namespace_name, common_unit_node cont_unit,SymbolTable.Scope _scope, location loc)
+        public common_namespace_node create_namespace(string namespace_name, common_unit_node cont_unit,Scope _scope, location loc)
         {
             return create_namespace(null, namespace_name, cont_unit,_scope, loc);
         }
@@ -820,7 +826,7 @@ namespace PascalSharp.Internal.TreeConverter.
                     convertion_data_and_alghoritms.get_location(si.sym_info), loc));
             }
 
-            //if (SystemUnitAssigned && SystemLibrary.SystemLibInitializer.ShortStringType.Found && SystemLibrary.SystemLibInitializer.ShortStringType.Equal(si))
+            //if (SystemUnitAssigned && SystemLibInitializer.ShortStringType.Found && SystemLibInitializer.ShortStringType.Equal(si))
             //    return context.create_short_string_type(SemanticRules.ShortStringDefaultLength, loc);
 
             return si.sym_info;
@@ -1018,12 +1024,12 @@ namespace PascalSharp.Internal.TreeConverter.
         	SymbolInfo si = _ctn.find_first_in_type(compiler_string_consts.noteq_name);
         	if (si.sym_info is common_method_node)
         		return;
-        	SymbolTable.ClassMethodScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(_cmn.scope,_ctn.scope);
-        	common_method_node cmn = new common_method_node(compiler_string_consts.GetNETOperName(compiler_string_consts.noteq_name),SystemLibrary.SystemLibrary.bool_type,null,_ctn,
-        	                                                SemanticTree.polymorphic_state.ps_static,SemanticTree.field_access_level.fal_public,scope);
+        	ClassMethodScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(_cmn.scope,_ctn.scope);
+        	common_method_node cmn = new common_method_node(compiler_string_consts.GetNETOperName(compiler_string_consts.noteq_name),SystemLibrary.bool_type,null,_ctn,
+        	                                                polymorphic_state.ps_static,field_access_level.fal_public,scope);
         	cmn.IsOperator = true;
-        	common_parameter prm1 = new common_parameter("a",_ctn,SemanticTree.parameter_type.value,cmn,concrete_parameter_type.cpt_none,null,null);
-        	common_parameter prm2 = new common_parameter("b",_ctn,SemanticTree.parameter_type.value,cmn,concrete_parameter_type.cpt_none,null,null);
+        	common_parameter prm1 = new common_parameter("a",_ctn,parameter_type.value,cmn,concrete_parameter_type.cpt_none,null,null);
+        	common_parameter prm2 = new common_parameter("b",_ctn,parameter_type.value,cmn,concrete_parameter_type.cpt_none,null,null);
         	cmn.parameters.AddElement(prm1);
         	cmn.parameters.AddElement(prm2);
         	statements_list body = new statements_list(null);
@@ -1031,9 +1037,9 @@ namespace PascalSharp.Internal.TreeConverter.
         	{
         		expression_node left = new class_field_reference(cf,new common_parameter_reference(prm1,0,null),null);
         		expression_node right = new class_field_reference(cf,new common_parameter_reference(prm2,0,null),null);
-        		expression_node cond = SystemLibrary.SystemLibrary.syn_visitor.find_operator(compiler_string_consts.noteq_name,
+        		expression_node cond = SystemLibrary.syn_visitor.find_operator(compiler_string_consts.noteq_name,
         		                                                                            left,right,null);
-        		//basic_function_call bfc = new basic_function_call(SystemLibrary.SystemLibrary.bool_not as basic_function_node,null);
+        		//basic_function_call bfc = new basic_function_call(SystemLibrary.bool_not as basic_function_node,null);
         		//bfc.parameters.AddElement(cond);
         		if_node if_stmt = new if_node(cond,new return_node(new bool_const_node(true,null),null),null,null);
         		body.statements.AddElement(if_stmt);
@@ -1050,12 +1056,12 @@ namespace PascalSharp.Internal.TreeConverter.
         	SymbolInfo si = _ctn.find_first_in_type(compiler_string_consts.eq_name);
         	if (si.sym_info is common_method_node)
         		return;
-        	SymbolTable.ClassMethodScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(_cmn.scope,_ctn.scope);
-        	common_method_node cmn = new common_method_node(compiler_string_consts.GetNETOperName(compiler_string_consts.eq_name),SystemLibrary.SystemLibrary.bool_type,null,_ctn,
-        	                                                SemanticTree.polymorphic_state.ps_static,SemanticTree.field_access_level.fal_public,scope);
+        	ClassMethodScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(_cmn.scope,_ctn.scope);
+        	common_method_node cmn = new common_method_node(compiler_string_consts.GetNETOperName(compiler_string_consts.eq_name),SystemLibrary.bool_type,null,_ctn,
+        	                                                polymorphic_state.ps_static,field_access_level.fal_public,scope);
         	cmn.IsOperator = true;
-        	common_parameter prm1 = new common_parameter("a",_ctn,SemanticTree.parameter_type.value,cmn,concrete_parameter_type.cpt_none,null,null);
-        	common_parameter prm2 = new common_parameter("b",_ctn,SemanticTree.parameter_type.value,cmn,concrete_parameter_type.cpt_none,null,null);
+        	common_parameter prm1 = new common_parameter("a",_ctn,parameter_type.value,cmn,concrete_parameter_type.cpt_none,null,null);
+        	common_parameter prm2 = new common_parameter("b",_ctn,parameter_type.value,cmn,concrete_parameter_type.cpt_none,null,null);
         	cmn.parameters.AddElement(prm1);
         	cmn.parameters.AddElement(prm2);
         	statements_list body = new statements_list(null);
@@ -1063,9 +1069,9 @@ namespace PascalSharp.Internal.TreeConverter.
         	{
         		expression_node left = new class_field_reference(cf,new common_parameter_reference(prm1,0,null),null);
         		expression_node right = new class_field_reference(cf,new common_parameter_reference(prm2,0,null),null);
-        		expression_node cond = SystemLibrary.SystemLibrary.syn_visitor.find_operator(compiler_string_consts.eq_name,
+        		expression_node cond = SystemLibrary.syn_visitor.find_operator(compiler_string_consts.eq_name,
         		                                                                            left,right,null);
-        		basic_function_call bfc = new basic_function_call(SystemLibrary.SystemLibrary.bool_not as basic_function_node,null);
+        		basic_function_call bfc = new basic_function_call(SystemLibrary.bool_not as basic_function_node,null);
         		bfc.parameters.AddElement(cond);
         		if_node if_stmt = new if_node(bfc,new return_node(new bool_const_node(false,null),null),null,null);
         		body.statements.AddElement(if_stmt);
@@ -1106,7 +1112,7 @@ namespace PascalSharp.Internal.TreeConverter.
         
 		public void create_lambda() //lroman//
         {
-            SymbolTable.Scope scope = convertion_data_and_alghoritms.symbol_table.CreateLambdaScope(CurrentScope);
+            Scope scope = convertion_data_and_alghoritms.symbol_table.CreateLambdaScope(CurrentScope);
             lambda_node new_lambda = new lambda_node(scope);
             LambdaHelper.CurrentLambdaScopeNum = new_lambda.scope.ScopeNum;
         }
@@ -1148,7 +1154,7 @@ namespace PascalSharp.Internal.TreeConverter.
         }
 
         //lroman//
-        public common_function_node create_lambda_function(string name, location def_loc, bool add_symbol_info, SymbolTable.Scope topScope)
+        public common_function_node create_lambda_function(string name, location def_loc, bool add_symbol_info, Scope topScope)
         {
             var func_stack_as_array = _func_stack.CloneInternalStack().ToList();
 
@@ -1167,10 +1173,10 @@ namespace PascalSharp.Internal.TreeConverter.
             if (_ctn != null)
             {
                 common_method_node cmmn;
-                SymbolTable.Scope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(topScope, _ctn.Scope);
+                Scope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(topScope, _ctn.Scope);
                 //TODO:сделать static и virtual.
                 //TODO: interface and implementation scopes.
-                cmmn = new common_method_node(name, def_loc, _ctn, SemanticTree.polymorphic_state.ps_common, _fal, scope);
+                cmmn = new common_method_node(name, def_loc, _ctn, polymorphic_state.ps_common, _fal, scope);
 
                 _last_created_function = new SymbolInfo(cmmn);
                 if (add_symbol_info)
@@ -1182,7 +1188,7 @@ namespace PascalSharp.Internal.TreeConverter.
             else
             {
                 common_namespace_function_node cnfnn;
-                SymbolTable.Scope scope = convertion_data_and_alghoritms.symbol_table.CreateScope(topScope);
+                Scope scope = convertion_data_and_alghoritms.symbol_table.CreateScope(topScope);
                 cnfnn = new common_namespace_function_node(name, def_loc, _cmn, scope);
                 _cmn.functions.AddElement(cnfnn);
                 _last_created_function = new SymbolInfo(cnfnn);
@@ -1213,7 +1219,7 @@ namespace PascalSharp.Internal.TreeConverter.
 				case block_type.function_block:
 				{
                     common_function_node top_func = _func_stack.top();
-                    SymbolTable.Scope scope = convertion_data_and_alghoritms.symbol_table.CreateScope(top_func.scope);
+                    Scope scope = convertion_data_and_alghoritms.symbol_table.CreateScope(top_func.scope);
 					common_in_function_function_node ciffn =new common_in_function_function_node(name,def_loc,top_func,scope);
 					top_func.functions_nodes_list.AddElement(ciffn);
                     _last_created_function = new SymbolInfo(ciffn);
@@ -1227,10 +1233,10 @@ namespace PascalSharp.Internal.TreeConverter.
                     if (!extension_method)
                     {
                         common_method_node cmmn;
-                        SymbolTable.Scope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(_cmn.scope, _ctn.Scope);
+                        Scope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(_cmn.scope, _ctn.Scope);
                         //TODO:сделать static и virtual.
                         //TODO: interface and implementation scopes.
-                        cmmn = new common_method_node(name, def_loc, _ctn, SemanticTree.polymorphic_state.ps_common, _fal, scope);
+                        cmmn = new common_method_node(name, def_loc, _ctn, polymorphic_state.ps_common, _fal, scope);
 
                         _last_created_function = new SymbolInfo(cmmn);
                         if (add_symbol_info)
@@ -1242,7 +1248,7 @@ namespace PascalSharp.Internal.TreeConverter.
                     else
                     {
                         common_namespace_function_node cnfnn;
-                        SymbolTable.Scope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(_cmn.scope, _ctn.scope);
+                        Scope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(_cmn.scope, _ctn.scope);
                         cnfnn = new common_namespace_function_node(name, def_loc, _cmn, scope);
                         //_cmn.functions.AddElement(cnfnn);
                         syntax_tree_visitor.compiled_unit.namespaces[0].functions.AddElement(cnfnn);
@@ -1258,7 +1264,7 @@ namespace PascalSharp.Internal.TreeConverter.
                 {
                     //string cname = compiler_string_consts.GetConnectedFunctionName(_compiled_tn.name, name);
                     common_namespace_function_node cnfnn;
-                    SymbolTable.Scope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(_cmn.scope, _compiled_tn.scope);
+                    Scope scope = convertion_data_and_alghoritms.symbol_table.CreateClassMethodScope(_cmn.scope, _compiled_tn.scope);
                     cnfnn = new common_namespace_function_node(name, def_loc, _cmn, scope);
                     //_cmn.functions.AddElement(cnfnn);
                     syntax_tree_visitor.compiled_unit.namespaces[0].functions.AddElement(cnfnn);
@@ -1275,7 +1281,7 @@ namespace PascalSharp.Internal.TreeConverter.
 				case block_type.namespace_block:
 				{
 					common_namespace_function_node cnfnn;
-                    SymbolTable.Scope scope = convertion_data_and_alghoritms.symbol_table.CreateScope(_cmn.scope);
+                    Scope scope = convertion_data_and_alghoritms.symbol_table.CreateScope(_cmn.scope);
 					cnfnn=new common_namespace_function_node(name,def_loc,_cmn,scope);
 					_cmn.functions.AddElement(cnfnn);
 					_last_created_function= new SymbolInfo(cnfnn);
@@ -1304,7 +1310,7 @@ namespace PascalSharp.Internal.TreeConverter.
             {
                 AddError(new ClassCanNotBeDefinedInTypeOrFunction(name, def_loc));
             }
-            SymbolTable.ClassScope scope;
+            ClassScope scope;
             //(ssyy) Если создаётся интерфейс, то создаём ему специальный вид области видимости
             if (type_is_interface)
             {
@@ -1314,7 +1320,7 @@ namespace PascalSharp.Internal.TreeConverter.
             {
                 scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(_cmn.scope, null);
             }
-			common_type_node tctn=new common_type_node(name,SemanticTree.type_access_level.tal_public,_cmn,
+			common_type_node tctn=new common_type_node(name,type_access_level.tal_public,_cmn,
                 scope,def_loc);
             tctn.IsPartial = is_partial;
             if (partial_class != null)
@@ -1322,13 +1328,13 @@ namespace PascalSharp.Internal.TreeConverter.
                 tctn.scope.PartialScope = partial_class.scope;
                 tctn.Merge(partial_class);
             }
-			set_field_access_level(SemanticTree.field_access_level.fal_public);
+			set_field_access_level(field_access_level.fal_public);
 			_cmn.scope.AddSymbol(name,new SymbolInfo(tctn));
             tctn.IsInterface = type_is_interface;
 
 			//_cmn.types.AddElement(tctn);
 			_ctn=tctn;
-			SystemLibrary.SystemLibrary.init_reference_type(tctn);
+			SystemLibrary.init_reference_type(tctn);
 			return tctn;
 		}
 
@@ -1338,14 +1344,14 @@ namespace PascalSharp.Internal.TreeConverter.
             while (_cmn.scope.Find(string.Format(nameTemplate, n)) != null)
                 n++;
             string name = string.Format(nameTemplate, n);
-            SymbolTable.ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(_cmn.scope, null);
-            common_type_node tctn = new common_type_node(name, SemanticTree.type_access_level.tal_internal, _cmn,
+            ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(_cmn.scope, null);
+            common_type_node tctn = new common_type_node(name, type_access_level.tal_internal, _cmn,
                 scope, def_loc);
             _cmn.scope.AddSymbol(name, new SymbolInfo(tctn));
             tctn.IsInterface = false;
             _cmn.types.AddElement(tctn);
             _ctn = tctn;
-            SystemLibrary.SystemLibrary.init_reference_type(tctn);
+            SystemLibrary.init_reference_type(tctn);
             return tctn;
         }
 		
@@ -1372,20 +1378,20 @@ namespace PascalSharp.Internal.TreeConverter.
             if (TypedFiles.ContainsKey(elem_type))
                 return TypedFiles[elem_type];
             string name = compiler_string_consts.GetTypedFileTypeName(elem_type.name);
-            type_node base_type = SystemLibrary.SystemLibInitializer.TypedFileType.sym_info as type_node;
+            type_node base_type = SystemLibInitializer.TypedFileType.sym_info as type_node;
             //check_name_free(name, def_loc);
-            SymbolTable.ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(_cmn.scope, null);
-            common_type_node tctn = new common_type_node(name, SemanticTree.type_access_level.tal_public, _cmn,
+            ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(_cmn.scope, null);
+            common_type_node tctn = new common_type_node(name, type_access_level.tal_public, _cmn,
                 scope, def_loc);
-            set_field_access_level(SemanticTree.field_access_level.fal_public);
+            set_field_access_level(field_access_level.fal_public);
             _cmn.scope.AddSymbol(name, new SymbolInfo(tctn));
-            tctn.type_special_kind = SemanticTree.type_special_kind.typed_file;
+            tctn.type_special_kind = type_special_kind.typed_file;
             tctn.element_type = elem_type;
             tctn.internal_is_value = base_type.is_value;
             tctn.is_class = base_type.is_class;
             tctn.SetBaseType(base_type);
             //_ctn = tctn;
-            SystemLibrary.SystemLibrary.init_reference_type(tctn);
+            SystemLibrary.init_reference_type(tctn);
             converted_namespace.types.AddElement(tctn);
             TypedFiles.Add(elem_type, tctn);
             return tctn;
@@ -1396,30 +1402,30 @@ namespace PascalSharp.Internal.TreeConverter.
         	if (TypedSets.ContainsKey(elem_type))
                 return TypedSets[elem_type];
             string name = compiler_string_consts.GetSetTypeName(elem_type.name);
-            type_node base_type = SystemLibrary.SystemLibInitializer.TypedSetType.sym_info as type_node;
+            type_node base_type = SystemLibInitializer.TypedSetType.sym_info as type_node;
             //check_name_free(name, def_loc);
-            SymbolTable.ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(_cmn.scope, null);
-            common_type_node tctn = new common_type_node(name, SemanticTree.type_access_level.tal_public, _cmn,
+            ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(_cmn.scope, null);
+            common_type_node tctn = new common_type_node(name, type_access_level.tal_public, _cmn,
                 scope, def_loc);
-            set_field_access_level(SemanticTree.field_access_level.fal_public);
+            set_field_access_level(field_access_level.fal_public);
             _cmn.scope.AddSymbol(name, new SymbolInfo(tctn));
-            tctn.type_special_kind = SemanticTree.type_special_kind.set_type;
+            tctn.type_special_kind = type_special_kind.set_type;
             tctn.element_type = elem_type;
             tctn.internal_is_value = base_type.is_value;
             tctn.is_class = base_type.is_class;
             tctn.SetBaseType(base_type);
-            tctn.add_name(compiler_string_consts.assign_name,new SymbolInfo(SystemLibrary.SystemLibrary.make_assign_operator(tctn,PascalABCCompiler.SemanticTree.basic_function_type.objassign)));
-            tctn.ImplementingInterfaces.Add(compiled_type_node.get_type_node(NetHelper.NetHelper.FindType(compiler_string_consts.IEnumerableInterfaceName)));
-            tctn.scope.AddSymbol(compiler_string_consts.plus_name, SystemLibrary.SystemLibInitializer.SetUnionProcedure.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.mul_name, SystemLibrary.SystemLibInitializer.SetIntersectProcedure.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.in_name, SystemLibrary.SystemLibInitializer.InSetProcedure.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.minus_name, SystemLibrary.SystemLibInitializer.SetSubtractProcedure.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.eq_name, SystemLibrary.SystemLibInitializer.CompareSetEquals.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.noteq_name, SystemLibrary.SystemLibInitializer.CompareSetInEquals.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.sm_name, SystemLibrary.SystemLibInitializer.CompareSetLess.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.smeq_name, SystemLibrary.SystemLibInitializer.CompareSetLessEqual.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.gr_name, SystemLibrary.SystemLibInitializer.CompareSetGreater.SymbolInfo.First());
-            tctn.scope.AddSymbol(compiler_string_consts.greq_name, SystemLibrary.SystemLibInitializer.CompareSetGreaterEqual.SymbolInfo.First());
+            tctn.add_name(compiler_string_consts.assign_name,new SymbolInfo(SystemLibrary.make_assign_operator(tctn,basic_function_type.objassign)));
+            tctn.ImplementingInterfaces.Add(compiled_type_node.get_type_node(NetHelper.FindType(compiler_string_consts.IEnumerableInterfaceName)));
+            tctn.scope.AddSymbol(compiler_string_consts.plus_name, SystemLibInitializer.SetUnionProcedure.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.mul_name, SystemLibInitializer.SetIntersectProcedure.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.in_name, SystemLibInitializer.InSetProcedure.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.minus_name, SystemLibInitializer.SetSubtractProcedure.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.eq_name, SystemLibInitializer.CompareSetEquals.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.noteq_name, SystemLibInitializer.CompareSetInEquals.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.sm_name, SystemLibInitializer.CompareSetLess.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.smeq_name, SystemLibInitializer.CompareSetLessEqual.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.gr_name, SystemLibInitializer.CompareSetGreater.SymbolInfo.First());
+            tctn.scope.AddSymbol(compiler_string_consts.greq_name, SystemLibInitializer.CompareSetGreaterEqual.SymbolInfo.First());
             tctn.scope.AddSymbol(compiler_string_consts.plusassign_name,new SymbolInfo(make_set_plus_assign(tctn)));
             tctn.scope.AddSymbol(compiler_string_consts.minusassign_name,new SymbolInfo(make_set_minus_assign(tctn)));
             tctn.scope.AddSymbol(compiler_string_consts.multassign_name,new SymbolInfo(make_set_mult_assign(tctn)));
@@ -1430,32 +1436,32 @@ namespace PascalSharp.Internal.TreeConverter.
 		
         private static basic_function_node make_set_plus_assign(common_type_node ctn)
         {
-        	//basic_function_node bfn = new basic_function_node(SemanticTree.basic_function_type.objassign,ctn,false);
-        	basic_function_node bfn = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.plusassign_name,ctn,SemanticTree.basic_function_type.objassign);
-        	bfn.compile_time_executor = SystemLibrary.static_executors.set_plusassign_executor;
+        	//basic_function_node bfn = new basic_function_node(basic_function_type.objassign,ctn,false);
+        	basic_function_node bfn = SystemLibrary.make_binary_operator(compiler_string_consts.plusassign_name,ctn,basic_function_type.objassign);
+        	bfn.compile_time_executor = static_executors.set_plusassign_executor;
         	return bfn;
         }
         
         private static basic_function_node make_set_minus_assign(common_type_node ctn)
         {
-        	//basic_function_node bfn = new basic_function_node(SemanticTree.basic_function_type.objassign,ctn,false);
-        	basic_function_node bfn = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.minusassign_name,ctn,SemanticTree.basic_function_type.objassign);
-        	bfn.compile_time_executor = SystemLibrary.static_executors.set_subassign_executor;
+        	//basic_function_node bfn = new basic_function_node(basic_function_type.objassign,ctn,false);
+        	basic_function_node bfn = SystemLibrary.make_binary_operator(compiler_string_consts.minusassign_name,ctn,basic_function_type.objassign);
+        	bfn.compile_time_executor = static_executors.set_subassign_executor;
         	return bfn;
         }
         
         private static basic_function_node make_set_mult_assign(common_type_node ctn)
         {
-        	//basic_function_node bfn = new basic_function_node(SemanticTree.basic_function_type.objassign,ctn,false);
-        	basic_function_node bfn = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.multassign_name,ctn,SemanticTree.basic_function_type.objassign);
-        	bfn.compile_time_executor = SystemLibrary.static_executors.set_multassign_executor;
+        	//basic_function_node bfn = new basic_function_node(basic_function_type.objassign,ctn,false);
+        	basic_function_node bfn = SystemLibrary.make_binary_operator(compiler_string_consts.multassign_name,ctn,basic_function_type.objassign);
+        	bfn.compile_time_executor = static_executors.set_multassign_executor;
         	return bfn;
         }
         
         private static basic_function_node make_short_string_plus_assign(short_string_type_node ctn)
         {
-        	basic_function_node bfn = SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.plusassign_name,ctn,SemanticTree.basic_function_type.objassign);
-        	bfn.compile_time_executor = SystemLibrary.static_executors.short_string_addassign_executor;
+        	basic_function_node bfn = SystemLibrary.make_binary_operator(compiler_string_consts.plusassign_name,ctn,basic_function_type.objassign);
+        	bfn.compile_time_executor = static_executors.short_string_addassign_executor;
         	return bfn;
         }
 
@@ -1466,7 +1472,7 @@ namespace PascalSharp.Internal.TreeConverter.
             if (compiled_tc_cache.TryGetValue(converted_namespace, out tc_dict) && tc_dict.TryGetValue(name, out tc))
                 return tc;
 
-            SyntaxTree.SyntaxTreeStreamReader str = new SyntaxTree.SyntaxTreeStreamReader();
+            SyntaxTreeStreamReader str = new SyntaxTreeStreamReader();
             str.br = new System.IO.BinaryReader(new System.IO.MemoryStream(tree));
             SyntaxTree.type_declaration t_d = str._read_node() as SyntaxTree.type_declaration;
             tc = new template_class(t_d, name, converted_namespace, null, new using_namespace_list());
@@ -1484,15 +1490,15 @@ namespace PascalSharp.Internal.TreeConverter.
         {
             if (ShortStringTypes.ContainsKey(length))
                 return ShortStringTypes[length];
-            SymbolTable.ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(null, SystemLibrary.SystemLibrary.string_type.Scope);
-            short_string_type_node tctn = new short_string_type_node(//SemanticTree.type_access_level.tal_public, _cmn,
+            ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(null, SystemLibrary.string_type.Scope);
+            short_string_type_node tctn = new short_string_type_node(//type_access_level.tal_public, _cmn,
                 scope, def_loc, length);
-            tctn.add_name(compiler_string_consts.assign_name,new SymbolInfo(SystemLibrary.SystemLibrary.make_assign_operator(tctn,PascalABCCompiler.SemanticTree.basic_function_type.objassign)));
-            tctn.add_name(compiler_string_consts.plus_name,new SymbolInfo(SystemLibrary.SystemLibrary.string_add));
+            tctn.add_name(compiler_string_consts.assign_name,new SymbolInfo(SystemLibrary.make_assign_operator(tctn,basic_function_type.objassign)));
+            tctn.add_name(compiler_string_consts.plus_name,new SymbolInfo(SystemLibrary.string_add));
             tctn.scope.AddSymbol(compiler_string_consts.plusassign_name,new SymbolInfo(make_short_string_plus_assign(tctn)));
             type_intersection_node inter = new type_intersection_node(type_compare.greater_type);
-            inter.another_to_this = new type_conversion(SystemLibrary.SystemLibrary.char_to_string);
-            tctn.add_intersection_node(SystemLibrary.SystemLibrary.char_type, inter,false);
+            inter.another_to_this = new type_conversion(SystemLibrary.char_to_string);
+            tctn.add_intersection_node(SystemLibrary.char_type, inter,false);
             ShortStringTypes.Add(length, tctn);
             return tctn;
         }
@@ -1502,20 +1508,20 @@ namespace PascalSharp.Internal.TreeConverter.
 
         public common_type_node create_record_type(location def_loc, string name)
         {
-            SymbolTable.ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(_cmn.scope, null);
+            ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(_cmn.scope, null);
             if (name == null)
                 name = "$record$" + rec_num++;
-            common_type_node tctn = new common_type_node(name, SemanticTree.type_access_level.tal_public, _cmn,
+            common_type_node tctn = new common_type_node(name, type_access_level.tal_public, _cmn,
                 scope, def_loc);
             if (top_function != null)
                 tctn.defined_in_scope = top_function.scope;
-            set_field_access_level(SemanticTree.field_access_level.fal_public);
+            set_field_access_level(field_access_level.fal_public);
             tctn.SetBaseType(SemanticRules.StructBaseType);
             if (_ctn != null) type_stack.Push(_ctn);
             add_type(name, tctn, def_loc);
             _ctn = tctn;
-            tctn.type_special_kind = SemanticTree.type_special_kind.record;
-            SystemLibrary.SystemLibrary.init_reference_type(tctn);
+            tctn.type_special_kind = type_special_kind.record;
+            SystemLibrary.init_reference_type(tctn);
             tctn.internal_is_value = true;
             return tctn;
 
@@ -1566,16 +1572,16 @@ namespace PascalSharp.Internal.TreeConverter.
 
         public var_definition_node add_var_definition(string name, location loc)
         {
-            return add_var_definition(name, loc, SemanticTree.polymorphic_state.ps_common);
+            return add_var_definition(name, loc, polymorphic_state.ps_common);
         }
-        public var_definition_node add_var_definition(string name, location loc, SemanticTree.polymorphic_state ps)
+        public var_definition_node add_var_definition(string name, location loc, polymorphic_state ps)
         {
             return add_var_definition(name, loc, null, ps);
         }
         
         public var_definition_node add_var_definition(string name, location loc, type_node tn, expression_node inital_value)
         {
-            var_definition_node vdn = add_var_definition(name, loc, tn, SemanticTree.polymorphic_state.ps_common);
+            var_definition_node vdn = add_var_definition(name, loc, tn, polymorphic_state.ps_common);
             vdn.inital_value = GetInitalValueForVariable(vdn, inital_value);
             return vdn;
         }
@@ -1596,7 +1602,7 @@ namespace PascalSharp.Internal.TreeConverter.
             common_namespace_event cne = new common_namespace_event(name, tn, converted_namespace, null, null, null, loc);
             common_namespace_function_node add_func = new common_namespace_function_node(compiler_string_consts.GetAddHandler(name),
                 null, this.converted_namespace, null);
-            common_parameter cp = new common_parameter("value", tn, SemanticTree.parameter_type.value, add_func, concrete_parameter_type.cpt_none, null, null);
+            common_parameter cp = new common_parameter("value", tn, parameter_type.value, add_func, concrete_parameter_type.cpt_none, null, null);
             add_func.parameters.AddElement(cp);
             expression_node fld_ref = null;
             fld_ref = new namespace_variable_reference(nv, null);
@@ -1609,7 +1615,7 @@ namespace PascalSharp.Internal.TreeConverter.
             //remove
             common_namespace_function_node remove_func = new common_namespace_function_node(compiler_string_consts.GetRemoveHandler(name), null, this.converted_namespace, null);
 
-            cp = new common_parameter("value", tn, SemanticTree.parameter_type.value, add_func, concrete_parameter_type.cpt_none, null, null);
+            cp = new common_parameter("value", tn, parameter_type.value, add_func, concrete_parameter_type.cpt_none, null, null);
             remove_func.parameters.AddElement(cp);
             en = this.syntax_tree_visitor.convertion_data_and_alghoritms.type_constructor.delegate_sub_assign_compile_time_executor
                 (null, new expression_node[2] { fld_ref, new common_parameter_reference(cp, 0, null) });
@@ -1628,14 +1634,14 @@ namespace PascalSharp.Internal.TreeConverter.
             return cne;
         }
 
-        public common_event add_event_definition(string name, location loc, type_node tn, SemanticTree.polymorphic_state ps, bool is_abstract)
+        public common_event add_event_definition(string name, location loc, type_node tn, polymorphic_state ps, bool is_abstract)
         {
             class_field cf = new class_field(name + "$", tn, converted_type, ps, _fal, loc);
             common_event ce = new common_event(name, tn, converted_type, null, null, null, _fal, ps, loc);
             //add
             common_method_node add_meth = new common_method_node(compiler_string_consts.GetAddHandler(name), null, this.converted_type,
-                                                                 ps, SemanticTree.field_access_level.fal_public, null);
-            common_parameter cp = new common_parameter("value", tn, SemanticTree.parameter_type.value, add_meth, concrete_parameter_type.cpt_none, null, null);
+                                                                 ps, field_access_level.fal_public, null);
+            common_parameter cp = new common_parameter("value", tn, parameter_type.value, add_meth, concrete_parameter_type.cpt_none, null, null);
             add_meth.parameters.AddElement(cp);
             expression_node fld_ref = null;
             if (!cf.IsStatic) fld_ref = new class_field_reference(cf, new this_node(converted_type, null), null);
@@ -1651,9 +1657,9 @@ namespace PascalSharp.Internal.TreeConverter.
             converted_type.scope.AddSymbol(add_meth.name, new SymbolInfo(add_meth));
             //remove
             common_method_node remove_meth = new common_method_node(compiler_string_consts.GetRemoveHandler(name), null, this.converted_type,
-                                                                 ps, SemanticTree.field_access_level.fal_public, null);
+                                                                 ps, field_access_level.fal_public, null);
 
-            cp = new common_parameter("value", tn, SemanticTree.parameter_type.value, add_meth, concrete_parameter_type.cpt_none, null, null);
+            cp = new common_parameter("value", tn, parameter_type.value, add_meth, concrete_parameter_type.cpt_none, null, null);
             remove_meth.parameters.AddElement(cp);
             en = this.syntax_tree_visitor.convertion_data_and_alghoritms.type_constructor.delegate_sub_assign_compile_time_executor
                 (null, new expression_node[2] { fld_ref, new common_parameter_reference(cp, 0, null) });
@@ -1677,7 +1683,7 @@ namespace PascalSharp.Internal.TreeConverter.
         
         public bool check_name_redefinition = true;
 
-        public var_definition_node add_field(string name, location loc, type_node tn, SemanticTree.polymorphic_state ps)
+        public var_definition_node add_field(string name, location loc, type_node tn, polymorphic_state ps)
         {
             class_field cf = new class_field(name, tn, _ctn, ps, _fal, loc);
             //_ctn.Scope.AddSymbol(name,new SymbolInfo(cf));
@@ -1686,18 +1692,18 @@ namespace PascalSharp.Internal.TreeConverter.
             return cf;
         }
 
-		public var_definition_node add_var_definition(string name, location loc, type_node tn, SemanticTree.polymorphic_state ps, bool not_add_to_varlist=false)
+		public var_definition_node add_var_definition(string name, location loc, type_node tn, polymorphic_state ps, bool not_add_to_varlist=false)
 		{
 			check_name_free(name,loc);
 			var_definition_node vdn=null;
-            if (CurrentScope is SymbolTable.BlockScope)
+            if (CurrentScope is BlockScope)
             {
                 if (SemanticRules.DisabledDefinitionBlockVariablesWithSameNameThatInAboveScope)
                 {
-                    SymbolTable.Scope cs = CurrentScope;
-                    while (cs.TopScope != null /*(cs.TopScope is SymbolTable.BlockScope || cs.TopScope is SymbolTable.UnitPartScope)*/)
+                    Scope cs = CurrentScope;
+                    while (cs.TopScope != null /*(cs.TopScope is BlockScope || cs.TopScope is UnitPartScope)*/)
                     {
-                    	if (cs.TopScope is SymbolTable.BlockScope)//projdemsja po blokam koda
+                    	if (cs.TopScope is BlockScope)//projdemsja po blokam koda
                     	{
                     		if (cs.TopScope.FindOnlyInScope(name) != null)
                                 syntax_tree_visitor.AddError(loc, "BLOCK_VARIABLES_CANNOT_HAVE_NAMES_UPPER_SCOPE");
@@ -1849,7 +1855,7 @@ namespace PascalSharp.Internal.TreeConverter.
 			num_of_for_cycles=num_of_for_cycles+1;
 			string name=compiler_string_consts.temp_for_variable_name+num_of_for_cycles.ToString();
 			//return create_temp_variable(name,type,loc);
-            return add_var_definition(name, loc, type,  SemanticTree.polymorphic_state.ps_common);
+            return add_var_definition(name, loc, type,  polymorphic_state.ps_common);
 		}
 
 		public var_definition_node create_temp_variable(string name,type_node type,location loc)
@@ -1868,7 +1874,7 @@ namespace PascalSharp.Internal.TreeConverter.
 				case block_type.type_block:
 				{
                     //TODO:сделать static и virtual.
-					class_field cf=new class_field(name,type,_ctn,SemanticTree.polymorphic_state.ps_common,_fal,loc);
+					class_field cf=new class_field(name,type,_ctn,polymorphic_state.ps_common,_fal,loc);
 					vdn=cf;
 					_ctn.fields.AddElement(cf);
 					break;
@@ -1884,7 +1890,7 @@ namespace PascalSharp.Internal.TreeConverter.
 			return vdn;
 		}
 
-		public common_parameter add_parameter(string name,SemanticTree.parameter_type pt,
+		public common_parameter add_parameter(string name,parameter_type pt,
 			concrete_parameter_type cpt,location loc)
 		{
 			check_name_free(name,loc);
@@ -1940,49 +1946,49 @@ namespace PascalSharp.Internal.TreeConverter.
 		
 		public static void add_convertions_to_enum_type(common_type_node tctn)
 		{
-			SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.gr_name,tctn,SemanticTree.basic_function_type.enumgr,SystemLibrary.SystemLibrary.bool_type);
-            SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.greq_name,tctn,SemanticTree.basic_function_type.enumgreq,SystemLibrary.SystemLibrary.bool_type);
-            SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.sm_name,tctn,SemanticTree.basic_function_type.enumsm,SystemLibrary.SystemLibrary.bool_type);
-            SystemLibrary.SystemLibrary.make_binary_operator(compiler_string_consts.smeq_name,tctn,SemanticTree.basic_function_type.enumsmeq,SystemLibrary.SystemLibrary.bool_type);
+			SystemLibrary.make_binary_operator(compiler_string_consts.gr_name,tctn,basic_function_type.enumgr,SystemLibrary.bool_type);
+            SystemLibrary.make_binary_operator(compiler_string_consts.greq_name,tctn,basic_function_type.enumgreq,SystemLibrary.bool_type);
+            SystemLibrary.make_binary_operator(compiler_string_consts.sm_name,tctn,basic_function_type.enumsm,SystemLibrary.bool_type);
+            SystemLibrary.make_binary_operator(compiler_string_consts.smeq_name,tctn,basic_function_type.enumsmeq,SystemLibrary.bool_type);
             
-			SystemLibrary.SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.SystemLibrary.byte_type,type_compare.greater_type,PascalABCCompiler.SemanticTree.basic_function_type.itob,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.SystemLibrary.sbyte_type,type_compare.greater_type,PascalABCCompiler.SemanticTree.basic_function_type.itosb,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.SystemLibrary.short_type,type_compare.greater_type,PascalABCCompiler.SemanticTree.basic_function_type.itos,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.SystemLibrary.ushort_type,type_compare.greater_type,PascalABCCompiler.SemanticTree.basic_function_type.itous,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.SystemLibrary.integer_type,type_compare.less_type,PascalABCCompiler.SemanticTree.basic_function_type.none,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.SystemLibrary.uint_type,type_compare.less_type,PascalABCCompiler.SemanticTree.basic_function_type.itoui,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.SystemLibrary.int64_type,type_compare.less_type,PascalABCCompiler.SemanticTree.basic_function_type.itol,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.SystemLibrary.uint64_type,type_compare.less_type,PascalABCCompiler.SemanticTree.basic_function_type.itoul,false);
+			SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.byte_type,type_compare.greater_type,basic_function_type.itob,false);
+            SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.sbyte_type,type_compare.greater_type,basic_function_type.itosb,false);
+            SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.short_type,type_compare.greater_type,basic_function_type.itos,false);
+            SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.ushort_type,type_compare.greater_type,basic_function_type.itous,false);
+            SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.integer_type,type_compare.less_type,basic_function_type.none,false);
+            SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.uint_type,type_compare.less_type,basic_function_type.itoui,false);
+            SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.int64_type,type_compare.less_type,basic_function_type.itol,false);
+            SystemLibrary.make_generated_type_conversion(tctn,SystemLibrary.uint64_type,type_compare.less_type,basic_function_type.itoul,false);
             
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(SystemLibrary.SystemLibrary.byte_type,tctn,type_compare.less_type,PascalABCCompiler.SemanticTree.basic_function_type.btoi,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(SystemLibrary.SystemLibrary.sbyte_type,tctn,type_compare.less_type,PascalABCCompiler.SemanticTree.basic_function_type.sbtoi,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(SystemLibrary.SystemLibrary.short_type,tctn,type_compare.less_type,PascalABCCompiler.SemanticTree.basic_function_type.stoi,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(SystemLibrary.SystemLibrary.ushort_type,tctn,type_compare.less_type,PascalABCCompiler.SemanticTree.basic_function_type.ustoi,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(SystemLibrary.SystemLibrary.integer_type,tctn,type_compare.greater_type,PascalABCCompiler.SemanticTree.basic_function_type.none,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(SystemLibrary.SystemLibrary.uint_type,tctn,type_compare.greater_type,PascalABCCompiler.SemanticTree.basic_function_type.uitoi,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(SystemLibrary.SystemLibrary.int64_type,tctn,type_compare.greater_type,PascalABCCompiler.SemanticTree.basic_function_type.ltoi,false);
-            SystemLibrary.SystemLibrary.make_generated_type_conversion(SystemLibrary.SystemLibrary.uint64_type,tctn,type_compare.greater_type,PascalABCCompiler.SemanticTree.basic_function_type.ultoi,false);
+            SystemLibrary.make_generated_type_conversion(SystemLibrary.byte_type,tctn,type_compare.less_type,basic_function_type.btoi,false);
+            SystemLibrary.make_generated_type_conversion(SystemLibrary.sbyte_type,tctn,type_compare.less_type,basic_function_type.sbtoi,false);
+            SystemLibrary.make_generated_type_conversion(SystemLibrary.short_type,tctn,type_compare.less_type,basic_function_type.stoi,false);
+            SystemLibrary.make_generated_type_conversion(SystemLibrary.ushort_type,tctn,type_compare.less_type,basic_function_type.ustoi,false);
+            SystemLibrary.make_generated_type_conversion(SystemLibrary.integer_type,tctn,type_compare.greater_type,basic_function_type.none,false);
+            SystemLibrary.make_generated_type_conversion(SystemLibrary.uint_type,tctn,type_compare.greater_type,basic_function_type.uitoi,false);
+            SystemLibrary.make_generated_type_conversion(SystemLibrary.int64_type,tctn,type_compare.greater_type,basic_function_type.ltoi,false);
+            SystemLibrary.make_generated_type_conversion(SystemLibrary.uint64_type,tctn,type_compare.greater_type,basic_function_type.ultoi,false);
 		}
 		
         public common_type_node create_enum_type(string name, location def_loc)
         {
-            SymbolTable.ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(_cmn.scope, null);
+            ClassScope scope = convertion_data_and_alghoritms.symbol_table.CreateClassScope(_cmn.scope, null);
             if (name == null)
                 name = "$enum$" + rec_num++;
-            common_type_node tctn = new common_type_node(name, SemanticTree.type_access_level.tal_public, _cmn,
+            common_type_node tctn = new common_type_node(name, type_access_level.tal_public, _cmn,
                 scope, def_loc);
             if (top_function != null)
                 tctn.defined_in_scope = top_function.scope;
-            set_field_access_level(SemanticTree.field_access_level.fal_public);
+            set_field_access_level(field_access_level.fal_public);
             //_cmn.scope.AddSymbol(name, new SymbolInfo(tctn));
-            tctn.SetBaseType(compiled_type_node.get_type_node(NetHelper.NetHelper.EnumType));
+            tctn.SetBaseType(compiled_type_node.get_type_node(NetHelper.EnumType));
             tctn.internal_is_value = true;
             
             add_convertions_to_enum_type(tctn);
             if (_ctn != null) type_stack.Push(_ctn);
             add_type(name, tctn, def_loc);
             _ctn = tctn;
-            SystemLibrary.SystemLibrary.init_reference_type(tctn);
+            SystemLibrary.init_reference_type(tctn);
             return tctn;
         }
 
@@ -1995,7 +2001,7 @@ namespace PascalSharp.Internal.TreeConverter.
             {
             	var_defs[i].type = tp;
             	bool flag = false;
-                if (var_defs[i] is common_parameter && ((var_defs[i] as common_parameter).parameter_type == SemanticTree.parameter_type.var || (var_defs[i] as common_parameter).concrete_parameter_type == concrete_parameter_type.cpt_const))
+                if (var_defs[i] is common_parameter && ((var_defs[i] as common_parameter).parameter_type == parameter_type.var || (var_defs[i] as common_parameter).concrete_parameter_type == concrete_parameter_type.cpt_const))
             		flag = true;
             	if (!flag)
             	var_defs[i].inital_value = GetInitalValueForVariable(var_defs[i],inital_value);
@@ -2017,37 +2023,37 @@ namespace PascalSharp.Internal.TreeConverter.
                     //Инициализировать надо в текущем стейтменте
                     location lid = ((local_block_variable)vdn).loc;
                     local_block_variable_reference lbvr = new local_block_variable_reference((local_block_variable)vdn, lid);
-                    if (vdn.type.type_special_kind == SemanticTree.type_special_kind.set_type)
+                    if (vdn.type.type_special_kind == type_special_kind.set_type)
                 	{
                 		userInitalValue = syntax_tree_visitor.get_init_call_for_set_as_constr(vdn,userInitalValue);
-                	//userInitalValue.type = SystemLibrary.SystemLibInitializer.TypedSetType.sym_info as type_node;
+                	//userInitalValue.type = SystemLibInitializer.TypedSetType.sym_info as type_node;
                 	}
-                    else if (vdn.type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                    else if (vdn.type.type_special_kind == type_special_kind.short_string)
                     {
-                        userInitalValue = convertion_data_and_alghoritms.create_simple_function_call(SystemLibrary.SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node, null, convertion_data_and_alghoritms.convert_type(userInitalValue, SystemLibrary.SystemLibrary.string_type), new int_const_node((vdn.type as short_string_type_node).Length, null));
+                        userInitalValue = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node, null, convertion_data_and_alghoritms.convert_type(userInitalValue, SystemLibrary.string_type), new int_const_node((vdn.type as short_string_type_node).Length, null));
                     }
                     else if (userInitalValue is array_initializer)
                 	{
                 		array_initializer arr = userInitalValue as array_initializer;
-                		if (vdn.type.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                		if (vdn.type.element_type.type_special_kind == type_special_kind.short_string)
                 		{
                 			for (int i=0; i<arr.element_values.Count; i++)
                 			{
                 				//arr.element_values[i] = syntax_tree_visitor.find_operator(compiler_string_consts.assign_name, varref2, arr.element_values[i], null);
-                				arr.element_values[i] = convertion_data_and_alghoritms.create_simple_function_call(SystemLibrary.SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(arr.element_values[i],SystemLibrary.SystemLibrary.string_type),new int_const_node((vdn.type.element_type as short_string_type_node).Length,null));
+                				arr.element_values[i] = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(arr.element_values[i],SystemLibrary.string_type),new int_const_node((vdn.type.element_type as short_string_type_node).Length,null));
                 			}
                 		}
                 	}
                     CurrentStatementList.statements.AddElement(syntax_tree_visitor.find_operator(compiler_string_consts.assign_name, lbvr, userInitalValue, lid));
-                    if (vdn.type.type_special_kind == SemanticTree.type_special_kind.set_type)
+                    if (vdn.type.type_special_kind == type_special_kind.set_type)
                 	{
-                 		lbvr.type = SystemLibrary.SystemLibInitializer.TypedSetType.sym_info as type_node;
+                 		lbvr.type = SystemLibInitializer.TypedSetType.sym_info as type_node;
                 	}
                     return null;
                 }
                 if (userInitalValue is constant_node)
                 {
-                    if (vdn.type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                    if (vdn.type.type_special_kind == type_special_kind.short_string)
                 	{
 						expression_node varref2 = convertion_data_and_alghoritms.CreateVariableReference(vdn, null);
 						userInitalValue = syntax_tree_visitor.find_operator(compiler_string_consts.assign_name, varref2, userInitalValue, null);
@@ -2057,60 +2063,60 @@ namespace PascalSharp.Internal.TreeConverter.
                 if (userInitalValue is array_initializer)
                 {
                 	array_initializer arr = userInitalValue as array_initializer;
-                	if (vdn.type.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                	if (vdn.type.element_type.type_special_kind == type_special_kind.short_string)
                 	{
                 		expression_node varref2 = convertion_data_and_alghoritms.CreateVariableReference(vdn, null);
                 		for (int i=0; i<arr.element_values.Count; i++)
                 		{
                 			//arr.element_values[i] = syntax_tree_visitor.find_operator(compiler_string_consts.assign_name, varref2, arr.element_values[i], null);
-                			arr.element_values[i] = convertion_data_and_alghoritms.create_simple_function_call(SystemLibrary.SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(arr.element_values[i],SystemLibrary.SystemLibrary.string_type),new int_const_node((vdn.type.element_type as short_string_type_node).Length,null));
+                			arr.element_values[i] = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(arr.element_values[i],SystemLibrary.string_type),new int_const_node((vdn.type.element_type as short_string_type_node).Length,null));
                 		}
                 	}
                 	return userInitalValue;
                 }
                 expression_node varref = convertion_data_and_alghoritms.CreateVariableReference(vdn, userInitalValue.location);
-                if (vdn.type.type_special_kind == SemanticTree.type_special_kind.set_type)
+                if (vdn.type.type_special_kind == type_special_kind.set_type)
                 {
                 	userInitalValue = syntax_tree_visitor.get_init_call_for_set_as_constr(vdn,userInitalValue);
-                	//userInitalValue.type = SystemLibrary.SystemLibInitializer.TypedSetType.sym_info as type_node;
+                	//userInitalValue.type = SystemLibInitializer.TypedSetType.sym_info as type_node;
                 }
-                else if (vdn.type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                else if (vdn.type.type_special_kind == type_special_kind.short_string)
                 {
-					expression_node cmc = convertion_data_and_alghoritms.create_simple_function_call(SystemLibrary.SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(userInitalValue,SystemLibrary.SystemLibrary.string_type),new int_const_node((vdn.type as short_string_type_node).Length,null));
+					expression_node cmc = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(userInitalValue,SystemLibrary.string_type),new int_const_node((vdn.type as short_string_type_node).Length,null));
         			userInitalValue = cmc;
                 }
                 userInitalValue = syntax_tree_visitor.find_operator(compiler_string_consts.assign_name, varref, userInitalValue, userInitalValue.location);
-                if (vdn.type.type_special_kind == SemanticTree.type_special_kind.set_type)
+                if (vdn.type.type_special_kind == type_special_kind.set_type)
                 {
-                 	varref.type = SystemLibrary.SystemLibInitializer.TypedSetType.sym_info as type_node;
+                 	varref.type = SystemLibInitializer.TypedSetType.sym_info as type_node;
                 }
                 return userInitalValue;
             }
             type_node tp = vdn.type;
-            if (syntax_tree_visitor.SystemUnitAssigned && SystemLibrary.SystemLibInitializer.TextFileType.Found && tp.name == compiler_string_consts.text_file_name_type_name)
-                if (tp == SystemLibrary.SystemLibInitializer.TextFileType.TypeNode)
-                    SystemLibrary.SystemLibInitializer.TextFileType.TypeNode.type_special_kind = PascalABCCompiler.SemanticTree.type_special_kind.text_file;
+            if (syntax_tree_visitor.SystemUnitAssigned && SystemLibInitializer.TextFileType.Found && tp.name == compiler_string_consts.text_file_name_type_name)
+                if (tp == SystemLibInitializer.TextFileType.TypeNode)
+                    SystemLibInitializer.TextFileType.TypeNode.type_special_kind = type_special_kind.text_file;
             //(ssyy) Вставил switch и обработку BinaryFile
             switch (tp.type_special_kind)
             {
-                case SemanticTree.type_special_kind.typed_file:
+                case type_special_kind.typed_file:
                     userInitalValue = syntax_tree_visitor.get_init_call_for_typed_file(vdn, tp.element_type);
                     break;
-                case SemanticTree.type_special_kind.set_type:
+                case type_special_kind.set_type:
                     userInitalValue = syntax_tree_visitor.get_init_call_for_set(vdn);
                     break;
-                case SemanticTree.type_special_kind.binary_file:
+                case type_special_kind.binary_file:
                     userInitalValue = syntax_tree_visitor.get_init_call_for_binary_file(vdn);
                     break;
-                case SemanticTree.type_special_kind.text_file:
+                case type_special_kind.text_file:
                     userInitalValue = syntax_tree_visitor.get_init_call_for_text_file(vdn);
                     break;
                 default:
                     if (tp is short_string_type_node)
-                        userInitalValue = SystemLibrary.SystemLibrary.empty_string;//syntax_tree_visitor.get_init_call_for_short_string(vdn);
+                        userInitalValue = SystemLibrary.empty_string;//syntax_tree_visitor.get_init_call_for_short_string(vdn);
                     else
-                        if (tp == SystemLibrary.SystemLibrary.string_type && SemanticRules.InitStringAsEmptyString)
-                            userInitalValue = SystemLibrary.SystemLibrary.empty_string;
+                        if (tp == SystemLibrary.string_type && SemanticRules.InitStringAsEmptyString)
+                            userInitalValue = SystemLibrary.empty_string;
                     break;
             }
             return userInitalValue;
@@ -2124,7 +2130,7 @@ namespace PascalSharp.Internal.TreeConverter.
 
         public SymbolInfoList find(string name)
         {
-            SymbolTable.Scope curscope = CurrentScope;
+            Scope curscope = CurrentScope;
             if (name == "$yield_element_type")
             {
             	if (top_function != null)
@@ -2141,10 +2147,10 @@ namespace PascalSharp.Internal.TreeConverter.
             	
             SymbolInfoList sil = curscope.Find(name, curscope);
             SymbolInfoList si2 = null;
-            if (sil != null && sil.First().scope is SymbolTable.ClassScope && curscope.TopScope is SymbolTable.BlockScope && curscope.TopScope.TopScope is SymbolTable.ClassMethodScope && curscope.TopScope.TopScope.TopScope is SymbolTable.BlockScope)
+            if (sil != null && sil.First().scope is ClassScope && curscope.TopScope is BlockScope && curscope.TopScope.TopScope is ClassMethodScope && curscope.TopScope.TopScope.TopScope is BlockScope)
             {
                 si2 = curscope.TopScope.TopScope.TopScope.Find(name, curscope.TopScope.TopScope.TopScope);
-                if (si2 != null && si2.First().scope is SymbolTable.ClassMethodScope)
+                if (si2 != null && si2.First().scope is ClassMethodScope)
                 {
                     sil = si2;
                 }
@@ -2152,7 +2158,7 @@ namespace PascalSharp.Internal.TreeConverter.
                 
             if (sil == null && _compiled_tn != null && curscope.TopScope != null)
             {
-                SymbolTable.Scope tmp = curscope.TopScope;
+                Scope tmp = curscope.TopScope;
                 while (tmp != null && sil == null)
                 {
                     sil = tmp.Find(name, curscope);
@@ -2243,10 +2249,10 @@ namespace PascalSharp.Internal.TreeConverter.
                     check_predefinition_defined();
                     if (_ctn.is_generic_type_definition && !_ctn.IsInterface && _ctn.static_constr == null)
                     {
-                        _ctn.static_constr = new common_method_node(PascalSharp.Internal.TreeConverter.compiler_string_consts.static_ctor_prefix + "Create", null, _ctn, SemanticTree.polymorphic_state.ps_static, SemanticTree.field_access_level.fal_private, null);
+                        _ctn.static_constr = new common_method_node(compiler_string_consts.static_ctor_prefix + "Create", null, _ctn, polymorphic_state.ps_static, field_access_level.fal_private, null);
                         _ctn.static_constr.is_constructor = true;
                         statements_list st = new statements_list(null); 
-                        st.statements.AddElement(new return_node(new null_const_node(SystemLibrary.SystemLibrary.object_type, null), null));
+                        st.statements.AddElement(new return_node(new null_const_node(SystemLibrary.object_type, null), null));
                         _ctn.static_constr.function_code = st;
                         _ctn.methods.AddElement(_ctn.static_constr);
                     }
@@ -2292,29 +2298,29 @@ namespace PascalSharp.Internal.TreeConverter.
                 {
                     if (gpa.useful_for_pointers)
                     {
-                        stl.statements.AddElement(CreateTypeCheckCall(SystemLibrary.SystemLibInitializer.CheckCanUsePointerOnTypeProcedure.sym_info, param));
+                        stl.statements.AddElement(CreateTypeCheckCall(SystemLibInitializer.CheckCanUsePointerOnTypeProcedure.sym_info, param));
                     }
                     if (gpa.useful_for_binary_files)
                     {
-                        stl.statements.AddElement(CreateTypeCheckCall(SystemLibrary.SystemLibInitializer.CheckCanUseTypeForBinaryFilesProcedure.sym_info, param));
+                        stl.statements.AddElement(CreateTypeCheckCall(SystemLibInitializer.CheckCanUseTypeForBinaryFilesProcedure.sym_info, param));
                     }
                     if (gpa.useful_for_typed_files)
                     {
-                        stl.statements.AddElement(CreateTypeCheckCall(SystemLibrary.SystemLibInitializer.CheckCanUseTypeForTypedFilesProcedure.sym_info, param));
+                        stl.statements.AddElement(CreateTypeCheckCall(SystemLibInitializer.CheckCanUseTypeForTypedFilesProcedure.sym_info, param));
                     }
                 }
                 if (SemanticRules.RuntimeInitVariablesOfGenericParameters)
                 {
                     basic_function_call bfc = new basic_function_call(
-                        SystemLibrary.SystemLibrary.byte_assign as basic_function_node, null);
+                        SystemLibrary.byte_assign as basic_function_node, null);
                     bfc.parameters.AddElement(new static_class_field_reference(param.runtime_initialization_marker, null));
                     base_function_call dcall = null;
-                    if (SystemLibrary.SystemLibInitializer.RuntimeDetermineTypeFunction.sym_info is common_namespace_function_node)
+                    if (SystemLibInitializer.RuntimeDetermineTypeFunction.sym_info is common_namespace_function_node)
                         dcall = new common_namespace_function_call(
-                            SystemLibrary.SystemLibInitializer.RuntimeDetermineTypeFunction.sym_info as common_namespace_function_node, null);
+                            SystemLibInitializer.RuntimeDetermineTypeFunction.sym_info as common_namespace_function_node, null);
                     else
                         dcall = new compiled_static_method_call(
-                            SystemLibrary.SystemLibInitializer.RuntimeDetermineTypeFunction.sym_info as compiled_function_node, null);
+                            SystemLibInitializer.RuntimeDetermineTypeFunction.sym_info as compiled_function_node, null);
                     dcall.parameters.AddElement(new typeof_operator(param, null));
                     bfc.parameters.AddElement(dcall);
                     stl.statements.AddElement(bfc);
@@ -2327,7 +2333,7 @@ namespace PascalSharp.Internal.TreeConverter.
             if (sil == null)
             {
                 stat_ctor = new common_method_node(stat_ctor_name, null, null, generic_def,
-                    SemanticTree.polymorphic_state.ps_static, SemanticTree.field_access_level.fal_public, null);
+                    polymorphic_state.ps_static, field_access_level.fal_public, null);
                 stat_ctor.is_constructor = true;
                 generic_def.add_name(stat_ctor_name, new SymbolInfo(stat_ctor));
                 generic_def.methods.AddElement(stat_ctor);
@@ -2429,7 +2435,7 @@ namespace PascalSharp.Internal.TreeConverter.
                         for (int i = 0; i < num_of_defaults; i++)
                             cnfn.parameters.AddElement(default_params[i]);
                         statements_list sl = new statements_list(null);
-                        common_method_call cnfc = new common_method_call(cmn, (cnfn.polymorphic_state != SemanticTree.polymorphic_state.ps_static) ? new this_node(converted_type, null) : null, null);
+                        common_method_call cnfc = new common_method_call(cmn, (cnfn.polymorphic_state != polymorphic_state.ps_static) ? new this_node(converted_type, null) : null, null);
                         foreach (common_parameter p in cnfn.parameters)
                         {
                             cnfc.parameters.AddElement(new common_parameter_reference(p, 0, null));
@@ -2477,7 +2483,7 @@ namespace PascalSharp.Internal.TreeConverter.
 			CurrentHandlerList = CurrentHandlerListStack.Pop();
 		}
 		
-		public void check_name_free(string name,SemanticTree.ILocation name_loc)
+		public void check_name_free(string name,ILocation name_loc)
 		{
 			SymbolInfoList sil=find_only_in_namespace(name);
 			if (sil==null)
@@ -2495,7 +2501,7 @@ namespace PascalSharp.Internal.TreeConverter.
 		}
 		
         //ssyy
-        public common_type_node check_type_name_free_and_predop(string name, SemanticTree.ILocation name_loc, ref common_type_node partial_class, bool is_partial=false)
+        public common_type_node check_type_name_free_and_predop(string name, ILocation name_loc, ref common_type_node partial_class, bool is_partial=false)
         {
             SymbolInfoList sil = find_only_in_namespace(name);
             if (sil == null)
@@ -2549,7 +2555,7 @@ namespace PascalSharp.Internal.TreeConverter.
 			{
 				for(int param_num=0;param_num<def.parameters.Count;param_num++)
                 {
-                    int res=SystemLibrary.SystemLibrary.string_comparer.Compare(def.parameters[param_num].name,
+                    int res=SystemLibrary.string_comparer.Compare(def.parameters[param_num].name,
                         predef.parameters[param_num].name);
 					if (res!=0)
 					{
@@ -2582,7 +2588,7 @@ namespace PascalSharp.Internal.TreeConverter.
                 if (!ctn.IsInterface)
                 {
                     foreach (common_method_node cmn in ctn.methods)
-                        if (cmn.function_code == null && cmn.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual_abstract)
+                        if (cmn.function_code == null && cmn.polymorphic_state != polymorphic_state.ps_virtual_abstract)
                             AddError(cmn.loc, "FUNCTION_PREDEFINITION_WITHOUT_DEFINITION");
                 }
             }
@@ -2621,13 +2627,13 @@ namespace PascalSharp.Internal.TreeConverter.
             bool bad = false;
             common_method_node commn = sil.First().sym_info as common_method_node;
             compiled_function_node compn = sil.First().sym_info as compiled_function_node;
-            SemanticTree.polymorphic_state pstate = SemanticTree.polymorphic_state.ps_static;
+            polymorphic_state pstate = polymorphic_state.ps_static;
             //Проверка пройдена!
 
             if (commn != null && commn.common_comprehensive_type == cnode)
             {
                 //Найденная функция описана в самом классе.
-                if (commn.polymorphic_state == SemanticTree.polymorphic_state.ps_common)
+                if (commn.polymorphic_state == polymorphic_state.ps_common)
                 {
                     //Делаем её virtual final
                     commn.is_final = true;
@@ -2638,7 +2644,7 @@ namespace PascalSharp.Internal.TreeConverter.
             {
                 //Найденная функция описана в каком-то предке класса
                 //Генерируем новую newslot virtual final функцию, вызывающую ту.
-                if (pstate == SemanticTree.polymorphic_state.ps_common)
+                if (pstate == polymorphic_state.ps_common)
                 {
                     syntax_tree_visitor.generate_inherited_from_base_and_interface_function(cnode, fn);
                 }
@@ -2681,7 +2687,7 @@ namespace PascalSharp.Internal.TreeConverter.
                             continue;
                         fn = si.sym_info as function_node;
                         //Сверяем параметры и тип возвращаемого значения
-                        if (convertion_data_and_alghoritms.function_eq_params_and_result(meth, fn, true) /*&& fn.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual_abstract*/)
+                        if (convertion_data_and_alghoritms.function_eq_params_and_result(meth, fn, true) /*&& fn.polymorphic_state != polymorphic_state.ps_virtual_abstract*/)
                         {
                             //Нашли нужную функцию
                             common_method_node fn_common = fn as common_method_node;
@@ -2717,12 +2723,12 @@ namespace PascalSharp.Internal.TreeConverter.
             bool bad = false;
             common_method_node commn = find_method.sym_info as common_method_node;
             compiled_function_node compn = find_method.sym_info as compiled_function_node;
-            SemanticTree.polymorphic_state pstate = SemanticTree.polymorphic_state.ps_static;
+            polymorphic_state pstate = polymorphic_state.ps_static;
             if (commn != null)
             {
                 pstate = commn.polymorphic_state;
-                if (commn.polymorphic_state == SemanticTree.polymorphic_state.ps_static ||
-                    commn.field_access_level != SemanticTree.field_access_level.fal_public ||
+                if (commn.polymorphic_state == polymorphic_state.ps_static ||
+                    commn.field_access_level != field_access_level.fal_public ||
                     commn.is_constructor)
                 {
                     bad = true;
@@ -2733,8 +2739,8 @@ namespace PascalSharp.Internal.TreeConverter.
                 if (compn != null)
                 {
                     pstate = compn.polymorphic_state;
-                    if (compn.polymorphic_state == SemanticTree.polymorphic_state.ps_static ||
-                        compn.field_access_level != SemanticTree.field_access_level.fal_public)
+                    if (compn.polymorphic_state == polymorphic_state.ps_static ||
+                        compn.field_access_level != field_access_level.fal_public)
                     {
                         bad = true;
                     }
@@ -2756,7 +2762,7 @@ namespace PascalSharp.Internal.TreeConverter.
             if (commn != null && commn.common_comprehensive_type == cnode)
             {
                 //Найденная функция описана в самом классе.
-                if (commn.polymorphic_state == SemanticTree.polymorphic_state.ps_common)
+                if (commn.polymorphic_state == polymorphic_state.ps_common)
                 {
                     //Делаем её virtual final
                     commn.is_final = true;
@@ -2767,7 +2773,7 @@ namespace PascalSharp.Internal.TreeConverter.
             {
                 //Найденная функция описана в каком-то предке класса
                 //Генерируем новую newslot virtual final функцию, вызывающую ту.
-                if (pstate == SemanticTree.polymorphic_state.ps_common)
+                if (pstate == polymorphic_state.ps_common)
                 {
                     syntax_tree_visitor.generate_inherited_from_base_and_interface_function(cnode, fn);
                 }
@@ -2836,7 +2842,7 @@ namespace PascalSharp.Internal.TreeConverter.
                         if (_ctn.IsAbstract) return;
                         foreach (common_method_node meth in cint.methods)
                         {
-                            if (meth.polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract)
+                            if (meth.polymorphic_state == polymorphic_state.ps_virtual_abstract)
                                 check_implement_abstract_function(cnode, meth, cint);
                         }
 
@@ -2856,13 +2862,13 @@ namespace PascalSharp.Internal.TreeConverter.
                             if (mi.MemberType == System.Reflection.MemberTypes.Method)
                             {
                                 compiled_function_node cmeth = compiled_function_node.get_compiled_method((System.Reflection.MethodInfo)mi);
-                                if (cmeth.polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract && !cmeth.IsSpecialName)
+                                if (cmeth.polymorphic_state == polymorphic_state.ps_virtual_abstract && !cmeth.IsSpecialName)
                                     check_implement_abstract_function(cnode, cmeth, tn);
                             }
                             else if (mi.MemberType == System.Reflection.MemberTypes.Property)
                             {
                                 /*compiled_property_node cmeth = compiled_property_node.get_compiled_method((System.Reflection.PropertyInfo)mi);
-                                if (cmeth.polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract)
+                                if (cmeth.polymorphic_state == polymorphic_state.ps_virtual_abstract)
                                 check_implement_function(cnode, cmeth, _ctn.base_type);*/
                             }
                         }
@@ -2910,7 +2916,7 @@ namespace PascalSharp.Internal.TreeConverter.
                                 //\ssyy
                                 foreach (common_method_node cmn in ctn.methods)
                                 {
-                                    if (cmn.function_code == null && cmn.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual_abstract)
+                                    if (cmn.function_code == null && cmn.polymorphic_state != polymorphic_state.ps_virtual_abstract)
                                     {
                                         AddError(cmn.loc, "FUNCTION_PREDEFINITION_WITHOUT_DEFINITION");
                                     }
@@ -3124,8 +3130,8 @@ namespace PascalSharp.Internal.TreeConverter.
                         AddError(fn.loc, "FUNCTION_{0}_ALREADY_HAVE_A_BODY", fn.name);
                     }
 
-                    if ((compar.polymorphic_state == PascalABCCompiler.SemanticTree.polymorphic_state.ps_static) !=
-                        (fn.polymorphic_state == PascalABCCompiler.SemanticTree.polymorphic_state.ps_static))
+                    if ((compar.polymorphic_state == polymorphic_state.ps_static) !=
+                        (fn.polymorphic_state == polymorphic_state.ps_static))
                     {
                         syntax_tree_visitor.AddError(fn.loc, "CLASS_FUNCTION_ATTRIBUTE_MISMATCH");
                     }
@@ -3265,8 +3271,8 @@ namespace PascalSharp.Internal.TreeConverter.
                             /*t_fn.is_class = t_compar.is_class;
                             t_fn.internal_is_value = t_compar.internal_is_value;
                             t_fn.SetImplementingInterfaces(t_compar.ImplementingInterfaces);
-                            (t_fn.Scope as SymbolTable.IInterfaceScope).TopInterfaceScopeArray =
-                                (t_compar.Scope as SymbolTable.IInterfaceScope).TopInterfaceScopeArray;
+                            (t_fn.Scope as IInterfaceScope).TopInterfaceScopeArray =
+                                (t_compar.Scope as IInterfaceScope).TopInterfaceScopeArray;
                             t_fn.SetBaseType(t_compar.base_type);*/
                             if (t_compar.has_default_constructor)
                             {
@@ -3390,7 +3396,7 @@ namespace PascalSharp.Internal.TreeConverter.
 			}
 			check_name_free(property_name,loc);
             common_property_node pn = new common_property_node(property_name, _ctn, loc, _fal,
-                SemanticTree.polymorphic_state.ps_common);
+                polymorphic_state.ps_common);
 			_ctn.Scope.AddSymbol(property_name,new SymbolInfo(pn));
 			_ctn.properties.AddElement(pn);
 			return pn;
@@ -3489,7 +3495,7 @@ namespace PascalSharp.Internal.TreeConverter.
         {
             cmn.overrided_method = null;
             cmn.newslot_awaited = true;
-            cmn.polymorphic_state = SemanticTree.polymorphic_state.ps_virtual;
+            cmn.polymorphic_state = polymorphic_state.ps_virtual;
         }
 
         //ssyy
@@ -3497,7 +3503,7 @@ namespace PascalSharp.Internal.TreeConverter.
         {
             cmn.overrided_method = null;
             cmn.newslot_awaited = true;
-            cmn.polymorphic_state = SemanticTree.polymorphic_state.ps_virtual_abstract;
+            cmn.polymorphic_state = polymorphic_state.ps_virtual_abstract;
         }
         //\ssyy
 
@@ -3532,7 +3538,7 @@ namespace PascalSharp.Internal.TreeConverter.
 
             if (cfn_sec != null)
             {
-                if (cfn_sec.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual && cfn_sec.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual_abstract && !cfn_sec.IsFinal)
+                if (cfn_sec.polymorphic_state != polymorphic_state.ps_virtual && cfn_sec.polymorphic_state != polymorphic_state.ps_virtual_abstract && !cfn_sec.IsFinal)
                 {
                     return null;
                 }
@@ -3575,7 +3581,7 @@ namespace PascalSharp.Internal.TreeConverter.
             common_method_node cmn_sec = fn as common_method_node;
             if (cmn_sec != null)
             {
-                if (cmn_sec.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual && cmn_sec.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual_abstract)
+                if (cmn_sec.polymorphic_state != polymorphic_state.ps_virtual && cmn_sec.polymorphic_state != polymorphic_state.ps_virtual_abstract)
                 {
                     return null;
                 }
@@ -3585,7 +3591,7 @@ namespace PascalSharp.Internal.TreeConverter.
                 compiled_function_node cfn_sec = fn as compiled_function_node;
                 if (cfn_sec != null)
                 {
-                    if (cfn_sec.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual && cfn_sec.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual_abstract && !cfn_sec.IsFinal)
+                    if (cfn_sec.polymorphic_state != polymorphic_state.ps_virtual && cfn_sec.polymorphic_state != polymorphic_state.ps_virtual_abstract && !cfn_sec.IsFinal)
                     {
                         return null;
                     }
@@ -3632,7 +3638,7 @@ namespace PascalSharp.Internal.TreeConverter.
             common_property_node cpn_sec = pn as common_property_node;
             if (cpn_sec != null)
             {
-                if (cpn_sec.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual && cpn_sec.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual_abstract)
+                if (cpn_sec.polymorphic_state != polymorphic_state.ps_virtual && cpn_sec.polymorphic_state != polymorphic_state.ps_virtual_abstract)
                 {
                     return null;
                 }
@@ -3642,7 +3648,7 @@ namespace PascalSharp.Internal.TreeConverter.
                 compiled_property_node cmpn_sec = pn as compiled_property_node;
                 if (cmpn_sec != null)
                 {
-                    if (cmpn_sec.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual && cmpn_sec.polymorphic_state != SemanticTree.polymorphic_state.ps_virtual_abstract)
+                    if (cmpn_sec.polymorphic_state != polymorphic_state.ps_virtual && cmpn_sec.polymorphic_state != polymorphic_state.ps_virtual_abstract)
                     {
                         return null;
                     }
@@ -3657,7 +3663,7 @@ namespace PascalSharp.Internal.TreeConverter.
 
         public void set_override(common_property_node cpn)
         {
-            cpn.polymorphic_state = SemanticTree.polymorphic_state.ps_virtual;
+            cpn.polymorphic_state = polymorphic_state.ps_virtual;
             property_node overrided_property = FindPropertyToOverride(cpn);
             if (overrided_property == null)
                 AddError(cpn.loc, "NO_PROPERTY_TO_OVERRIDE");
@@ -3665,7 +3671,7 @@ namespace PascalSharp.Internal.TreeConverter.
 
         public void set_override(common_method_node cmn)
         {
-            cmn.polymorphic_state = SemanticTree.polymorphic_state.ps_virtual;
+            cmn.polymorphic_state = polymorphic_state.ps_virtual;
             cmn.overrided_method = FindMethodToOverride(cmn);
             if (cmn.overrided_method == null)
                 AddError(cmn.loc, "NO_METHOD_TO_OVERRIDE");

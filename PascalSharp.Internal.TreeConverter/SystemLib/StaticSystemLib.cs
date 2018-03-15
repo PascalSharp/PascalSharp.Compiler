@@ -6,6 +6,9 @@ using PascalSharp.Internal.TreeConverter;
 
 using System.Collections;
 using System.Collections.Generic;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalABCCompiler.SystemLibrary
 {
@@ -85,7 +88,7 @@ namespace PascalABCCompiler.SystemLibrary
         public static type_constructor type_constructor = null;
         //\ssyy
 
-		private static SymbolTable.TreeConverterSymbolTable _symtab;
+		private static TreeConverterSymbolTable _symtab;
         private static System.Collections.Generic.Dictionary<SemanticTree.basic_function_type, basic_function_node> ht = new System.Collections.Generic.Dictionary<SemanticTree.basic_function_type, basic_function_node>();
 
         private static System.Collections.Hashtable writable_in_typed_files_types = new System.Collections.Hashtable();
@@ -557,7 +560,7 @@ namespace PascalABCCompiler.SystemLibrary
 
         public static basic_function_node make_binary_operator(string operator_name, type_node to)
         {
-            return make_binary_operator(operator_name, to, PascalABCCompiler.SemanticTree.basic_function_type.none, to);
+            return make_binary_operator(operator_name, to, basic_function_type.none, to);
         }
 
         public static basic_function_node make_type_conversion(type_node from, type_node to, type_compare tc,
@@ -715,7 +718,7 @@ namespace PascalABCCompiler.SystemLibrary
         private static function_node make_compiled_operator(compiled_type_node declaring_type,
             string method_name,string new_name,compiled_type_node left_type,compiled_type_node right_type)
         {
-            compiled_function_node fn=NetHelper.NetHelper.get_compiled_method(declaring_type, method_name, left_type, right_type);
+            compiled_function_node fn=NetHelper.get_compiled_method(declaring_type, method_name, left_type, right_type);
             declaring_type.add_name(new_name,new SymbolInfo(fn));
             return fn;
         }
@@ -729,7 +732,7 @@ namespace PascalABCCompiler.SystemLibrary
         private static function_node make_binary_compiled_operator(compiled_type_node declaring_type, compiled_type_node add_to_type,
             string method_name, string new_name, compiled_type_node operand_type)
         {
-            compiled_function_node fn = NetHelper.NetHelper.get_compiled_method(declaring_type, method_name, operand_type, operand_type);
+            compiled_function_node fn = NetHelper.get_compiled_method(declaring_type, method_name, operand_type, operand_type);
             add_to_type.add_name(new_name, new SymbolInfo(fn));
             fn.IsOperator = true;
             return fn;
@@ -953,7 +956,7 @@ namespace PascalABCCompiler.SystemLibrary
             basic_function_node inc_var = create_oti_method(vinc, type, SemanticTree.parameter_type.var);
             basic_function_node dec_var = create_oti_method(vdec, type, SemanticTree.parameter_type.var);
 
-            SymbolInfo si = type.find_first_in_type(compiler_string_consts.greq_name);
+            var si = type.find_first_in_type(compiler_string_consts.greq_name);
             basic_function_node greq = (basic_function_node)si.sym_info;
         
             si = type.find(compiler_string_consts.smeq_name).First();
@@ -1182,7 +1185,7 @@ namespace PascalABCCompiler.SystemLibrary
             _string_type = compiled_type_node.get_type_node(typeof(string), symtab);
             _string_type.SetName(compiler_string_consts.string_type_name);
 
-            _pointer_type = compiled_type_node.get_type_node(NetHelper.NetHelper.void_ptr_type, symtab);
+            _pointer_type = compiled_type_node.get_type_node(void_ptr_type, symtab);
             _pointer_type.SetName(compiler_string_consts.pointer_type_name);
 
             _object_type = compiled_type_node.get_type_node(typeof(object), symtab);
@@ -2605,11 +2608,11 @@ namespace PascalABCCompiler.SystemLibrary
             }
         }
 
-        public static SymbolTable.TreeConverterSymbolTable symtab
+        public static TreeConverterSymbolTable symtab
         {
             get
             {
-                return SymbolTable.SymbolTableController.CurrentSymbolTable;
+                return SymbolTableController.CurrentSymbolTable;
             }
         }
 

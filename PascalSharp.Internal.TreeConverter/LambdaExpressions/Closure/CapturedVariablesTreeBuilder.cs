@@ -6,8 +6,10 @@ using System.Linq;
 using PascalABCCompiler.SystemLibrary;
 using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
-using PascalSharp.Internal.TreeConverter;TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace TreeConverter.LambdaExpressions.Closure
 {
@@ -476,7 +478,7 @@ namespace TreeConverter.LambdaExpressions.Closure
             _currentTreeNode = _currentTreeNode.ParentNode;
         }
 
-        public override void visit(PascalABCCompiler.SyntaxTree.for_node _for_node)
+        public override void visit(for_node _for_node)
         {
             var loc1 = _visitor.get_location(_for_node.loop_variable);
             var loopIdentName = _for_node.loop_variable.name.ToLower();
@@ -625,7 +627,7 @@ namespace TreeConverter.LambdaExpressions.Closure
             _visitor.AddError(_visitor.get_location(_with_statement), "WITH_AND_LAMBDAS_NOT_ALLOWED");
         }
         
-        public override void visit(PascalABCCompiler.SyntaxTree.goto_statement _goto_statement)
+        public override void visit(goto_statement _goto_statement)
         {
         	if (_goto_statement.source_context != null)
             	_visitor.AddError(_visitor.get_location(_goto_statement), "GOTO_AND_LAMBDAS_NOT_ALLOWED");

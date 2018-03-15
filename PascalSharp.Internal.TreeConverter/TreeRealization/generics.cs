@@ -10,8 +10,12 @@ using System.Linq;
 using System.Reflection;
 using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
+using PascalABCCompiler.SystemLibrary;
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
-using PascalSharp.Internal.TreeConverter;TreeConversion;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -52,15 +56,15 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             common_method_node cnode = new common_method_node(
                 compiler_string_consts.default_constructor_name, param, null,
-                param, PascalABCCompiler.SemanticTree.polymorphic_state.ps_common,
-                PascalABCCompiler.SemanticTree.field_access_level.fal_public, null);
+                param, polymorphic_state.ps_common,
+                field_access_level.fal_public, null);
             cnode.is_constructor = true;
             param.methods.AddElement(cnode);
             param.add_name(compiler_string_consts.default_constructor_name, new SymbolInfo(cnode));
             param.has_default_constructor = true;
         }
 
-        public static List<generic_parameter_eliminations> make_eliminations_common(List<PascalABCCompiler.SemanticTree.ICommonTypeNode> generic_params)
+        public static List<generic_parameter_eliminations> make_eliminations_common(List<ICommonTypeNode> generic_params)
         {
             List<generic_parameter_eliminations> _parameters_eliminations = new List<generic_parameter_eliminations>();
             foreach (type_node t in generic_params)
@@ -119,18 +123,18 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
             switch (tn.type_special_kind)
             {
-                case PascalABCCompiler.SemanticTree.type_special_kind.diap_type:
+                case type_special_kind.diap_type:
                     return new SimpleSemanticError(loc, "CANNOT_USE_DIAPASON_AS_GENERIC_ARGUMENT");
-                case PascalABCCompiler.SemanticTree.type_special_kind.typed_file:
+                case type_special_kind.typed_file:
                     return new SimpleSemanticError(loc, "CANNOT_USE_TYPED_FILE_AS_GENERIC_ARGUMENT");
-                case PascalABCCompiler.SemanticTree.type_special_kind.short_string:
+                case type_special_kind.short_string:
                     return new SimpleSemanticError(loc, "CANNOT_USE_SHORT_STRING_AS_GENERIC_ARGUMENT");
             }
-            /*if (tn == SystemLibrary.SystemLibrary.void_type)
+            /*if (tn == SystemLibrary.void_type)
             {
                 return new VoidNotValid(loc);
             }*/
-            PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.check_for_type_allowed(tn,loc);
+            SystemLibrary.syn_visitor.check_for_type_allowed(tn,loc);
             internal_interface ii = tn.get_internal_interface(internal_interface_kind.bounded_array_interface);
             if (ii != null)
             {
@@ -154,7 +158,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 {
                     return new SimpleSemanticError(null, "PARAMETER_{0}_MUST_BE_VALUE_TYPE", tn.PrintableName);
                 }
-                if (gpe.base_class != null && gpe.base_class != PascalABCCompiler.SystemLibrary.SystemLibrary.object_type)
+                if (gpe.base_class != null && gpe.base_class != SystemLibrary.object_type)
                 {
                     type_node base_type = generic_convertions.determine_type(gpe.base_class, tparams, method_param_types);
                     if (base_type != tn && !type_table.is_derived(base_type, tn) && !tn.is_generic_parameter)
@@ -202,11 +206,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
     public static class generic_convertions
     {
         //Список, хранящий все псевдо-инстанции generic-типов, нужен для NetGenerator.
-        public static List<PascalABCCompiler.SemanticTree.IGenericTypeInstance> all_type_instances =
-            new List<PascalABCCompiler.SemanticTree.IGenericTypeInstance>();
+        public static List<IGenericTypeInstance> all_type_instances =
+            new List<IGenericTypeInstance>();
 
-        public static List<PascalABCCompiler.SemanticTree.IGenericFunctionInstance> all_function_instances =
-            new List<PascalABCCompiler.SemanticTree.IGenericFunctionInstance>();
+        public static List<IGenericFunctionInstance> all_function_instances =
+            new List<IGenericFunctionInstance>();
 
         public static Hashtable generic_instances = new Hashtable();
 
@@ -310,7 +314,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                     );
             }
 
-            PascalABCCompiler.SystemLibrary.SystemLibrary.init_reference_type(instance);
+            SystemLibrary.init_reference_type(instance);
             instance.conform_basic_functions();
             //(ssyy) Нужно, чтобы добавились конструкторы
             //ctnode.find_in_type(compiler_string_consts.default_constructor_name);
@@ -366,7 +370,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 delegate_internal_interface dii = ii as delegate_internal_interface;
                 common_method_node inv = instance.ConvertMember(dii.invoke_method) as common_method_node;
                 common_method_node constr = instance.ConvertMember(dii.constructor) as common_method_node;
-                constr.function_code = new runtime_statement(PascalABCCompiler.SemanticTree.runtime_statement_type.ctor_delegate, null);
+                constr.function_code = new runtime_statement(runtime_statement_type.ctor_delegate, null);
                 delegate_internal_interface converted_dii = new delegate_internal_interface(inv.return_value_type,
                     inv, constr);
                 converted_dii.parameters.AddRange(inv.parameters);
@@ -440,7 +444,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 type_node elem_tp = determine_type(ii.element_type, param_types, method_param_types);
                 if (elem_tp != ii.element_type)
                 {
-                    return PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.convertion_data_and_alghoritms.type_constructor.create_unsized_array(elem_tp, null, ii.rank, null);
+                    return SystemLibrary.syn_visitor.convertion_data_and_alghoritms.type_constructor.create_unsized_array(elem_tp, null, ii.rank, null);
                 }
                 return tn;
             }
@@ -474,30 +478,30 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 {
                     return comm_type.get_instance(param_types);
                 }
-                if (comm_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.array_kind)
+                if (comm_type.type_special_kind == type_special_kind.array_kind)
                 {
                     type_node elem_tp = determine_type(comm_type.element_type, param_types, method_param_types);
                     if (elem_tp != comm_type.element_type)
                     {
-                        return PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.convertion_data_and_alghoritms.type_constructor.create_unsized_array(elem_tp, null, 1, comm_type.loc);
+                        return SystemLibrary.syn_visitor.convertion_data_and_alghoritms.type_constructor.create_unsized_array(elem_tp, null, 1, comm_type.loc);
                     }
                     return tn;
                 }
-                if (comm_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type)
+                if (comm_type.type_special_kind == type_special_kind.set_type)
                 {
                     type_node elem_tp = determine_type(comm_type.element_type, param_types, method_param_types);
                     if (elem_tp != comm_type.element_type)
                     {
-                        return PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.context.create_set_type(elem_tp, comm_type.loc);
+                        return SystemLibrary.syn_visitor.context.create_set_type(elem_tp, comm_type.loc);
                     }
                     return tn;
                 }
-                if (comm_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.typed_file)
+                if (comm_type.type_special_kind == type_special_kind.typed_file)
                 {
                     type_node elem_tp = determine_type(comm_type.element_type, param_types, method_param_types);
                     if (elem_tp != comm_type.element_type)
                     {
-                        return PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.context.create_typed_file_type(elem_tp, comm_type.loc);
+                        return SystemLibrary.syn_visitor.context.create_typed_file_type(elem_tp, comm_type.loc);
                     }
                     return tn;
                 }
@@ -531,7 +535,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 return CheckIfTypeDependsOnUndeducedGenericParameters(formalIi.element_type, deduced);
             }
 
-            if (formalType.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type)
+            if (formalType.type_special_kind == type_special_kind.set_type)
             {
                 return CheckIfTypeDependsOnUndeducedGenericParameters(formalType.element_type, deduced);
             }
@@ -647,7 +651,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             var there_are_undeduced_params = false;
             var param_counter = 0;
-            var visitor = PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor;
+            var visitor = SystemLibrary.syn_visitor;
             var result = true;
             exception_on_body_compilation = null;
 
@@ -737,7 +741,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             return result;
         }
 
-        public static function_node DeduceFunction(function_node func, expressions_list fact, bool alone, location loc, List<PascalABCCompiler.SyntaxTree.expression> syntax_nodes_parameters = null)
+        public static function_node DeduceFunction(function_node func, expressions_list fact, bool alone, location loc, List<expression> syntax_nodes_parameters = null)
         {
             parameter_list formal = func.parameters;
             int formal_count = formal.Count;
@@ -815,7 +819,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                     {
                         //Проверяем фактические, попадающие под params...
                         type_node tn = fact[i].type;
-                        if (tn.element_type != null && tn.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.array_wrapper)
+                        if (tn.element_type != null && tn.type_special_kind != type_special_kind.array_wrapper)
                             tn = tn.element_type;
                         if (!DeduceInstanceTypes(last_params_type, tn, deduced, nils))
                         {
@@ -1055,18 +1059,18 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 return DeduceInstanceTypes(formal_ii.element_type, fact_ii.element_type, deduced, nils);
             }
             //множества
-            if (formal_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type)
+            if (formal_type.type_special_kind == type_special_kind.set_type)
             {
-                if (fact_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.set_type)
+                if (fact_type.type_special_kind != type_special_kind.set_type)
                 {
                     goto eq_cmp;
                 }
                 return DeduceInstanceTypes(formal_type.element_type, fact_type.element_type, deduced, nils);
             }
             //множества
-            if (formal_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.typed_file)
+            if (formal_type.type_special_kind == type_special_kind.typed_file)
             {
-                if (fact_type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.typed_file)
+                if (fact_type.type_special_kind != type_special_kind.typed_file)
                 {
                     goto eq_cmp;
                 }
@@ -1264,7 +1268,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 {
                     function_node fn = si.sym_info as function_node;
                     if (find_protected_ctors ||
-                        fn.field_access_level == PascalABCCompiler.SemanticTree.field_access_level.fal_public)
+                        fn.field_access_level == field_access_level.fal_public)
                     {
                         compiled_constructor_node pconstr = fn as compiled_constructor_node;
                         common_method_node mconstr = fn as common_method_node;
@@ -1292,7 +1296,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 if (param_types[i] is delegated_methods)
                 {
                     base_function_call bfc = (param_types[i] as delegated_methods).proper_methods[0];
-                    var context = PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.context;
+                    var context = SystemLibrary.syn_visitor.context;
                     common_type_node del =
                         type_constructor.instance.create_delegate(context.get_delegate_type_name(), bfc.simple_function_node.return_value_type, bfc.simple_function_node.parameters, context.converted_namespace, null);
                     context.converted_namespace.types.AddElement(del);
@@ -1301,7 +1305,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
             //Создаём новую псевдо-инстанцию
             common_function_node new_func = null;
-            PascalABCCompiler.SemanticTree.IGenericFunctionInstance new_inst = null;
+            IGenericFunctionInstance new_inst = null;
             if (orig.semantic_node_type == semantic_node_type.common_namespace_function_node)
             {
                 generic_namespace_function_instance_node nnode = new generic_namespace_function_instance_node(orig as common_namespace_function_node, param_types);
@@ -1361,7 +1365,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        PascalABCCompiler.SemanticTree.ITypeNode PascalABCCompiler.SemanticTree.IGenericTypeInstance.original_generic
+        ITypeNode IGenericTypeInstance.original_generic
         {
             get { return _original_generic; }
         }
@@ -1379,12 +1383,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        protected List<PascalABCCompiler.SemanticTree.ITypeNode> _generic_parameters = null;
+        protected List<ITypeNode> _generic_parameters = null;
         protected List<type_node> _instance_params;
 
         public generic_instance_type_node(type_node original_generic_type,
             List<type_node> param_types,
-            type_node base_type, string name, PascalABCCompiler.SemanticTree.type_access_level type_access_level,
+            type_node base_type, string name, type_access_level type_access_level,
             common_namespace_node comprehensive_namespace, location loc)
             :
             base(base_type, name, type_access_level, comprehensive_namespace,
@@ -1394,13 +1398,13 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             _instance_params = param_types;
         }
 
-        public List<PascalABCCompiler.SemanticTree.ITypeNode> generic_parameters
+        public List<ITypeNode> generic_parameters
         {
             get
             {
                 if (_generic_parameters == null)
                 {
-                    _generic_parameters = new List<PascalABCCompiler.SemanticTree.ITypeNode>(_instance_params.Count);
+                    _generic_parameters = new List<ITypeNode>(_instance_params.Count);
                     foreach (type_node tn in _instance_params)
                     {
                         _generic_parameters.Add(tn);
@@ -1450,7 +1454,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 return null;
             }
             List<type_node> meth_inst_pars = null;
-            PascalABCCompiler.SemanticTree.IClassMemberNode orig_member = orig_fn as PascalABCCompiler.SemanticTree.IClassMemberNode;
+            IClassMemberNode orig_member = orig_fn as IClassMemberNode;
             common_method_node cmn = new common_method_node(
                 orig_fn.name,
                 //generic_convertions.determine_type(orig_fn.return_value_type, _instance_params, false),
@@ -1461,13 +1465,13 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             {
                 List<type_node> orig_tpars = orig_fn.get_generic_params_list();
                 int type_count = orig_tpars.Count;
-                cmn.generic_params = new List<PascalABCCompiler.SemanticTree.ICommonTypeNode>(orig_tpars.Count);
+                cmn.generic_params = new List<ICommonTypeNode>(orig_tpars.Count);
                 foreach (type_node t in orig_tpars)
                 {
-                    common_type_node par = new common_type_node(t.name, PascalABCCompiler.SemanticTree.type_access_level.tal_public,
-                        null, PascalABCCompiler.SystemLibrary.SystemLibrary.syn_visitor.convertion_data_and_alghoritms.symbol_table.CreateInterfaceScope(null, PascalABCCompiler.SystemLibrary.SystemLibrary.object_type.Scope, null), null);
-                    PascalABCCompiler.SystemLibrary.SystemLibrary.init_reference_type(par);
-                    par.SetBaseType(PascalABCCompiler.SystemLibrary.SystemLibrary.object_type);
+                    common_type_node par = new common_type_node(t.name, type_access_level.tal_public,
+                        null, SystemLibrary.syn_visitor.convertion_data_and_alghoritms.symbol_table.CreateInterfaceScope(null, SystemLibrary.object_type.Scope, null), null);
+                    SystemLibrary.init_reference_type(par);
+                    par.SetBaseType(SystemLibrary.object_type);
                     cmn.generic_params.Add(par);
                     par.generic_function_container = cmn;
                 }
@@ -1612,7 +1616,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             if (rez_node == null)
             {
                 //Преобразуем найденный член класса.
-                PascalABCCompiler.SemanticTree.IClassMemberNode orig_member = orig_node as PascalABCCompiler.SemanticTree.IClassMemberNode;
+                IClassMemberNode orig_member = orig_node as IClassMemberNode;
                 if (orig_member == null)
                 {
                     //Для basic_function
@@ -1693,7 +1697,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                     else
                         return orig_node;
                 }
-                PascalABCCompiler.SemanticTree.ILocated orig_loc = orig_node as PascalABCCompiler.SemanticTree.ILocated;
+                ILocated orig_loc = orig_node as ILocated;
                 location loc = (orig_loc == null) ? null : (orig_loc.Location as location);
                 switch (orig_node.general_node_type)
                 {
@@ -1856,7 +1860,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         public compiled_generic_instance_type_node(compiled_type_node generic_definition,
             List<type_node> param_types,
             type_node base_type, string name,
-            PascalABCCompiler.SemanticTree.type_access_level type_access_level,
+            type_access_level type_access_level,
             common_namespace_node comprehensive_namespace,
             location loc)
             :
@@ -1920,7 +1924,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         public common_generic_instance_type_node(common_type_node generic_definition,
             List<type_node> param_types,
             type_node base_type, string name,
-            PascalABCCompiler.SemanticTree.type_access_level type_access_level,
+            type_access_level type_access_level,
             common_namespace_node comprehensive_namespace,
             location loc)
             :
@@ -1980,7 +1984,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             _generic = generic_type;
         }
 
-        public PascalABCCompiler.SemanticTree.ILocation Location
+        public ILocation Location
         {
             get
             {
@@ -2032,15 +2036,15 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        protected List<PascalABCCompiler.SemanticTree.ITypeNode> _generic_parameters = null;
+        protected List<ITypeNode> _generic_parameters = null;
 
-        public List<PascalABCCompiler.SemanticTree.ITypeNode> generic_parameters
+        public List<ITypeNode> generic_parameters
         {
             get
             {
                 if (_generic_parameters == null)
                 {
-                    _generic_parameters = new List<PascalABCCompiler.SemanticTree.ITypeNode>();
+                    _generic_parameters = new List<ITypeNode>();
                     foreach (type_node t in _instance_params)
                     {
                         _generic_parameters.Add(t);
@@ -2052,7 +2056,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
         protected function_node _original_function;
 
-        PascalABCCompiler.SemanticTree.IFunctionNode PascalABCCompiler.SemanticTree.IGenericFunctionInstance.original_function
+        IFunctionNode IGenericFunctionInstance.original_function
         {
             get
             {
@@ -2076,11 +2080,11 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override PascalABCCompiler.SemanticTree.ITypeNode comperehensive_type
+        public override ITypeNode comperehensive_type
         {
             get
             {
-                return (_original_function as PascalABCCompiler.SemanticTree.IClassMemberNode).comperehensive_type;
+                return (_original_function as IClassMemberNode).comperehensive_type;
             }
         }
 
@@ -2104,7 +2108,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 common_parameter cpar = new common_parameter(par.name,
                     generic_convertions.determine_type(par.type, _instance_params, true),
                     par.parameter_type, this,
-                    (par.parameter_type == PascalABCCompiler.SemanticTree.parameter_type.var) ? concrete_parameter_type.cpt_var : concrete_parameter_type.cpt_none,
+                    (par.parameter_type == parameter_type.var) ? concrete_parameter_type.cpt_var : concrete_parameter_type.cpt_none,
                     par.default_value, null);
                 cpar.inital_value = par.inital_value;
                 cpar.default_value = par.default_value;
@@ -2133,15 +2137,15 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        protected List<PascalABCCompiler.SemanticTree.ITypeNode> _generic_parameters = null;
+        protected List<ITypeNode> _generic_parameters = null;
 
-        public List<PascalABCCompiler.SemanticTree.ITypeNode> generic_parameters
+        public List<ITypeNode> generic_parameters
         {
             get
             {
                 if (_generic_parameters == null)
                 {
-                    _generic_parameters = new List<PascalABCCompiler.SemanticTree.ITypeNode>();
+                    _generic_parameters = new List<ITypeNode>();
                     foreach (type_node t in _instance_params)
                     {
                         _generic_parameters.Add(t);
@@ -2153,7 +2157,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
         protected common_namespace_function_node _original_function;
 
-        PascalABCCompiler.SemanticTree.IFunctionNode PascalABCCompiler.SemanticTree.IGenericFunctionInstance.original_function
+        IFunctionNode IGenericFunctionInstance.original_function
         {
             get
             {
@@ -2197,7 +2201,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 common_parameter cpar = new common_parameter(par.name,
                     generic_convertions.determine_type(par.type, _instance_params, true),
                     par.parameter_type, this,
-                    (par.parameter_type == PascalABCCompiler.SemanticTree.parameter_type.var) ? concrete_parameter_type.cpt_var : concrete_parameter_type.cpt_none,
+                    (par.parameter_type == parameter_type.var) ? concrete_parameter_type.cpt_var : concrete_parameter_type.cpt_none,
                     par.default_value, null);
                 cpar.inital_value = par.inital_value;
                 cpar.default_value = par.default_value;
@@ -2233,7 +2237,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         /// Метод для обхода дерева посетителем.
         /// </summary>
         /// <param name="visitor">Класс - посетитель дерева.</param>
-        public override void visit(PascalABCCompiler.SemanticTree.ISemanticVisitor visitor)
+        public override void visit(ISemanticVisitor visitor)
         {
             visitor.visit(this);
         }

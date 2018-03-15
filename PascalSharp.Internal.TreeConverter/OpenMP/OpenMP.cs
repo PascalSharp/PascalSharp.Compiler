@@ -664,7 +664,7 @@ namespace PascalABCCompiler.TreeConverter
         private static string InParallelSection = "";
         private static bool InParallelSectionCreated = false;
         //временно удаленные директивы
-        private static Dictionary<SyntaxTree.syntax_tree_node, SyntaxTree.compiler_directive> DisabledDirectives = new Dictionary<PascalABCCompiler.SyntaxTree.syntax_tree_node, PascalABCCompiler.SyntaxTree.compiler_directive>();
+        private static Dictionary<SyntaxTree.syntax_tree_node, SyntaxTree.compiler_directive> DisabledDirectives = new Dictionary<syntax_tree_node, compiler_directive>();
         //В программе встречаются директивы parallel for
         public static bool ForsFound = false;
         //в программе встречаются директивы parallel sections
@@ -681,7 +681,7 @@ namespace PascalABCCompiler.TreeConverter
         //приведение класса в исходное состояние
         public static void InternalReset()
         {
-            DisabledDirectives = new Dictionary<PascalABCCompiler.SyntaxTree.syntax_tree_node, PascalABCCompiler.SyntaxTree.compiler_directive>();
+            DisabledDirectives = new Dictionary<syntax_tree_node, compiler_directive>();
             LocksName = "";
             LocksFound = false;
             LocksInitialized = false;
@@ -698,7 +698,7 @@ namespace PascalABCCompiler.TreeConverter
         {
             //Из-за переноса этой проверки в секцию инициализации - оно не всегда успевает инициализироваться до выполнения этого кода.
             //Будем надеяться, что условие никогда не выполнится. Без постороннего вмешательства (замена файлов старыми версиями) - не должно.
-            //if (SystemLibrary.SystemLibInitializer.OMP_Available == null || SystemLibrary.SystemLibInitializer.OMP_Available.NotFound)
+            //if (SystemLibInitializer.OMP_Available == null || SystemLibInitializer.OMP_Available.NotFound)
             //{
             //    visitor.AddWarning(new Errors.CommonWarning(PascalABCCompiler.StringResources.Get("OMPERROR_OMP_NOT_AVAILABLE"), cu.file_name, cu.source_context.begin_position.line_num, cu.source_context.begin_position.column_num));
             //    return;
@@ -724,12 +724,12 @@ namespace PascalABCCompiler.TreeConverter
                 }
             }
             //уже не нужно
-            //if (ForsFound && SystemLibrary.SystemLibInitializer.OMP_ParallelFor.NotFound)
+            //if (ForsFound && SystemLibInitializer.OMP_ParallelFor.NotFound)
             //{
             //    visitor.AddWarning(new Errors.CommonWarning(PascalABCCompiler.StringResources.Get("OMPERROR_PARALLELIZATION_FOR_NOT_AVAILABLE"), cu.file_name, cu.source_context.begin_position.line_num, cu.source_context.begin_position.column_num));
             //    ForsFound = false;
             //}
-            //if (SectionsFound && SystemLibrary.SystemLibInitializer.OMP_ParallelSections.NotFound)
+            //if (SectionsFound && SystemLibInitializer.OMP_ParallelSections.NotFound)
             //{
             //    visitor.AddWarning(new Errors.CommonWarning(PascalABCCompiler.StringResources.Get("OMPERROR_PARALLELIZATION_SECTIONS_NOT_AVAILABLE"), cu.file_name, cu.source_context.begin_position.line_num, cu.source_context.begin_position.column_num));
             //    SectionsFound = false;
@@ -748,18 +748,18 @@ namespace PascalABCCompiler.TreeConverter
         private static void InitCriticals(syntax_tree_visitor visitor)
         {
             //генерируем класс
-            SyntaxTree.type_declarations TypeDecls = new PascalABCCompiler.SyntaxTree.type_declarations();
-            SyntaxTree.type_declaration TypeDecl = new PascalABCCompiler.SyntaxTree.type_declaration();
+            SyntaxTree.type_declarations TypeDecls = new type_declarations();
+            SyntaxTree.type_declaration TypeDecl = new type_declaration();
             TypeDecls.types_decl.Add(TypeDecl);
             LocksName = visitor.context.get_free_name("$locks_container{0}");
-            TypeDecl.type_name = new PascalABCCompiler.SyntaxTree.ident(LocksName);
-            SyntaxTree.class_definition ClassDef = new PascalABCCompiler.SyntaxTree.class_definition();
+            TypeDecl.type_name = new ident(LocksName);
+            SyntaxTree.class_definition ClassDef = new class_definition();
             TypeDecl.type_def = ClassDef;
-            SyntaxTree.class_body_list ClassBody = new PascalABCCompiler.SyntaxTree.class_body_list();
+            SyntaxTree.class_body_list ClassBody = new class_body_list();
             ClassDef.body = ClassBody;
-            SyntaxTree.class_members ClassMember = new PascalABCCompiler.SyntaxTree.class_members();
+            SyntaxTree.class_members ClassMember = new class_members();
             ClassBody.class_def_blocks.Add(ClassMember);
-            ClassMember.access_mod = new PascalABCCompiler.SyntaxTree.access_modifer_node(PascalABCCompiler.SyntaxTree.access_modifer.public_modifer);
+            ClassMember.access_mod = new access_modifer_node(access_modifer.public_modifer);
 
             List<string> ProcessedNames = new List<string>();
 
@@ -776,17 +776,17 @@ namespace PascalABCCompiler.TreeConverter
                         continue;
                     ProcessedNames.Add(LockName);
 
-                    SyntaxTree.var_def_statement vds = new PascalABCCompiler.SyntaxTree.var_def_statement();
-                    SyntaxTree.ident_list idl = new PascalABCCompiler.SyntaxTree.ident_list();
+                    SyntaxTree.var_def_statement vds = new var_def_statement();
+                    SyntaxTree.ident_list idl = new ident_list();
                     vds.vars = idl;
                     idl.Add(new SyntaxTree.ident(LockName));
-                    SyntaxTree.named_type_reference ntr = new PascalABCCompiler.SyntaxTree.named_type_reference();
+                    SyntaxTree.named_type_reference ntr = new named_type_reference();
                     vds.vars_type = ntr;
                     ntr.Add(new SyntaxTree.ident("object"));
-                    SyntaxTree.new_expr ne = new PascalABCCompiler.SyntaxTree.new_expr();
+                    SyntaxTree.new_expr ne = new new_expr();
                     vds.inital_value = ne;
                     ne.type = ntr;
-                    vds.var_attr = PascalABCCompiler.SyntaxTree.definition_attribute.Static;
+                    vds.var_attr = definition_attribute.Static;
                     ClassMember.members.Add(vds);
                 }
 
@@ -816,7 +816,7 @@ namespace PascalABCCompiler.TreeConverter
             string LockName = "$default";
             if (DirInfosTable[directive].Name.Length != 0)
                 LockName = DirInfosTable[directive].Name;
-            SyntaxTree.lock_stmt LockStmt = new PascalABCCompiler.SyntaxTree.lock_stmt();
+            SyntaxTree.lock_stmt LockStmt = new lock_stmt();
             LockStmt.lock_object = new SyntaxTree.dot_node(new SyntaxTree.ident(LocksName), new SyntaxTree.ident(LockName));
             LockStmt.stmt = st;
             st = LockStmt;
@@ -920,10 +920,10 @@ namespace PascalABCCompiler.TreeConverter
                     return false;
                 }
                 base_function_call omp_parallel_for_call = null;
-                if (SystemLibrary.SystemLibInitializer.OMP_ParallelFor.sym_info is common_namespace_function_node)
-                    omp_parallel_for_call = new common_namespace_function_call(SystemLibrary.SystemLibInitializer.OMP_ParallelFor.sym_info as common_namespace_function_node, body.location);
+                if (SystemLibInitializer.OMP_ParallelFor.sym_info is common_namespace_function_node)
+                    omp_parallel_for_call = new common_namespace_function_call(SystemLibInitializer.OMP_ParallelFor.sym_info as common_namespace_function_node, body.location);
                 else
-                    omp_parallel_for_call = new compiled_static_method_call(SystemLibrary.SystemLibInitializer.OMP_ParallelFor.sym_info as compiled_function_node, body.location);
+                    omp_parallel_for_call = new compiled_static_method_call(SystemLibInitializer.OMP_ParallelFor.sym_info as compiled_function_node, body.location);
                 omp_parallel_for_call.parameters.AddElement(fromInclusive);
                 omp_parallel_for_call.parameters.AddElement(toInclusive);
                 omp_parallel_for_call.parameters.AddElement(omp_call);
@@ -1027,12 +1027,12 @@ namespace PascalABCCompiler.TreeConverter
         private static bool GenerateOMPParallelSectionsCall(statements_list stmts, SyntaxTree.statement_list syntax_stmts, statements_list omp_stmts, syntax_tree_visitor syntax_tree_visitor)
         {
 
-            SyntaxTree.expression_list delegates = new PascalABCCompiler.SyntaxTree.expression_list();
-            SyntaxTree.statement_list stlInit = new PascalABCCompiler.SyntaxTree.statement_list();
-            SyntaxTree.statement_list stlFinal = new PascalABCCompiler.SyntaxTree.statement_list();
+            SyntaxTree.expression_list delegates = new expression_list();
+            SyntaxTree.statement_list stlInit = new statement_list();
+            SyntaxTree.statement_list stlFinal = new statement_list();
             VarInfoContainer Vars = new VarInfoContainer();
             string ClassName = syntax_tree_visitor.context.get_free_name("$section_class{0}");
-            List<SyntaxTree.statement> Sections = new List<PascalABCCompiler.SyntaxTree.statement>();
+            List<SyntaxTree.statement> Sections = new List<statement>();
             foreach (SyntaxTree.statement syntax_statement in syntax_stmts.subnodes)
             {
                 if (syntax_statement is SyntaxTree.empty_statement)
@@ -1087,11 +1087,11 @@ namespace PascalABCCompiler.TreeConverter
             stlInit.subnodes.AddRange(CreateInitPart(ClassName, ObjName, Vars).subnodes);
             stlFinal.subnodes.AddRange(CreateFinalPart(ObjName, Vars).subnodes);
 
-            SyntaxTree.procedure_call pc = new PascalABCCompiler.SyntaxTree.procedure_call();
-            SyntaxTree.method_call mc = new PascalABCCompiler.SyntaxTree.method_call();
+            SyntaxTree.procedure_call pc = new procedure_call();
+            SyntaxTree.method_call mc = new method_call();
             mc.dereferencing_value = CreateTPLFunctionReference("Invoke");
             pc.func_name = mc;
-            SyntaxTree.expression_list exl = new PascalABCCompiler.SyntaxTree.expression_list();
+            SyntaxTree.expression_list exl = new expression_list();
             //foreach (string str in ObjNames)
             for (int i=0; i<Sections.Count; ++i)
                 exl.Add(new SyntaxTree.dot_node(new SyntaxTree.ident(ObjName), new SyntaxTree.ident("Method"+i.ToString())));
@@ -1134,7 +1134,7 @@ namespace PascalABCCompiler.TreeConverter
         /// <returns></returns>
         private static List<SyntaxTree.diapason> get_diapasons(string index_str)
         {
-            List<SyntaxTree.diapason> res = new List<PascalABCCompiler.SyntaxTree.diapason>();
+            List<SyntaxTree.diapason> res = new List<diapason>();
             string[] diaps = index_str.Split(',');
             foreach (string str in diaps)
             {
@@ -1160,7 +1160,7 @@ namespace PascalABCCompiler.TreeConverter
                         right_expr = new SyntaxTree.int32_const(val);
                     }
                     else right_expr = new SyntaxTree.ident(right);
-                    res.Add(new PascalABCCompiler.SyntaxTree.diapason(left_expr, right_expr));
+                    res.Add(new diapason(left_expr, right_expr));
                 }
             }
             return res;
@@ -1172,7 +1172,7 @@ namespace PascalABCCompiler.TreeConverter
         /// <returns></returns>
         private static List<SyntaxTree.ident> get_idents_from_dot_string(string s)
         {
-            List<SyntaxTree.ident> idents = new List<PascalABCCompiler.SyntaxTree.ident>();
+            List<SyntaxTree.ident> idents = new List<ident>();
             string[] strs = s.Split('.');
             foreach (string id in strs)
                 idents.Add(new SyntaxTree.ident(id));
@@ -1200,11 +1200,11 @@ namespace PascalABCCompiler.TreeConverter
         private static SyntaxTree.type_definition get_diapason(type_node sem_type)
         {
             if (sem_type is compiled_type_node)
-                return new PascalABCCompiler.SyntaxTree.named_type_reference(get_idents_from_dot_string(sem_type.PrintableName));
+                return new named_type_reference(get_idents_from_dot_string(sem_type.PrintableName));
 
             if (sem_type is common_type_node)
             {
-                SyntaxTree.diapason diap = new PascalABCCompiler.SyntaxTree.diapason();
+                SyntaxTree.diapason diap = new diapason();
                 common_type_node ctn = sem_type as common_type_node;
                 diap.left = ConvertConstant(ctn.low_bound);
                 diap.right = ConvertConstant(ctn.upper_bound);
@@ -1223,7 +1223,7 @@ namespace PascalABCCompiler.TreeConverter
         {
             if (sem_type.IsPointer)// если указатель
             {
-                SyntaxTree.ref_type rt = new PascalABCCompiler.SyntaxTree.ref_type();
+                SyntaxTree.ref_type rt = new ref_type();
                 rt.pointed_to = ConvertToSyntaxType((sem_type as ref_type_node).pointed_type);
                 return rt;
 
@@ -1234,11 +1234,11 @@ namespace PascalABCCompiler.TreeConverter
                 {
                     if (sem_type.is_generic_type_instance)// это шаблонный тип
                     {
-                        SyntaxTree.template_type_reference ttr = new PascalABCCompiler.SyntaxTree.template_type_reference();
-                        SyntaxTree.named_type_reference ntr = new PascalABCCompiler.SyntaxTree.named_type_reference();
+                        SyntaxTree.template_type_reference ttr = new template_type_reference();
+                        SyntaxTree.named_type_reference ntr = new named_type_reference();
                         ttr.name = ntr;
                         ntr.names.AddRange(get_idents_from_generic_type(sem_type));
-                        SyntaxTree.template_param_list tpl = new PascalABCCompiler.SyntaxTree.template_param_list();
+                        SyntaxTree.template_param_list tpl = new template_param_list();
                         ttr.params_list = tpl;
                         foreach (type_node tn in sem_type.instance_params)
                             tpl.params_list.Add(ConvertToSyntaxType(tn));
@@ -1246,20 +1246,20 @@ namespace PascalABCCompiler.TreeConverter
                         return ttr;
                     }
                     else if (sem_type.IsEnum)
-                        return new PascalABCCompiler.SyntaxTree.named_type_reference(get_idents_from_dot_string(sem_type.name));
+                        return new named_type_reference(get_idents_from_dot_string(sem_type.name));
                     else
-                        return new PascalABCCompiler.SyntaxTree.named_type_reference(get_idents_from_dot_string(sem_type.PrintableName));
+                        return new named_type_reference(get_idents_from_dot_string(sem_type.PrintableName));
                 }
                 else if (sem_type.type_special_kind == SemanticTree.type_special_kind.array_kind || sem_type.type_special_kind == SemanticTree.type_special_kind.array_wrapper)
                 {
                     //значит тип-это массив
-                    SyntaxTree.array_type arr_t = new PascalABCCompiler.SyntaxTree.array_type();
-                    arr_t.source_context = new PascalABCCompiler.SyntaxTree.SourceContext(0xFFFFFF, 0, 0xFFFFFF, 0);
+                    SyntaxTree.array_type arr_t = new array_type();
+                    arr_t.source_context = new SourceContext(0xFFFFFF, 0, 0xFFFFFF, 0);
                     // Cоздаем индексер для массива
-                    SyntaxTree.indexers_types indt = new PascalABCCompiler.SyntaxTree.indexers_types();
+                    SyntaxTree.indexers_types indt = new indexers_types();
                     if (sem_type is common_type_node)
                     {
-                        SyntaxTree.diapason diap = new PascalABCCompiler.SyntaxTree.diapason();
+                        SyntaxTree.diapason diap = new diapason();
                         common_type_node ctn = sem_type as common_type_node;
                         if (ctn.constants.Length > 1)
                         {
@@ -1303,25 +1303,25 @@ namespace PascalABCCompiler.TreeConverter
                 }
                 else if (sem_type.type_special_kind == SemanticTree.type_special_kind.typed_file || sem_type.type_special_kind == SemanticTree.type_special_kind.binary_file)
                 {
-                    SyntaxTree.file_type ft = new PascalABCCompiler.SyntaxTree.file_type();
+                    SyntaxTree.file_type ft = new file_type();
                     if (sem_type.element_type != null)
                         ft.file_of_type = ConvertToSyntaxType(sem_type.element_type);
                     //SyntaxTree.named_type_reference ntr = null;
                     //if (sem_type.element_type!= null)
-                    //    ntr= new PascalABCCompiler.SyntaxTree.named_type_reference(get_idents_from_dot_string(sem_type.element_type.name));
+                    //    ntr= new named_type_reference(get_idents_from_dot_string(sem_type.element_type.name));
                     //ft.file_of_type = ntr;
                     return ft;
                 }
-                else if (sem_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.short_string)
+                else if (sem_type.type_special_kind == type_special_kind.short_string)
                 {
-                    SyntaxTree.string_num_definition snd = new PascalABCCompiler.SyntaxTree.string_num_definition();
+                    SyntaxTree.string_num_definition snd = new string_num_definition();
                     snd.name = new SyntaxTree.ident(sem_type.name.Substring(0, sem_type.name.IndexOf('[')));
                     snd.num_of_symbols = new SyntaxTree.int32_const(Int32.Parse(get_indexer_string(sem_type.PrintableName)));
                     return snd;
                 }
-                else if (sem_type.type_special_kind == PascalABCCompiler.SemanticTree.type_special_kind.set_type)
+                else if (sem_type.type_special_kind == type_special_kind.set_type)
                 {
-                    SyntaxTree.set_type_definition std = new PascalABCCompiler.SyntaxTree.set_type_definition();
+                    SyntaxTree.set_type_definition std = new set_type_definition();
                     if (sem_type.element_type != null)
                         std.of_type = ConvertToSyntaxType(sem_type.element_type);
                     return std;
@@ -1353,7 +1353,7 @@ namespace PascalABCCompiler.TreeConverter
 
                     if (arr.indexers != null)
                     {
-                        List<SyntaxTree.diapason> diaps = new List<PascalABCCompiler.SyntaxTree.diapason>();
+                        List<SyntaxTree.diapason> diaps = new List<diapason>();
                         foreach (SyntaxTree.type_definition td in arr.indexers.indexers)
                         {
                             if (td is SyntaxTree.diapason)
@@ -1387,7 +1387,7 @@ namespace PascalABCCompiler.TreeConverter
 
                 while (true)
                 {
-                    List<SyntaxTree.diapason> diaps = new List<PascalABCCompiler.SyntaxTree.diapason>();
+                    List<SyntaxTree.diapason> diaps = new List<diapason>();
                     if (arr.indexers != null)
                     {
 
@@ -1412,35 +1412,35 @@ namespace PascalABCCompiler.TreeConverter
         }
         private static SyntaxTree.statement_list AssignArrs(SyntaxTree.array_type ArrFrom, SyntaxTree.addressed_value IdFrom, SyntaxTree.addressed_value IdTo)
         {
-            SyntaxTree.statement_list OuterSTL = new PascalABCCompiler.SyntaxTree.statement_list();
+            SyntaxTree.statement_list OuterSTL = new statement_list();
             SyntaxTree.statement_list InnerSTL = OuterSTL;
             List<List<SyntaxTree.diapason>> DiapasonsList = get_list_of_diapasons(ArrFrom);
-            List<List<SyntaxTree.ident>> IdentsList = new List<List<PascalABCCompiler.SyntaxTree.ident>>();
+            List<List<SyntaxTree.ident>> IdentsList = new List<List<ident>>();
             int VarNum = 0;
             if (DiapasonsList == null)
-                DiapasonsList = new List<List<PascalABCCompiler.SyntaxTree.diapason>>();
+                DiapasonsList = new List<List<diapason>>();
             foreach (List<SyntaxTree.diapason> Diapasons in DiapasonsList)
             {
                 bool IsDynamicArray = false;
-                List<SyntaxTree.method_call> Lens = new List<PascalABCCompiler.SyntaxTree.method_call>();
+                List<SyntaxTree.method_call> Lens = new List<method_call>();
                 if ((Diapasons.Count == 0) || (Diapasons[0] == null))
                 {
                     //массив динамический, нужно делать setlength
                     IsDynamicArray = true;
-                    SyntaxTree.procedure_call SetLenPC = new PascalABCCompiler.SyntaxTree.procedure_call();
-                    SyntaxTree.method_call SetLenMC = new PascalABCCompiler.SyntaxTree.method_call();
+                    SyntaxTree.procedure_call SetLenPC = new procedure_call();
+                    SyntaxTree.method_call SetLenMC = new method_call();
                     SetLenMC.dereferencing_value = new SyntaxTree.ident("SetLength");
                     SetLenPC.func_name = SetLenMC;
-                    SyntaxTree.expression_list SetLenParamsExl = new PascalABCCompiler.SyntaxTree.expression_list();
+                    SyntaxTree.expression_list SetLenParamsExl = new expression_list();
                     SetLenMC.parameters = SetLenParamsExl;
 
                     //индексное выражение для массива-приемника
                     SyntaxTree.addressed_value IndexerTo = IdTo;
                     foreach (List<SyntaxTree.ident> Idents in IdentsList)
                     {
-                        SyntaxTree.indexer InnerInd = new PascalABCCompiler.SyntaxTree.indexer();
+                        SyntaxTree.indexer InnerInd = new indexer();
                         InnerInd.dereferencing_value = IndexerTo;
-                        SyntaxTree.expression_list IndexersExl = new PascalABCCompiler.SyntaxTree.expression_list();
+                        SyntaxTree.expression_list IndexersExl = new expression_list();
                         foreach (SyntaxTree.ident Ident in Idents)
                             IndexersExl.expressions.Add(new SyntaxTree.ident(Ident.name));
                         InnerInd.indexes = IndexersExl;
@@ -1451,9 +1451,9 @@ namespace PascalABCCompiler.TreeConverter
                     SyntaxTree.addressed_value IndexerFrom = IdFrom;
                     foreach (List<SyntaxTree.ident> Idents in IdentsList)
                     {
-                        SyntaxTree.indexer InnerInd = new PascalABCCompiler.SyntaxTree.indexer();
+                        SyntaxTree.indexer InnerInd = new indexer();
                         InnerInd.dereferencing_value = IndexerFrom;
-                        SyntaxTree.expression_list IndexersExl = new PascalABCCompiler.SyntaxTree.expression_list();
+                        SyntaxTree.expression_list IndexersExl = new expression_list();
                         foreach (SyntaxTree.ident Ident in Idents)
                             IndexersExl.expressions.Add(new SyntaxTree.ident(Ident.name));
                         InnerInd.indexes = IndexersExl;
@@ -1462,12 +1462,12 @@ namespace PascalABCCompiler.TreeConverter
 
                     SetLenParamsExl.expressions.Add(IndexerTo);
 
-                    //List<SyntaxTree.method_call> Lengths = new List<PascalABCCompiler.SyntaxTree.method_call>();
+                    //List<SyntaxTree.method_call> Lengths = new List<method_call>();
                     if (Diapasons.Count == 0)
                     {
-                        SyntaxTree.method_call LengthMC = new PascalABCCompiler.SyntaxTree.method_call();
+                        SyntaxTree.method_call LengthMC = new method_call();
                         LengthMC.dereferencing_value = new SyntaxTree.ident("Length");
-                        SyntaxTree.expression_list LenMCExl = new PascalABCCompiler.SyntaxTree.expression_list();
+                        SyntaxTree.expression_list LenMCExl = new expression_list();
                         LengthMC.parameters = LenMCExl;
                         LenMCExl.expressions.Add(IndexerFrom);
                         SetLenParamsExl.expressions.Add(LengthMC);
@@ -1477,9 +1477,9 @@ namespace PascalABCCompiler.TreeConverter
                     {
                         for (int i = 0; i < Diapasons.Count; ++i)
                         {
-                            SyntaxTree.method_call LengthMC = new PascalABCCompiler.SyntaxTree.method_call();
+                            SyntaxTree.method_call LengthMC = new method_call();
                             LengthMC.dereferencing_value = new SyntaxTree.ident("Length");
-                            SyntaxTree.expression_list LenMCExl = new PascalABCCompiler.SyntaxTree.expression_list();
+                            SyntaxTree.expression_list LenMCExl = new expression_list();
                             LengthMC.parameters = LenMCExl;
                             LenMCExl.expressions.Add(IndexerFrom);
                             LenMCExl.expressions.Add(new SyntaxTree.int32_const(i));
@@ -1495,15 +1495,15 @@ namespace PascalABCCompiler.TreeConverter
                 List<SyntaxTree.ident> LoopIdents = new List<SyntaxTree.ident>();
                 for (int i = 0; i < Math.Max(Diapasons.Count, 1); ++i)
                 {
-                    SyntaxTree.for_node ForNode = new PascalABCCompiler.SyntaxTree.for_node();
-                    SyntaxTree.ident LoopVar = new PascalABCCompiler.SyntaxTree.ident("$i" + (VarNum++).ToString());
+                    SyntaxTree.for_node ForNode = new for_node();
+                    SyntaxTree.ident LoopVar = new ident("$i" + (VarNum++).ToString());
                     LoopIdents.Add(LoopVar);
                     ForNode.loop_variable = LoopVar;
                     ForNode.create_loop_variable = true;
                     if (IsDynamicArray)
                     {
                         ForNode.initial_value = new SyntaxTree.int32_const(0);
-                        ForNode.finish_value = new PascalABCCompiler.SyntaxTree.bin_expr(Lens[i], new SyntaxTree.int32_const(1), PascalABCCompiler.SyntaxTree.Operators.Minus);
+                        ForNode.finish_value = new bin_expr(Lens[i], new SyntaxTree.int32_const(1), Operators.Minus);
                     }
                     else
                     {
@@ -1511,7 +1511,7 @@ namespace PascalABCCompiler.TreeConverter
                         ForNode.finish_value = Diapasons[i].right;
                     }
                     InnerSTL.subnodes.Add(ForNode);
-                    ForNode.statements = new PascalABCCompiler.SyntaxTree.statement_list();
+                    ForNode.statements = new statement_list();
                     InnerSTL = ForNode.statements as SyntaxTree.statement_list;
                 }
                 IdentsList.Add(LoopIdents);
@@ -1523,12 +1523,12 @@ namespace PascalABCCompiler.TreeConverter
             SyntaxTree.addressed_value AssignIndexerTo = IdTo;
             foreach (List<SyntaxTree.ident> AssignIdents in IdentsList)
             {
-                SyntaxTree.indexer FromIndexer = new PascalABCCompiler.SyntaxTree.indexer();
-                SyntaxTree.indexer ToIndexer = new PascalABCCompiler.SyntaxTree.indexer();
+                SyntaxTree.indexer FromIndexer = new indexer();
+                SyntaxTree.indexer ToIndexer = new indexer();
                 FromIndexer.dereferencing_value = AssignIndexerFrom;
                 ToIndexer.dereferencing_value = AssignIndexerTo;
 
-                SyntaxTree.expression_list Exl = new PascalABCCompiler.SyntaxTree.expression_list();
+                SyntaxTree.expression_list Exl = new expression_list();
                 foreach (SyntaxTree.ident id in AssignIdents)
                     Exl.expressions.Add(id);
                 FromIndexer.indexes = Exl;
@@ -1537,10 +1537,10 @@ namespace PascalABCCompiler.TreeConverter
                 AssignIndexerFrom = FromIndexer;
                 AssignIndexerTo = ToIndexer;
             }
-            SyntaxTree.assign Assign = new PascalABCCompiler.SyntaxTree.assign();
+            SyntaxTree.assign Assign = new assign();
             Assign.from = AssignIndexerFrom;
             Assign.to = AssignIndexerTo;
-            Assign.operator_type = PascalABCCompiler.SyntaxTree.Operators.Assignment;
+            Assign.operator_type = Operators.Assignment;
             InnerSTL.subnodes.Add(Assign);
 
             return OuterSTL;
@@ -1571,17 +1571,17 @@ namespace PascalABCCompiler.TreeConverter
         private static SyntaxTree.type_declarations CreateClass(string ClassName,out SyntaxTree.class_members ClassMember, VarInfoContainer Vars)
         {
             //генерация класса
-            SyntaxTree.type_declarations TypeDecls = new PascalABCCompiler.SyntaxTree.type_declarations();
-            SyntaxTree.type_declaration TypeDecl = new PascalABCCompiler.SyntaxTree.type_declaration();
+            SyntaxTree.type_declarations TypeDecls = new type_declarations();
+            SyntaxTree.type_declaration TypeDecl = new type_declaration();
             TypeDecls.types_decl.Add(TypeDecl);
-            TypeDecl.type_name = new PascalABCCompiler.SyntaxTree.ident(ClassName);
-            SyntaxTree.class_definition ClassDef = new PascalABCCompiler.SyntaxTree.class_definition();
+            TypeDecl.type_name = new ident(ClassName);
+            SyntaxTree.class_definition ClassDef = new class_definition();
             TypeDecl.type_def = ClassDef;
-            SyntaxTree.class_body_list ClassBody = new PascalABCCompiler.SyntaxTree.class_body_list();
+            SyntaxTree.class_body_list ClassBody = new class_body_list();
             ClassDef.body = ClassBody;
-            ClassMember = new PascalABCCompiler.SyntaxTree.class_members();
+            ClassMember = new class_members();
             ClassBody.class_def_blocks.Add(ClassMember);
-            ClassMember.access_mod = new PascalABCCompiler.SyntaxTree.access_modifer_node(PascalABCCompiler.SyntaxTree.access_modifer.public_modifer);
+            ClassMember.access_mod = new access_modifer_node(access_modifer.public_modifer);
 
             //  генерация полей класса
             //  shared переменные
@@ -1597,33 +1597,33 @@ namespace PascalABCCompiler.TreeConverter
         private static SyntaxTree.procedure_definition CreateMethod(string MethodName, SyntaxTree.statement Body, string LoopVariableName, SyntaxTree.class_members ClassMember, VarInfoContainer Vars)
         {
             //  генерация метода
-            SyntaxTree.procedure_definition ProcDef = new PascalABCCompiler.SyntaxTree.procedure_definition();
+            SyntaxTree.procedure_definition ProcDef = new procedure_definition();
             //ClassMember.members.Add(ProcDef);
-            SyntaxTree.procedure_header ProcHead = new PascalABCCompiler.SyntaxTree.procedure_header();
+            SyntaxTree.procedure_header ProcHead = new procedure_header();
             ProcDef.proc_header = ProcHead;
-            ProcHead.name = new PascalABCCompiler.SyntaxTree.method_name(null, null, new PascalABCCompiler.SyntaxTree.ident(MethodName), null);
+            ProcHead.name = new method_name(null, null, new ident(MethodName), null);
             if (LoopVariableName != "")
             {
                 //  параметр, счетчик цикла
                 string ParamType = "integer";
-                SyntaxTree.formal_parameters FormalParams = new PascalABCCompiler.SyntaxTree.formal_parameters();
+                SyntaxTree.formal_parameters FormalParams = new formal_parameters();
                 ProcHead.parameters = FormalParams;
-                SyntaxTree.typed_parameters TypedParams = new PascalABCCompiler.SyntaxTree.typed_parameters();
+                SyntaxTree.typed_parameters TypedParams = new typed_parameters();
                 FormalParams.params_list.Add(TypedParams);
-                SyntaxTree.ident_list idl = new PascalABCCompiler.SyntaxTree.ident_list();
+                SyntaxTree.ident_list idl = new ident_list();
                 TypedParams.idents = idl;
                 idl.Add(new SyntaxTree.ident(LoopVariableName));
-                SyntaxTree.named_type_reference ntr = new PascalABCCompiler.SyntaxTree.named_type_reference();
+                SyntaxTree.named_type_reference ntr = new named_type_reference();
                 TypedParams.vars_type = ntr;
                 ntr.Add(new SyntaxTree.ident(ParamType));
             }
 
-            SyntaxTree.block ProcBlock = new PascalABCCompiler.SyntaxTree.block();
+            SyntaxTree.block ProcBlock = new block();
             ProcDef.proc_body = ProcBlock;
-            ProcBlock.defs = new PascalABCCompiler.SyntaxTree.declarations();
+            ProcBlock.defs = new declarations();
             if (Vars.Constants.Count > 0)
             {
-                SyntaxTree.consts_definitions_list cdl = new PascalABCCompiler.SyntaxTree.consts_definitions_list();
+                SyntaxTree.consts_definitions_list cdl = new consts_definitions_list();
                 ProcBlock.defs.defs.Add(cdl);
                 //  константы - в методе
                 for (int i = 0; i < Vars.Constants.Count; ++i)
@@ -1632,7 +1632,7 @@ namespace PascalABCCompiler.TreeConverter
             if ((Vars.ReductionVariables.Count > 0) || (Vars.PrivateVariables.Count > 0))
             {
                 //  переменные редукции - в методе тоже, но без префикса
-                SyntaxTree.variable_definitions vds = new PascalABCCompiler.SyntaxTree.variable_definitions();
+                SyntaxTree.variable_definitions vds = new variable_definitions();
                 ProcBlock.defs.defs.Add(vds);
                 for (int i = 0; i < Vars.ReductionVariables.Count; ++i)
                     vds.Add(CreateClassMember(Vars.ReductionVariables[i], "") as SyntaxTree.var_def_statement);
@@ -1645,7 +1645,7 @@ namespace PascalABCCompiler.TreeConverter
                 ProcBlock.program_code = Body as SyntaxTree.statement_list;
             else
             {
-                SyntaxTree.statement_list stl = new PascalABCCompiler.SyntaxTree.statement_list();
+                SyntaxTree.statement_list stl = new statement_list();
                 stl.subnodes.Add(Body);
                 ProcBlock.program_code = stl;
             }
@@ -1653,14 +1653,14 @@ namespace PascalABCCompiler.TreeConverter
             //присваивания для переменных редукции
             if (Vars.ReductionVariables.Count > 0)
             {
-                SyntaxTree.statement_list LoopBodyInit = new PascalABCCompiler.SyntaxTree.statement_list();
-                SyntaxTree.statement_list LoopBodyFinal = new PascalABCCompiler.SyntaxTree.statement_list();
+                SyntaxTree.statement_list LoopBodyInit = new statement_list();
+                SyntaxTree.statement_list LoopBodyFinal = new statement_list();
 
                 for (int i = 0; i < Vars.ReductionVariables.Count; ++i)
                 {
                     //присваивание начального значения
-                    SyntaxTree.assign Assign = new PascalABCCompiler.SyntaxTree.assign();
-                    Assign.operator_type = PascalABCCompiler.SyntaxTree.Operators.Assignment;
+                    SyntaxTree.assign Assign = new assign();
+                    Assign.operator_type = Operators.Assignment;
                     Assign.to = new SyntaxTree.ident(Vars.ReductionVariables[i].name);
                     bool isBool = Vars.ReductionVariables[i].type.name.ToLower() == "boolean";
                     switch (Vars.ReductionActions[i])
@@ -1674,11 +1674,11 @@ namespace PascalABCCompiler.TreeConverter
                                     //отрицание нуля
                                     Assign.from = new SyntaxTree.int32_const(0);
                                     LoopBodyInit.subnodes.Add(Assign);
-                                    Assign = new PascalABCCompiler.SyntaxTree.assign();
-                                    Assign.operator_type = PascalABCCompiler.SyntaxTree.Operators.Assignment;
+                                    Assign = new assign();
+                                    Assign.operator_type = Operators.Assignment;
                                     Assign.to = new SyntaxTree.ident(Vars.ReductionVariables[i].name);
-                                    SyntaxTree.un_expr ue = new PascalABCCompiler.SyntaxTree.un_expr();
-                                    ue.operation_type = PascalABCCompiler.SyntaxTree.Operators.LogicalNOT;
+                                    SyntaxTree.un_expr ue = new un_expr();
+                                    ue.operation_type = Operators.LogicalNOT;
                                     ue.subnode = new SyntaxTree.ident(Vars.ReductionVariables[i].name);
                                     Assign.from = ue;
                                 }
@@ -1700,40 +1700,40 @@ namespace PascalABCCompiler.TreeConverter
                     LoopBodyInit.Add(Assign);
 
                     //присваивание после итерации
-                    Assign = new PascalABCCompiler.SyntaxTree.assign();
-                    Assign.operator_type = PascalABCCompiler.SyntaxTree.Operators.Assignment;
+                    Assign = new assign();
+                    Assign.operator_type = Operators.Assignment;
                     Assign.to = new SyntaxTree.ident("$" + Vars.ReductionVariables[i].name);
-                    SyntaxTree.bin_expr From = new PascalABCCompiler.SyntaxTree.bin_expr();
+                    SyntaxTree.bin_expr From = new bin_expr();
                     From.left = new SyntaxTree.ident("$" + Vars.ReductionVariables[i].name);
                     From.right = new SyntaxTree.ident(Vars.ReductionVariables[i].name);
                     Assign.from = From;
                     switch (Vars.ReductionActions[i])
                     {
-                        case ReductionOperations.and: From.operation_type = PascalABCCompiler.SyntaxTree.Operators.LogicalAND; break;
-                        case ReductionOperations.or: From.operation_type = PascalABCCompiler.SyntaxTree.Operators.LogicalOR; break;
-                        case ReductionOperations.xor: From.operation_type = PascalABCCompiler.SyntaxTree.Operators.BitwiseXOR; break;
-                        case ReductionOperations.plus: From.operation_type = PascalABCCompiler.SyntaxTree.Operators.Plus; break;
-                        case ReductionOperations.minus: From.operation_type = PascalABCCompiler.SyntaxTree.Operators.Minus; break;
-                        case ReductionOperations.mult: From.operation_type = PascalABCCompiler.SyntaxTree.Operators.Multiplication; break;
+                        case ReductionOperations.and: From.operation_type = Operators.LogicalAND; break;
+                        case ReductionOperations.or: From.operation_type = Operators.LogicalOR; break;
+                        case ReductionOperations.xor: From.operation_type = Operators.BitwiseXOR; break;
+                        case ReductionOperations.plus: From.operation_type = Operators.Plus; break;
+                        case ReductionOperations.minus: From.operation_type = Operators.Minus; break;
+                        case ReductionOperations.mult: From.operation_type = Operators.Multiplication; break;
                     }
                     LoopBodyFinal.Add(Assign);
                 }
 
                 //создаем обьект для блокировки в классе
-                SyntaxTree.var_def_statement Lvds = new PascalABCCompiler.SyntaxTree.var_def_statement();
-                SyntaxTree.ident_list Lidl = new PascalABCCompiler.SyntaxTree.ident_list();
+                SyntaxTree.var_def_statement Lvds = new var_def_statement();
+                SyntaxTree.ident_list Lidl = new ident_list();
                 Lvds.vars = Lidl;
                 Lidl.Add(new SyntaxTree.ident("$ReductionLock"));
-                SyntaxTree.named_type_reference Lntr = new PascalABCCompiler.SyntaxTree.named_type_reference();
+                SyntaxTree.named_type_reference Lntr = new named_type_reference();
                 Lvds.vars_type = Lntr;
                 Lntr.Add(new SyntaxTree.ident("object"));
-                SyntaxTree.new_expr Lne = new PascalABCCompiler.SyntaxTree.new_expr();
+                SyntaxTree.new_expr Lne = new new_expr();
                 Lvds.inital_value = Lne;
                 Lne.type = Lntr;
                 ClassMember.members.Add(Lvds);
 
                 //создаем lock Statement на обьекте с присваиваниями в конце итерации
-                SyntaxTree.lock_stmt reductionLock = new PascalABCCompiler.SyntaxTree.lock_stmt();
+                SyntaxTree.lock_stmt reductionLock = new lock_stmt();
                 reductionLock.lock_object = new SyntaxTree.ident("$ReductionLock");
                 reductionLock.stmt = LoopBodyFinal;
 
@@ -1750,8 +1750,8 @@ namespace PascalABCCompiler.TreeConverter
             if (Def is SemanticTree.IConstantDefinitionNode)
             {
                 SemanticTree.IConstantDefinitionNode ConstDef = Def as SemanticTree.IConstantDefinitionNode;
-                SyntaxTree.typed_const_definition tcd = new PascalABCCompiler.SyntaxTree.typed_const_definition();
-                tcd.const_name = new PascalABCCompiler.SyntaxTree.ident(Prefix + ConstDef.name);
+                SyntaxTree.typed_const_definition tcd = new typed_const_definition();
+                tcd.const_name = new ident(Prefix + ConstDef.name);
                 tcd.const_type = ConvertToSyntaxType(ConstDef.type as type_node);
                 tcd.const_value = ConvertConstant(ConstDef.constant_value);
                 return tcd;
@@ -1759,8 +1759,8 @@ namespace PascalABCCompiler.TreeConverter
             else
             {
                 SemanticTree.IVAriableDefinitionNode VarDef = Def as SemanticTree.IVAriableDefinitionNode;
-                SyntaxTree.var_def_statement vds = new PascalABCCompiler.SyntaxTree.var_def_statement();
-                SyntaxTree.ident_list idl = new PascalABCCompiler.SyntaxTree.ident_list();
+                SyntaxTree.var_def_statement vds = new var_def_statement();
+                SyntaxTree.ident_list idl = new ident_list();
                 vds.vars = idl;
                 idl.Add(new SyntaxTree.ident(Prefix + VarDef.name));
                 vds.vars_type = ConvertToSyntaxType(VarDef.type as type_node);
@@ -1770,31 +1770,31 @@ namespace PascalABCCompiler.TreeConverter
 
         private static SyntaxTree.statement_list CreateInitPart(string ClassName, string ObjName, VarInfoContainer Vars)
         {
-            SyntaxTree.statement_list stl = new PascalABCCompiler.SyntaxTree.statement_list();
+            SyntaxTree.statement_list stl = new statement_list();
 
             //Var Statement - объявление экземпляра обьекта-функции
-            SyntaxTree.var_statement ClassVar = new PascalABCCompiler.SyntaxTree.var_statement();
+            SyntaxTree.var_statement ClassVar = new var_statement();
             stl.subnodes.Add(ClassVar);
-            SyntaxTree.var_def_statement ClassVarDef = new PascalABCCompiler.SyntaxTree.var_def_statement();
+            SyntaxTree.var_def_statement ClassVarDef = new var_def_statement();
             ClassVar.var_def = ClassVarDef;
-            SyntaxTree.ident_list ClassIdl = new PascalABCCompiler.SyntaxTree.ident_list();
+            SyntaxTree.ident_list ClassIdl = new ident_list();
             ClassVarDef.vars = ClassIdl;
-            ClassIdl.idents.Add(new PascalABCCompiler.SyntaxTree.ident(ObjName));
-            SyntaxTree.named_type_reference ClassTypeNTR = new PascalABCCompiler.SyntaxTree.named_type_reference();
+            ClassIdl.idents.Add(new ident(ObjName));
+            SyntaxTree.named_type_reference ClassTypeNTR = new named_type_reference();
             ClassVarDef.vars_type = ClassTypeNTR;
-            ClassTypeNTR.names.Add(new PascalABCCompiler.SyntaxTree.ident(ClassName));
-            SyntaxTree.new_expr ClassInitNE = new PascalABCCompiler.SyntaxTree.new_expr();
+            ClassTypeNTR.names.Add(new ident(ClassName));
+            SyntaxTree.new_expr ClassInitNE = new new_expr();
             ClassVarDef.inital_value = ClassInitNE;
-            SyntaxTree.named_type_reference ClassInitNTR = new PascalABCCompiler.SyntaxTree.named_type_reference();
+            SyntaxTree.named_type_reference ClassInitNTR = new named_type_reference();
             ClassInitNE.type = ClassInitNTR;
-            ClassInitNTR.names.Add(new PascalABCCompiler.SyntaxTree.ident(ClassName));
+            ClassInitNTR.names.Add(new ident(ClassName));
 
             //создаем присваивания разделяемым переменным
             for (int i = 0; i < Vars.SharedVariables.Count; ++i)
             {
                 string VarName = Vars.SharedVariables[i].name;
 
-                SyntaxTree.dot_node DotNode = new PascalABCCompiler.SyntaxTree.dot_node();
+                SyntaxTree.dot_node DotNode = new dot_node();
                 DotNode.left = new SyntaxTree.ident(ObjName);
                 DotNode.right = new SyntaxTree.ident(VarName);
 
@@ -1805,8 +1805,8 @@ namespace PascalABCCompiler.TreeConverter
                 }
                 else
                 {
-                    SyntaxTree.assign Assign = new PascalABCCompiler.SyntaxTree.assign();
-                    Assign.operator_type = PascalABCCompiler.SyntaxTree.Operators.Assignment;
+                    SyntaxTree.assign Assign = new assign();
+                    Assign.operator_type = Operators.Assignment;
                     Assign.from = new SyntaxTree.ident(VarName);
                     Assign.to = DotNode;
                     stl.subnodes.Add(Assign);
@@ -1817,7 +1817,7 @@ namespace PascalABCCompiler.TreeConverter
             {
                 string VarName = Vars.ReductionVariables[i].name;
 
-                SyntaxTree.dot_node DotNode = new PascalABCCompiler.SyntaxTree.dot_node();
+                SyntaxTree.dot_node DotNode = new dot_node();
                 DotNode.left = new SyntaxTree.ident(ObjName);
                 DotNode.right = new SyntaxTree.ident("$" + VarName);
 
@@ -1828,8 +1828,8 @@ namespace PascalABCCompiler.TreeConverter
                 }
                 else
                 {
-                    SyntaxTree.assign Assign = new PascalABCCompiler.SyntaxTree.assign();
-                    Assign.operator_type = PascalABCCompiler.SyntaxTree.Operators.Assignment;
+                    SyntaxTree.assign Assign = new assign();
+                    Assign.operator_type = Operators.Assignment;
                     Assign.from = new SyntaxTree.ident(VarName);
                     Assign.to = DotNode;
                     stl.subnodes.Add(Assign);
@@ -1840,7 +1840,7 @@ namespace PascalABCCompiler.TreeConverter
 
         private static SyntaxTree.statement_list CreateFinalPart(string ObjName, VarInfoContainer Vars)
         {
-            SyntaxTree.statement_list stl = new PascalABCCompiler.SyntaxTree.statement_list();
+            SyntaxTree.statement_list stl = new statement_list();
 
             //создаем присваивания разделяемым переменным
             for (int i = 0; i < Vars.SharedVariables.Count; ++i)
@@ -1849,7 +1849,7 @@ namespace PascalABCCompiler.TreeConverter
                 if (LoopVariables.Contains(VarName.ToLower()))
                     continue;
 
-                SyntaxTree.dot_node DotNode = new PascalABCCompiler.SyntaxTree.dot_node();
+                SyntaxTree.dot_node DotNode = new dot_node();
                 DotNode.left = new SyntaxTree.ident(ObjName);
                 DotNode.right = new SyntaxTree.ident(VarName);
 
@@ -1860,8 +1860,8 @@ namespace PascalABCCompiler.TreeConverter
                 }
                 else
                 {
-                    SyntaxTree.assign Assign = new PascalABCCompiler.SyntaxTree.assign();
-                    Assign.operator_type = PascalABCCompiler.SyntaxTree.Operators.Assignment;
+                    SyntaxTree.assign Assign = new assign();
+                    Assign.operator_type = Operators.Assignment;
                     Assign.to = new SyntaxTree.ident(VarName);
                     Assign.from = DotNode;
                     stl.subnodes.Add(Assign);
@@ -1874,7 +1874,7 @@ namespace PascalABCCompiler.TreeConverter
             {
                 string VarName = Vars.ReductionVariables[i].name;
 
-                SyntaxTree.dot_node DotNode = new PascalABCCompiler.SyntaxTree.dot_node();
+                SyntaxTree.dot_node DotNode = new dot_node();
                 DotNode.left = new SyntaxTree.ident(ObjName);
                 DotNode.right = new SyntaxTree.ident("$" + VarName);
 
@@ -1885,8 +1885,8 @@ namespace PascalABCCompiler.TreeConverter
                 }
                 else
                 {
-                    SyntaxTree.assign Assign = new PascalABCCompiler.SyntaxTree.assign();
-                    Assign.operator_type = PascalABCCompiler.SyntaxTree.Operators.Assignment;
+                    SyntaxTree.assign Assign = new assign();
+                    Assign.operator_type = Operators.Assignment;
                     Assign.to = new SyntaxTree.ident(VarName);
                     Assign.from = DotNode;
                     stl.subnodes.Add(Assign);
@@ -1898,8 +1898,8 @@ namespace PascalABCCompiler.TreeConverter
 
         private static SyntaxTree.procedure_call CreateOMPParallelForCall(SyntaxTree.dot_node dn, SyntaxTree.expression FromInclusive, SyntaxTree.expression ToInclusive)
         {
-            SyntaxTree.procedure_call pc = new PascalABCCompiler.SyntaxTree.procedure_call();
-            SyntaxTree.method_call mc = new PascalABCCompiler.SyntaxTree.method_call();
+            SyntaxTree.procedure_call pc = new procedure_call();
+            SyntaxTree.method_call mc = new method_call();
             pc.func_name = mc;
             mc.dereferencing_value = CreateTPLFunctionReference("For");
 
@@ -1909,7 +1909,7 @@ namespace PascalABCCompiler.TreeConverter
             ToExclusive.right = new SyntaxTree.int32_const(1);
             ToExclusive.operation_type = SyntaxTree.Operators.Plus;
 
-            mc.parameters = new PascalABCCompiler.SyntaxTree.expression_list();
+            mc.parameters = new expression_list();
             mc.parameters.Add(FromInclusive);
             mc.parameters.Add(ToExclusive);
             mc.parameters.Add(dn);
@@ -1924,8 +1924,8 @@ namespace PascalABCCompiler.TreeConverter
             if_node res = null;
             try
             {
-                SyntaxTree.if_node if_node = new PascalABCCompiler.SyntaxTree.if_node();
-                SyntaxTree.un_expr une = new PascalABCCompiler.SyntaxTree.un_expr();
+                SyntaxTree.if_node if_node = new if_node();
+                SyntaxTree.un_expr une = new un_expr();
                 une.operation_type = SyntaxTree.Operators.LogicalNOT;
                 une.subnode = new SyntaxTree.ident(InParallelSection);
                 if_node.condition = une;
@@ -1976,15 +1976,15 @@ namespace PascalABCCompiler.TreeConverter
             try
             {
                 //создание и конвертирование переменной                
-                SyntaxTree.var_def_statement vds = new PascalABCCompiler.SyntaxTree.var_def_statement();
-                SyntaxTree.variable_definitions var_def = new PascalABCCompiler.SyntaxTree.variable_definitions(vds, null);
-                SyntaxTree.ident_list idl = new PascalABCCompiler.SyntaxTree.ident_list();
+                SyntaxTree.var_def_statement vds = new var_def_statement();
+                SyntaxTree.variable_definitions var_def = new variable_definitions(vds, null);
+                SyntaxTree.ident_list idl = new ident_list();
                 vds.vars = idl;
                 idl.Add(new SyntaxTree.ident(VarName));
-                SyntaxTree.named_type_reference ntr = new PascalABCCompiler.SyntaxTree.named_type_reference();
+                SyntaxTree.named_type_reference ntr = new named_type_reference();
                 vds.vars_type = ntr;
-                ntr.names.Add(new PascalABCCompiler.SyntaxTree.ident("boolean"));
-                vds.inital_value = new PascalABCCompiler.SyntaxTree.ident("false");
+                ntr.names.Add(new ident("boolean"));
+                vds.inital_value = new ident("false");
                 syntax_tree_visitor.visit(var_def);
             }
             finally
@@ -1997,14 +1997,14 @@ namespace PascalABCCompiler.TreeConverter
         
         private static SyntaxTree.if_node CreateNestedRegionBorder(bool ifEnter)
         {
-            SyntaxTree.if_node result = new PascalABCCompiler.SyntaxTree.if_node();
-            SyntaxTree.un_expr ue = new PascalABCCompiler.SyntaxTree.un_expr();
-            ue.operation_type = PascalABCCompiler.SyntaxTree.Operators.LogicalNOT;
+            SyntaxTree.if_node result = new if_node();
+            SyntaxTree.un_expr ue = new un_expr();
+            ue.operation_type = Operators.LogicalNOT;
             ue.subnode = new SyntaxTree.ident(TreeConverter.compiler_string_consts.OMP_NESTED);
             result.condition = ue;
 
-            SyntaxTree.assign AssignInParVar = new PascalABCCompiler.SyntaxTree.assign();
-            AssignInParVar.operator_type = PascalABCCompiler.SyntaxTree.Operators.Assignment;
+            SyntaxTree.assign AssignInParVar = new assign();
+            AssignInParVar.operator_type = Operators.Assignment;
             AssignInParVar.from = new SyntaxTree.ident(ifEnter ? "true" : "false");
             AssignInParVar.to = new SyntaxTree.ident(InParallelSection);
 
@@ -2046,10 +2046,10 @@ namespace PascalABCCompiler.TreeConverter
             else if (value is array_const)
             {
                 array_const ac = value as array_const;
-                SyntaxTree.expression_list el = new PascalABCCompiler.SyntaxTree.expression_list();
+                SyntaxTree.expression_list el = new expression_list();
                 for (int i = 0; i < ac.element_values.Count; ++i)
                     el.Add(ConvertConstant(ac.element_values[i]));
-                SyntaxTree.array_const synAC = new PascalABCCompiler.SyntaxTree.array_const();
+                SyntaxTree.array_const synAC = new array_const();
                 synAC.elements = el;
                 return synAC;
             }
@@ -2064,10 +2064,10 @@ namespace PascalABCCompiler.TreeConverter
             else if (value is record_constant)
             {
                 record_constant rc = value as record_constant;
-                SyntaxTree.record_const synRC = new PascalABCCompiler.SyntaxTree.record_const();
+                SyntaxTree.record_const synRC = new record_const();
                 for (int i = 0; i < rc.field_values.Count; ++i)
                 {
-                    SyntaxTree.record_const_definition rcd = new PascalABCCompiler.SyntaxTree.record_const_definition();
+                    SyntaxTree.record_const_definition rcd = new record_const_definition();
                     rcd.name = rc.record_const_definition_list[i].name;
                     rcd.val = rc.record_const_definition_list[i].val;
                     synRC.rec_consts.Add(rcd);
@@ -2187,7 +2187,7 @@ namespace PascalABCCompiler.TreeConverter
             //допустимые типы:
             //shortint	byte	smallint	word	integer	longword	int64	uint64	single	real
             //+ страховка на случай наличия записей вида "type integer = object"
-            if (var.type.type_special_kind != PascalABCCompiler.SemanticTree.type_special_kind.none_kind)
+            if (var.type.type_special_kind != type_special_kind.none_kind)
                 return false;
             if (var.type.is_class)
                 return false;

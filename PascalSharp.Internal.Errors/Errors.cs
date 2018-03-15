@@ -6,6 +6,7 @@ using System.IO;
 using PascalABCCompiler;
 using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.Localization;
+using PascalSharp.Internal.SyntaxTree;
 
 namespace PascalSharp.Internal.Errors
 {
@@ -96,7 +97,7 @@ namespace PascalSharp.Internal.Errors
     	public CommonCompilerError(string mes, string fileName, int line, int col):base(mes,fileName)
     	{
     		this.sourceLocation = new SourceLocation(fileName,line,col,line,col);
-    		this.source_context = new PascalABCCompiler.SyntaxTree.SourceContext(line,col,line,col);
+    		this.source_context = new SourceContext(line,col,line,col);
     	}
         public override string ToString()
         {
@@ -133,7 +134,7 @@ namespace PascalSharp.Internal.Errors
     	public CommonWarning(string mes, string fileName, int line, int col):base(mes,fileName)
     	{
     		this.sourceLocation = new SourceLocation(fileName,line,col,line,col);
-    		this.source_context = new PascalABCCompiler.SyntaxTree.SourceContext(line,col,line,col);
+    		this.source_context = new SourceContext(line,col,line,col);
     		_mes = mes;
     	}
     	
@@ -149,7 +150,7 @@ namespace PascalSharp.Internal.Errors
     public class SyntaxError : LocatedError
     {
         public syntax_tree_node bad_node;
-        public SyntaxError(string Message, string fileName, PascalABCCompiler.SyntaxTree.SourceContext _source_context, PascalABCCompiler.SyntaxTree.syntax_tree_node _bad_node)
+        public SyntaxError(string Message, string fileName, SourceContext _source_context, syntax_tree_node _bad_node)
             : base(Message, fileName)
         {
             source_context = _source_context;

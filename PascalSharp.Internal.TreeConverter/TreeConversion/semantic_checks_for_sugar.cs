@@ -2,10 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-
+using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
+using PascalABCCompiler.SystemLibrary;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter
 {
     public partial class syntax_tree_visitor
     {
@@ -58,7 +62,7 @@ namespace PascalSharp.Internal.TreeConverter.
                 semvar = convert_typed_expression_to_function_call(semvar as typed_expression);
 
             var IsSlicedType = 0; // проверим, является ли semvar.type динамическим массивом, списком List или строкой
-            if (semvar.type.type_special_kind == SemanticTree.type_special_kind.array_kind)
+            if (semvar.type.type_special_kind == type_special_kind.array_kind)
                 IsSlicedType = 1;
 
             if (IsSlicedType == 0)
@@ -80,19 +84,19 @@ namespace PascalSharp.Internal.TreeConverter.
                 AddError(get_location(v), "BAD_SLICE_OBJECT");
 
             var semfrom = convert_strong(from);
-            var b = convertion_data_and_alghoritms.can_convert_type(semfrom, SystemLibrary.SystemLibrary.integer_type);
+            var b = convertion_data_and_alghoritms.can_convert_type(semfrom, SystemLibrary.integer_type);
             if (!b)
                 AddError(get_location(from), "INTEGER_VALUE_EXPECTED");
 
             var semto = convert_strong(to);
-            b = convertion_data_and_alghoritms.can_convert_type(semto, SystemLibrary.SystemLibrary.integer_type);
+            b = convertion_data_and_alghoritms.can_convert_type(semto, SystemLibrary.integer_type);
             if (!b)
                 AddError(get_location(to), "INTEGER_VALUE_EXPECTED");
 
             if (step != null)
             {
                 var semstep = convert_strong(step);
-                b = convertion_data_and_alghoritms.can_convert_type(semstep, SystemLibrary.SystemLibrary.integer_type);
+                b = convertion_data_and_alghoritms.can_convert_type(semstep, SystemLibrary.integer_type);
                 if (!b)
                     AddError(get_location(step), "INTEGER_VALUE_EXPECTED");
             }
@@ -114,7 +118,7 @@ namespace PascalSharp.Internal.TreeConverter.
         public void semantic_check_loop_stmt(SyntaxTree.expression ex)
         {
             var sem_ex = convert_strong(ex);
-            var b = convertion_data_and_alghoritms.can_convert_type(sem_ex, SystemLibrary.SystemLibrary.integer_type);
+            var b = convertion_data_and_alghoritms.can_convert_type(sem_ex, SystemLibrary.integer_type);
             if (!b)
                 AddError(sem_ex.location, "INTEGER_VALUE_EXPECTED");
         }

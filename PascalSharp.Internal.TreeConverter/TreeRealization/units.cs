@@ -3,6 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -10,7 +13,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
     [Serializable]
     public abstract class unit_node : definition_node
     {
-        public abstract PascalSharp.Internal.TreeConverter.SymbolInfoList find_only_in_namespace(string name);
+        public abstract SymbolInfoList find_only_in_namespace(string name);
 
         public override general_node_type general_node_type
         {
@@ -30,7 +33,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             this.namespace_name = namespace_name;
         }
-        public override PascalSharp.Internal.TreeConverter.SymbolInfoList find_only_in_namespace(string name)
+        public override SymbolInfoList find_only_in_namespace(string name)
         {
             throw new NotSupportedException();
         }
@@ -47,14 +50,14 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
     public class dot_net_unit_node : unit_node
     {
         //private SymbolTable.DotNETScope _dotNetScope;
-        private NetHelper.NetScope _dotNetScope;
+        private NetScope _dotNetScope;
 
-        public dot_net_unit_node(NetHelper.NetScope dotNetScope)
+        public dot_net_unit_node(NetScope dotNetScope)
         {
             _dotNetScope = dotNetScope;
         }
 
-        public NetHelper.NetScope dotNetScope
+        public NetScope dotNetScope
         {
             get
             {
@@ -70,7 +73,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
-        public override PascalSharp.Internal.TreeConverter.SymbolInfoList find_only_in_namespace(string name)
+        public override SymbolInfoList find_only_in_namespace(string name)
         {
             return _dotNetScope.Find(name);
         }
@@ -97,7 +100,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                PascalSharp.Internal.TreeConverter.SymbolInfo si = namespaces[0].findFirstOnlyInNamespace(PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_marker);
+                SymbolInfo si = namespaces[0].findFirstOnlyInNamespace(compiler_string_consts.system_unit_marker);
                 if (si == null)
                     return false;
                 if (si.sym_info is constant_definition_node)
@@ -147,7 +150,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
         public void add_unit_name_to_namespace()
         {
-            this.scope.AddSymbol(unit_name, new PascalSharp.Internal.TreeConverter.SymbolInfo(this));
+            this.scope.AddSymbol(unit_name, new SymbolInfo(this));
         }
 
         public string unit_name
@@ -236,7 +239,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 			}
 		}
 
-        public override PascalSharp.Internal.TreeConverter.SymbolInfoList find_only_in_namespace(string name)
+        public override SymbolInfoList find_only_in_namespace(string name)
 		{
 			return _scope.FindOnlyInScope(name);
 		}

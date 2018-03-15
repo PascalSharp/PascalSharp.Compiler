@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using PascalABCCompiler.SemanticTree;
 
 namespace PascalSharp.Compiler.SemanticTreeConverters
 {
@@ -86,7 +87,7 @@ namespace PascalSharp.Compiler.SemanticTreeConverters
 
         }
 
-        public PascalABCCompiler.SemanticTree.IProgramNode Convert(PascalABCCompiler.SemanticTree.IProgramNode ProgramNode)
+        public IProgramNode Convert(IProgramNode ProgramNode)
         {
             foreach (ISemanticTreeConverter SemanticTreeConverter in semanticTreeConverters)
             {

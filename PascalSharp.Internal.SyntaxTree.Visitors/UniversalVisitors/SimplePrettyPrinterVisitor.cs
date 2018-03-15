@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SyntaxTree;
 
 
 namespace SyntaxVisitors
@@ -43,7 +44,7 @@ namespace SyntaxVisitors
         }
         public void PrintNoOffset(string s)
         {
-            s = s.Replace("PascalABCCompiler.SyntaxTree.", "").Replace("System.Collections.Generic.", "");
+            s = s.Replace("", "").Replace("System.Collections.Generic.", "");
             if (filename == null)
             {
                 Console.Write(s);
@@ -201,7 +202,7 @@ namespace SyntaxVisitors
             else if (st is var_statement || st is procedure_header)
             {
                 var s = st.ToString();
-                s = s.Replace("PascalABCCompiler.SyntaxTree.", "").Replace("System.Collections.Generic.","");
+                s = s.Replace("", "").Replace("System.Collections.Generic.","");
 
                 Println(s);
                 visitNode = false;
@@ -235,7 +236,7 @@ namespace SyntaxVisitors
             /*else if (st is named_type_reference)
             {
                 var s = st.ToString();
-                s = s.Replace("PascalABCCompiler.SyntaxTree.", "").Replace("System.Collections.Generic.","");
+                s = s.Replace("", "").Replace("System.Collections.Generic.","");
 
                 PrintlnNoOffset(s);
             }*/

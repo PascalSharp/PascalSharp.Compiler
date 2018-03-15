@@ -5,34 +5,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using PascalABCCompiler.Parsers;
 using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
+using ToolKeywordKind = PascalSharp.Internal.ParserTools.KeywordKind;
 
 namespace PascalSharp.Internal.CodeCompletion
 {
-    public enum KeywordKind
-    {
-        kw_none,
-        kw_new,
-        kw_proc,
-        kw_constr,
-        kw_destr,
-        kw_uses,
-        kw_inherited,
-        kw_raise,
-        kw_type,
-        kw_var,
-        kw_unit,
-        kw_punkt,
-        kw_colon,
-        kw_const,
-        kw_program,
-        kw_of,
-        kw_typedecl
-    }
-
-
-
     public class ExtensionMethodsCache
     {
 
@@ -70,19 +53,19 @@ namespace PascalSharp.Internal.CodeCompletion
             if (!ctn.IsEnum)
                 switch (tc)
                 {
-                    case TypeCode.Int32: return PascalSharp.Internal.TreeConverter.compiler_string_consts.integer_type_name;
-                    case TypeCode.Double: return PascalSharp.Internal.TreeConverter.compiler_string_consts.real_type_name;
-                    case TypeCode.Boolean: return PascalSharp.Internal.TreeConverter.compiler_string_consts.bool_type_name;
-                    case TypeCode.String: return PascalSharp.Internal.TreeConverter.compiler_string_consts.string_type_name;
-                    case TypeCode.Char: return PascalSharp.Internal.TreeConverter.compiler_string_consts.char_type_name;
-                    case TypeCode.Byte: return PascalSharp.Internal.TreeConverter.compiler_string_consts.byte_type_name;
-                    case TypeCode.SByte: return PascalSharp.Internal.TreeConverter.compiler_string_consts.sbyte_type_name;
-                    case TypeCode.Int16: return PascalSharp.Internal.TreeConverter.compiler_string_consts.short_type_name;
-                    case TypeCode.Int64: return PascalSharp.Internal.TreeConverter.compiler_string_consts.long_type_name;
-                    case TypeCode.UInt16: return PascalSharp.Internal.TreeConverter.compiler_string_consts.ushort_type_name;
-                    case TypeCode.UInt32: return PascalSharp.Internal.TreeConverter.compiler_string_consts.uint_type_name;
-                    case TypeCode.UInt64: return PascalSharp.Internal.TreeConverter.compiler_string_consts.ulong_type_name;
-                    case TypeCode.Single: return PascalSharp.Internal.TreeConverter.compiler_string_consts.float_type_name;
+                    case TypeCode.Int32: return compiler_string_consts.integer_type_name;
+                    case TypeCode.Double: return compiler_string_consts.real_type_name;
+                    case TypeCode.Boolean: return compiler_string_consts.bool_type_name;
+                    case TypeCode.String: return compiler_string_consts.string_type_name;
+                    case TypeCode.Char: return compiler_string_consts.char_type_name;
+                    case TypeCode.Byte: return compiler_string_consts.byte_type_name;
+                    case TypeCode.SByte: return compiler_string_consts.sbyte_type_name;
+                    case TypeCode.Int16: return compiler_string_consts.short_type_name;
+                    case TypeCode.Int64: return compiler_string_consts.long_type_name;
+                    case TypeCode.UInt16: return compiler_string_consts.ushort_type_name;
+                    case TypeCode.UInt32: return compiler_string_consts.uint_type_name;
+                    case TypeCode.UInt64: return compiler_string_consts.ulong_type_name;
+                    case TypeCode.Single: return compiler_string_consts.float_type_name;
                 }
             else return ctn.FullName;
 
@@ -103,7 +86,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 return sb.ToString();
             }
             if (ctn.IsArray) return "array of " + GetTypeName(ctn.GetElementType());
-            if (ctn == Type.GetType("System.Void*")) return PascalSharp.Internal.TreeConverter.compiler_string_consts.pointer_type_name;
+            if (ctn == Type.GetType("System.Void*")) return compiler_string_consts.pointer_type_name;
             return ctn.FullName;
         }
 
@@ -139,7 +122,7 @@ namespace PascalSharp.Internal.CodeCompletion
         public static string GetTopScopeName(SymScope sc)
         {
             if (sc == null || sc.si == null) return "";
-            if (sc.si.name == "" || sc.si.name.Contains("$") || sc.si.name == PascalSharp.Internal.TreeConverter.compiler_string_consts.system_unit_file_name) return "";
+            if (sc.si.name == "" || sc.si.name.Contains("$") || sc.si.name == compiler_string_consts.system_unit_file_name) return "";
             if (sc is ProcScope) return "";
             return sc.si.name + ".";
         }
@@ -248,28 +231,28 @@ namespace PascalSharp.Internal.CodeCompletion
             }
         }
 
-        public virtual PascalABCCompiler.Parsers.SymbolKind ElemKind
+        public virtual SymbolKind ElemKind
         {
             get
             {
                 switch (si.kind)
                 {
-                    case SymbolKind.Block: return PascalABCCompiler.Parsers.SymbolKind.Block;
-                    case SymbolKind.Class: return PascalABCCompiler.Parsers.SymbolKind.Class;
-                    case SymbolKind.Constant: return PascalABCCompiler.Parsers.SymbolKind.Constant;
-                    case SymbolKind.Delegate: return PascalABCCompiler.Parsers.SymbolKind.Delegate;
-                    case SymbolKind.Enum: return PascalABCCompiler.Parsers.SymbolKind.Enum;
-                    case SymbolKind.Event: return PascalABCCompiler.Parsers.SymbolKind.Event;
-                    case SymbolKind.Field: return PascalABCCompiler.Parsers.SymbolKind.Field;
-                    case SymbolKind.Interface: return PascalABCCompiler.Parsers.SymbolKind.Interface;
-                    case SymbolKind.Method: return PascalABCCompiler.Parsers.SymbolKind.Method;
-                    case SymbolKind.Parameter: return PascalABCCompiler.Parsers.SymbolKind.Parameter;
-                    case SymbolKind.Property: return PascalABCCompiler.Parsers.SymbolKind.Property;
-                    case SymbolKind.Struct: return PascalABCCompiler.Parsers.SymbolKind.Struct;
-                    case SymbolKind.Type: return PascalABCCompiler.Parsers.SymbolKind.Type;
-                    case SymbolKind.Variable: return PascalABCCompiler.Parsers.SymbolKind.Variable;
+                    case SymbolKind.Block: return SymbolKind.Block;
+                    case SymbolKind.Class: return SymbolKind.Class;
+                    case SymbolKind.Constant: return SymbolKind.Constant;
+                    case SymbolKind.Delegate: return SymbolKind.Delegate;
+                    case SymbolKind.Enum: return SymbolKind.Enum;
+                    case SymbolKind.Event: return SymbolKind.Event;
+                    case SymbolKind.Field: return SymbolKind.Field;
+                    case SymbolKind.Interface: return SymbolKind.Interface;
+                    case SymbolKind.Method: return SymbolKind.Method;
+                    case SymbolKind.Parameter: return SymbolKind.Parameter;
+                    case SymbolKind.Property: return SymbolKind.Property;
+                    case SymbolKind.Struct: return SymbolKind.Struct;
+                    case SymbolKind.Type: return SymbolKind.Type;
+                    case SymbolKind.Variable: return SymbolKind.Variable;
                 }
-                return PascalABCCompiler.Parsers.SymbolKind.Block;
+                return SymbolKind.Block;
             }
         }
 
@@ -1055,7 +1038,7 @@ namespace PascalSharp.Internal.CodeCompletion
         {
             if (ref_assms != null)
                 foreach (Assembly a in ref_assms)
-                    if (PascalABCCompiler.NetHelper.NetHelper.IsAssemblyChanged(a.ManifestModule.ScopeName))
+                    if (NetHelper.IsAssemblyChanged(a.ManifestModule.ScopeName))
                         return true;
             return false;
         }
@@ -1064,14 +1047,14 @@ namespace PascalSharp.Internal.CodeCompletion
         {
             if (ref_assms != null)
                 foreach (Assembly a in ref_assms)
-                    PascalABCCompiler.NetHelper.NetHelper.init_namespaces(a);
+                    NetHelper.init_namespaces(a);
         }
 
         public void AddReferencedAssembly(System.Reflection.Assembly assm)
         {
             if (ref_assms == null) ref_assms = new List<Assembly>();
             ref_assms.Add(assm);
-            List<Type> lst = PascalABCCompiler.NetHelper.NetHelper.entry_types[assm] as List<Type>;
+            List<Type> lst = NetHelper.entry_types[assm] as List<Type>;
             Type entry_type = null;
             if (lst != null)
                 entry_type = lst[0];
@@ -1215,7 +1198,7 @@ namespace PascalSharp.Internal.CodeCompletion
     public class ElementScope : SymScope, IElementScope
     {
         public SymScope sc;
-        public PascalABCCompiler.SyntaxTree.parametr_kind param_kind;
+        public parametr_kind param_kind;
         public object cnst_val;
         public List<TypeScope> indexers;
         public TypeScope elementType;
@@ -1272,7 +1255,7 @@ namespace PascalSharp.Internal.CodeCompletion
             }
         }
 
-        public PascalABCCompiler.SyntaxTree.parametr_kind ParamKind
+        public parametr_kind ParamKind
         {
             get
             {
@@ -1696,9 +1679,9 @@ namespace PascalSharp.Internal.CodeCompletion
             }
         }
 
-        public override PascalABCCompiler.Parsers.SymbolKind ElemKind
+        public override SymbolKind ElemKind
         {
-            get { return PascalABCCompiler.Parsers.SymbolKind.Delegate; }
+            get { return SymbolKind.Delegate; }
         }
 
         public override ScopeKind Kind
@@ -1720,7 +1703,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return null;
         }
 
-        public override SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public override SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             return null;
         }
@@ -2328,7 +2311,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return null;
         }
 
-        public override SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public override SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             return base.GetNames(ev, keyword, true);
         }
@@ -2388,7 +2371,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return null;
         }
 
-        public override SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public override SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             return null;
         }
@@ -2514,7 +2497,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return null;
         }
 
-        public override SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public override SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             if (this.baseScope != null)
                 return this.baseScope.GetNames(ev, keyword, called_in_base);
@@ -2701,7 +2684,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return actType.GetNames();
         }
 
-        public override SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public override SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             return actType.GetNames(ev, keyword, called_in_base);
         }
@@ -2861,7 +2844,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return actType.GetNames();
         }
 
-        public override SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public override SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             return actType.GetNames(ev, keyword, called_in_base);
         }
@@ -3102,7 +3085,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return this;
         }
 
-        public override SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public override SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             return new SymInfo[0];
         }
@@ -3319,7 +3302,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return new SymInfo[0];
         }
 
-        public override SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public override SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             return new SymInfo[0];
         }
@@ -3443,7 +3426,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return new SymInfo[0];
         }
 
-        public override SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public override SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             return new SymInfo[0];
         }
@@ -3528,7 +3511,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return new SymInfo[0];
         }
 
-        public override SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public override SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             return new SymInfo[0];
         }
@@ -3631,10 +3614,10 @@ namespace PascalSharp.Internal.CodeCompletion
             //UnitDocCache.AddDescribeToComplete(this);
             switch (kind)
             {
-                case SymbolKind.Struct: si.description = CodeCompletionController.CurrentParser.LanguageInformation.GetKeyword(PascalABCCompiler.Parsers.SymbolKind.Struct); break;
-                case SymbolKind.Class: si.description = CodeCompletionController.CurrentParser.LanguageInformation.GetKeyword(PascalABCCompiler.Parsers.SymbolKind.Class); break;
-                case SymbolKind.Interface: si.description = CodeCompletionController.CurrentParser.LanguageInformation.GetKeyword(PascalABCCompiler.Parsers.SymbolKind.Interface); break;
-                case SymbolKind.Enum: si.description = CodeCompletionController.CurrentParser.LanguageInformation.GetKeyword(PascalABCCompiler.Parsers.SymbolKind.Enum); break;
+                case SymbolKind.Struct: si.description = CodeCompletionController.CurrentParser.LanguageInformation.GetKeyword(SymbolKind.Struct); break;
+                case SymbolKind.Class: si.description = CodeCompletionController.CurrentParser.LanguageInformation.GetKeyword(SymbolKind.Class); break;
+                case SymbolKind.Interface: si.description = CodeCompletionController.CurrentParser.LanguageInformation.GetKeyword(SymbolKind.Interface); break;
+                case SymbolKind.Enum: si.description = CodeCompletionController.CurrentParser.LanguageInformation.GetKeyword(SymbolKind.Enum); break;
             }
 
         }
@@ -4260,14 +4243,14 @@ namespace PascalSharp.Internal.CodeCompletion
 
         //poluchit imena s klassa s kluchevym slovom
         //vyzyvaetsja, kogda procedure TClass. tut vse ekzemplarnye i staticheskie
-        public virtual SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public virtual SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             List<SymInfo> lst = new List<SymInfo>();
             foreach (SymScope ss in members)
             {
                 if (!ss.si.name.StartsWith("$"))
                 {
-                    if (keyword != PascalABCCompiler.Parsers.KeywordKind.Function && keyword != PascalABCCompiler.Parsers.KeywordKind.Constructor && keyword != PascalABCCompiler.Parsers.KeywordKind.Destructor/*!(ev.entry_scope is InterfaceUnitScope) && !(ev.entry_scope is ImplementationUnitScope)*/)
+                    if (keyword != ToolKeywordKind.Function && keyword != ToolKeywordKind.Constructor && keyword != ToolKeywordKind.Destructor/*!(ev.entry_scope is InterfaceUnitScope) && !(ev.entry_scope is ImplementationUnitScope)*/)
                     {
                         if (ss.si.acc_mod == access_modifer.private_modifer)
                         {
@@ -4290,7 +4273,7 @@ namespace PascalSharp.Internal.CodeCompletion
                     {
                         if (ss is ProcScope && !(ss as ProcScope).already_defined)
                         {
-                            if (keyword == PascalABCCompiler.Parsers.KeywordKind.Function || keyword == PascalABCCompiler.Parsers.KeywordKind.Destructor)
+                            if (keyword == ToolKeywordKind.Function || keyword == ToolKeywordKind.Destructor)
                                 lst.Add(ss.si);
                             else if ((ss as ProcScope).IsConstructor())
                                 lst.Add(ss.si);
@@ -4301,7 +4284,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 }
             }
 
-            if (baseScope != null && keyword != PascalABCCompiler.Parsers.KeywordKind.Constructor && keyword != PascalABCCompiler.Parsers.KeywordKind.Destructor)
+            if (baseScope != null && keyword != ToolKeywordKind.Constructor && keyword != ToolKeywordKind.Destructor)
                 lst.AddRange(baseScope.GetNames(ev, keyword, true));
             /*if (topScope != null)
                 lst.AddRange(topScope.GetNames());*/
@@ -4547,14 +4530,14 @@ namespace PascalSharp.Internal.CodeCompletion
             return new_si;
         }
 
-        public SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword)
+        public SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword)
         {
             List<SymInfo> syms = new List<SymInfo>();
-            Type[] types = PascalABCCompiler.NetHelper.NetHelper.FindTypesInNamespace(name);
-            string[] ns = PascalABCCompiler.NetHelper.NetHelper.FindSubNamespaces(name);
+            Type[] types = NetHelper.FindTypesInNamespace(name);
+            string[] ns = NetHelper.FindSubNamespaces(name);
 
             Hashtable ht = new Hashtable();
-            if (keyword != PascalABCCompiler.Parsers.KeywordKind.Uses)
+            if (keyword != ToolKeywordKind.Uses)
                 if (types != null)
                     foreach (Type t in types)
                     {
@@ -4601,26 +4584,26 @@ namespace PascalSharp.Internal.CodeCompletion
         public override SymScope FindName(string s)
         {
             string full_name = name + "." + s;
-            bool is_ns = PascalABCCompiler.NetHelper.NetHelper.IsNetNamespace(full_name);
+            bool is_ns = NetHelper.IsNetNamespace(full_name);
             if (is_ns)
             {
                 return new NamespaceScope(full_name);
             }
             else
             {
-                Type t = PascalABCCompiler.NetHelper.NetHelper.FindType(full_name);
-                if (t == null) t = PascalABCCompiler.NetHelper.NetHelper.FindType(full_name + PascalSharp.Internal.TreeConverter.compiler_string_consts.generic_params_infix + "1");
-                if (t == null) t = PascalABCCompiler.NetHelper.NetHelper.FindType(full_name + PascalSharp.Internal.TreeConverter.compiler_string_consts.generic_params_infix + "2");
+                Type t = NetHelper.FindType(full_name);
+                if (t == null) t = NetHelper.FindType(full_name + compiler_string_consts.generic_params_infix + "1");
+                if (t == null) t = NetHelper.FindType(full_name + compiler_string_consts.generic_params_infix + "2");
                 if (t != null)
                 {
                     return TypeTable.get_compiled_type(new SymInfo(s, SymbolKind.Type, full_name), t);
                 }
                 else
                 {
-                    PascalSharp.Internal.TreeConverter.SymbolInfoList sil = null;
+                    SymbolInfoList sil = null;
                     if (entry_type != null)
                     {
-                        t = PascalABCCompiler.NetHelper.NetHelper.FindType(entry_type.ctn.Namespace + "." + s);
+                        t = NetHelper.FindType(entry_type.ctn.Namespace + "." + s);
                         if (t != null) return TypeTable.get_compiled_type(new SymInfo(s, SymbolKind.Type, entry_type.ctn.Namespace + "." + s), t);
                         else
                         {
@@ -4628,7 +4611,7 @@ namespace PascalSharp.Internal.CodeCompletion
                             for (int j = 0; j < attrs.Length; j++)
                                 if (attrs[j].GetType().Name == "$GlobAttr")
                                 {
-                                    sil = PascalABCCompiler.NetHelper.NetHelper.FindName(entry_type.ctn, s);
+                                    sil = NetHelper.FindName(entry_type.ctn, s);
                                     if (sil != null) break;
                                 }
                         }
@@ -4654,7 +4637,7 @@ namespace PascalSharp.Internal.CodeCompletion
                                     {
                                         foreach(var si in sil.list)
                                         {
-                                            if (si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_private && si.sym_info.semantic_node_type == semantic_node_type.compiled_function_node)
+                                            if (si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private && si.sym_info.semantic_node_type == semantic_node_type.compiled_function_node)
                                             {
                                                 tmp = new CompiledMethodScope(new SymInfo(s, SymbolKind.Method, s), (si.sym_info as compiled_function_node).method_info, entry_type);
                                                 tmp.is_global = true;
@@ -4690,14 +4673,14 @@ namespace PascalSharp.Internal.CodeCompletion
                                     return cms;
                                 }
                             case semantic_node_type.compiled_variable_definition:
-                                if (sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_private)
+                                if (sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private)
                                 {
                                     CompiledFieldScope fld = new CompiledFieldScope(new SymInfo(s, SymbolKind.Field, s), (sil.First().sym_info as compiled_variable_definition).compiled_field, entry_type, true);
                                     return fld;
                                 }
                                 break;
                             case semantic_node_type.compiled_class_constant_definition:
-                                if (sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_private)
+                                if (sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private)
                                 {
                                     CompiledFieldScope fld = new CompiledFieldScope(new SymInfo(s, SymbolKind.Constant, s), (sil.First().sym_info as compiled_class_constant_definition).field, entry_type, true);
                                     return fld;
@@ -4722,8 +4705,8 @@ namespace PascalSharp.Internal.CodeCompletion
         public override SymInfo[] GetNames()
         {
             List<SymInfo> syms = new List<SymInfo>();
-            Type[] types = PascalABCCompiler.NetHelper.NetHelper.FindTypesInNamespace(name);
-            string[] ns = PascalABCCompiler.NetHelper.NetHelper.FindSubNamespaces(name);
+            Type[] types = NetHelper.FindTypesInNamespace(name);
+            string[] ns = NetHelper.FindSubNamespaces(name);
 
             Hashtable ht = new Hashtable();
             if (types != null)
@@ -4762,8 +4745,8 @@ namespace PascalSharp.Internal.CodeCompletion
         public override SymInfo[] GetNamesAsInObject()
         {
             List<SymInfo> syms = new List<SymInfo>();
-            Type[] types = PascalABCCompiler.NetHelper.NetHelper.FindTypesInNamespace(name);
-            string[] ns = PascalABCCompiler.NetHelper.NetHelper.FindSubNamespaces(name);
+            Type[] types = NetHelper.FindTypesInNamespace(name);
+            string[] ns = NetHelper.FindSubNamespaces(name);
 
             Hashtable ht = new Hashtable();
             if (types != null)
@@ -4909,7 +4892,7 @@ namespace PascalSharp.Internal.CodeCompletion
         {
             get
             {
-                return ctn == PascalABCCompiler.NetHelper.NetHelper.MulticastDelegateType || ctn.BaseType == PascalABCCompiler.NetHelper.NetHelper.MulticastDelegateType;
+                return ctn == NetHelper.MulticastDelegateType || ctn.BaseType == NetHelper.MulticastDelegateType;
             }
         }
 
@@ -4975,16 +4958,16 @@ namespace PascalSharp.Internal.CodeCompletion
             }
         }
 
-        public override PascalABCCompiler.Parsers.SymbolKind ElemKind
+        public override SymbolKind ElemKind
         {
             get
             {
-                if (TypeUtility.IsStandType(ctn)) return PascalABCCompiler.Parsers.SymbolKind.Type;
-                if (ctn.IsClass) return PascalABCCompiler.Parsers.SymbolKind.Class;
-                if (ctn.IsEnum) return PascalABCCompiler.Parsers.SymbolKind.Enum;
-                if (ctn.IsValueType) return PascalABCCompiler.Parsers.SymbolKind.Struct;
-                if (ctn.IsInterface) return PascalABCCompiler.Parsers.SymbolKind.Interface;
-                return PascalABCCompiler.Parsers.SymbolKind.Type;
+                if (TypeUtility.IsStandType(ctn)) return SymbolKind.Type;
+                if (ctn.IsClass) return SymbolKind.Class;
+                if (ctn.IsEnum) return SymbolKind.Enum;
+                if (ctn.IsValueType) return SymbolKind.Struct;
+                if (ctn.IsInterface) return SymbolKind.Interface;
+                return SymbolKind.Type;
             }
         }
 
@@ -5018,19 +5001,19 @@ namespace PascalSharp.Internal.CodeCompletion
             if (!ctn.IsGenericType)
                 return this;
             if (!ctn.IsGenericTypeDefinition)
-                t = PascalABCCompiler.NetHelper.NetHelper.FindType(this.ctn.Namespace + "." + this.ctn.Name);
+                t = NetHelper.FindType(this.ctn.Namespace + "." + this.ctn.Name);
             else if (this.instances != null && this.instances.Count > 0)
             {
                 if (this.instances.Count != ctn.GetGenericArguments().Length)
                 {
-                    Type t2 = PascalABCCompiler.NetHelper.NetHelper.FindType(this.ctn.Namespace + "." + this.ctn.Name.Substring(0, this.ctn.Name.IndexOf('`')) + "`" + this.instances.Count);
+                    Type t2 = NetHelper.FindType(this.ctn.Namespace + "." + this.ctn.Name.Substring(0, this.ctn.Name.IndexOf('`')) + "`" + this.instances.Count);
                     if (t2 != null)
                         t = t2;
                 }
             }
             else if (gen_args.Count != ctn.GetGenericArguments().Length)
             {
-                Type t2 = PascalABCCompiler.NetHelper.NetHelper.FindType(this.ctn.Namespace + "." + this.ctn.Name.Substring(0, this.ctn.Name.IndexOf('`')) + "`" + gen_args.Count);
+                Type t2 = NetHelper.FindType(this.ctn.Namespace + "." + this.ctn.Name.Substring(0, this.ctn.Name.IndexOf('`')) + "`" + gen_args.Count);
                 if (t2 != null)
                     t = t2;
             }
@@ -5393,7 +5376,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return CodeCompletionController.CurrentParser.LanguageInformation.GetDescription(this);
         }
 
-        public override SymInfo[] GetNames(ExpressionVisitor ev, PascalABCCompiler.Parsers.KeywordKind keyword, bool called_in_base)
+        public override SymInfo[] GetNames(ExpressionVisitor ev, ToolKeywordKind keyword, bool called_in_base)
         {
             List<SymInfo> syms = new List<SymInfo>();
             if (!CodeCompletionController.CurrentParser.LanguageInformation.IncludeDotNetEntities)
@@ -5409,7 +5392,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 else if (ci.GetParameters().Length > 0)
                     constrs.Add(ci);
             constrs.AddRange(mis);
-            //constrs.AddRange(PascalABCCompiler.NetHelper.NetHelper.GetExtensionMethods(ctn));
+            //constrs.AddRange(NetHelper.GetExtensionMethods(ctn));
             mis = constrs.ToArray();
             if (ctn.IsInterface)
             {
@@ -5646,7 +5629,7 @@ namespace PascalSharp.Internal.CodeCompletion
             MemberInfo[] mis = ctn.GetMembers(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.FlattenHierarchy);
             List<MemberInfo> members = new List<MemberInfo>();
             members.AddRange(mis);
-            IEnumerable<MemberInfo> en = PascalABCCompiler.NetHelper.NetHelper.GetExtensionMethods(ctn);
+            IEnumerable<MemberInfo> en = NetHelper.GetExtensionMethods(ctn);
             members.AddRange(en);
             mis = members.ToArray();
             if (ctn.IsInterface)
@@ -6057,14 +6040,14 @@ namespace PascalSharp.Internal.CodeCompletion
         public override List<SymScope> FindOverloadNames(string name)
         {
             List<SymScope> names = new List<SymScope>();
-            PascalSharp.Internal.TreeConverter.SymbolInfoList sil = PascalABCCompiler.NetHelper.NetHelper.FindNameIncludeProtected(ctn, name);
-            //IEnumerable<MemberInfo> ext_meths = PascalABCCompiler.NetHelper.NetHelper.GetExtensionMethods(ctn);
+            SymbolInfoList sil = NetHelper.FindNameIncludeProtected(ctn, name);
+            //IEnumerable<MemberInfo> ext_meths = NetHelper.GetExtensionMethods(ctn);
             List<ProcScope> pascal_ext_meths = this.GetExtensionMethods(name, this);
 
             if (sil == null && names.Count == 0)
             {
                 if (string.Compare(name, "Create", true) == 0 && this.ctn != typeof(object))
-                    sil = PascalABCCompiler.NetHelper.NetHelper.GetConstructor(ctn);
+                    sil = NetHelper.GetConstructor(ctn);
                 if (sil == null)
                 {
                     if (pascal_ext_meths.Count > 0)
@@ -6101,7 +6084,7 @@ namespace PascalSharp.Internal.CodeCompletion
                         if (sil != null) {
                             foreach (var si in sil.list)
                             {
-                                if (si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_private && si.sym_info.semantic_node_type == semantic_node_type.compiled_function_node)
+                                if (si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private && si.sym_info.semantic_node_type == semantic_node_type.compiled_function_node)
                                 {
                                     tmp = new CompiledMethodScope(new SymInfo(name, SymbolKind.Method, name), (si.sym_info as compiled_function_node).method_info, this);
                                     names.Insert(0, tmp);
@@ -6154,7 +6137,7 @@ namespace PascalSharp.Internal.CodeCompletion
                         {
                             foreach (var si in sil.list)
                             {
-                                if (si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_private && si.sym_info.semantic_node_type == semantic_node_type.compiled_constructor_node)
+                                if (si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private && si.sym_info.semantic_node_type == semantic_node_type.compiled_constructor_node)
                                 {
                                     tmp = new CompiledConstructorScope(new SymInfo("Create", SymbolKind.Method, "Create"), (si.sym_info as compiled_constructor_node).constructor_info, this);
                                     //tmp.nextProc = cms;
@@ -6189,19 +6172,19 @@ namespace PascalSharp.Internal.CodeCompletion
                     }
                     break;
                 case semantic_node_type.compiled_variable_definition:
-                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_private)
+                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private)
                         names.Add(new CompiledFieldScope(new SymInfo(name, SymbolKind.Field, name), (sil.First().sym_info as compiled_variable_definition).compiled_field, this));
                     break;
                 case semantic_node_type.basic_property_node:
-                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_private)
+                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private)
                         names.Add(new CompiledPropertyScope(new SymInfo(name, SymbolKind.Property, name), (sil.First().sym_info as compiled_property_node).property_info, this));
                     break;
                 case semantic_node_type.compiled_class_constant_definition:
-                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_private)
+                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private)
                         names.Add(new CompiledFieldScope(new SymInfo(name, SymbolKind.Constant, name), (sil.First().sym_info as compiled_class_constant_definition).field, this));
                     break;
                 case semantic_node_type.compiled_event:
-                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_private)
+                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private)
                         names.Add(new CompiledEventScope(new SymInfo(name, SymbolKind.Constant, name), (sil.First().sym_info as compiled_event).event_info, this));
                     break;
                 //case semantic_node_type.compiled_event: return new CompiledScope(null,(si.sym_info as compiled_event).event_info.);
@@ -6213,13 +6196,13 @@ namespace PascalSharp.Internal.CodeCompletion
 
         public override SymScope FindName(string name)
         {
-            PascalSharp.Internal.TreeConverter.SymbolInfoList sil = PascalABCCompiler.NetHelper.NetHelper.FindNameIncludeProtected(ctn, name);
+            SymbolInfoList sil = NetHelper.FindNameIncludeProtected(ctn, name);
             if (!CodeCompletionController.CurrentParser.LanguageInformation.IncludeDotNetEntities)
                 return null;
             if (sil == null)
             {
                 if (string.Compare(name, "Create", true) == 0)
-                    sil = PascalABCCompiler.NetHelper.NetHelper.GetConstructor(ctn);
+                    sil = NetHelper.GetConstructor(ctn);
                 if (sil == null)
                 {
                     return null;
@@ -6245,7 +6228,7 @@ namespace PascalSharp.Internal.CodeCompletion
                         {
                             foreach (var si in sil.list)
                             {
-                                if (si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_private && si.sym_info.semantic_node_type == semantic_node_type.compiled_function_node)
+                                if (si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private && si.sym_info.semantic_node_type == semantic_node_type.compiled_function_node)
                                 {
                                     tmp = new CompiledMethodScope(new SymInfo(name, SymbolKind.Method, name), (si.sym_info as compiled_function_node).method_info, this);
                                     //tmp.nextProc = cms;
@@ -6254,7 +6237,7 @@ namespace PascalSharp.Internal.CodeCompletion
                                     if (!meths.ContainsKey(par_num)) meths[par_num] = new List<CompiledMethodScope>();
                                     meths[par_num].Add(tmp);
                                 }
-                                else if (si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_private && si.sym_info is compiled_property_node)
+                                else if (si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private && si.sym_info is compiled_property_node)
                                 {
                                     return new CompiledPropertyScope(new SymInfo(name, SymbolKind.Property, name), (si.sym_info as compiled_property_node).property_info, this);
                                 }
@@ -6300,7 +6283,7 @@ namespace PascalSharp.Internal.CodeCompletion
                         {
                             foreach (var si in sil.list)
                             {
-                                if (si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.access_level.al_private && si.sym_info.semantic_node_type == semantic_node_type.compiled_constructor_node)
+                                if (si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && si.access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private && si.sym_info.semantic_node_type == semantic_node_type.compiled_constructor_node)
                                 {
                                     tmp = new CompiledConstructorScope(new SymInfo("Create", SymbolKind.Method, "Create"), (si.sym_info as compiled_constructor_node).constructor_info, this);
                                     //tmp.nextProc = cms;
@@ -6334,23 +6317,23 @@ namespace PascalSharp.Internal.CodeCompletion
                         return cms;
                     }
                 case semantic_node_type.compiled_variable_definition:
-                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_private)
+                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private)
                         return new CompiledFieldScope(new SymInfo(name, SymbolKind.Field, name), (sil.First().sym_info as compiled_variable_definition).compiled_field, this);
                     break;
                 case semantic_node_type.basic_property_node:
-                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_private)
+                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private)
                         return new CompiledPropertyScope(new SymInfo(name, SymbolKind.Property, name), (sil.First().sym_info as compiled_property_node).property_info, this);
                     break;
                 case semantic_node_type.compiled_class_constant_definition:
-                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_private)
+                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private)
                         return new CompiledFieldScope(new SymInfo(name, SymbolKind.Constant, name), (sil.First().sym_info as compiled_class_constant_definition).field, this);
                     break;
                 case semantic_node_type.compiled_event:
-                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_private)
+                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private)
                         return new CompiledEventScope(new SymInfo(name, SymbolKind.Constant, name), (sil.First().sym_info as compiled_event).event_info, this);
                     break;
                 case semantic_node_type.compiled_type_node:
-                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_private && sil.First().access_level != PascalSharp.Internal.TreeConverter.access_level.al_protected)
+                    if (sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_internal && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_private && sil.First().access_level != PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_protected)
                         return TypeTable.get_compiled_type(new SymInfo(name, SymbolKind.Type, name), (sil.First().sym_info as compiled_type_node).compiled_type);
                     break;
                 //case semantic_node_type.compiled_event: return new CompiledScope(null,(si.sym_info as compiled_event).event_info.);
@@ -6624,7 +6607,7 @@ namespace PascalSharp.Internal.CodeCompletion
             this.si.name = pi.Name;
             this.topScope = declaringType;
             //this.si.describe += "\n"+AssemblyDocCache.GetDocumentation(pi.DeclaringType.Assembly,"P:"+pi.DeclaringType.FullName+"."+pi.Name);
-            MethodInfo acc_mi = PascalABCCompiler.NetHelper.NetHelper.GetAnyAccessor(pi);
+            MethodInfo acc_mi = NetHelper.GetAnyAccessor(pi);
             if (acc_mi != null && acc_mi == pi.GetGetMethod(true))
             {
                 ParameterInfo[] prms = acc_mi.GetParameters();
@@ -6763,7 +6746,7 @@ namespace PascalSharp.Internal.CodeCompletion
             }
             parameters = new List<ElementScope>();
             int i = 0;
-            is_extension = PascalABCCompiler.NetHelper.NetHelper.IsExtensionMethod(mi);
+            is_extension = NetHelper.IsExtensionMethod(mi);
             foreach (ParameterInfo pi in mi.GetParameters())
             {
                 parameters.Add(new CompiledParameterScope(new SymInfo(pi.Name, SymbolKind.Parameter, pi.Name), pi));
@@ -6806,7 +6789,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 return_type = TypeTable.get_compiled_type(mi.ReturnType);
             parameters = new List<ElementScope>();
             int i = 0;
-            is_extension = PascalABCCompiler.NetHelper.NetHelper.IsExtensionMethod(mi);
+            is_extension = NetHelper.IsExtensionMethod(mi);
             foreach (ParameterInfo pi in mi.GetParameters())
             {
                 parameters.Add(new CompiledParameterScope(new SymInfo(pi.Name, SymbolKind.Parameter, pi.Name), pi));
@@ -7155,7 +7138,7 @@ namespace PascalSharp.Internal.CodeCompletion
         //				if (!with_scopes[i].is_type)
         //				lst.AddRange(with_scopes[i].ss.GetNamesAsInObject(ev));
         //				else
-        //				lst.AddRange((with_scopes[i].ss as TypeScope).GetNames(ev,PascalABCCompiler.Parsers.KeywordKind.None));
+        //				lst.AddRange((with_scopes[i].ss as TypeScope).GetNames(ev,ToolKeywordKind.None));
         //			}
         //			lst.AddRange(topScope.GetNames(ev));
         //			return lst.ToArray();
@@ -7170,7 +7153,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 if (!with_scopes[i].is_type)
                     lst.AddRange(with_scopes[i].ss.GetNamesAsInObject(ev));
                 else
-                    lst.AddRange((with_scopes[i].ss as TypeScope).GetNames(ev, PascalABCCompiler.Parsers.KeywordKind.None, false));
+                    lst.AddRange((with_scopes[i].ss as TypeScope).GetNames(ev, ToolKeywordKind.None, false));
             }
             lst.AddRange(topScope.GetNamesInAllTopScopes(all_names, ev, is_static));
             return lst.ToArray();

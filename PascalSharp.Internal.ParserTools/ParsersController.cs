@@ -1,13 +1,14 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
-using System.IO;
-using PascalABCCompiler.ParserTools;
-using PascalABCCompiler.Errors;
-using System.Collections.Generic;
-using PascalSharp.Internal.Errors;
 
-namespace PascalABCCompiler.Parsers
+using System;
+using System.Collections.Generic;
+using System.IO;
+using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SyntaxTree;
+
+namespace PascalSharp.Internal.ParserTools
 {
 	public class Controller
 	{
@@ -79,7 +80,7 @@ namespace PascalABCCompiler.Parsers
 		}
         public Controller()
         {
-            sourceFilesProvider = PascalABCCompiler.SourceFilesProviders.DefaultSourceFilesProvider;
+            sourceFilesProvider = SourceFilesProviders.DefaultSourceFilesProvider;
         }
         SourceFilesProviderDelegate sourceFilesProvider = null;
         public SourceFilesProviderDelegate SourceFilesProvider
@@ -116,7 +117,7 @@ namespace PascalABCCompiler.Parsers
         //        return p.Keywords;
         //    return null;
         //}
-        public SyntaxTree.syntax_tree_node Compile(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings, ParseMode ParseMode, List<string> DefinesList = null)
+        public syntax_tree_node Compile(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings, ParseMode ParseMode, List<string> DefinesList = null)
         {
             LastParser = selectParser(Path.GetExtension(FileName).ToLower());
             if (LastParser == null)
@@ -125,68 +126,68 @@ namespace PascalABCCompiler.Parsers
             LastParser.Warnings = Warnings;
             return LastParser.BuildTree(FileName, Text, ParseMode, DefinesList);
         }
-        public SyntaxTree.compilation_unit GetCompilationUnitSpecial(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings)
+        public compilation_unit GetCompilationUnitSpecial(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings)
         {
-            SyntaxTree.syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.Special);
+            syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.Special);
             if (cu == null)
                 return null;
-            if (cu is SyntaxTree.compilation_unit)
-                return cu as SyntaxTree.compilation_unit;
-            Errors.Add(new Errors.UnexpectedNodeType(FileName, cu.source_context,null));
+            if (cu is compilation_unit)
+                return cu as compilation_unit;
+            Errors.Add(new UnexpectedNodeType(FileName, cu.source_context,null));
             return null;
             //throw new Errors.CompilerInternalError("Parsers.Controller.GetComilationUnit", new Exception("bad node type"));
         }
-        public SyntaxTree.compilation_unit GetCompilationUnit(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings, List<string> DefinesList = null)
+        public compilation_unit GetCompilationUnit(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings, List<string> DefinesList = null)
         {
-            SyntaxTree.syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.Normal, DefinesList);
+            syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.Normal, DefinesList);
             if (cu == null)
                 return null;
-            if (cu is SyntaxTree.compilation_unit)
-                return cu as SyntaxTree.compilation_unit;
-            Errors.Add(new Errors.UnexpectedNodeType(FileName, cu.source_context,null));
+            if (cu is compilation_unit)
+                return cu as compilation_unit;
+            Errors.Add(new UnexpectedNodeType(FileName, cu.source_context,null));
             return null;
             //throw new Errors.CompilerInternalError("Parsers.Controller.GetComilationUnit", new Exception("bad node type"));
         }
-        public SyntaxTree.compilation_unit GetCompilationUnitForFormatter(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings)
+        public compilation_unit GetCompilationUnitForFormatter(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings)
         {
-            SyntaxTree.syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.ForFormatter);
+            syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.ForFormatter);
             if (cu == null)
                 return null;
-            if (cu is SyntaxTree.compilation_unit)
-                return cu as SyntaxTree.compilation_unit;
-            Errors.Add(new Errors.UnexpectedNodeType(FileName, cu.source_context, null));
+            if (cu is compilation_unit)
+                return cu as compilation_unit;
+            Errors.Add(new UnexpectedNodeType(FileName, cu.source_context, null));
             return null;
         }
-        public SyntaxTree.expression GetExpression(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings)
+        public expression GetExpression(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings)
         {
-            SyntaxTree.syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.Expression);
+            syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.Expression);
             if (cu == null)
                 return null;
-            if (cu is SyntaxTree.expression)
-                return cu as SyntaxTree.expression;
-            Errors.Add(new Errors.UnexpectedNodeType(FileName, cu.source_context, null));
-            return null;
-            //throw new Errors.CompilerInternalError("Parsers.Controller.GetComilationUnit", new Exception("bad node type"));
-        }
-        public SyntaxTree.expression GetTypeAsExpression(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings)
-        {
-            SyntaxTree.syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.TypeAsExpression);
-            if (cu == null)
-                return null;
-            if (cu is SyntaxTree.expression)
-                return cu as SyntaxTree.expression;
-            Errors.Add(new Errors.UnexpectedNodeType(FileName, cu.source_context, null));
+            if (cu is expression)
+                return cu as expression;
+            Errors.Add(new UnexpectedNodeType(FileName, cu.source_context, null));
             return null;
             //throw new Errors.CompilerInternalError("Parsers.Controller.GetComilationUnit", new Exception("bad node type"));
         }
-        public SyntaxTree.statement GetStatement(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings)
+        public expression GetTypeAsExpression(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings)
         {
-            SyntaxTree.syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.Statement);
+            syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.TypeAsExpression);
             if (cu == null)
                 return null;
-            if (cu is SyntaxTree.statement)
-                return cu as SyntaxTree.statement;
-            Errors.Add(new Errors.UnexpectedNodeType(FileName, cu.source_context, null));
+            if (cu is expression)
+                return cu as expression;
+            Errors.Add(new UnexpectedNodeType(FileName, cu.source_context, null));
+            return null;
+            //throw new Errors.CompilerInternalError("Parsers.Controller.GetComilationUnit", new Exception("bad node type"));
+        }
+        public statement GetStatement(string FileName, string Text, List<Error> Errors, List<CompilerWarning> Warnings)
+        {
+            syntax_tree_node cu = Compile(FileName, Text, Errors, Warnings, ParseMode.Statement);
+            if (cu == null)
+                return null;
+            if (cu is statement)
+                return cu as statement;
+            Errors.Add(new UnexpectedNodeType(FileName, cu.source_context, null));
             return null;
             //throw new Errors.CompilerInternalError("Parsers.Controller.GetComilationUnit", new Exception("bad node type"));
         }

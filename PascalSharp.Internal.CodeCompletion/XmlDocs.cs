@@ -6,13 +6,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
-using PascalABCCompiler.Parsers;
+using PascalSharp.Internal.ParserTools;
 
 namespace PascalSharp.Internal.CodeCompletion
 {
 	public class AbstractDispatcher
 	{
-        public virtual void Update(PascalABCCompiler.Parsers.SymInfo si)
+        public virtual void Update(SymInfo si)
 		{
 			
 		}
@@ -24,37 +24,37 @@ namespace PascalSharp.Internal.CodeCompletion
 
         public static string Load(Assembly a, string path)
         {
-            return CodeCompletionTools.AssemblyDocCache.Load(a, path);
+            return ParserTools.AssemblyDocCache.Load(a, path);
         }
 
         internal static string GetNormalHint(string s)
         {
-            return CodeCompletionTools.AssemblyDocCache.GetNormalHint(s);
+            return ParserTools.AssemblyDocCache.GetNormalHint(s);
         }
 		
 		public static string GetDocumentation(Type t)
 		{
-            return CodeCompletionTools.AssemblyDocCache.GetDocumentation(t);
+            return ParserTools.AssemblyDocCache.GetDocumentation(t);
 		}
 
         public static string GetFullDocumentation(Type t)
         {
-            return CodeCompletionTools.AssemblyDocCache.GetFullDocumentation(t);
+            return ParserTools.AssemblyDocCache.GetFullDocumentation(t);
         }
 
 		public static string GetParamNames(ConstructorInfo mi)
 		{
-            return CodeCompletionTools.AssemblyDocCache.GetParamNames(mi);
+            return ParserTools.AssemblyDocCache.GetParamNames(mi);
 		}
 		
 		public static string GetParamNames(MethodInfo mi)
 		{
-            return CodeCompletionTools.AssemblyDocCache.GetParamNames(mi);
+            return ParserTools.AssemblyDocCache.GetParamNames(mi);
 		}
 
         private static string GetTypeName(Type t)
         {
-            return CodeCompletionTools.AssemblyDocCache.GetTypeName(t);
+            return ParserTools.AssemblyDocCache.GetTypeName(t);
         }
 		
 		private static Dictionary<MemberInfo,SymInfo> doc_wait_list = new Dictionary<MemberInfo,SymInfo>();
@@ -190,42 +190,42 @@ namespace PascalSharp.Internal.CodeCompletion
 		
 		public static string GetDocumentation(ConstructorInfo mi)
 		{
-            return CodeCompletionTools.AssemblyDocCache.GetDocumentation(mi);
+            return ParserTools.AssemblyDocCache.GetDocumentation(mi);
 		}
 
         public static string GetFullDocumentation(ConstructorInfo mi)
         {
-            return CodeCompletionTools.AssemblyDocCache.GetFullDocumentation(mi);
+            return ParserTools.AssemblyDocCache.GetFullDocumentation(mi);
         }
 
 		public static string GetDocumentation(FieldInfo fi)
 		{
-            return CodeCompletionTools.AssemblyDocCache.GetDocumentation(fi);
+            return ParserTools.AssemblyDocCache.GetDocumentation(fi);
 		}
 
         public static string GetFullDocumentation(FieldInfo fi)
         {
-            return CodeCompletionTools.AssemblyDocCache.GetFullDocumentation(fi);
+            return ParserTools.AssemblyDocCache.GetFullDocumentation(fi);
         }
 
 		public static string GetDocumentation(PropertyInfo pi)
 		{
-            return CodeCompletionTools.AssemblyDocCache.GetDocumentation(pi);
+            return ParserTools.AssemblyDocCache.GetDocumentation(pi);
 		}
 
         public static string GetFullDocumentation(PropertyInfo pi)
         {
-            return CodeCompletionTools.AssemblyDocCache.GetFullDocumentation(pi);
+            return ParserTools.AssemblyDocCache.GetFullDocumentation(pi);
         }
 
 		public static string GetDocumentation(EventInfo ei)
 		{
-            return CodeCompletionTools.AssemblyDocCache.GetDocumentation(ei);
+            return ParserTools.AssemblyDocCache.GetDocumentation(ei);
 		}
 
         public static string GetFullDocumentation(EventInfo ei)
         {
-            return CodeCompletionTools.AssemblyDocCache.GetFullDocumentation(ei);
+            return ParserTools.AssemblyDocCache.GetFullDocumentation(ei);
         }
 
 		private static string GetGenericAddString(MethodInfo mi)
@@ -239,12 +239,12 @@ namespace PascalSharp.Internal.CodeCompletion
 		
 		public static string GetDocumentation(MethodInfo mi)
 		{
-            return CodeCompletionTools.AssemblyDocCache.GetDocumentation(mi);
+            return ParserTools.AssemblyDocCache.GetDocumentation(mi);
 		}
 
         public static string GetFullDocumentation(MethodInfo mi)
         {
-            return CodeCompletionTools.AssemblyDocCache.GetFullDocumentation(mi);
+            return ParserTools.AssemblyDocCache.GetFullDocumentation(mi);
         }
 
         public static string GetDocumentationForNamespace(string name)
@@ -254,7 +254,7 @@ namespace PascalSharp.Internal.CodeCompletion
 		
 		public static string GetDocumentation(Assembly a, string descr)
 		{
-            return CodeCompletionTools.AssemblyDocCache.GetDocumentation(a, descr);
+            return ParserTools.AssemblyDocCache.GetDocumentation(a, descr);
 		}
 	}
 }

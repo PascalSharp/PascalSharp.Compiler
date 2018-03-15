@@ -13,6 +13,13 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="DefaultLang.resources" />
+    <!-- <GenerateResource
+      Sources="$(SolutionDir)..\PascalSharp.Inbox\InboxRelease\Lng\Eng"
+      OutputResources="@(Resx->'$(IntermediateOutputPath)Eng.resources')">
+      <Output
+        TaskParameter="OutputResources"
+        ItemName="Resources" />
+    </GenerateResource> -->
   </ItemGroup>
   <ItemGroup>
     <Reference Include="System.Windows.Forms" />

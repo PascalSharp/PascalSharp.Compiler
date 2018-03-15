@@ -2,15 +2,13 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 using System;
 using System.IO;
-using PascalABCCompiler.ParserTools;
 using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.Parsers;
 using System.Resources;
 using System.Reflection;
-using PascalABCCompiler.Errors;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.ParserTools;
 
 
 namespace PascalABCCompiler.DocTagsParser

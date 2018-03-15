@@ -1,5 +1,5 @@
 
-namespace PascalABCCompiler.SyntaxTree
+namespace PascalSharp.Internal.SyntaxTree
 {
 
 	public class AbstractVisitor: IVisitor

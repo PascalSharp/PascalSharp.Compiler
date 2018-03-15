@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
+using PascalABCCompiler.SyntaxTree;
 
-
-namespace PascalABCCompiler.SyntaxTree
+namespace PascalSharp.Internal.SyntaxTree
 {
 
     //Два варианта использования визитора:

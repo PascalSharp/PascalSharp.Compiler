@@ -42,7 +42,7 @@ namespace PascalSharp.Internal.Optimizer
             get { return ExecutionOrder.Undefined; }
         }
 
-        public PascalABCCompiler.SemanticTree.IProgramNode Convert(ICompiler Compiler, PascalABCCompiler.SemanticTree.IProgramNode ProgramNode)
+        public IProgramNode Convert(ICompiler Compiler, IProgramNode ProgramNode)
         {
             Optimizer Optimizer = new Optimizer();
             Compiler.AddWarnings(Optimizer.Optimize(ProgramNode as PascalSharp.Internal.TreeConverter.TreeRealization.program_node));

@@ -8,10 +8,14 @@ using System.IO;
 using System.Reflection;
 using System.Text;
 using PascalABCCompiler;
-using PascalABCCompiler.Parsers;
 using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Compiler;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
+using ToolKeywordKind = PascalSharp.Internal.ParserTools.KeywordKind;
 
 namespace PascalSharp.Internal.CodeCompletion
 {
@@ -100,7 +104,7 @@ namespace PascalSharp.Internal.CodeCompletion
             CodeCompletionController.comp.CompilerOptions.SourceFileName = cu.file_name;
             visitor.Convert(cu);
             is_compiled = true;
-            cur_used_assemblies = (Hashtable)PascalABCCompiler.NetHelper.NetHelper.cur_used_assemblies.Clone();
+            cur_used_assemblies = (Hashtable)NetHelper.cur_used_assemblies.Clone();
             return;
         }
 
@@ -109,7 +113,7 @@ namespace PascalSharp.Internal.CodeCompletion
             return visitor.entry_scope.IsAssembliesChanged();
         }
 
-        public definition_node[] GetNamesAfterDot(expression expr, string str, int line, int col, PascalABCCompiler.Parsers.KeywordKind keyword, ref definition_node root)
+        public definition_node[] GetNamesAfterDot(expression expr, string str, int line, int col, ToolKeywordKind keyword, ref definition_node root)
         {
             unit.SemanticTree.find_by_location(line, col);
             return null;
@@ -118,7 +122,7 @@ namespace PascalSharp.Internal.CodeCompletion
         /// <summary>
         /// Получение имен после точки
         /// </summary>
-        public SymInfo[] GetName(expression expr, string str, int line, int col, PascalABCCompiler.Parsers.KeywordKind keyword, ref SymScope root)
+        public SymInfo[] GetName(expression expr, string str, int line, int col, ToolKeywordKind keyword, ref SymScope root)
         {
             if (visitor.cur_scope == null) return null;
             if (col + 1 > str.Length)
@@ -173,7 +177,7 @@ namespace PascalSharp.Internal.CodeCompletion
                     else
                     {
                         if (ev.entry_scope.InUsesRange(line + 1, col + 1))
-                            keyword = PascalABCCompiler.Parsers.KeywordKind.Uses;
+                            keyword = ToolKeywordKind.Uses;
                         RestoreCurrentUsedAssemblies();
                         return (si as NamespaceScope).GetNames(ev, keyword);
                     }
@@ -375,13 +379,13 @@ namespace PascalSharp.Internal.CodeCompletion
         /// <summary>
         /// Получение описания символа
         /// </summary>
-        public IBaseScope GetSymDefinition(expression expr, int line, int col, PascalABCCompiler.Parsers.KeywordKind keyword)
+        public IBaseScope GetSymDefinition(expression expr, int line, int col, ToolKeywordKind keyword)
         {
             if (visitor.cur_scope == null) return null;
             SymScope ss = visitor.FindScopeByLocation(line + 1, col + 1);//stv.cur_scope;
             if (ss == null) return null;
             bool on_proc = false;
-            if (keyword == PascalABCCompiler.Parsers.KeywordKind.Function || keyword == PascalABCCompiler.Parsers.KeywordKind.Constructor || keyword == PascalABCCompiler.Parsers.KeywordKind.Destructor)
+            if (keyword == ToolKeywordKind.Function || keyword == ToolKeywordKind.Constructor || keyword == ToolKeywordKind.Destructor)
             {
                 if (ss is ProcRealization)
                 {
@@ -400,7 +404,7 @@ namespace PascalSharp.Internal.CodeCompletion
                     else on_proc = true;
                 }
             }
-            //if (!((keyword == KeywordKind.kw_proc || keyword == KeywordKind.kw_constr || keyword == KeywordKind.kw_destr) && ss is ProcScope))
+            //if (!((keyword == ToolKeywordKind.kw_proc || keyword == ToolKeywordKind.kw_constr || keyword == ToolKeywordKind.kw_destr) && ss is ProcScope))
             if (!on_proc)
             {
                 SetCurrentUsedAssemblies();
@@ -559,7 +563,7 @@ namespace PascalSharp.Internal.CodeCompletion
                     {
                         out_si = elems[i];
                         //out_si = new SymInfo(elems[i].name,elems[i].kind,elems[i].describe);
-                        string s = CodeCompletionController.CurrentParser.LanguageInformation.GetSimpleDescriptionWithoutNamespace((si as ElementScope).sc as PascalABCCompiler.Parsers.ITypeScope);
+                        string s = CodeCompletionController.CurrentParser.LanguageInformation.GetSimpleDescriptionWithoutNamespace((si as ElementScope).sc as ITypeScope);
                         if (s != out_si.name)
                             out_si.addit_name = s;
                     }
@@ -613,7 +617,7 @@ namespace PascalSharp.Internal.CodeCompletion
         /// <summary>
         /// Получить определение expr
         /// </summary>
-        public List<Position> GetDefinition(expression expr, int line, int col, PascalABCCompiler.Parsers.KeywordKind keyword, bool only_check)
+        public List<Position> GetDefinition(expression expr, int line, int col, ToolKeywordKind keyword, bool only_check)
         {
             List<Position> poses = new List<Position>();
             Position pos = new Position(); pos.line = -1; pos.column = -1;
@@ -624,7 +628,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 if (ss == null) return poses;
                 bool on_proc = false;
                 SetCurrentUsedAssemblies();
-                if (keyword == PascalABCCompiler.Parsers.KeywordKind.Function || keyword == PascalABCCompiler.Parsers.KeywordKind.Constructor || keyword == PascalABCCompiler.Parsers.KeywordKind.Destructor)
+                if (keyword == ToolKeywordKind.Function || keyword == ToolKeywordKind.Constructor || keyword == ToolKeywordKind.Destructor)
                 {
                     if (ss is ProcRealization)
                     {
@@ -647,9 +651,9 @@ namespace PascalSharp.Internal.CodeCompletion
                             on_proc = true;
                     }
                 }
-                //if (!((keyword == KeywordKind.kw_proc || keyword == KeywordKind.kw_constr || keyword == KeywordKind.kw_destr) && ss is ProcScope))
+                //if (!((keyword == ToolKeywordKind.kw_proc || keyword == ToolKeywordKind.kw_constr || keyword == ToolKeywordKind.kw_destr) && ss is ProcScope))
                 if (!on_proc)
-                //if (!((keyword == KeywordKind.kw_proc || keyword == KeywordKind.kw_constr || keyword == KeywordKind.kw_destr) && ss is ProcRealization))
+                //if (!((keyword == ToolKeywordKind.kw_proc || keyword == ToolKeywordKind.kw_constr || keyword == ToolKeywordKind.kw_destr) && ss is ProcRealization))
                 {
                     ExpressionVisitor ev = new ExpressionVisitor(expr, ss, visitor);
                     ss = ev.GetScopeOfExpression();
@@ -832,7 +836,7 @@ namespace PascalSharp.Internal.CodeCompletion
         /// <summary>
         /// Получить реализацию expr
         /// </summary>
-        public List<Position> GetRealization(expression expr, int line, int col, PascalABCCompiler.Parsers.KeywordKind keyword)
+        public List<Position> GetRealization(expression expr, int line, int col, ToolKeywordKind keyword)
         {
             List<Position> poses = new List<Position>();
             Position pos = new Position(); pos.line = -1; pos.column = -1;
@@ -844,7 +848,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 //if (!(expr is ident && string.Compare((expr as ident).name,ss.si.name) == 0))
                 bool on_proc = false;
                 SetCurrentUsedAssemblies();
-                if (keyword == PascalABCCompiler.Parsers.KeywordKind.Function || keyword == PascalABCCompiler.Parsers.KeywordKind.Constructor || keyword == PascalABCCompiler.Parsers.KeywordKind.Destructor)
+                if (keyword == ToolKeywordKind.Function || keyword == ToolKeywordKind.Constructor || keyword == ToolKeywordKind.Destructor)
                 {
                     if (ss is ProcRealization)
                     {
@@ -867,9 +871,9 @@ namespace PascalSharp.Internal.CodeCompletion
                             on_proc = true;
                     }
                 }
-                //if (!((keyword == KeywordKind.kw_proc || keyword == KeywordKind.kw_constr || keyword == KeywordKind.kw_destr) && ss is ProcScope))
+                //if (!((keyword == ToolKeywordKind.kw_proc || keyword == ToolKeywordKind.kw_constr || keyword == ToolKeywordKind.kw_destr) && ss is ProcScope))
                 if (!on_proc)
-                //if (keyword != KeywordKind.kw_proc && keyword != KeywordKind.kw_constr && keyword != KeywordKind.kw_destr)
+                //if (keyword != ToolKeywordKind.kw_proc && keyword != ToolKeywordKind.kw_constr && keyword != ToolKeywordKind.kw_destr)
                 {
                     ExpressionVisitor ev = new ExpressionVisitor(expr, ss, visitor);
                     ss = ev.GetScopeOfExpression();
@@ -897,7 +901,7 @@ namespace PascalSharp.Internal.CodeCompletion
         /// <summary>
         /// Получить описание элемента при наведении мышью
         /// </summary>
-        public string GetDescription(expression expr, string FileName, string expr_without_brackets, PascalABCCompiler.Parsers.Controller parser, int line, int col, PascalABCCompiler.Parsers.KeywordKind keyword, bool header)
+        public string GetDescription(expression expr, string FileName, string expr_without_brackets, Controller parser, int line, int col, ToolKeywordKind keyword, bool header)
         {
             if (visitor.cur_scope == null) return null;
             SymScope ss = visitor.FindScopeByLocation(line + 1, col + 1);//stv.cur_scope;
@@ -912,7 +916,7 @@ namespace PascalSharp.Internal.CodeCompletion
             }
             bool on_proc = false;
             SetCurrentUsedAssemblies();
-            if (keyword == PascalABCCompiler.Parsers.KeywordKind.Function || keyword == PascalABCCompiler.Parsers.KeywordKind.Constructor || keyword == PascalABCCompiler.Parsers.KeywordKind.Destructor)
+            if (keyword == ToolKeywordKind.Function || keyword == ToolKeywordKind.Constructor || keyword == ToolKeywordKind.Destructor)
             {
                 if (ss is ProcRealization)
                 {
@@ -931,7 +935,7 @@ namespace PascalSharp.Internal.CodeCompletion
                     else on_proc = true;
                 }
             }
-            //if (!((keyword == KeywordKind.kw_proc || keyword == KeywordKind.kw_constr || keyword == KeywordKind.kw_destr) && ss is ProcScope))
+            //if (!((keyword == ToolKeywordKind.kw_proc || keyword == ToolKeywordKind.kw_constr || keyword == ToolKeywordKind.kw_destr) && ss is ProcScope))
             if (!on_proc)
             {
                 ExpressionVisitor ev = new ExpressionVisitor(expr, ss, visitor);
@@ -1125,14 +1129,14 @@ namespace PascalSharp.Internal.CodeCompletion
         //poetomu nado sohranat i vosstanavlivat tekushij kesh sborok
         private void SetCurrentUsedAssemblies()
         {
-            tmp_cur_used_assemblies = PascalABCCompiler.NetHelper.NetHelper.cur_used_assemblies;
-            PascalABCCompiler.NetHelper.NetHelper.cur_used_assemblies = cur_used_assemblies;
+            tmp_cur_used_assemblies = NetHelper.cur_used_assemblies;
+            NetHelper.cur_used_assemblies = cur_used_assemblies;
         }
 
         private void RestoreCurrentUsedAssemblies()
         {
             if (tmp_cur_used_assemblies != null)
-                PascalABCCompiler.NetHelper.NetHelper.cur_used_assemblies = tmp_cur_used_assemblies;
+                NetHelper.cur_used_assemblies = tmp_cur_used_assemblies;
         }
 
         ~DomConverter()

@@ -1,9 +1,13 @@
 ﻿using System;
+using PascalSharp.Internal.SyntaxTree;
 using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
-using for_node = PascalABCCompiler.SyntaxTree.for_node;
+using PascalABCCompiler.SystemLibrary;
+using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
+using for_node = PascalSharp.Internal.SyntaxTree.for_node;
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter
 {
     public partial class syntax_tree_visitor
     {
@@ -75,7 +79,7 @@ namespace PascalSharp.Internal.TreeConverter.
                     tn = convert_strong(_for_node.type_name);
                 else
                     tn = initialValue.type;
-                //if (tn == SystemLibrary.SystemLibrary.void_type && _for_node.type_name != null)
+                //if (tn == SystemLibrary.void_type && _for_node.type_name != null)
                 //	AddError(new VoidNotValid(get_location(_for_node.type_name)))
                 if (_for_node.type_name != null)
                     check_for_type_allowed(tn, get_location(_for_node.type_name));
@@ -145,7 +149,7 @@ namespace PascalSharp.Internal.TreeConverter.
             //DarkStar Modifed
             //исправил ошибку:  не работали break в циклах
             TreeRealization.for_node forNode = new TreeRealization.for_node(null, sn_while, sn_init_while, sn_inc, null, get_location(_for_node));
-            if (vdn.type == SystemLibrary.SystemLibrary.bool_type)
+            if (vdn.type == SystemLibrary.bool_type)
                 forNode.bool_cycle = true;
             context.cycle_stack.push(forNode);
             context.loop_var_stack.Push(vdn);

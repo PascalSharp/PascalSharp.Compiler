@@ -6,7 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
-using PascalABCCompiler.Parsers;
+using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SyntaxTree;
 
 namespace PascalSharp.Internal.CodeCompletion
 {
@@ -31,10 +32,10 @@ namespace PascalSharp.Internal.CodeCompletion
 		public static void Load(SymScope unit, string fileName)
 		{
 			if (ht[unit] != null) return;
-			string xml_loc = CodeCompletionTools.XmlDoc.LookupLocalizedXmlDocForUnit(fileName, CodeCompletionController.currentLanguageISO);
+			string xml_loc = XmlDoc.LookupLocalizedXmlDocForUnit(fileName, CodeCompletionController.currentLanguageISO);
 			if (xml_loc != null)
 			{
-                CodeCompletionTools.XmlDoc xdoc = CodeCompletionTools.XmlDoc.Load(xml_loc, Environment.GetEnvironmentVariable("TEMP"), false);
+                XmlDoc xdoc = XmlDoc.Load(xml_loc, Environment.GetEnvironmentVariable("TEMP"), false);
 				ht[unit] = xdoc;
 			}
 		}
@@ -42,10 +43,10 @@ namespace PascalSharp.Internal.CodeCompletion
 		public static void LoadWithSources(SymScope unit, string fileName)
 		{
 			if (ht[unit] != null) return;
-            string xml_loc = CodeCompletionTools.XmlDoc.LookupLocalizedXmlDocForUnitWithSources(fileName, CodeCompletionController.currentLanguageISO);
+            string xml_loc = XmlDoc.LookupLocalizedXmlDocForUnitWithSources(fileName, CodeCompletionController.currentLanguageISO);
 			if (xml_loc != null)
 			{
-                CodeCompletionTools.XmlDoc xdoc = CodeCompletionTools.XmlDoc.Load(xml_loc, Environment.GetEnvironmentVariable("TEMP"), false);
+                XmlDoc xdoc = XmlDoc.Load(xml_loc, Environment.GetEnvironmentVariable("TEMP"), false);
 				ht[unit] = xdoc;
 			}
 		}
@@ -108,7 +109,7 @@ namespace PascalSharp.Internal.CodeCompletion
 			{
                 if (t.declaringUnit != null)
                 {
-                    CodeCompletionTools.XmlDoc xdoc = (CodeCompletionTools.XmlDoc)ht[t.declaringUnit];
+                    XmlDoc xdoc = (XmlDoc)ht[t.declaringUnit];
                     if (xdoc != null)
                     {
                         string s = GetNormalHint(xdoc.GetDocumentation("T:" + t.si.name, true));
@@ -129,7 +130,7 @@ namespace PascalSharp.Internal.CodeCompletion
 			{
                 if (es.declaringUnit == null)
                     return "";
-                CodeCompletionTools.XmlDoc xdoc = (CodeCompletionTools.XmlDoc)ht[es.declaringUnit];
+                XmlDoc xdoc = (XmlDoc)ht[es.declaringUnit];
 				if (xdoc != null)
 				{
 					string s = "";
@@ -158,7 +159,7 @@ namespace PascalSharp.Internal.CodeCompletion
 
                 if (mi.declaringUnit != null)
                 {
-                    CodeCompletionTools.XmlDoc xdoc = (CodeCompletionTools.XmlDoc)ht[mi.declaringUnit];
+                    XmlDoc xdoc = (XmlDoc)ht[mi.declaringUnit];
                     if (xdoc != null)
                     {
                         string s = "";
@@ -186,7 +187,7 @@ namespace PascalSharp.Internal.CodeCompletion
 		{
 			try
 			{
-                CodeCompletionTools.XmlDoc xdoc = (CodeCompletionTools.XmlDoc)ht[mi];
+                XmlDoc xdoc = (XmlDoc)ht[mi];
 				if (xdoc != null)
 				{
 					return GetNormalHint(xdoc.GetDocumentation(mi.si.name,true));
@@ -203,7 +204,7 @@ namespace PascalSharp.Internal.CodeCompletion
 		{
 			try
 			{
-                CodeCompletionTools.XmlDoc xdoc = (CodeCompletionTools.XmlDoc)ht[unit];
+                XmlDoc xdoc = (XmlDoc)ht[unit];
 				if (xdoc != null)
 				{
 					string s = GetNormalHint(xdoc.GetDocumentation(descr,false));
@@ -309,7 +310,7 @@ namespace PascalSharp.Internal.CodeCompletion
 					SymScope typ = mi.parameters[i].sc;
 					if (typ is TypeScope) 
 						sb.Append(GetTypeName(typ as TypeScope));
-					if (mi.parameters[i].param_kind == PascalABCCompiler.SyntaxTree.parametr_kind.var_parametr || mi.parameters[i].param_kind == PascalABCCompiler.SyntaxTree.parametr_kind.const_parametr)
+					if (mi.parameters[i].param_kind == parametr_kind.var_parametr || mi.parameters[i].param_kind == parametr_kind.const_parametr)
 						sb.Append('@');
 					if (i<mi.parameters.Count-1)
 						sb.Append(',');

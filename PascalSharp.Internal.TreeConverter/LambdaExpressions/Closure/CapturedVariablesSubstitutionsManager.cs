@@ -3,7 +3,7 @@
 using System.Linq;
 using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
-using PascalSharp.Internal.TreeConverter;TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace TreeConverter.LambdaExpressions.Closure
 {

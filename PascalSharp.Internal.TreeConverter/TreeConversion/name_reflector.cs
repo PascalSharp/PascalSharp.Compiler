@@ -2,8 +2,9 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Отображение типов операторов узлов синтаксического дерева в имена методов.
 using System;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter
 {
 
 	public class name_reflector

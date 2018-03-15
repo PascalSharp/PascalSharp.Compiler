@@ -10,9 +10,15 @@
 
 using System;
 using System.Collections.Generic;
+using PascalABCCompiler.SystemLibrary;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
+using compiler_directive = PascalSharp.Internal.SyntaxTree.compiler_directive;
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter
 {
 	public class SyntaxTreeToSemanticTreeConverter 
 	{
@@ -21,11 +27,11 @@ namespace PascalSharp.Internal.TreeConverter.
         public SyntaxTreeToSemanticTreeConverter()
         {
             //(ssyy) запоминаем visitor
-            SystemLibrary.SystemLibrary.syn_visitor = stv;
+            SystemLibrary.syn_visitor = stv;
         }
 
         //TODO: Разобраться, где использутеся.
-		public SymbolTable.TreeConverterSymbolTable SymbolTable
+		public TreeConverterSymbolTable SymbolTable
 		{
 			get
 			{
@@ -33,13 +39,13 @@ namespace PascalSharp.Internal.TreeConverter.
 			}
 		}
 
-        void SetSemanticRules(SyntaxTree.compilation_unit SyntaxUnit)
+        void SetSemanticRules(compilation_unit SyntaxUnit)
         {
-            SemanticRules.ClassBaseType = SystemLibrary.SystemLibrary.object_type;
-            SemanticRules.StructBaseType = SystemLibrary.SystemLibrary.value_type;
+            SemanticRules.ClassBaseType = SystemLibrary.object_type;
+            SemanticRules.StructBaseType = SystemLibrary.value_type;
             switch (SyntaxUnit.Language)
             {
-                case PascalABCCompiler.SyntaxTree.LanguageId.PascalABCNET:
+                case LanguageId.PascalABCNET:
                     SemanticRules.AddResultVariable = true;
                     SemanticRules.NullBasedStrings = false;
                     SemanticRules.FastStrings = false;
@@ -54,7 +60,7 @@ namespace PascalSharp.Internal.TreeConverter.
                     SemanticRules.AllowChangeLoopVariable = false;
                     SemanticRules.AllowGlobalVisibilityForPABCDll = true;
                     break;
-                case PascalABCCompiler.SyntaxTree.LanguageId.C:
+                case LanguageId.C:
                     SemanticRules.AddResultVariable = false;
                     SemanticRules.NullBasedStrings = true;
                     SemanticRules.InitStringAsEmptyString = false;
@@ -72,9 +78,9 @@ namespace PascalSharp.Internal.TreeConverter.
 
 
         //TODO: Исправить коллекцию модулей.
-        public PascalSharp.Internal.TreeConverter.TreeRealization.common_unit_node CompileInterface(SyntaxTree.compilation_unit SyntaxUnit,
+        public PascalSharp.Internal.TreeConverter.TreeRealization.common_unit_node CompileInterface(compilation_unit SyntaxUnit,
             PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list UsedUnits, List<Error> ErrorsList, List<CompilerWarning> WarningsList, SyntaxError parser_error,
-            System.Collections.Hashtable bad_nodes, TreeRealization.using_namespace_list namespaces, Dictionary<SyntaxTree.syntax_tree_node,string> docs, bool debug, bool debugging)
+            System.Collections.Hashtable bad_nodes, using_namespace_list namespaces, Dictionary<syntax_tree_node,string> docs, bool debug, bool debugging)
 		{
             //convertion_data_and_alghoritms.__i = 0;
 			stv.parser_error=parser_error;
@@ -86,18 +92,18 @@ namespace PascalSharp.Internal.TreeConverter.
             stv.using_list.clear();
             stv.interface_using_list.clear();
             stv.using_list.AddRange(namespaces);
-            stv.current_document = new TreeRealization.document(SyntaxUnit.file_name);
+            stv.current_document = new document(SyntaxUnit.file_name);
             stv.ErrorsList = ErrorsList;
             stv.WarningsList = WarningsList;
             stv.SymbolTable.CaseSensitive = SemanticRules.SymbolTableCaseSensitive;
             stv.docs = docs;
             stv.debug = debug;
             stv.debugging = debugging;
-			SystemLibrary.SystemLibrary.syn_visitor = stv;
+			SystemLibrary.syn_visitor = stv;
             SetSemanticRules(SyntaxUnit);
             
 
-            foreach (SyntaxTree.compiler_directive cd in SyntaxUnit.compiler_directives)
+            foreach (var cd in SyntaxUnit.compiler_directives)
                 cd.visit(stv);
 
             stv.DirectivesToNodesLinks = CompilerDirectivesToSyntaxTreeNodesLinker.BuildLinks(SyntaxUnit, ErrorsList);  //MikhailoMMX добавил передачу списка ошибок (02.10.10)
@@ -123,9 +129,9 @@ namespace PascalSharp.Internal.TreeConverter.
 		}
 
         public void CompileImplementation(PascalSharp.Internal.TreeConverter.TreeRealization.common_unit_node SemanticUnit,
-			SyntaxTree.compilation_unit SyntaxUnit,PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list UsedUnits,List<Error> ErrorsList,List<CompilerWarning> WarningsList,
-            SyntaxError parser_error, System.Collections.Hashtable bad_nodes, TreeRealization.using_namespace_list interface_namespaces, TreeRealization.using_namespace_list imlementation_namespaces,
-           Dictionary<SyntaxTree.syntax_tree_node,string> docs, bool debug, bool debugging)
+			compilation_unit SyntaxUnit,PascalSharp.Internal.TreeConverter.TreeRealization.unit_node_list UsedUnits,List<Error> ErrorsList,List<CompilerWarning> WarningsList,
+            SyntaxError parser_error, System.Collections.Hashtable bad_nodes, using_namespace_list interface_namespaces, using_namespace_list imlementation_namespaces,
+           Dictionary<syntax_tree_node,string> docs, bool debug, bool debugging)
 		{
 			//if (ErrorsList.Count>0) throw ErrorsList[0];
 			stv.parser_error=parser_error;
@@ -143,19 +149,19 @@ namespace PascalSharp.Internal.TreeConverter.
             stv.docs = docs;
             stv.debug = debug;
             stv.debugging = debugging;
-			SystemLibrary.SystemLibrary.syn_visitor = stv;
+			SystemLibrary.syn_visitor = stv;
             SetSemanticRules(SyntaxUnit);
 
-			SyntaxTree.unit_module umod = SyntaxUnit as SyntaxTree.unit_module;
+			unit_module umod = SyntaxUnit as unit_module;
 			if (umod==null)
 			{
                 throw new PascalSharp.Internal.TreeConverter.CompilerInternalError("Program has not implementation part");
 			}
             //TODO: Переделать, чтобы Сашин код работал с common_unit_node.
 			stv.compiled_unit=(PascalSharp.Internal.TreeConverter.TreeRealization.common_unit_node)SemanticUnit;
-            stv.current_document = new TreeRealization.document(SyntaxUnit.file_name);
+            stv.current_document = new document(SyntaxUnit.file_name);
 
-            foreach (SyntaxTree.compiler_directive cd in umod.compiler_directives)
+            foreach (compiler_directive cd in umod.compiler_directives)
                 cd.visit(stv);
 
 			stv.visit_implementation(umod);
@@ -167,7 +173,7 @@ namespace PascalSharp.Internal.TreeConverter.
 		{
 			stv.reset();
             //stv = new syntax_tree_visitor(); // SSM 14/07/13 - может, будет занимать больше памяти, зато все внутренние переменные будут чиститься
-            //SystemLibrary.SystemLibrary.syn_visitor = stv;
+            //SystemLibrary.syn_visitor = stv;
 
 		}
 	}

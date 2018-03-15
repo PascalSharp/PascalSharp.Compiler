@@ -1,10 +1,13 @@
 ﻿using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
 using PascalABCCompiler.SystemLibrary;
-using PascalSharp.Internal.TreeConverter;TreeConversion;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 using SymTable = SymbolTable;
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter
 {
     public partial class syntax_tree_visitor
     {
@@ -75,7 +78,7 @@ namespace PascalSharp.Internal.TreeConverter.
                 {
                     expression_node expr = (to as simple_array_indexing).simple_arr_expr;
                     expression_node ind_expr = (to as simple_array_indexing).ind_expr;
-                    from = convertion_data_and_alghoritms.convert_type(from, SystemLibrary.SystemLibrary.char_type);
+                    from = convertion_data_and_alghoritms.convert_type(from, SystemLibrary.char_type);
                     ind_expr = convertion_data_and_alghoritms.create_simple_function_call(
                         SystemLibInitializer.SetCharInShortStringProcedure.sym_info as function_node,
                         loc,
@@ -92,7 +95,7 @@ namespace PascalSharp.Internal.TreeConverter.
                     expression_node clip_expr = convertion_data_and_alghoritms.create_simple_function_call(
                         SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,
                         loc,
-                        convertion_data_and_alghoritms.convert_type(from, SystemLibrary.SystemLibrary.string_type),
+                        convertion_data_and_alghoritms.convert_type(from, SystemLibrary.string_type),
                         new int_const_node((to.type as short_string_type_node).Length,
                             null));
                     statement_node en = find_operator(compiler_string_consts.assign_name, to, clip_expr, get_location(_assign));
@@ -309,9 +312,9 @@ namespace PascalSharp.Internal.TreeConverter.
 
                         //Обработка s[i]:='c'
                         if (SystemUnitAssigned)
-                            if (nspr.property.comprehensive_type == SystemLibrary.SystemLibrary.string_type)
+                            if (nspr.property.comprehensive_type == SystemLibrary.string_type)
                             {
-                                if (nspr.property == SystemLibrary.SystemLibrary.string_type.default_property_node)
+                                if (nspr.property == SystemLibrary.string_type.default_property_node)
                                 {
                                     if (SystemLibInitializer.StringDefaultPropertySetProcedure != null)
                                     {

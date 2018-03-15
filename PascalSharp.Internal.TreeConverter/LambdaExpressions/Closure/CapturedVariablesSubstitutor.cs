@@ -6,10 +6,12 @@ using System.Linq;
 using PascalABCCompiler.SemanticTree;
 using PascalABCCompiler.SyntaxTree;
 using PascalABCCompiler.SystemLibrary;
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
-using PascalSharp.Internal.TreeConverter;TreeConversion;
-using array_const = PascalABCCompiler.SyntaxTree.array_const;
-using for_node = PascalABCCompiler.SyntaxTree.for_node;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using array_const = array_const;
+using for_node = for_node;
 
 namespace TreeConverter.LambdaExpressions.Closure
 {
