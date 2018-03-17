@@ -1865,6 +1865,10 @@ namespace PascalSharp.Internal.TreeConverter.TreeConversion
                         set_of_possible_functions.remove_at(i);
                         lastFailedWhileTryingToCompileLambdaBodyWithGivenParametersException = exc;
                     }
+                    catch(Errors.Error err)
+                    {
+                        return AddError<function_node>(err);
+                    }
                 }
             }
 

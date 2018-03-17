@@ -2858,7 +2858,7 @@
   </SyntaxNodes>
   <Settings>
     <FileName>Tree.cs</FileName>
-    <NamespaceName>PascalABCCompiler.SyntaxTree</NamespaceName>
+    <NamespaceName>PascalSharp.Internal.SyntaxTree</NamespaceName>
     <FactoryName>initial_tree_maker</FactoryName>
     <VisitorInterfaceFileName>Visitor.cs</VisitorInterfaceFileName>
     <PcuWriterName>SyntaxTreeStreamWriter</PcuWriterName>

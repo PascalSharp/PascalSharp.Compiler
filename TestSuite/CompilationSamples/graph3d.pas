@@ -87,6 +87,7 @@ const
   OrtY = V3D(0, 1, 0);
   OrtZ = V3D(0, 0, 1);
   Origin: Point3D = P3D(0, 0, 0);
+  EmptyColor = ARGB(0,0,0,0);
 
 function ChangeOpacity(Self: GColor; value: integer); extensionmethod := ARGB(value, Self.R, Self.G, Self.B);
 
@@ -427,6 +428,9 @@ type
     scaletransform := new ScaleTransform3D;
     transltransform: TranslateTransform3D;
     
+    procedure AddToObject3DList;
+    procedure DeleteFromObject3DList;
+    
     procedure CreateBase0(m: Visual3D; x, y, z: real);
     begin
       model := m;
@@ -439,6 +443,7 @@ type
       transfgroup.Children.Add(transltransform);
       model.Transform := transfgroup;
       hvp.Children.Add(model);
+      AddToObject3DList;
     end;
     
     procedure SetX(xx: real) := Invoke(()->begin transltransform.OffsetX := xx; end); 
@@ -448,7 +453,16 @@ type
     procedure SetZ(zz: real) := Invoke(()->begin transltransform.OffsetZ := zz; end);
     function GetZ: real := InvokeReal(()->transltransform.OffsetZ);
     function GetPos: Point3D := Invoke&<Point3D>(()->P3D(transltransform.OffsetX, transltransform.OffsetY, transltransform.OffsetZ));
-
+    
+    function FindVisual(v: Visual3D): Object3D; virtual;
+    begin
+      if model = v then
+        Result := Self
+    end;
+    function GetColor: GColor := EmptyColor;
+    procedure SetColor(c: GColor); 
+    begin end;
+    
   protected 
     function CreateObject: Object3D; virtual; // нужно для клонирования
     begin
@@ -492,6 +506,7 @@ type
     function MoveOnX(dx: real) := MoveOn(dx, 0, 0);
     function MoveOnY(dy: real) := MoveOn(0, dy, 0);
     function MoveOnZ(dz: real) := MoveOn(0, 0, dz);
+    property Color: GColor read GetColor write SetColor; virtual;
   private
     procedure MoveToProp(p: Point3D) := MoveTo(p);
   
@@ -585,12 +600,20 @@ type
         var m := XamlReader.Load(new System.IO.FileStream(fname,System.IO.FileMode.Open)) as Visual3D;
         Result := new Object3D(m);
       end);
+    procedure Destroy(); virtual;
+    begin
+      DeleteFromObject3DList;
+    end;
   end;
   
   ObjectWithChildren3D = class(Object3D) // model is ModelVisual3D
   private
     l := new List<Object3D>;
     
+    procedure DestroyT;
+    begin
+      
+    end;
     procedure AddT(obj: Object3D);
     begin
       var p := Self;
@@ -602,6 +625,7 @@ type
       end;
       if obj.Parent = Self then
         exit;
+        
       if obj.Parent = nil then
         hvp.Children.Remove(obj.model)
       else 
@@ -610,6 +634,7 @@ type
         q.Children.Remove(obj.model);
         obj.Parent.l.Remove(obj);
       end;
+      
       (model as ModelVisual3D).Children.Add(obj.model);
       l.Add(obj);  
       obj.Parent := Self;
@@ -625,6 +650,19 @@ type
     end;
     function GetObj(i: integer): Object3D := l[i];
     function CountT: integer := (model as ModelVisual3D).Children.Count;
+    function FindVisual(v: Visual3D): Object3D; override;
+    begin
+      Result := nil;
+      if model = v then
+        Result := Self
+      else
+        foreach var x in l do
+        begin
+          Result := x.FindVisual(v);
+          if Result<>nil then
+            exit;
+        end;
+    end;
   protected  
     procedure CloneChildren(from: Object3D); override;
     begin
@@ -641,10 +679,21 @@ type
     
     procedure DestroyP;
     begin
-      hvp.Children.Remove(model);
+      if Parent = nil then
+        hvp.Children.Remove(model)
+      else 
+      begin
+        var q := Parent.model as ModelVisual3D;
+        q.Children.Remove(model);
+        Parent.l.Remove(Self);
+      end;
       model := nil;
     end;
-    procedure Destroy := Invoke(DestroyP);
+    procedure Destroy; override;
+    begin
+      inherited Destroy;
+      Invoke(DestroyP);
+    end;
   end;
   
   ObjectWithMaterial3D = class(ObjectWithChildren3D) // model is MeshElement3D
@@ -658,6 +707,18 @@ type
       //m.BackMaterial := nil;
     end;
     
+    function GetColorP: GColor;
+    begin
+      Result := EmptyColor;
+      var g := Material as System.Windows.Media.Media3D.MaterialGroup;
+      if g=nil then exit;      
+      var t := g.Children[0] as System.Windows.Media.Media3D.DiffuseMaterial;
+      if t=nil then exit;
+      var v := t.Brush as System.Windows.Media.SolidColorBrush;
+      if v=nil then exit;
+      Result := v.Color; 
+    end;
+    function GetColor: GColor := Invoke&<GColor>(GetColorP);
     procedure SetColorP(c: GColor) := (model as MeshElement3D).Material := MaterialHelper.CreateMaterial(c);
     procedure SetColor(c: GColor) := Invoke(SetColorP, c); 
     procedure SetVP(v: boolean) := (model as MeshElement3D).Visible := v;
@@ -671,7 +732,7 @@ type
     procedure SetBMaterial(mat: GMaterial) := Invoke(SetBMP, mat);
     function GetBMaterial: GMaterial := Invoke&<GMaterial>(()->(model as MeshElement3D).BackMaterial);
   public 
-    property Color: GColor write SetColor;
+    property Color: GColor read GetColor write SetColor; override;
     property Material: GMaterial read GetMaterial write SetMaterial;
     property BackMaterial: GMaterial read GetBMaterial write SetBMaterial;
     property Visible: boolean read GetV write SetV;
@@ -1185,6 +1246,20 @@ function Object3D.AnimRotate(vx, vy, vz, angle, seconds: real) := new RotateAtAn
 
 function Object3D.AnimRotateAt(axis: Vector3D; angle: real; center: Point3D; seconds: real) := new RotateAtAnimation(Self, seconds, axis.X, axis.y, axis.z, angle, center);
 
+var Object3DList := new List<Object3D>;
+
+procedure Object3D.AddToObject3DList;
+begin
+  Object3DList.Add(Self)  
+end;
+
+procedure Object3D.DeleteFromObject3DList;
+begin
+  var oc := Self as ObjectWithChildren3D;
+  foreach var c in oc.l do
+    c.DeleteFromObject3DList;
+  Object3DList.Remove(Self)  
+end;
 
 type
   Animate = class
@@ -1205,6 +1280,7 @@ function operator*(a, b: MyAnimation): MyAnimation; extensionmethod := Animate.G
 function MyAnimation.&Then(second: MyAnimation): MyAnimation := Self + second;
 
 //------------------------------ End Animation -------------------------------
+
 
 type
   SphereT = class(ObjectWithMaterial3D)
@@ -1530,7 +1606,7 @@ type
   protected  
     function CreateObject: Object3D; override := new TextT(X, Y, Z, Text, Height, Name, Color);
   public 
-    constructor(x, y, z: real; text: string; height: real; fontname: string; c: Color);
+    constructor(x, y, z: real; text: string; height: real; fontname: string; c: GColor);
     begin
       var a := new TextVisual3D;
       a.Position := p3D(0, 0, 0);
@@ -1547,7 +1623,7 @@ type
     property Height: real read GetFS write SetFS;
     property Name: string read GetN write SetN;
     property UpDirection: Vector3D read GetU write SetU;
-    property Color: GColor read GetColor write SetColor;
+    property Color: GColor read GetColor write SetColor; override;
     function Clone := (inherited Clone) as TextT;
   end;
   
@@ -2202,7 +2278,7 @@ type
     property Height: real read fh write SetH;
     property Radius: real read fr write SetR;
     property N: integer read fn write SetN;
-    property Color: GColor read GetC write SetC;
+    property Color: GColor read GetC write SetC; override;
     property Thickness: real read GetT write SetT;
   end;
   
@@ -2258,7 +2334,7 @@ type
     end;
     
     property Thickness: real read GetT write SetT;
-    property Color: GColor read GetC write SetC;
+    property Color: GColor read GetC write SetC; override;
     property Points: array of Point3D read GetP write SetP;
     function Clone := (inherited Clone) as SegmentsT;
   end;
@@ -2375,6 +2451,15 @@ type
       CreateBase0(a, x, y, z);
     end;
   end;
+
+function FindObject3D(x,y: real): Object3D;
+begin
+  Result := nil;
+  var v := hvp.FindNearestVisual(new Point(x,y));
+  foreach var obj in Object3DList do
+    if obj.model = v then
+      Result := obj
+end;
 
 function DefaultMaterialColor := RandomColor;
 function DefaultMaterial := MaterialHelper.CreateMaterial(DefaultMaterialColor);
@@ -2687,26 +2772,28 @@ begin
   MainWindow.Width := 640;
   MainWindow.Height := 480;
   MainWindow.Closed += procedure(sender, e) -> begin Halt; end;
-  //MainWindow.KeyDown += SystemOnKeyDown;
-  
-  MainWindow.KeyUp += SystemOnKeyUp;
   
   View3D := new View3DT;
   
   MainWindow.PreviewKeyDown += (o,e)-> begin 
-    {if hvp.CameraController<>nil then 
-    begin
-      hvp.CameraController.IsRotationEnabled := False;
-      hvp.CameraController.IsManipulationEnabled := False;
-      hvp.CameraController.IsMoveEnabled := False;
-      hvp.CameraController.IsPanEnabled := False;
-    end;}
     if OnKeyDown<>nil then 
     begin
       OnKeyDown(e.Key);
-      e.Handled := True;
     end;
+    e.Handled := True;
   end;
+
+  MainWindow.PreviewKeyUp += (o,e)-> begin 
+    if OnKeyUp<>nil then 
+    begin
+      OnKeyUp(e.Key);
+    end;
+    e.Handled := True;
+  end;
+  
+  MainWindow.PreviewMouseDown += (o,e) -> SystemOnMouseDown(o,e);  
+  MainWindow.PreviewMouseUp += (o,e) -> SystemOnMouseUp(o,e);  
+  MainWindow.PreviewMouseMove += (o,e) -> SystemOnMouseMove(o,e);  
 
   mre.Set();
   

@@ -123,7 +123,7 @@ namespace PascalSharp.Internal.ParserTools
             keywords.Add("template", "template"); keys.Add("template");
             keywords.Add("namespace", "namespace"); keys.Add("namespace");
             keywords.Add("exit", "exit"); keys.Add("exit");
-
+            keywords.Add("event", "event"); keys.Add("event");
             //keywords.Add("typeof", "typeof"); //keys.Add("typeof");
             //keywords.Add("sizeof", "sizeof"); //keys.Add("sizeof");
             keywords_array = new string[keywords.Count + 2];
@@ -1161,7 +1161,7 @@ namespace PascalSharp.Internal.ParserTools
                     sb.Append(parameters[0] + "->" + parameters[1]);
                 else if (parameters.Count == 1)
                 {
-                    if (t.Name == "Predicate`1")
+                    if (t.FullName == "System.Predicate`1")
                         sb.Append(parameters[0] + "->boolean");
                     else
                         sb.Append("()->" + parameters[0]);
@@ -1170,7 +1170,9 @@ namespace PascalSharp.Internal.ParserTools
             }
             else if (parameters.Count > 0)
             {
-                if (parameters.Count > 1)
+                if (t.FullName == "System.Predicate`1")
+                    sb.Append(parameters[0] + "->boolean");
+                else if (parameters.Count > 1)
                     sb.Append("(" + string.Join(",", parameters.ToArray()) + ")->()");
                 else
                     sb.Append(parameters[0] + "->()");

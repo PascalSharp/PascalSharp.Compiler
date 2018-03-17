@@ -396,22 +396,22 @@ namespace PascalSharp.Internal.TreeConverter.SymbolTable
             _instance_type = instance_type;
         }
 
-        public override SymbolInfo Find(string name)
+        public override SymbolInfoList Find(string name)
         {
             return _instance_type.ConvertSymbolInfo(_orig_scope.Find(name));
         }
 
-        public override SymbolInfo Find(string name, Scope CurrentScope)
+        public override SymbolInfoList Find(string name, Scope CurrentScope)
         {
             return _instance_type.ConvertSymbolInfo(_orig_scope.Find(name, CurrentScope));
         }
 
-        public override SymbolInfo FindOnlyInScope(string name)
+        public override SymbolInfoList FindOnlyInScope(string name)
         {
             return _instance_type.ConvertSymbolInfo(_orig_scope.FindOnlyInScope(name));
         }
 
-        public override SymbolInfo FindOnlyInScopeAndBlocks(string name)
+        public override SymbolInfoList FindOnlyInScopeAndBlocks(string name)
         {
             return _instance_type.ConvertSymbolInfo(_orig_scope.FindOnlyInScopeAndBlocks(name));
         }

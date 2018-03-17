@@ -1642,7 +1642,7 @@ namespace PascalSharp.Internal.CodeCompletion
                 if (_procedure_definition.proc_header is function_header && (_procedure_definition.proc_header as function_header).return_type == null)
                 {
                     var fh = (_procedure_definition.proc_header as function_header);
-                    if (fh != null && fh.return_type == null && !(returned_scope is ProcScope && (returned_scope as ProcScope).procRealization != null))
+                    if (fh != null && fh.return_type == null && !(returned_scope is ProcScope && (returned_scope as ProcScope).procRealization != null && !(returned_scope as ProcScope).is_extension))
                     {
                         var bl = _procedure_definition.proc_body as block;
                         if (bl != null && bl.program_code != null)
@@ -2904,7 +2904,13 @@ namespace PascalSharp.Internal.CodeCompletion
             {
                 if (ps.return_type != null)
                 {
-                    returned_scope = ps.return_type;
+                    if (ps.name == "Copy" && ps.return_type.Name == "Array" && _method_call.parameters.expressions.Count > 0)
+                    {
+                        _method_call.parameters.expressions[0].visit(this);
+                        
+                    }
+                    else
+                        returned_scope = ps.return_type;
                 }
                 else
                     returned_scope = null;
@@ -3155,8 +3161,10 @@ namespace PascalSharp.Internal.CodeCompletion
             else
                 ss.baseScope = returned_scope as TypeScope;
             int num = 0;
-            if (_class_definition.keyword != class_keyword.Interface) num = 1;
-            else ss.baseScope = null;
+            if (_class_definition.keyword != class_keyword.Interface)
+                num = 1;
+            else
+                ss.baseScope = null;
             if (_class_definition.class_parents != null && _class_definition.class_parents.types.Count > num)
             {
                 for (int i = num; i < _class_definition.class_parents.types.Count; i++)
@@ -3168,9 +3176,13 @@ namespace PascalSharp.Internal.CodeCompletion
                         ss.AddImplementedInterface(returned_scope as TypeScope);
                 }
             }
-            if (has_cyclic_inheritance(ss)) ss.baseScope = null;
+            if (has_cyclic_inheritance(ss))
+                ss.baseScope = null;
+            if (ss.loc != null)
+                ss.predef_loc = ss.loc;
             ss.loc = get_location(_class_definition);
             cur_scope = ss;
+            
             if (_class_definition.template_args != null)
             {
                 foreach (ident id in _class_definition.template_args.idents)
@@ -4100,26 +4112,27 @@ namespace PascalSharp.Internal.CodeCompletion
         public override void visit(exception_handler _exception_handler)
         {
             SymScope tmp = cur_scope;
-        	SymScope stmt_scope = new BlockScope(cur_scope);
-        	cur_scope.AddName("$block_scope",stmt_scope);
-        	stmt_scope.loc = get_location(_exception_handler);
-        	stmt_scope.loc = new location(stmt_scope.loc.begin_line_num,stmt_scope.loc.begin_column_num,
-        	                              _exception_handler.statements.source_context.end_position.line_num,
-        	                              _exception_handler.statements.source_context.end_position.column_num,stmt_scope.loc.doc);
-        	returned_scope = null;
-        	if (_exception_handler.variable == null) return;
-        	if (_exception_handler.type_name != null)
-        	_exception_handler.type_name.visit(this);
-        	else returned_scope = cur_scope.FindName(_exception_handler.variable.name);
-        	if (returned_scope != null)
-        	{
-        		cur_scope = stmt_scope;
-        		ElementScope es = new ElementScope(new SymInfo(_exception_handler.variable.name, SymbolKind.Variable,_exception_handler.variable.name),returned_scope,cur_scope);
-        		es.loc = get_location(_exception_handler.variable);
-        		stmt_scope.AddName(_exception_handler.variable.name,es);
-        	}
-        	_exception_handler.statements.visit(this);
-        	cur_scope = tmp;
+            SymScope stmt_scope = new BlockScope(cur_scope);
+            cur_scope.AddName("$block_scope", stmt_scope);
+            stmt_scope.loc = get_location(_exception_handler);
+            if (_exception_handler.statements.source_context != null)
+                stmt_scope.loc = new location(stmt_scope.loc.begin_line_num, stmt_scope.loc.begin_column_num,
+                                              _exception_handler.statements.source_context.end_position.line_num,
+                                              _exception_handler.statements.source_context.end_position.column_num, stmt_scope.loc.doc);
+            returned_scope = null;
+            if (_exception_handler.variable == null) return;
+            if (_exception_handler.type_name != null)
+                _exception_handler.type_name.visit(this);
+            else returned_scope = cur_scope.FindName(_exception_handler.variable.name);
+            if (returned_scope != null)
+            {
+                cur_scope = stmt_scope;
+                ElementScope es = new ElementScope(new SymInfo(_exception_handler.variable.name, SymbolKind.Variable, _exception_handler.variable.name), returned_scope, cur_scope);
+                es.loc = get_location(_exception_handler.variable);
+                stmt_scope.AddName(_exception_handler.variable.name, es);
+            }
+            _exception_handler.statements.visit(this);
+            cur_scope = tmp;
         }
 
         public override void visit(exception_ident _exception_ident)
@@ -4599,7 +4612,7 @@ namespace PascalSharp.Internal.CodeCompletion
         public override void visit(ident_with_templateparams node)
         {
             node.name.visit(this);
-            if (returned_scopes.Count > 0 && returned_scopes[0] is ProcScope)
+            if (search_all && returned_scopes.Count > 0 && returned_scopes[0] is ProcScope)
             {
                 ProcScope ps = returned_scopes[0] as ProcScope;
                 List<TypeScope> template_params = new List<TypeScope>();
@@ -4631,6 +4644,23 @@ namespace PascalSharp.Internal.CodeCompletion
                     }
                 }
                 returned_scope = ps.GetInstance(template_params);
+            }
+            else if (returned_scope is TypeScope)
+            {
+                TypeScope ts = returned_scope as TypeScope;
+                List<TypeScope> template_params = new List<TypeScope>();
+                foreach (type_definition td in node.template_params.params_list)
+                {
+                    td.visit(this);
+                    if (returned_scope is TypeScope)
+                        template_params.Add(returned_scope as TypeScope);
+                    else
+                    {
+                        returned_scope = ts;
+                        return;
+                    }
+                }
+                returned_scope = ts.GetInstance(template_params);
             }
         }
 		public override void visit(bracket_expr _bracket_expr)

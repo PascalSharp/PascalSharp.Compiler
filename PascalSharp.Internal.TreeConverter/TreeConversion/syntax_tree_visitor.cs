@@ -8259,6 +8259,8 @@ namespace PascalSharp.Internal.TreeConverter.TreeConversion
                 if (expr is typed_expression) expr = convert_typed_expression_to_function_call(expr as typed_expression);
                 if (expr != null)
                 {
+                    if (expr.type is generic_instance_type_node)
+                        AddError(get_location(s_expr), "UNEXPECTED_EXPRESSION_IN_WITH");
                 	variable_reference vr = expr as variable_reference;
                 	if (expr.type == null)
                         AddError(get_location(s_expr), "UNEXPECTED_EXPRESSION_IN_WITH");
@@ -12478,6 +12480,8 @@ namespace PascalSharp.Internal.TreeConverter.TreeConversion
                                 AddError(new SimpleSemanticError(cmmn.loc, "OPERATOR_SHOULD_HAVE_1_PARAMETER"));
                             else AddError(new SimpleSemanticError(cmmn.loc, "OPERATOR_SHOULD_HAVE_2_PARAMETERS"));
                         }
+                        if (cmmn.cont_type.IsDelegate && (cmmn.name == "+" || cmmn.name == "-" || cmmn.name == "+=" || cmmn.name == "-="))
+                            AddError(cmmn.loc, "CANNOT_EXTEND_STANDARD_OPERATORS_FOR_DELEGATE");
                         bool has_types = false;
                         foreach (parameter p in cmmn.parameters)
                         {
@@ -12539,6 +12543,8 @@ namespace PascalSharp.Internal.TreeConverter.TreeConversion
                             AddError(new SimpleSemanticError(cnfn.loc, "OPERATOR_SHOULD_BE_EXTENSION_METHOD"));
                         if (!has_types)
                             AddError(new SimpleSemanticError(cnfn.loc, "LEAST_ONE_PARAMETER_TYPE_SHOULD_EQ_DECLARING_TYPE_{0}",cnfn.ConnectedToType.name));
+                        if (cnfn.ConnectedToType.IsDelegate && (cnfn.name == "+" || cnfn.name == "-" || cnfn.name == "+=" || cnfn.name == "-="))
+                            AddError(cnfn.loc, "CANNOT_EXTEND_STANDARD_OPERATORS_FOR_DELEGATE");
                     }
                 }
             }
@@ -13024,6 +13030,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeConversion
                                 AddError(context.top_function.loc, "FIRST_PARAMETER_SHOULDBE_ONLY_VALUE_PARAMETER");
                             if (!context.top_function.IsOperator && context.top_function.parameters[0].name.ToLower() != compiler_string_consts.self_word)
                                 AddError(context.top_function.loc,"FIRST_PARAMETER_MUST_HAVE_NAME_SELF");
+                            
                             common_namespace_function_node top_function = context.top_function as common_namespace_function_node;
                             top_function.ConnectedToType = context.top_function.parameters[0].type;
                             if (top_function.ConnectedToType.Scope == null && top_function.ConnectedToType is compiled_type_node)

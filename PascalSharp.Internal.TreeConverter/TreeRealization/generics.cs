@@ -1351,14 +1351,12 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         protected Hashtable _member_definitions = new Hashtable();
 
         protected type_node _original_generic;
-
-        //public SymbolTable.GenericTypeInstanceScope _scope;
-
-        public override PascalSharp.Internal.TreeConverter.SymbolTable.Scope Scope
+        
+        public override SymbolTable.Scope Scope
         {
             get
             {
-                return original_generic.Scope;//_scope;
+                return _original_generic.Scope;
             }
         }
 
@@ -1557,6 +1555,28 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             }
         }
 
+        protected common_event make_event(event_node orig_event, location loc)
+        {
+            common_event cme = orig_event as common_event;
+            compiled_event ce = orig_event as compiled_event;
+            if (_members[orig_event.add_method] == null)
+                ConvertMember(orig_event.add_method);
+            if (_members[orig_event.remove_method] == null)
+                ConvertMember(orig_event.remove_method);
+            if (orig_event.raise_method != null && _members[orig_event.raise_method] == null)
+                ConvertMember(orig_event.raise_method);
+            common_event evnt = new common_event(orig_event.name, generic_convertions.determine_type(
+                orig_event.delegate_type, _instance_params, false), this,
+                _members[orig_event.add_method] as common_method_node,
+                _members[orig_event.remove_method] as common_method_node,
+                orig_event.raise_method != null ? _members[orig_event.raise_method] as common_method_node : null,
+                cme != null ? cme.field_access_level : SemanticTree.field_access_level.fal_public,
+                orig_event.is_static ? SemanticTree.polymorphic_state.ps_static : SemanticTree.polymorphic_state.ps_common,
+                loc
+                );
+            return evnt;
+        }
+
         protected common_property_node make_property(property_node orig_pn, location loc)
         {
             AddPropertyAccessors(orig_pn);
@@ -1721,7 +1741,8 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                         break;
                     case general_node_type.event_node:
                         //(ssyy) Не знаю, что тут делать
-                        rez_node = orig_node;
+                        event_node orig_event = (event_node)orig_node;
+                        rez_node = make_event(orig_event, loc);
                         break;
                     default:
                         throw new CompilerInternalError("Unexpected definition_node.");
