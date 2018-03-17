@@ -4,7 +4,7 @@
 
 // GPPG version 1.3.6
 // Machine:  ANDREWPC
-// DateTime: 3/13/2018 21:25:01
+// DateTime: 3/15/2018 18:10:45
 // UserName: boyar
 // Input file <Preprocessor3Yacc.y>
 
@@ -17,7 +17,7 @@ using System.Text;
 using QUT.Gppg;
 using PascalSharp.Internal.SyntaxTree;
 
-namespace PascalSharp.Internal.Lexer
+namespace PascalSharp.Internal.Lexer.Preprocessor
 {
 public enum Tokens {
     error=1,EOF=2,DIRECTIVE=3,NODIRECTIVE=4};

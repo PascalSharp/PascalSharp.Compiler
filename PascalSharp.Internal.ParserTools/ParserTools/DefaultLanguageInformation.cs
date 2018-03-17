@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using PascalSharp.Internal.Localization;
+using PascalSharp.Internal.SyntaxTree;
 
 namespace PascalSharp.Internal.ParserTools
 {

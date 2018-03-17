@@ -7,7 +7,7 @@
 %partial
 %parsertype PreprocessorParser
 
-%namespace PascalSharp.Internal.Lexer
+%namespace PascalSharp.Internal.Lexer.Preprocessor
 
 %using PascalSharp.Internal.SyntaxTree;
 

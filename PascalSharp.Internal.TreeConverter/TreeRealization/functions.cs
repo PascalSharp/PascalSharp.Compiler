@@ -3,7 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -359,7 +362,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.general_node_type.function_node;
+				return general_node_type.function_node;
 			}
 		}
 
@@ -435,7 +438,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return this.semantic_node_type.convert_types_function_node;
+                return semantic_node_type.convert_types_function_node;
             }
         }
 
@@ -575,7 +578,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.basic_function_node;
+				return semantic_node_type.basic_function_node;
 			}
 		}
 
@@ -1155,7 +1158,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.common_namespace_function_node;
+				return semantic_node_type.common_namespace_function_node;
 			}
 		}
 
@@ -1281,7 +1284,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.common_in_function_function_node;
+				return semantic_node_type.common_in_function_function_node;
 			}
 		}
 
@@ -1582,7 +1585,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.common_method_node;
+				return semantic_node_type.common_method_node;
 			}
 		}
 
@@ -1848,7 +1851,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.compiled_function_node;
+				return semantic_node_type.compiled_function_node;
 			}
 		}
 
@@ -2089,7 +2092,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.return_node;
+				return semantic_node_type.return_node;
 			}
 		}
 
@@ -2241,7 +2244,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.compiled_constructor_node;
+				return semantic_node_type.compiled_constructor_node;
 			}
 		}
 
@@ -2603,7 +2606,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return this.general_node_type.function_node;
+                return general_node_type.function_node;
             }
         }
 
@@ -2650,7 +2653,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return this.semantic_node_type.return_node;
+                return semantic_node_type.return_node;
             }
         }
 
@@ -2717,7 +2720,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return this.general_node_type.function_node;
+                return general_node_type.function_node;
             }
         }
 
@@ -2730,7 +2733,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return this.semantic_node_type.return_node;
+                return semantic_node_type.return_node;
             }
         }
         IExpressionNode[] ILambdaFunctionCallNode.parameters

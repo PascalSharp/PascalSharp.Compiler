@@ -1,20 +1,17 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Некоторые алгоритмы . В основном выбор перегруженного метода. Сильно связан с syntax_tree_visitor.
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SystemLibrary;
 using PascalSharp.Internal.Errors;
-using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
-using CompilerInternalError = PascalSharp.Internal.Errors.CompilerInternalError;
 
-namespace PascalSharp.Internal.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
 
 	public class convertion_data_and_alghoritms
@@ -23,7 +20,7 @@ namespace PascalSharp.Internal.TreeConverter
 
 		private SyntaxError _parser_error;
 
-		private syntax_tree_visitor _stv;
+		private TreeConversion.syntax_tree_visitor _stv;
 
         private type_constructor _type_constructor;
 
@@ -31,7 +28,7 @@ namespace PascalSharp.Internal.TreeConverter
 
         //private special_operation_kind _current_operation_kind= special_operation_kind.none;
 
-		public convertion_data_and_alghoritms(syntax_tree_visitor stv)
+		public convertion_data_and_alghoritms(TreeConversion.syntax_tree_visitor stv)
 		{
             type_table.type_table_function_call_maker = create_simple_function_call;
 			_stv=stv;
@@ -142,7 +139,7 @@ namespace PascalSharp.Internal.TreeConverter
 		}
 
         //TODO: Наверно это свойство вообще не нужно.
-		public syntax_tree_visitor syntax_tree_visitor
+		public TreeConversion.syntax_tree_visitor syntax_tree_visitor
 		{
 			get
 			{
@@ -153,7 +150,7 @@ namespace PascalSharp.Internal.TreeConverter
         //TODO: Избавиться от дублирования метода.
 		public location get_location(semantic_node sn)
 		{
-			SemanticTree.ILocated iloc=sn as SemanticTree.ILocated;
+			ILocated iloc=sn as ILocated;
 			if (iloc==null)
 			{
 				return null;
@@ -171,7 +168,7 @@ namespace PascalSharp.Internal.TreeConverter
 		}
 
         //TODO: Избавиться от этого метода. Везде должен быть только location (а не ILocation).
-        private location loc_to_loc(SemanticTree.ILocation l)
+        private location loc_to_loc(ILocation l)
         {
             if (l == null)
             {
@@ -186,7 +183,7 @@ namespace PascalSharp.Internal.TreeConverter
         }
 
         //TODO: Вообще нужен-ли этот набор методов (create_..._function_call)?
-		private basic_function_call create_basic_function_call(basic_function_node bfn,SemanticTree.ILocation loc,params expression_node[] exprs)
+		private basic_function_call create_basic_function_call(basic_function_node bfn,ILocation loc,params expression_node[] exprs)
 		{
 			basic_function_call bfc=new basic_function_call(bfn,loc_to_loc(loc));
 			bfc.parameters.AddRange(exprs);
@@ -194,18 +191,18 @@ namespace PascalSharp.Internal.TreeConverter
 		}
 
 		private common_namespace_function_call create_common_namespace_function_call(common_namespace_function_node cnfn,
-			SemanticTree.ILocation loc,params expression_node[] exprs)
+			ILocation loc,params expression_node[] exprs)
 		{
 			common_namespace_function_call cnc=new common_namespace_function_call(cnfn,loc_to_loc(loc));
 			cnc.parameters.AddRange(exprs);
 			return cnc;
 		}
 
-		private common_static_method_call create_common_static_method_call(common_method_node cmn,SemanticTree.ILocation loc,
+		private common_static_method_call create_common_static_method_call(common_method_node cmn,ILocation loc,
 			params expression_node[] exprs)
 		{
 #if (DEBUG)
-			if (cmn.polymorphic_state!=SemanticTree.polymorphic_state.ps_static)
+			if (cmn.polymorphic_state!=polymorphic_state.ps_static)
 			{
 				throw new CompilerInternalError("Not static method can not be called as static");
 			}
@@ -247,7 +244,7 @@ namespace PascalSharp.Internal.TreeConverter
 			params expression_node[] exprs)
 		{
 #if (DEBUG)
-			if (cmn.polymorphic_state==SemanticTree.polymorphic_state.ps_static)
+			if (cmn.polymorphic_state==polymorphic_state.ps_static)
 			{
 				throw new CompilerInternalError("Static method can not be called with type");
 			}
@@ -262,7 +259,7 @@ namespace PascalSharp.Internal.TreeConverter
 			expression_node obj,params expression_node[] exprs)
 		{
 #if (DEBUG)
-			if (cfn.polymorphic_state==SemanticTree.polymorphic_state.ps_static)
+			if (cfn.polymorphic_state==polymorphic_state.ps_static)
 			{
 				throw new CompilerInternalError("Static method can not be called with type");
 			}
@@ -277,7 +274,7 @@ namespace PascalSharp.Internal.TreeConverter
 			location loc, params expression_node[] exprs)
 		{
 #if (DEBUG)
-			if (cfn.polymorphic_state!=SemanticTree.polymorphic_state.ps_static)
+			if (cfn.polymorphic_state!=polymorphic_state.ps_static)
 			{
 				throw new CompilerInternalError("Not static method can not be called as static");
 			}
@@ -322,7 +319,7 @@ namespace PascalSharp.Internal.TreeConverter
                 case semantic_node_type.common_method_node:
                     {
                         common_method_node cmn = (common_method_node)fn;
-                        if (cmn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                        if (cmn.polymorphic_state != polymorphic_state.ps_static)
                         {
                             break;
                         }
@@ -339,7 +336,7 @@ namespace PascalSharp.Internal.TreeConverter
                 case semantic_node_type.compiled_function_node:
                     {
                         compiled_function_node cfn = (compiled_function_node)fn;
-                        if (cfn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                        if (cfn.polymorphic_state != polymorphic_state.ps_static)
                         {
                             break;
                         }
@@ -431,8 +428,8 @@ namespace PascalSharp.Internal.TreeConverter
                 case semantic_node_type.common_method_node:
                 case semantic_node_type.compiled_function_node:
                     {
-                        SemanticTree.IClassMemberNode icmn = (SemanticTree.IClassMemberNode)fn;
-                        if (icmn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                        IClassMemberNode icmn = (IClassMemberNode)fn;
+                        if (icmn.polymorphic_state == polymorphic_state.ps_static)
                         {
                             expr_node = create_simple_function_call(fn, loc, exprs.ToArray());
                             break;
@@ -541,7 +538,7 @@ namespace PascalSharp.Internal.TreeConverter
 				case semantic_node_type.common_method_node:
 				{
 					common_method_node cmn=(common_method_node)fn;
-					if (cmn.polymorphic_state!=SemanticTree.polymorphic_state.ps_static)
+					if (cmn.polymorphic_state!=polymorphic_state.ps_static)
 					{
 						throw new CompilerInternalError("Operator can not be non static method");
 					}
@@ -550,7 +547,7 @@ namespace PascalSharp.Internal.TreeConverter
 				case semantic_node_type.compiled_function_node:
 				{
 					compiled_function_node cfn=(compiled_function_node)fn;
-					if (cfn.polymorphic_state!=SemanticTree.polymorphic_state.ps_static)
+					if (cfn.polymorphic_state!=polymorphic_state.ps_static)
 					{
 						throw new CompilerInternalError("Operator can not be non static method. Included library is can be corrupted or library data extraction error.");
 					}
@@ -655,8 +652,8 @@ namespace PascalSharp.Internal.TreeConverter
         public static function_node get_empty_conversion(type_node from_type, type_node to_type, bool with_compile_time_executor)
         {
             basic_function_node bfn = null;
-            bfn = new basic_function_node(SemanticTree.basic_function_type.none, to_type, false);
-            bfn.parameters.AddElement(new basic_parameter("expr", from_type, SemanticTree.parameter_type.value, bfn));
+            bfn = new basic_function_node(basic_function_type.none, to_type, false);
+            bfn.parameters.AddElement(new basic_parameter("expr", from_type, parameter_type.value, bfn));
             if (with_compile_time_executor)
                 bfn.compile_time_executor = SystemLibrary.delegated_empty_method;
             return bfn;
@@ -992,7 +989,7 @@ namespace PascalSharp.Internal.TreeConverter
                 }
                 if (possible_equal_types(factparams[i].type, formal_param_type))
 				{
-					if ((i<formalparams.Count)&&(formalparams[i].parameter_type==SemanticTree.parameter_type.var))
+					if ((i<formalparams.Count)&&(formalparams[i].parameter_type==parameter_type.var))
 					{
                         bool is_pascal_array_ref = false;
                         bool is_ok = false;
@@ -1085,7 +1082,7 @@ namespace PascalSharp.Internal.TreeConverter
 
 					continue;
 				}
-				if ((i<formalparams.Count)&&(formalparams[i].parameter_type==SemanticTree.parameter_type.var))
+				if ((i<formalparams.Count)&&(formalparams[i].parameter_type==parameter_type.var))
 				{
 					return null;
 				}
@@ -1618,7 +1615,7 @@ namespace PascalSharp.Internal.TreeConverter
                     exprs[i] = create_simple_function_call(ptcal[i].first.convertion_method, get_location(exprs[i]), temp_arr);
 			}
             //TODO: Можно сделать параметры по умолчанию для откомпилированных функций.
-            if ((exprs.Count < fn.parameters.Count) && (fn.node_kind == SemanticTree.node_kind.common))
+            if ((exprs.Count < fn.parameters.Count) && (fn.node_kind == node_kind.common))
             {
                 if (exprs.Count == 0 && fn.parameters != null && fn.parameters.Count == 1 && fn.parameters[0].is_params ||
                     exprs.Count == 1 && fn.parameters != null && fn is common_namespace_function_node && (fn as common_namespace_function_node).ConnectedToType != null &&
@@ -1638,7 +1635,7 @@ namespace PascalSharp.Internal.TreeConverter
                         exprs.AddElement(cp.default_value);
                 }
             }
-            else if ((exprs.Count < fn.parameters.Count) && (fn.node_kind == SemanticTree.node_kind.compiled))
+            else if ((exprs.Count < fn.parameters.Count) && (fn.node_kind == node_kind.compiled))
             {
                 if (exprs.Count == 0 && fn.parameters != null && fn.parameters.Count == 1 && fn.parameters[0].is_params ||
                     exprs.Count == 1 && fn.parameters != null && fn is compiled_function_node && (fn as compiled_function_node).ConnectedToType != null &&

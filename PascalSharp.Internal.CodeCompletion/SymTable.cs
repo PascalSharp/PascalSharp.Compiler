@@ -5,7 +5,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.ParserTools;
 using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter.NetWrappers;

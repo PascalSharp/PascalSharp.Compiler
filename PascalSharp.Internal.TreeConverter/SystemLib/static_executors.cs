@@ -1,14 +1,12 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Интерпретатор константных выражений
-using System;
-using PascalSharp.Internal.TreeConverter;
+
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 
-namespace PascalABCCompiler.SystemLibrary
+namespace PascalSharp.Internal.TreeConverter.SystemLib
 {
-
     public static class static_executors
     {
         public static void init_compiled_type_executors()

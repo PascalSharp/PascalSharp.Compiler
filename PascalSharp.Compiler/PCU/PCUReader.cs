@@ -6,14 +6,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.SystemLibrary;
 using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter.NetWrappers;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 using array_const = PascalSharp.Internal.TreeConverter.TreeRealization.array_const;
@@ -27,6 +26,7 @@ using labeled_statement = PascalSharp.Internal.TreeConverter.TreeRealization.lab
 using question_colon_expression = PascalSharp.Internal.TreeConverter.TreeRealization.question_colon_expression;
 using repeat_node = PascalSharp.Internal.TreeConverter.TreeRealization.repeat_node;
 using sizeof_operator = PascalSharp.Internal.TreeConverter.TreeRealization.sizeof_operator;
+using syntax_tree_visitor = PascalSharp.Internal.TreeConverter.TreeConversion.syntax_tree_visitor;
 using typeof_operator = PascalSharp.Internal.TreeConverter.TreeRealization.typeof_operator;
 using while_node = PascalSharp.Internal.TreeConverter.TreeRealization.while_node;
 
@@ -272,7 +272,7 @@ namespace PascalSharp.Compiler.PCU
                 //TODO сохранить в PCU
                 cun.scope.CaseSensitive = false;
                 if (string.Compare(unit_name,compiler_string_consts.system_unit_file_name)==0)
-                	PascalSharp.Internal.TreeConverter.syntax_tree_visitor.init_system_module(cun);
+                	syntax_tree_visitor.init_system_module(cun);
                 //ssyy
                 //Создаём область видимости для implementation - части
                 cun.implementation_scope = new WrappedUnitImplementationScope(this, cun.scope);

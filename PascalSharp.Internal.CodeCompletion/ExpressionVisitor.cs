@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.ParserTools;
 using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.TreeConverter.TreeConversion;

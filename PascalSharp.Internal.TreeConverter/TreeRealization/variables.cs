@@ -2,7 +2,8 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System;
-using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -148,7 +149,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.general_node_type.variable_node;
+				return general_node_type.variable_node;
 			}
 		}
 
@@ -244,7 +245,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.local_variable;
+				return semantic_node_type.local_variable;
 			}
 		}
 
@@ -330,7 +331,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return this.semantic_node_type.local_block_variable;
+                return semantic_node_type.local_block_variable;
             }
         }
 
@@ -414,7 +415,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.namespace_variable;
+				return semantic_node_type.namespace_variable;
 			}
 		}
 
@@ -542,7 +543,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.class_field;
+				return semantic_node_type.class_field;
 			}
 		}
 
@@ -656,7 +657,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.compiled_variable_definition;
+				return semantic_node_type.compiled_variable_definition;
 			}
 		}
 
@@ -935,7 +936,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.common_parameter;
+				return semantic_node_type.common_parameter;
 			}
 		}
 
@@ -1008,7 +1009,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.basic_parameter;
+				return semantic_node_type.basic_parameter;
 			}
 		}
 
@@ -1111,7 +1112,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.compiled_parameter;
+				return semantic_node_type.compiled_parameter;
 			}
 		}
 

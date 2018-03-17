@@ -5,18 +5,18 @@ using System;
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SystemLibrary;
-using PascalABCCompiler.TreeConverter;
 using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.Errors;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.TreeConverter.LambdaExpressions;
+using PascalSharp.Internal.TreeConverter.LambdaExpressions.Closure;
 using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.OpenMP;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
-using SyntaxTreeBuilder = SyntaxTreeBuilder;
-using SymTable = SymbolTable;
+using PascalSharp.Internal.YieldHelpers;
+using SymTable = PascalSharp.Internal.TreeConverter.SymbolTable;
 using array_const = PascalSharp.Internal.TreeConverter.TreeRealization.array_const;
 using compiler_directive = PascalSharp.Internal.TreeConverter.TreeRealization.compiler_directive;
 using empty_statement = PascalSharp.Internal.TreeConverter.TreeRealization.empty_statement;
@@ -29,10 +29,9 @@ using repeat_node = PascalSharp.Internal.TreeConverter.TreeRealization.repeat_no
 using sizeof_operator = PascalSharp.Internal.TreeConverter.TreeRealization.sizeof_operator;
 using typeof_operator = PascalSharp.Internal.TreeConverter.TreeRealization.typeof_operator;
 using while_node = PascalSharp.Internal.TreeConverter.TreeRealization.while_node;
-using TreeConverter.LambdaExpressions.Closure;
-using TreeConverter.LambdaExpressions;
+using static PascalSharp.Internal.TreeConverter.SystemLib.SystemLibrary;
 
-namespace PascalSharp.Internal.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
     // Сахарный узел синтаксического дерева. Не генерируется автоматически, поскольку содержит ссылку на узел семантического дерева
     // Нужен только при генерации синтаксических узлов на семантическом уровне, т.е. для синтаксического сахара
@@ -174,7 +173,7 @@ namespace PascalSharp.Internal.TreeConverter
 
             _system_unit = SystemLibInitializer.make_system_unit(convertion_data_and_alghoritms.symbol_table,
                 init_properties);
-            SystemLibrary.system_unit = _system_unit;
+            system_unit = _system_unit;
             generic_convertions.reset_generics();
             generic_convertions.visitor = this;
             _record_created = false;
@@ -191,7 +190,7 @@ namespace PascalSharp.Internal.TreeConverter
             type_section_converting = false;
             ThrowCompilationError = true;
             #region MikhailoMMX, реинициализация класса OpenMP
-            OpenMP.InternalReset();
+            OpenMP.OpenMP.InternalReset();
             CurrentParallelPosition = ParallelPosition.Outside;
             #endregion
 
@@ -299,93 +298,93 @@ namespace PascalSharp.Internal.TreeConverter
         
         public static void init_system_module(common_unit_node psystem_unit)
         {
-        	SystemLibInitializer.format_function = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.format_procedure_name);
-            SystemLibInitializer.read_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.read_procedure_name);
-            SystemLibInitializer.write_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.write_procedure_name);
-            SystemLibInitializer.writeln_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.writeln_procedure_name);
-            SystemLibInitializer.readln_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.readln_procedure_name);
-            SystemLibInitializer.TextFileType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.text_file_name_type_name);
-            SystemLibInitializer.TextFileInitProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TextFileInitProcedureName);
-            SystemLibInitializer.BinaryFileType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileTypeName);
-            SystemLibInitializer.AbstractBinaryFileType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.AbstractBinaryFileTypeName);
-            SystemLibInitializer.PointerOutputType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.PointerOutputTypeName);
-            SystemLibInitializer.BinaryFileReadProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileReadProcedureName);
-            SystemLibInitializer.BinaryFileInitProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileInitProcedureName);
-            SystemLibInitializer.StringDefaultPropertySetProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.StringDefaultPropertySetProcedureName);
-            SystemLibInitializer.TypedFileType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileTypeName);
-            SystemLibInitializer.TypedFileInitProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileInitProcedureName);
-            SystemLibInitializer.TypedFileReadProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileReadProcedureName);
-            SystemLibInitializer.ClipShortStringProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortString);
-            SystemLibInitializer.GetCharInShortStringProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.GetCharInShortString);
-            SystemLibInitializer.SetCharInShortStringProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.SetCharInShortString);
-            //SystemLibInitializer.ShortStringType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ShortStringTypeName);
-            //SystemLibInitializer.ShortStringTypeInitProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ShortStringTypeInitProcedure);
-            SystemLibInitializer.TypedSetType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.set_name);
-            SystemLibInitializer.TypedSetInitProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitProcedure);
-            SystemLibInitializer.SetUnionProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.union_of_set);
-            SystemLibInitializer.SetIntersectProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.intersect_of_set);
-            SystemLibInitializer.SetSubtractProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.subtract_of_set);
-            SystemLibInitializer.InSetProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.in_set);
-            SystemLibInitializer.CreateSetProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateSetProcedure);
-            SystemLibInitializer.IncludeProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.IncludeProcedure);
-            SystemLibInitializer.ExcludeProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ExcludeProcedure);
-            SystemLibInitializer.DiapasonType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.DiapasonType);
-            SystemLibInitializer.CreateDiapason = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateDiapason);
-            SystemLibInitializer.CreateObjDiapason = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateObjDiapason);
-            SystemLibInitializer.CompareSetEquals = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetEquals);
-            SystemLibInitializer.CompareSetInEquals = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetInEquals);
-            SystemLibInitializer.CompareSetLess = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetLess);
-            SystemLibInitializer.CompareSetLessEqual = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetLessEqual);
-            SystemLibInitializer.CompareSetGreater = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetGreater);
-            SystemLibInitializer.CompareSetGreaterEqual = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetGreaterEqual);
-            SystemLibInitializer.IncProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.IncProcedure);
-            SystemLibInitializer.DecProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.DecProcedure);
-            SystemLibInitializer.SuccFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.SuccFunction);
-			SystemLibInitializer.PredFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.PredFunction);            
-			SystemLibInitializer.OrdFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.OrdFunction);
-			SystemLibInitializer.TypedSetInitProcedureWithBounds = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitProcedureWithBounds);
-			SystemLibInitializer.TypedSetInitWithShortString = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitWithShortString);
-			SystemLibInitializer.AssignSetProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.AssignSetProcedure);
-			SystemLibInitializer.AssignSetProcedureWithBounds = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.AssignSetProcedureWithBounds);
-			SystemLibInitializer.ClipProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipProcedure);
-			SystemLibInitializer.ClipFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipFunction);
-			SystemLibInitializer.ClipShortStringInSetFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortStringInSetFunction);
-			SystemLibInitializer.ClipShortStringInSetProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortStringInSetProcedure);
-			SystemLibInitializer.SetLengthForShortStringProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.set_length_for_short_string);
-			SystemLibInitializer.SetLengthProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.set_length_procedure_name);
-			SystemLibInitializer.read_short_string_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.read_short_string);
-            SystemLibInitializer.read_short_string_from_file_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.read_short_string_from_file);
-            SystemLibInitializer.InsertProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit,compiler_string_consts.Insert);
-            SystemLibInitializer.InsertInShortStringProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit,compiler_string_consts.InsertInShortString);
-            SystemLibInitializer.DeleteProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit,compiler_string_consts.Delete);
-			SystemLibInitializer.LowFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit,compiler_string_consts.Low);
-            SystemLibInitializer.HighFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit,compiler_string_consts.High);
-            SystemLibInitializer.CheckCanUsePointerOnTypeProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUsePointerOnType_proc_name);
-            SystemLibInitializer.CheckCanUseTypeForBinaryFilesProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUseTypeForBinaryFiles_proc_name);
-            SystemLibInitializer.CheckCanUseTypeForTypedFilesProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUseTypeForTypedFiles_proc_name);
-            SystemLibInitializer.RuntimeDetermineTypeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.RuntimeDetermineType_func_name);
-            SystemLibInitializer.RuntimeInitializeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.RuntimeInitializeFunction_func_name);
-            SystemLibInitializer.PointerToStringFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.PointerToStringFunction_func_name);
-            SystemLibInitializer.GetRuntimeSizeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.GetRuntimeSizeFunction_func_name);
-            SystemLibInitializer.StrProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.StrProcedure_func_name);
-            SystemLibInitializer.PascalABCVersion = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.PascalABCVersion_func_name);
-            SystemLibInitializer.ChrUnicodeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ChrUnicodeFunction_func_name);
-            SystemLibInitializer.AssertProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.AssertProcedure);
-            SystemLibInitializer.CheckRangeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.check_in_range);
-            SystemLibInitializer.CheckCharRangeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.check_in_range_char);
-            SystemLibInitializer.CopyWithSizeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CopyWithSizeFunction);
-            SystemLibInitializer.ArrayCopyFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ArrayCopyFunction);
-            SystemLibInitializer.ConfigVariable = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.config_variable_name);
-            //SystemLibrary.make_type_conversion(SystemLibInitializer.ShortStringType.sym_info as type_node,SystemLibrary.string_type,type_compare.less_type,SemanticTree.basic_function_type.none,true);
-            //SystemLibrary.make_type_conversion(SystemLibrary.string_type,SystemLibInitializer.ShortStringType.sym_info as type_node,type_compare.greater_type,SemanticTree.basic_function_type.none,true);
+        	SystemLibInitializer.format_function = new UnitDefinitionItem(psystem_unit, compiler_string_consts.format_procedure_name);
+            SystemLibInitializer.read_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.read_procedure_name);
+            SystemLibInitializer.write_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.write_procedure_name);
+            SystemLibInitializer.writeln_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.writeln_procedure_name);
+            SystemLibInitializer.readln_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.readln_procedure_name);
+            SystemLibInitializer.TextFileType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.text_file_name_type_name);
+            SystemLibInitializer.TextFileInitProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TextFileInitProcedureName);
+            SystemLibInitializer.BinaryFileType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileTypeName);
+            SystemLibInitializer.AbstractBinaryFileType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.AbstractBinaryFileTypeName);
+            SystemLibInitializer.PointerOutputType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.PointerOutputTypeName);
+            SystemLibInitializer.BinaryFileReadProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileReadProcedureName);
+            SystemLibInitializer.BinaryFileInitProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileInitProcedureName);
+            SystemLibInitializer.StringDefaultPropertySetProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.StringDefaultPropertySetProcedureName);
+            SystemLibInitializer.TypedFileType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileTypeName);
+            SystemLibInitializer.TypedFileInitProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileInitProcedureName);
+            SystemLibInitializer.TypedFileReadProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileReadProcedureName);
+            SystemLibInitializer.ClipShortStringProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortString);
+            SystemLibInitializer.GetCharInShortStringProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.GetCharInShortString);
+            SystemLibInitializer.SetCharInShortStringProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.SetCharInShortString);
+            //SystemLibInitializer.ShortStringType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ShortStringTypeName);
+            //SystemLibInitializer.ShortStringTypeInitProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ShortStringTypeInitProcedure);
+            SystemLibInitializer.TypedSetType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.set_name);
+            SystemLibInitializer.TypedSetInitProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitProcedure);
+            SystemLibInitializer.SetUnionProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.union_of_set);
+            SystemLibInitializer.SetIntersectProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.intersect_of_set);
+            SystemLibInitializer.SetSubtractProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.subtract_of_set);
+            SystemLibInitializer.InSetProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.in_set);
+            SystemLibInitializer.CreateSetProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateSetProcedure);
+            SystemLibInitializer.IncludeProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.IncludeProcedure);
+            SystemLibInitializer.ExcludeProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ExcludeProcedure);
+            SystemLibInitializer.DiapasonType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.DiapasonType);
+            SystemLibInitializer.CreateDiapason = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateDiapason);
+            SystemLibInitializer.CreateObjDiapason = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateObjDiapason);
+            SystemLibInitializer.CompareSetEquals = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetEquals);
+            SystemLibInitializer.CompareSetInEquals = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetInEquals);
+            SystemLibInitializer.CompareSetLess = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetLess);
+            SystemLibInitializer.CompareSetLessEqual = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetLessEqual);
+            SystemLibInitializer.CompareSetGreater = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetGreater);
+            SystemLibInitializer.CompareSetGreaterEqual = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetGreaterEqual);
+            SystemLibInitializer.IncProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.IncProcedure);
+            SystemLibInitializer.DecProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.DecProcedure);
+            SystemLibInitializer.SuccFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.SuccFunction);
+			SystemLibInitializer.PredFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.PredFunction);            
+			SystemLibInitializer.OrdFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.OrdFunction);
+			SystemLibInitializer.TypedSetInitProcedureWithBounds = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitProcedureWithBounds);
+			SystemLibInitializer.TypedSetInitWithShortString = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitWithShortString);
+			SystemLibInitializer.AssignSetProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.AssignSetProcedure);
+			SystemLibInitializer.AssignSetProcedureWithBounds = new UnitDefinitionItem(psystem_unit, compiler_string_consts.AssignSetProcedureWithBounds);
+			SystemLibInitializer.ClipProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipProcedure);
+			SystemLibInitializer.ClipFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipFunction);
+			SystemLibInitializer.ClipShortStringInSetFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortStringInSetFunction);
+			SystemLibInitializer.ClipShortStringInSetProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortStringInSetProcedure);
+			SystemLibInitializer.SetLengthForShortStringProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.set_length_for_short_string);
+			SystemLibInitializer.SetLengthProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.set_length_procedure_name);
+			SystemLibInitializer.read_short_string_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.read_short_string);
+            SystemLibInitializer.read_short_string_from_file_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.read_short_string_from_file);
+            SystemLibInitializer.InsertProcedure = new UnitDefinitionItem(psystem_unit,compiler_string_consts.Insert);
+            SystemLibInitializer.InsertInShortStringProcedure = new UnitDefinitionItem(psystem_unit,compiler_string_consts.InsertInShortString);
+            SystemLibInitializer.DeleteProcedure = new UnitDefinitionItem(psystem_unit,compiler_string_consts.Delete);
+			SystemLibInitializer.LowFunction = new UnitDefinitionItem(psystem_unit,compiler_string_consts.Low);
+            SystemLibInitializer.HighFunction = new UnitDefinitionItem(psystem_unit,compiler_string_consts.High);
+            SystemLibInitializer.CheckCanUsePointerOnTypeProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUsePointerOnType_proc_name);
+            SystemLibInitializer.CheckCanUseTypeForBinaryFilesProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUseTypeForBinaryFiles_proc_name);
+            SystemLibInitializer.CheckCanUseTypeForTypedFilesProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUseTypeForTypedFiles_proc_name);
+            SystemLibInitializer.RuntimeDetermineTypeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.RuntimeDetermineType_func_name);
+            SystemLibInitializer.RuntimeInitializeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.RuntimeInitializeFunction_func_name);
+            SystemLibInitializer.PointerToStringFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.PointerToStringFunction_func_name);
+            SystemLibInitializer.GetRuntimeSizeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.GetRuntimeSizeFunction_func_name);
+            SystemLibInitializer.StrProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.StrProcedure_func_name);
+            SystemLibInitializer.PascalABCVersion = new UnitDefinitionItem(psystem_unit, compiler_string_consts.PascalABCVersion_func_name);
+            SystemLibInitializer.ChrUnicodeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ChrUnicodeFunction_func_name);
+            SystemLibInitializer.AssertProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.AssertProcedure);
+            SystemLibInitializer.CheckRangeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.check_in_range);
+            SystemLibInitializer.CheckCharRangeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.check_in_range_char);
+            SystemLibInitializer.CopyWithSizeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CopyWithSizeFunction);
+            SystemLibInitializer.ArrayCopyFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ArrayCopyFunction);
+            SystemLibInitializer.ConfigVariable = new UnitDefinitionItem(psystem_unit, compiler_string_consts.config_variable_name);
+            //make_type_conversion(SystemLibInitializer.ShortStringType.sym_info as type_node,string_type,type_compare.less_type,basic_function_type.none,true);
+            //make_type_conversion(string_type,SystemLibInitializer.ShortStringType.sym_info as type_node,type_compare.greater_type,basic_function_type.none,true);
             if (SystemLibInitializer.TextFileType.Found)
                 SystemLibInitializer.TextFileType.TypeNode.type_special_kind = type_special_kind.text_file;
             if (SemanticRules.GenerateNativeCode)
             {
-                SystemLibInitializer.ObjectType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ObjectType);
+                SystemLibInitializer.ObjectType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ObjectType);
                 if (SystemLibInitializer.ObjectType.Found)
                     SemanticRules.ClassBaseType = SystemLibInitializer.ObjectType.sym_info as TreeRealization.type_node;
-                SystemLibInitializer.StringType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.StringType);
+                SystemLibInitializer.StringType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.StringType);
                 if (SystemLibInitializer.StringType.Found)
                     SemanticRules.StringType = SystemLibInitializer.StringType.sym_info as TreeRealization.type_node;
             }
@@ -393,86 +392,86 @@ namespace PascalSharp.Internal.TreeConverter
 
         public static void init_system_module_from_dll(dot_net_unit_node psystem_unit)
         {
-            SystemLibInitializer.format_function = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.format_procedure_name);
-            SystemLibInitializer.read_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.read_procedure_name);
-            SystemLibInitializer.write_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.write_procedure_name);
-            SystemLibInitializer.writeln_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.writeln_procedure_name);
-            SystemLibInitializer.readln_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.readln_procedure_name);
-            SystemLibInitializer.TextFileType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.text_file_name_type_name);
-            SystemLibInitializer.TextFileInitProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TextFileInitProcedureName);
-            SystemLibInitializer.BinaryFileType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileTypeName);
-            SystemLibInitializer.AbstractBinaryFileType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.AbstractBinaryFileTypeName);
-            SystemLibInitializer.PointerOutputType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.PointerOutputTypeName);
-            SystemLibInitializer.BinaryFileReadProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileReadProcedureName);
-            SystemLibInitializer.BinaryFileInitProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileInitProcedureName);
-            SystemLibInitializer.StringDefaultPropertySetProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.StringDefaultPropertySetProcedureName);
-            SystemLibInitializer.TypedFileType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileTypeName);
-            SystemLibInitializer.TypedFileInitProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileInitProcedureName);
-            SystemLibInitializer.TypedFileReadProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileReadProcedureName);
-            SystemLibInitializer.ClipShortStringProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortString);
-            SystemLibInitializer.GetCharInShortStringProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.GetCharInShortString);
-            SystemLibInitializer.SetCharInShortStringProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.SetCharInShortString);
-            //SystemLibInitializer.ShortStringType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ShortStringTypeName);
-            //SystemLibInitializer.ShortStringTypeInitProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ShortStringTypeInitProcedure);
-            SystemLibInitializer.TypedSetType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.set_name);
-            SystemLibInitializer.TypedSetInitProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitProcedure);
-            SystemLibInitializer.SetUnionProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.union_of_set);
-            SystemLibInitializer.SetIntersectProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.intersect_of_set);
-            SystemLibInitializer.SetSubtractProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.subtract_of_set);
-            SystemLibInitializer.InSetProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.in_set);
-            SystemLibInitializer.CreateSetProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateSetProcedure);
-            SystemLibInitializer.IncludeProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.IncludeProcedure);
-            SystemLibInitializer.ExcludeProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ExcludeProcedure);
-            SystemLibInitializer.DiapasonType = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.DiapasonType);
-            SystemLibInitializer.CreateDiapason = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateDiapason);
-            SystemLibInitializer.CreateObjDiapason = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateObjDiapason);
-            SystemLibInitializer.CompareSetEquals = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetEquals);
-            SystemLibInitializer.CompareSetInEquals = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetInEquals);
-            SystemLibInitializer.CompareSetLess = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetLess);
-            SystemLibInitializer.CompareSetLessEqual = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetLessEqual);
-            SystemLibInitializer.CompareSetGreater = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetGreater);
-            SystemLibInitializer.CompareSetGreaterEqual = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetGreaterEqual);
-            SystemLibInitializer.IncProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.IncProcedure);
-            SystemLibInitializer.DecProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.DecProcedure);
-            SystemLibInitializer.SuccFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.SuccFunction);
-            SystemLibInitializer.PredFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.PredFunction);
-            SystemLibInitializer.OrdFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.OrdFunction);
-            SystemLibInitializer.TypedSetInitProcedureWithBounds = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitProcedureWithBounds);
-            SystemLibInitializer.TypedSetInitWithShortString = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitWithShortString);
-            SystemLibInitializer.AssignSetProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.AssignSetProcedure);
-            SystemLibInitializer.AssignSetProcedureWithBounds = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.AssignSetProcedureWithBounds);
-            SystemLibInitializer.ClipProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipProcedure);
-            SystemLibInitializer.ClipFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipFunction);
-            SystemLibInitializer.ClipShortStringInSetFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortStringInSetFunction);
-            SystemLibInitializer.ClipShortStringInSetProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortStringInSetProcedure);
-            SystemLibInitializer.SetLengthForShortStringProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.set_length_for_short_string);
-            SystemLibInitializer.SetLengthProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.set_length_procedure_name);
-            SystemLibInitializer.read_short_string_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.read_short_string);
-            SystemLibInitializer.read_short_string_from_file_procedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.read_short_string_from_file);
-            SystemLibInitializer.InsertProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.Insert);
-            SystemLibInitializer.InsertInShortStringProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.InsertInShortString);
-            SystemLibInitializer.DeleteProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.Delete);
-            SystemLibInitializer.LowFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.Low);
-            SystemLibInitializer.HighFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.High);
-            SystemLibInitializer.CheckCanUsePointerOnTypeProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUsePointerOnType_proc_name);
-            SystemLibInitializer.CheckCanUseTypeForBinaryFilesProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUseTypeForBinaryFiles_proc_name);
-            SystemLibInitializer.CheckCanUseTypeForTypedFilesProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUseTypeForTypedFiles_proc_name);
-            SystemLibInitializer.RuntimeDetermineTypeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.RuntimeDetermineType_func_name);
-            SystemLibInitializer.RuntimeInitializeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.RuntimeInitializeFunction_func_name);
-            SystemLibInitializer.PointerToStringFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.PointerToStringFunction_func_name);
-            SystemLibInitializer.GetRuntimeSizeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.GetRuntimeSizeFunction_func_name);
-            SystemLibInitializer.StrProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.StrProcedure_func_name);
-            SystemLibInitializer.PascalABCVersion = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.PascalABCVersion_func_name);
-            SystemLibInitializer.ChrUnicodeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ChrUnicodeFunction_func_name);
-            SystemLibInitializer.AssertProcedure = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.AssertProcedure);
-            SystemLibInitializer.CheckRangeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.check_in_range);
-            SystemLibInitializer.CheckCharRangeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.check_in_range_char);
-            SystemLibInitializer.CopyWithSizeFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.CopyWithSizeFunction);
-            SystemLibInitializer.ArrayCopyFunction = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.ArrayCopyFunction);
-            SystemLibInitializer.ConfigVariable = new SystemLibrary.UnitDefinitionItem(psystem_unit, compiler_string_consts.config_variable_name);
+            SystemLibInitializer.format_function = new UnitDefinitionItem(psystem_unit, compiler_string_consts.format_procedure_name);
+            SystemLibInitializer.read_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.read_procedure_name);
+            SystemLibInitializer.write_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.write_procedure_name);
+            SystemLibInitializer.writeln_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.writeln_procedure_name);
+            SystemLibInitializer.readln_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.readln_procedure_name);
+            SystemLibInitializer.TextFileType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.text_file_name_type_name);
+            SystemLibInitializer.TextFileInitProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TextFileInitProcedureName);
+            SystemLibInitializer.BinaryFileType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileTypeName);
+            SystemLibInitializer.AbstractBinaryFileType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.AbstractBinaryFileTypeName);
+            SystemLibInitializer.PointerOutputType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.PointerOutputTypeName);
+            SystemLibInitializer.BinaryFileReadProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileReadProcedureName);
+            SystemLibInitializer.BinaryFileInitProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.BinaryFileInitProcedureName);
+            SystemLibInitializer.StringDefaultPropertySetProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.StringDefaultPropertySetProcedureName);
+            SystemLibInitializer.TypedFileType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileTypeName);
+            SystemLibInitializer.TypedFileInitProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileInitProcedureName);
+            SystemLibInitializer.TypedFileReadProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedFileReadProcedureName);
+            SystemLibInitializer.ClipShortStringProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortString);
+            SystemLibInitializer.GetCharInShortStringProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.GetCharInShortString);
+            SystemLibInitializer.SetCharInShortStringProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.SetCharInShortString);
+            //SystemLibInitializer.ShortStringType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ShortStringTypeName);
+            //SystemLibInitializer.ShortStringTypeInitProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ShortStringTypeInitProcedure);
+            SystemLibInitializer.TypedSetType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.set_name);
+            SystemLibInitializer.TypedSetInitProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitProcedure);
+            SystemLibInitializer.SetUnionProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.union_of_set);
+            SystemLibInitializer.SetIntersectProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.intersect_of_set);
+            SystemLibInitializer.SetSubtractProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.subtract_of_set);
+            SystemLibInitializer.InSetProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.in_set);
+            SystemLibInitializer.CreateSetProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateSetProcedure);
+            SystemLibInitializer.IncludeProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.IncludeProcedure);
+            SystemLibInitializer.ExcludeProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ExcludeProcedure);
+            SystemLibInitializer.DiapasonType = new UnitDefinitionItem(psystem_unit, compiler_string_consts.DiapasonType);
+            SystemLibInitializer.CreateDiapason = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateDiapason);
+            SystemLibInitializer.CreateObjDiapason = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CreateObjDiapason);
+            SystemLibInitializer.CompareSetEquals = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetEquals);
+            SystemLibInitializer.CompareSetInEquals = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetInEquals);
+            SystemLibInitializer.CompareSetLess = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetLess);
+            SystemLibInitializer.CompareSetLessEqual = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetLessEqual);
+            SystemLibInitializer.CompareSetGreater = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetGreater);
+            SystemLibInitializer.CompareSetGreaterEqual = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CompareSetGreaterEqual);
+            SystemLibInitializer.IncProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.IncProcedure);
+            SystemLibInitializer.DecProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.DecProcedure);
+            SystemLibInitializer.SuccFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.SuccFunction);
+            SystemLibInitializer.PredFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.PredFunction);
+            SystemLibInitializer.OrdFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.OrdFunction);
+            SystemLibInitializer.TypedSetInitProcedureWithBounds = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitProcedureWithBounds);
+            SystemLibInitializer.TypedSetInitWithShortString = new UnitDefinitionItem(psystem_unit, compiler_string_consts.TypedSetInitWithShortString);
+            SystemLibInitializer.AssignSetProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.AssignSetProcedure);
+            SystemLibInitializer.AssignSetProcedureWithBounds = new UnitDefinitionItem(psystem_unit, compiler_string_consts.AssignSetProcedureWithBounds);
+            SystemLibInitializer.ClipProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipProcedure);
+            SystemLibInitializer.ClipFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipFunction);
+            SystemLibInitializer.ClipShortStringInSetFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortStringInSetFunction);
+            SystemLibInitializer.ClipShortStringInSetProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ClipShortStringInSetProcedure);
+            SystemLibInitializer.SetLengthForShortStringProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.set_length_for_short_string);
+            SystemLibInitializer.SetLengthProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.set_length_procedure_name);
+            SystemLibInitializer.read_short_string_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.read_short_string);
+            SystemLibInitializer.read_short_string_from_file_procedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.read_short_string_from_file);
+            SystemLibInitializer.InsertProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.Insert);
+            SystemLibInitializer.InsertInShortStringProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.InsertInShortString);
+            SystemLibInitializer.DeleteProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.Delete);
+            SystemLibInitializer.LowFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.Low);
+            SystemLibInitializer.HighFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.High);
+            SystemLibInitializer.CheckCanUsePointerOnTypeProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUsePointerOnType_proc_name);
+            SystemLibInitializer.CheckCanUseTypeForBinaryFilesProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUseTypeForBinaryFiles_proc_name);
+            SystemLibInitializer.CheckCanUseTypeForTypedFilesProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CheckCanUseTypeForTypedFiles_proc_name);
+            SystemLibInitializer.RuntimeDetermineTypeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.RuntimeDetermineType_func_name);
+            SystemLibInitializer.RuntimeInitializeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.RuntimeInitializeFunction_func_name);
+            SystemLibInitializer.PointerToStringFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.PointerToStringFunction_func_name);
+            SystemLibInitializer.GetRuntimeSizeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.GetRuntimeSizeFunction_func_name);
+            SystemLibInitializer.StrProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.StrProcedure_func_name);
+            SystemLibInitializer.PascalABCVersion = new UnitDefinitionItem(psystem_unit, compiler_string_consts.PascalABCVersion_func_name);
+            SystemLibInitializer.ChrUnicodeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ChrUnicodeFunction_func_name);
+            SystemLibInitializer.AssertProcedure = new UnitDefinitionItem(psystem_unit, compiler_string_consts.AssertProcedure);
+            SystemLibInitializer.CheckRangeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.check_in_range);
+            SystemLibInitializer.CheckCharRangeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.check_in_range_char);
+            SystemLibInitializer.CopyWithSizeFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.CopyWithSizeFunction);
+            SystemLibInitializer.ArrayCopyFunction = new UnitDefinitionItem(psystem_unit, compiler_string_consts.ArrayCopyFunction);
+            SystemLibInitializer.ConfigVariable = new UnitDefinitionItem(psystem_unit, compiler_string_consts.config_variable_name);
             //AddSpecialOperatorsToSetType();
-            //SystemLibrary.make_type_conversion(SystemLibInitializer.ShortStringType.sym_info as type_node,SystemLibrary.string_type,type_compare.less_type,SemanticTree.basic_function_type.none,true);
-            //SystemLibrary.make_type_conversion(SystemLibrary.string_type,SystemLibInitializer.ShortStringType.sym_info as type_node,type_compare.greater_type,SemanticTree.basic_function_type.none,true);
+            //make_type_conversion(SystemLibInitializer.ShortStringType.sym_info as type_node,string_type,type_compare.less_type,basic_function_type.none,true);
+            //make_type_conversion(string_type,SystemLibInitializer.ShortStringType.sym_info as type_node,type_compare.greater_type,basic_function_type.none,true);
             if (SystemLibInitializer.TextFileType.Found)
                 SystemLibInitializer.TextFileType.TypeNode.type_special_kind = type_special_kind.text_file;
         }
@@ -514,7 +513,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (SystemLibInitializer.TypedSetType.NotFound)
                 return;
             common_type_node tctn = SystemLibInitializer.TypedSetType.sym_info as common_type_node;
-            tctn.type_special_kind = SemanticTree.type_special_kind.base_set_type;
+            tctn.type_special_kind = type_special_kind.base_set_type;
             tctn.scope.AddSymbol(compiler_string_consts.plus_name, SystemLibInitializer.SetUnionProcedure.SymbolInfo.First());
             tctn.scope.AddSymbol(compiler_string_consts.mul_name, SystemLibInitializer.SetIntersectProcedure.SymbolInfo.First());
             tctn.scope.AddSymbol(compiler_string_consts.in_name, SystemLibInitializer.InSetProcedure.SymbolInfo.First());
@@ -541,21 +540,21 @@ namespace PascalSharp.Internal.TreeConverter
         {
             if (!from_pabc_dll)
             {
-                SystemLibInitializer.read_procedure = new SystemLibrary.UnitDefinitionItem(unit, compiler_string_consts.read_procedure_name);
-                SystemLibInitializer.readln_procedure = new SystemLibrary.UnitDefinitionItem(unit, compiler_string_consts.readln_procedure_name);
+                SystemLibInitializer.read_procedure = new UnitDefinitionItem(unit, compiler_string_consts.read_procedure_name);
+                SystemLibInitializer.readln_procedure = new UnitDefinitionItem(unit, compiler_string_consts.readln_procedure_name);
             }
             else
             {
-                //SystemLibInitializer.read_procedure = new SystemLibrary.UnitDefinitionItem(unit, compiler_string_consts.read_procedure_name);
-                //SystemLibInitializer.readln_procedure = new SystemLibrary.UnitDefinitionItem(unit, compiler_string_consts.readln_procedure_name);
+                //SystemLibInitializer.read_procedure = new UnitDefinitionItem(unit, compiler_string_consts.read_procedure_name);
+                //SystemLibInitializer.readln_procedure = new UnitDefinitionItem(unit, compiler_string_consts.readln_procedure_name);
             }
         }
 
         public void reset()
         {
             _system_unit = null;
-            SystemLibrary.system_unit = null;
-            //SystemLibrary.Reset();
+            system_unit = null;
+            //Reset();
             SystemUnitAssigned = false;
             _compiled_unit = null;
             _referenced_units = null;
@@ -766,13 +765,13 @@ namespace PascalSharp.Internal.TreeConverter
             #region MikhailoMMX, обработка критических секций OpenMP
             bool isCritical = false;
             SyntaxTree.statement st_orig = st;
-            if (OpenMP.LocksFound)
-                if (DirectivesToNodesLinks.ContainsKey(st) && OpenMP.IsCriticalDirective(DirectivesToNodesLinks[st]))
+            if (OpenMP.OpenMP.LocksFound)
+                if (DirectivesToNodesLinks.ContainsKey(st) && OpenMP.OpenMP.IsCriticalDirective(DirectivesToNodesLinks[st]))
                 {
                     //если перед узлом есть директива omp critical
                     isCritical = true;
-                    OpenMP.TryConvertCritical(ref st, this, DirectivesToNodesLinks[st]);
-                    OpenMP.DisableDirective(st_orig, DirectivesToNodesLinks);
+                    OpenMP.OpenMP.TryConvertCritical(ref st, this, DirectivesToNodesLinks[st]);
+                    OpenMP.OpenMP.DisableDirective(st_orig, DirectivesToNodesLinks);
                 }
             #endregion
 
@@ -808,7 +807,7 @@ namespace PascalSharp.Internal.TreeConverter
 
             #region MikhailoMMX, обработка критических секций OpenMP
             if (isCritical)
-                OpenMP.EnableDirective(st_orig, DirectivesToNodesLinks);
+                OpenMP.OpenMP.EnableDirective(st_orig, DirectivesToNodesLinks);
             #endregion
 
             return sn;
@@ -1095,7 +1094,7 @@ namespace PascalSharp.Internal.TreeConverter
                     }
                 }
             }
-            if (name == "+" && right_type == SystemLibrary.char_type && left_type != SystemLibrary.string_type)
+            if (name == "+" && right_type == char_type && left_type != string_type)
                 no_search_in_extension_methods = false;
             SymbolInfoList sil = left_type.find_in_type(name, left_type.Scope, no_search_in_extension_methods);
             int added_symbols = -1;
@@ -1105,7 +1104,7 @@ namespace PascalSharp.Internal.TreeConverter
                 //SymbolInfo si2 = right_type.find(name, context.CurrentScope);
                 if (sil != null)
                     sil = sil.copy();
-                if (name == "+" && right_type != SystemLibrary.string_type && left_type == SystemLibrary.char_type)
+                if (name == "+" && right_type != string_type && left_type == char_type)
                     no_search_in_extension_methods = false;
                 sil2 = right_type.find_in_type(name, right_type.Scope, no_search_in_extension_methods);
                 if ((sil != null) && (sil2 != null))
@@ -1171,13 +1170,13 @@ namespace PascalSharp.Internal.TreeConverter
                                 }
                                 else
                                 {
-                                	if (left.type.type_special_kind == SemanticTree.type_special_kind.set_type && right.type.type_special_kind == SemanticTree.type_special_kind.set_type
-                                	   || left.type.type_special_kind == SemanticTree.type_special_kind.set_type &&  right.type.type_special_kind == SemanticTree.type_special_kind.base_set_type
-                                	  || left.type.type_special_kind == SemanticTree.type_special_kind.base_set_type &&  right.type.type_special_kind == SemanticTree.type_special_kind.set_type
-                                	 || left.type.type_special_kind == SemanticTree.type_special_kind.base_set_type &&  right.type.type_special_kind == SemanticTree.type_special_kind.base_set_type
-                                	|| left.type == SystemLibrary.string_type && right.type.type_special_kind == SemanticTree.type_special_kind.short_string
-                               		 || right.type == SystemLibrary.string_type && left.type.type_special_kind == SemanticTree.type_special_kind.short_string
-                               		|| left.type.type_special_kind == SemanticTree.type_special_kind.short_string && right.type.type_special_kind == SemanticTree.type_special_kind.short_string
+                                	if (left.type.type_special_kind == type_special_kind.set_type && right.type.type_special_kind == type_special_kind.set_type
+                                	   || left.type.type_special_kind == type_special_kind.set_type &&  right.type.type_special_kind == type_special_kind.base_set_type
+                                	  || left.type.type_special_kind == type_special_kind.base_set_type &&  right.type.type_special_kind == type_special_kind.set_type
+                                	 || left.type.type_special_kind == type_special_kind.base_set_type &&  right.type.type_special_kind == type_special_kind.base_set_type
+                                	|| left.type == string_type && right.type.type_special_kind == type_special_kind.short_string
+                               		 || right.type == string_type && left.type.type_special_kind == type_special_kind.short_string
+                               		|| left.type.type_special_kind == type_special_kind.short_string && right.type.type_special_kind == type_special_kind.short_string
                                     || left.type.IsDelegate == right.type.IsDelegate)
                                 	{
                                 		//if (left.type.find_in_type(name) !=null)
@@ -1294,13 +1293,13 @@ namespace PascalSharp.Internal.TreeConverter
             if (SystemUnitAssigned && in_check_range_region() && name == compiler_string_consts.assign_name && is_range_checkable(left.type) && is_range_checkable(right.type))
             {
             	ordinal_type_interface oti = left.type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
-            	if (left.type != SystemLibrary.char_type && left.type != SystemLibrary.uint64_type && !(oti.lower_value is ulong_const_node))
+            	if (left.type != char_type && left.type != uint64_type && !(oti.lower_value is ulong_const_node))
             	if(!(oti.lower_value is enum_const_node) && !(oti.lower_value is char_const_node))
-            		right = convertion_data_and_alghoritms.convert_type(convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.CheckRangeFunction.sym_info as common_namespace_function_node, null, convertion_data_and_alghoritms.convert_type(right,SystemLibrary.int64_type), convertion_data_and_alghoritms.convert_type(oti.lower_value,SystemLibrary.int64_type),convertion_data_and_alghoritms.convert_type(oti.upper_value,SystemLibrary.int64_type)),right.type);
+            		right = convertion_data_and_alghoritms.convert_type(convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.CheckRangeFunction.sym_info as common_namespace_function_node, null, convertion_data_and_alghoritms.convert_type(right,int64_type), convertion_data_and_alghoritms.convert_type(oti.lower_value,int64_type),convertion_data_and_alghoritms.convert_type(oti.upper_value,int64_type)),right.type);
             	else if (oti.lower_value is enum_const_node)
             	{
-            		right = convertion_data_and_alghoritms.explicit_convert_type(convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.CheckRangeFunction.sym_info as common_namespace_function_node, null, convertion_data_and_alghoritms.explicit_convert_type(right,SystemLibrary.int64_type),
-            		                                                                                                               convertion_data_and_alghoritms.explicit_convert_type(oti.lower_value,SystemLibrary.int64_type),convertion_data_and_alghoritms.explicit_convert_type(oti.upper_value,SystemLibrary.int64_type)),right.type);
+            		right = convertion_data_and_alghoritms.explicit_convert_type(convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.CheckRangeFunction.sym_info as common_namespace_function_node, null, convertion_data_and_alghoritms.explicit_convert_type(right,int64_type),
+            		                                                                                                               convertion_data_and_alghoritms.explicit_convert_type(oti.lower_value,int64_type),convertion_data_and_alghoritms.explicit_convert_type(oti.upper_value,int64_type)),right.type);
             	}
             	else if (oti.lower_value is char_const_node)
             	right = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.CheckCharRangeFunction.sym_info as common_namespace_function_node, null, right, oti.lower_value,oti.upper_value);	
@@ -1317,7 +1316,7 @@ namespace PascalSharp.Internal.TreeConverter
         internal bool is_range_checkable(type_node tn)
         {
         	ordinal_type_interface oti = tn.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
-        	if (oti != null && !tn.IsEnum && tn != SystemLibrary.bool_type)
+        	if (oti != null && !tn.IsEnum && tn != bool_type)
         		return true;
         	return false;
         }
@@ -1379,7 +1378,7 @@ namespace PascalSharp.Internal.TreeConverter
                         {
                             common_method_node cmn = fnode as common_method_node;
                             //Если cmn конструктор - то плохо, но его не должно сюда попасть.
-                            if (cmn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                            if (cmn.polymorphic_state != polymorphic_state.ps_static)
                             {
                                 if (!is_static)
                                 {
@@ -1419,7 +1418,7 @@ namespace PascalSharp.Internal.TreeConverter
                             if (cfn.cont_type.Scope == null && cfn is compiled_function_node)
                         	(cfn.cont_type as compiled_type_node).init_scope();
                             
-                            if (cfn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                            if (cfn.polymorphic_state == polymorphic_state.ps_static)
                             {
                                 //ispravleno ibond
                             	//if (is_static)
@@ -1509,7 +1508,7 @@ namespace PascalSharp.Internal.TreeConverter
                 }
                 if (convertion_data_and_alghoritms.find_eq_method_in_list(fn, fnl) == null)
                 {
-                    if (!(obj != null && fn.polymorphic_state == SemanticTree.polymorphic_state.ps_static && !fn.is_extension_method))
+                    if (!(obj != null && fn.polymorphic_state == polymorphic_state.ps_static && !fn.is_extension_method))
                     {
                         if (fn.is_extension_method)
                         {
@@ -1581,13 +1580,13 @@ namespace PascalSharp.Internal.TreeConverter
         {
 
             SymbolTable.Scope cscope = context.CurrentScope, name_scope = context.find_first(name).scope;
-            while (cscope is SymbolTable.BlockScope)
+            while (cscope is BlockScope)
             {
                 if (name_scope == cscope)
                     return true;
                 cscope = cscope.TopScope;
             }
-            if (cscope is SymbolTable.UnitImplementationScope && name_scope is SymbolTable.UnitInterfaceScope)
+            if (cscope is UnitImplementationScope && name_scope is UnitInterfaceScope)
                 return cscope.TopScope == name_scope;
             return cscope == name_scope;
         }
@@ -1786,8 +1785,8 @@ namespace PascalSharp.Internal.TreeConverter
                         SyntaxTree.exception_handler eh = try_hand_except.except_block.handlers.handlers[i];
                         type_node filter_type = convert_strong(eh.type_name);
                         if (!SemanticRules.GenerateNativeCode && !(filter_type.is_generic_parameter ||
-                            filter_type == SystemLibrary.exception_base_type ||
-                            type_table.is_derived(SystemLibrary.exception_base_type, filter_type)))
+                            filter_type == exception_base_type ||
+                            type_table.is_derived(exception_base_type, filter_type)))
                         {
                             AddError(get_location(eh.type_name), "EXCEPTION_TYPE_MUST_BE_SYSTEM_EXCEPTION_OR_DERIVED_FROM_EXCEPTION");
                         }
@@ -1798,7 +1797,7 @@ namespace PascalSharp.Internal.TreeConverter
                         context.enter_code_block_without_bind();
                         if (eh.variable != null)
                         {
-                        	local_block_variable lbv = context.add_var_definition(eh.variable.name, get_location(eh.variable), filter_type, SemanticTree.polymorphic_state.ps_common, true) as local_block_variable;
+                        	local_block_variable lbv = context.add_var_definition(eh.variable.name, get_location(eh.variable), filter_type, polymorphic_state.ps_common, true) as local_block_variable;
                         	lvr = new local_block_variable_reference(lbv, lbv.loc);
                         }
                         statement_node stm = convert_strong(eh.statements);
@@ -1821,7 +1820,7 @@ namespace PascalSharp.Internal.TreeConverter
                     context.enter_code_block_without_bind();
                     statement_node else_stm = convert_strong(try_hand_except.except_block.else_stmt_list);
                     context.leave_code_block();
-                    type_node ftype = SystemLibrary.object_type;
+                    type_node ftype = object_type;
                     exception_filter else_ef = new exception_filter(ftype, null, else_stm, else_stm.location);
                     efl.AddElement(else_ef);
                 }
@@ -1831,19 +1830,19 @@ namespace PascalSharp.Internal.TreeConverter
             	type_node filter_type = compiled_type_node.get_type_node(NetHelper.FindType(compiler_string_consts.ExceptionName));
             	expression_node current_catch_excep = create_constructor_call(filter_type, new expressions_list(), null);
                 local_block_variable_reference lvr = null;
-                local_block_variable tmp_var = context.add_var_definition(context.BuildName("$try_temp" + UniqueNumStr()), null, SystemLibrary.bool_type, null) as local_block_variable;
+                local_block_variable tmp_var = context.add_var_definition(context.BuildName("$try_temp" + UniqueNumStr()), null, bool_type, null) as local_block_variable;
                 statements_list stm = new statements_list(null);
                 SyntaxTree.try_handler_finally try_hndlr_finally = _try_stmt.handler as SyntaxTree.try_handler_finally;
                 context.enter_code_block_without_bind();
                 statement_node finally_stmt = convert_strong(try_hndlr_finally.stmt_list);
                 context.leave_code_block();
                 stm.statements.AddElement(finally_stmt);
-                basic_function_call bfc = new basic_function_call(SystemLibrary.bool_not as basic_function_node,null);
+                basic_function_call bfc = new basic_function_call(bool_not as basic_function_node,null);
                 bfc.parameters.AddElement(new local_block_variable_reference(tmp_var,null));
                 stm.statements.AddElement(new if_node(bfc,new rethrow_statement_node(null),null,null));
             	exception_filter ef = new exception_filter(filter_type, lvr, stm, null);
                 efl.AddElement(ef);
-                bfc = new basic_function_call(SystemLibrary.bool_assign as basic_function_node,null);
+                bfc = new basic_function_call(bool_assign as basic_function_node,null);
                 bfc.parameters.AddElement(new local_block_variable_reference(tmp_var,null));
                 bfc.parameters.AddElement(new bool_const_node(true,null));
                 
@@ -1909,10 +1908,10 @@ namespace PascalSharp.Internal.TreeConverter
                 motivation_keeper.reset();
                 switch (mot)
                 {
-                    case motivation.address_reciving: return_value(SystemLibrary.string_type); break;
-                    case motivation.expression_evaluation: return_value(SystemLibrary.string_type); break;
+                    case motivation.address_reciving: return_value(string_type); break;
+                    case motivation.expression_evaluation: return_value(string_type); break;
                     //case motivation.symbol_info_reciving: return_symbol_value(blocks.find(_ident.name));break;
-                    case motivation.semantic_node_reciving: return_semantic_value(SystemLibrary.string_type); break;
+                    case motivation.semantic_node_reciving: return_semantic_value(string_type); break;
                 }
 
                 return;
@@ -1927,7 +1926,7 @@ namespace PascalSharp.Internal.TreeConverter
                 //Типизированый файл
                 type_node el_type = convert_strong(_file_type.file_of_type);
                 check_for_type_allowed(el_type,get_location(_file_type.file_of_type));
-                //if (el_type == SystemLibrary.void_type)
+                //if (el_type == void_type)
                 //	ErrorsList.Add(new VoidNotValid(get_location(_file_type.file_of_type)));
                 /*if (el_type == SystemLibInitializer.TextFileType.sym_info) 
                 {
@@ -1946,7 +1945,7 @@ namespace PascalSharp.Internal.TreeConverter
                 //Бинарнай файл
                 if (SystemLibInitializer.BinaryFileType == null)
                     AddError(new NotSupportedError(get_location(_file_type)));
-                ((type_node)SystemLibInitializer.BinaryFileType.sym_info).type_special_kind = SemanticTree.type_special_kind.binary_file;
+                ((type_node)SystemLibInitializer.BinaryFileType.sym_info).type_special_kind = type_special_kind.binary_file;
                 return_value((type_node)SystemLibInitializer.BinaryFileType.sym_info);
             }
         }
@@ -1968,17 +1967,17 @@ namespace PascalSharp.Internal.TreeConverter
                     return false;
                 }
             }
-            if (el_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+            if (el_type.type_special_kind == type_special_kind.short_string)
             	return true;
-        	if (el_type.type_special_kind == SemanticTree.type_special_kind.set_type)
+        	if (el_type.type_special_kind == type_special_kind.set_type)
         	{
-        		if (el_type.element_type == SystemLibrary.byte_type || el_type.element_type == SystemLibrary.sbyte_type
-        		   || el_type.element_type == SystemLibrary.bool_type || el_type.element_type.IsEnum) return true;
-        		else if (el_type.element_type.type_special_kind == SemanticTree.type_special_kind.diap_type)
+        		if (el_type.element_type == byte_type || el_type.element_type == sbyte_type
+        		   || el_type.element_type == bool_type || el_type.element_type.IsEnum) return true;
+        		else if (el_type.element_type.type_special_kind == type_special_kind.diap_type)
         		{
-        			if (el_type.element_type.base_type == SystemLibrary.byte_type || el_type.element_type.base_type == SystemLibrary.sbyte_type
-        		   || el_type.element_type.base_type == SystemLibrary.bool_type || el_type.element_type.base_type.IsEnum) return true;
-        			if (el_type.element_type.base_type == SystemLibrary.integer_type)
+        			if (el_type.element_type.base_type == byte_type || el_type.element_type.base_type == sbyte_type
+        		   || el_type.element_type.base_type == bool_type || el_type.element_type.base_type.IsEnum) return true;
+        			if (el_type.element_type.base_type == integer_type)
         			{
         				ordinal_type_interface oti = el_type.element_type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
         				if (((oti.upper_value as int_const_node).constant_value-(oti.lower_value as int_const_node).constant_value) <= 256)
@@ -2002,7 +2001,7 @@ namespace PascalSharp.Internal.TreeConverter
                     }
                     return true;
                 }
-                if (SystemLibrary.CanUseThisTypeForTypedFiles(el_type))
+                if (CanUseThisTypeForTypedFiles(el_type))
                     return true;
                 if (el_type is common_type_node)
                 {
@@ -2011,7 +2010,7 @@ namespace PascalSharp.Internal.TreeConverter
                 		return false;
                 	common_type_node ctn = el_type as common_type_node;
                     foreach (class_field cf in ctn.fields)
-                    	if (cf.type.type_special_kind != SemanticTree.type_special_kind.short_string && !CanUseThisTypeForFiles(cf.type, allow_strings))
+                    	if (cf.type.type_special_kind != type_special_kind.short_string && !CanUseThisTypeForFiles(cf.type, allow_strings))
                             return false;
                     return true;
                 }
@@ -2034,7 +2033,7 @@ namespace PascalSharp.Internal.TreeConverter
                 bounded_array_interface bai = (bounded_array_interface)el_type.get_internal_interface(internal_interface_kind.bounded_array_interface);
                 return CanUseThisTypeForFiles(bai.element_type, allow_strings);
             }
-            if (allow_strings && el_type == SystemLibrary.string_type)
+            if (allow_strings && el_type == string_type)
             {
                 return true;
             }
@@ -2043,31 +2042,31 @@ namespace PascalSharp.Internal.TreeConverter
 
         private bool CanUseThisTypeForTypedFiles(type_node el_type)
         {
-        	if (el_type.type_special_kind == SemanticTree.type_special_kind.short_string) return true;
+        	if (el_type.type_special_kind == type_special_kind.short_string) return true;
         	return CanUseThisTypeForFiles(el_type, false);
         }
 
         private bool CanUseThisTypeForBinaryFiles(type_node el_type)
         {
-        	if (el_type == SystemLibrary.string_type || el_type is short_string_type_node) return true;
+        	if (el_type == string_type || el_type is short_string_type_node) return true;
             return CanUseThisTypeForFiles(el_type, true);
         }
 		
         internal List<int> get_short_string_lens(type_node tn)
         {
         	List<int> lst = new List<int>();
-        	if (tn.type_special_kind == SemanticTree.type_special_kind.short_string)
+        	if (tn.type_special_kind == type_special_kind.short_string)
         	{
         		lst.Add((tn as short_string_type_node).Length);
         	}
         	if (tn is common_type_node)
         	{
         		common_type_node ctn = tn as common_type_node;
-        		if (ctn.type_special_kind == SemanticTree.type_special_kind.array_wrapper)
+        		if (ctn.type_special_kind == type_special_kind.array_wrapper)
         		{
         			lst.AddRange(get_short_string_lens(ctn.element_type));
         		}
-        		else if (ctn.type_special_kind == SemanticTree.type_special_kind.record)
+        		else if (ctn.type_special_kind == type_special_kind.record)
         		{
         			foreach (class_field fld in ctn.fields)
         				lst.AddRange(get_short_string_lens(fld.type));
@@ -2078,19 +2077,19 @@ namespace PascalSharp.Internal.TreeConverter
         
         internal int get_short_string_size(type_node tn)
         {
-        	if (tn.type_special_kind == SemanticTree.type_special_kind.short_string)
+        	if (tn.type_special_kind == type_special_kind.short_string)
         	{
         		return (tn as short_string_type_node).Length+1;
         	}
         	if (tn is common_type_node)
         	{
         		common_type_node ctn = tn as common_type_node;
-        		if (ctn.type_special_kind == SemanticTree.type_special_kind.array_wrapper)
+        		if (ctn.type_special_kind == type_special_kind.array_wrapper)
         		{
         			int len = ((ctn.find_first_in_type(compiler_string_consts.internal_array_name).sym_info as class_field).type as simple_array).length;
         			return len*get_short_string_size(ctn.element_type);
         		}
-        		else if (ctn.type_special_kind == SemanticTree.type_special_kind.record)
+        		else if (ctn.type_special_kind == type_special_kind.record)
         		{
         			int off = 0;
         			foreach (class_field fld in ctn.fields)
@@ -2200,33 +2199,33 @@ namespace PascalSharp.Internal.TreeConverter
             exl.AddElement(var_ref);
             bool short_str = false;
             //exl.AddElement(new typeof_operator(element_type, loc));
-            if (tn.element_type == SystemLibrary.byte_type)
+            if (tn.element_type == byte_type)
             {
             	exl.AddElement(new byte_const_node(byte.MinValue,null));
             	exl.AddElement(new byte_const_node(byte.MaxValue,null));
             }
-            else if (tn.element_type == SystemLibrary.sbyte_type)
+            else if (tn.element_type == sbyte_type)
             {
             	exl.AddElement(new sbyte_const_node(sbyte.MinValue,null));
             	exl.AddElement(new sbyte_const_node(sbyte.MaxValue,null));
             }
-            else if (tn.element_type == SystemLibrary.short_type)
+            else if (tn.element_type == short_type)
             {
             	exl.AddElement(new short_const_node(short.MinValue,null));
             	exl.AddElement(new short_const_node(short.MaxValue,null));
             }
-            else if (tn.element_type == SystemLibrary.ushort_type)
+            else if (tn.element_type == ushort_type)
             {
             	exl.AddElement(new ushort_const_node(ushort.MinValue,null));
             	exl.AddElement(new ushort_const_node(ushort.MaxValue,null));
             }
-            else if (tn.element_type.type_special_kind == SemanticTree.type_special_kind.diap_type || tn.element_type.type_special_kind == SemanticTree.type_special_kind.enum_kind)
+            else if (tn.element_type.type_special_kind == type_special_kind.diap_type || tn.element_type.type_special_kind == type_special_kind.enum_kind)
             {
             	ordinal_type_interface ii = tn.element_type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
             	exl.AddElement(ii.lower_value);
             	exl.AddElement(ii.upper_value);
             }
-            else if (tn.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+            else if (tn.element_type.type_special_kind == type_special_kind.short_string)
             {
             	short_str = true;
             	exl.AddElement(new int_const_node((tn.element_type as short_string_type_node).Length,null));
@@ -2267,27 +2266,27 @@ namespace PascalSharp.Internal.TreeConverter
             expressions_list exl = new expressions_list();
             //exl.AddElement(var_ref);
             //exl.AddElement(new typeof_operator(element_type, loc));
-            if (tn.element_type == SystemLibrary.byte_type)
+            if (tn.element_type == byte_type)
             {
             	exl.AddElement(new byte_const_node(byte.MinValue,null));
             	exl.AddElement(new byte_const_node(byte.MaxValue,null));
             }
-            else if (tn.element_type == SystemLibrary.sbyte_type)
+            else if (tn.element_type == sbyte_type)
             {
             	exl.AddElement(new sbyte_const_node(sbyte.MinValue,null));
             	exl.AddElement(new sbyte_const_node(sbyte.MaxValue,null));
             }
-            else if (tn.element_type == SystemLibrary.short_type)
+            else if (tn.element_type == short_type)
             {
             	exl.AddElement(new short_const_node(short.MinValue,null));
             	exl.AddElement(new short_const_node(short.MaxValue,null));
             }
-            else if (tn.element_type == SystemLibrary.ushort_type)
+            else if (tn.element_type == ushort_type)
             {
             	exl.AddElement(new ushort_const_node(ushort.MinValue,null));
             	exl.AddElement(new ushort_const_node(ushort.MaxValue,null));
             }
-            else if (tn.element_type.type_special_kind == SemanticTree.type_special_kind.diap_type || tn.element_type.type_special_kind == SemanticTree.type_special_kind.enum_kind)
+            else if (tn.element_type.type_special_kind == type_special_kind.diap_type || tn.element_type.type_special_kind == type_special_kind.enum_kind)
             {
             	ordinal_type_interface ii = tn.element_type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
             	exl.AddElement(ii.lower_value);
@@ -2316,7 +2315,7 @@ namespace PascalSharp.Internal.TreeConverter
 
             type_node tn = vdn.type;
             //vdn.type = SystemLibInitializer.ShortStringType.TypeNode;
-			vdn.type = SystemLibrary.string_type;
+			vdn.type = string_type;
             int Length = (tn as short_string_type_node).Length;
 
             expression_node var_ref = create_variable_reference(vdn, loc);
@@ -2349,8 +2348,8 @@ namespace PascalSharp.Internal.TreeConverter
         	}
         	expression_node en = convert_strong(_raise_stmt.expr);
         	if (en is typed_expression) en = convert_typed_expression_to_function_call(en as typed_expression);
-            if (!SemanticRules.GenerateNativeCode && (!(type_table.is_derived(SystemLibrary.exception_base_type, en.type))) &&
-                (en.type != SystemLibrary.exception_base_type))
+            if (!SemanticRules.GenerateNativeCode && (!(type_table.is_derived(exception_base_type, en.type))) &&
+                (en.type != exception_base_type))
             {
                 AddError(loc, "EXCEPTION_TYPE_MUST_BE_SYSTEM_EXCEPTION_OR_DERIVED_FROM_EXCEPTION");
             }
@@ -2383,15 +2382,15 @@ namespace PascalSharp.Internal.TreeConverter
             if (expr is typed_expression)
                 expr = convert_typed_expression_to_function_call(expr as typed_expression);
             expression_node par1 = convert_strong(_format_expr.format1);
-            par1 = convertion_data_and_alghoritms.convert_type(par1, SystemLibrary.integer_type);
+            par1 = convertion_data_and_alghoritms.convert_type(par1, integer_type);
             expression_node par2 = convert_weak(_format_expr.format2);
             if (par2 != null)
             {
-                if (expr.type != SystemLibrary.double_type && expr.type != SystemLibrary.float_type)
+                if (expr.type != double_type && expr.type != float_type)
                 {
                     AddError(expr.location, "REAL_TYPE_IN_DOUBLE_COLON_EXPRESSION_EXPECTED");
                 }
-                par2 = convertion_data_and_alghoritms.convert_type(par2, SystemLibrary.integer_type);
+                par2 = convertion_data_and_alghoritms.convert_type(par2, integer_type);
             }
             expressions_list exl = new expressions_list();
             exl.AddElement(expr);
@@ -2569,7 +2568,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (context.converting_block() == block_type.function_block)
             {
                 common_method_node cmn = context.top_function as common_method_node;
-                if (cmn != null && cmn.is_constructor && !(cmn.polymorphic_state == SemanticTree.polymorphic_state.ps_static))
+                if (cmn != null && cmn.is_constructor && !(cmn.polymorphic_state == polymorphic_state.ps_static))
                 {
                     context.allow_inherited_ctor_call = true;
                     if (_block.program_code != null && _block.program_code.subnodes != null)
@@ -2816,7 +2815,7 @@ namespace PascalSharp.Internal.TreeConverter
                     }
                     else
                     {
-                        if (NetHelper.PABCSystemType == null || net_scope.Assembly != PABCSystemType.Assembly)
+                        if (NetHelper.PABCSystemType == null || net_scope.Assembly != NetHelper.PABCSystemType.Assembly)
                             assm_cache.Add(net_scope.Assembly, net_scope);
                         fetched_used_units.Add(net_scope);
                     }
@@ -2980,7 +2979,7 @@ namespace PascalSharp.Internal.TreeConverter
                     AddError(loc, "OPERATOR_{0}_CAN_NOT_BE_APPLIED_TO_POINTER_TYPE", compiler_string_consts.as_name);
             }
             else
-            	if (!(type_table.is_derived(en.type, tp) || type_table.is_derived(tp, en.type) || en.type == tp || en.type == SystemLibrary.object_type
+            	if (!(type_table.is_derived(en.type, tp) || type_table.is_derived(tp, en.type) || en.type == tp || en.type == object_type
             	      || en.type.IsInterface || tp.IsInterface))
                 {
                     AddError(loc, "EXPECTED_DERIVED_CLASSES");
@@ -3198,8 +3197,8 @@ namespace PascalSharp.Internal.TreeConverter
             statement_node sn = convert_strong(mc);
             //проверяем на случай вызова типа real(a) ...
             if (/*((sn is base_function_call) && (sn as base_function_call).IsExplicitConversion)
-                || (sn is SemanticTree.IReferenceNode)
-                || (sn is SemanticTree.IGetAddrNode)
+                || (sn is IReferenceNode)
+                || (sn is IGetAddrNode)
                 || (sn is null_const_node)
                 || (sn is simple_array_indexing)
                 || (sn is basic_function_call)
@@ -3246,12 +3245,12 @@ namespace PascalSharp.Internal.TreeConverter
             //if (SystemLibInitializer.ShortStringType.NotFound)
             //    throw new NotSupportedError(loc);
             type_node tn = find_type(node.name.name, loc);
-            if (!(tn == SystemLibrary.string_type))
-                AddError(new ExpectedType(SystemLibrary.string_type.name, loc));
-            constant_node cn = convert_strong_to_constant_node(node.num_of_symbols, SystemLibrary.integer_type);
+            if (!(tn == string_type))
+                AddError(new ExpectedType(string_type.name, loc));
+            constant_node cn = convert_strong_to_constant_node(node.num_of_symbols, integer_type);
             int length = (cn as int_const_node).constant_value;
             if (length < 1 || length > 255)
-                AddError(loc, "TYPE_CAN_NOT_HAVE_THIS_SIZE_{0}", SystemLibrary.string_type.name);
+                AddError(loc, "TYPE_CAN_NOT_HAVE_THIS_SIZE_{0}", string_type.name);
             return_value(context.create_short_string_type(length, loc));
         }
 
@@ -3381,7 +3380,7 @@ namespace PascalSharp.Internal.TreeConverter
                 cdn.const_value = new enum_const_node(num++, null, get_location(id));
                 else
                 {
-                	constant_node cn = convert_strong_to_constant_node(en.value,SystemLibrary.integer_type);
+                	constant_node cn = convert_strong_to_constant_node(en.value,integer_type);
                 	check_for_strong_constant(cn,get_location(en.value));
                 	cdn.const_value = new enum_const_node((cn as int_const_node).constant_value,null,get_location(id));
                 }
@@ -3397,7 +3396,7 @@ namespace PascalSharp.Internal.TreeConverter
                 cdn.const_value = new enum_const_node(num++, null, get_location(id));
                 else
                 {
-                	constant_node cn = convert_strong_to_constant_node(en.value,SystemLibrary.integer_type);
+                	constant_node cn = convert_strong_to_constant_node(en.value,integer_type);
                 	check_for_strong_constant(cn,get_location(en.value));
                 	cdn.const_value = new enum_const_node((cn as int_const_node).constant_value,null,get_location(id));
                 }
@@ -3405,7 +3404,7 @@ namespace PascalSharp.Internal.TreeConverter
             }
             foreach (constant_definition_node cdn in cnsts)
                 cdn.const_value.type = ctn;
-            internal_interface ii = SystemLibrary.integer_type.get_internal_interface(internal_interface_kind.ordinal_interface);
+            internal_interface ii = integer_type.get_internal_interface(internal_interface_kind.ordinal_interface);
             ordinal_type_interface oti_old = (ordinal_type_interface)ii;
             enum_const_node lower_value = new enum_const_node(0, ctn, ctn.loc);
             enum_const_node upper_value = new enum_const_node(ctn.const_defs.Count - 1, ctn, ctn.loc);
@@ -3455,7 +3454,7 @@ namespace PascalSharp.Internal.TreeConverter
             type_node el_type = convert_strong(_set_type_definition.of_type);
             if (el_type.IsPointer)
                 AddError(get_location(_set_type_definition.of_type), "POINTERS_IN_SETS_NOT_ALLOWED");
-            //if (el_type == SystemLibrary.void_type)
+            //if (el_type == void_type)
             //	AddError(new VoidNotValid(get_location(_set_type_definition.of_type)));
             check_for_type_allowed(el_type,get_location(_set_type_definition.of_type));
             return_value(context.create_set_type(el_type, get_location(_set_type_definition)));
@@ -3498,7 +3497,7 @@ namespace PascalSharp.Internal.TreeConverter
                             AddError(new UndefinedNameReference(tn.name, get_location(_class_definition.class_parents.types[0])));
                         if (tn.IsSealed)
                             AddError(get_location(_class_definition.class_parents.types[0]), "PARENT_TYPE_IS_SALED{0}", tn.name);
-                        if (tn == SystemLibrary.value_type)
+                        if (tn == value_type)
                         {
                             AddError(get_location(_class_definition.class_parents.types[0]), "CAN_NOT_INHERIT_FROM_VALUE_TYPE");
                         }
@@ -3510,7 +3509,7 @@ namespace PascalSharp.Internal.TreeConverter
                         {
                             AddError(get_location(_class_definition.class_parents.types[0]), "CAN_NOT_INHERIT_FROM_FUNCTION_TYPE");
                         }
-                        if (tn == SystemLibrary.delegate_base_type || tn == SystemLibrary.system_delegate_type)
+                        if (tn == delegate_base_type || tn == system_delegate_type)
                         {
                             AddError(get_location(_class_definition.class_parents.types[0]), "CAN_NOT_INHERIT_FROM_DELEGATE_TYPE");
                         }
@@ -3635,7 +3634,7 @@ namespace PascalSharp.Internal.TreeConverter
                         visit_where_list(_class_definition.where_section);
                     }
 
-                    if (context.CurrentScope is SymbolTable.BlockScope)
+                    if (context.CurrentScope is BlockScope)
                     {
                         AddError(get_location(_class_definition), "RECORD_CANNOT_BE_DECLARED_IN_BLOCK");
                         ctn.internal_is_value = true;
@@ -3696,7 +3695,7 @@ namespace PascalSharp.Internal.TreeConverter
                     if (SemanticRules.GenerateNativeCode)
                         context.converted_type.SetBaseType(SemanticRules.ClassBaseType);
                     else
-                        context.converted_type.SetBaseType(SystemLibrary.object_type);
+                        context.converted_type.SetBaseType(object_type);
                     context.converted_type.IsInterface = true;
                     context.converted_type.is_class = true;
                     //Добавляем интерфейсы - предки.
@@ -3909,7 +3908,7 @@ namespace PascalSharp.Internal.TreeConverter
             {
                 if (_access_modifer_node.access_level == SyntaxTree.access_modifer.none)
                 {
-                    context.set_field_access_level(SemanticTree.field_access_level.fal_public);
+                    context.set_field_access_level(field_access_level.fal_public);
                 }
                 else
                 {
@@ -3922,22 +3921,22 @@ namespace PascalSharp.Internal.TreeConverter
             {
                 case SyntaxTree.access_modifer.private_modifer:
                     {
-                        context.set_field_access_level(SemanticTree.field_access_level.fal_private);
+                        context.set_field_access_level(field_access_level.fal_private);
                         break;
                     }
                 case SyntaxTree.access_modifer.protected_modifer:
                     {
-                        context.set_field_access_level(SemanticTree.field_access_level.fal_protected);
+                        context.set_field_access_level(field_access_level.fal_protected);
                         break;
                     }
                 case SyntaxTree.access_modifer.public_modifer:
                     {
-                        context.set_field_access_level(SemanticTree.field_access_level.fal_public);
+                        context.set_field_access_level(field_access_level.fal_public);
                         break;
                     }
                 case SyntaxTree.access_modifer.internal_modifer:
                     {
-                        context.set_field_access_level(SemanticTree.field_access_level.fal_internal);
+                        context.set_field_access_level(field_access_level.fal_internal);
                         break;
                     }
             }
@@ -3979,12 +3978,12 @@ namespace PascalSharp.Internal.TreeConverter
             common_property_node pn = context.add_property(_simple_property.property_name.name,
                 get_location(_simple_property.property_name));
             assign_doc_info(pn, _simple_property);
-            //pn.polymorphic_state=SemanticTree.polymorphic_state.ps_common;
+            //pn.polymorphic_state=polymorphic_state.ps_common;
             //pn.loc=get_location(_simple_property.property_name);
             if (_simple_property.attr == SyntaxTree.definition_attribute.Static)
-            	pn.polymorphic_state = SemanticTree.polymorphic_state.ps_static;
+            	pn.polymorphic_state = polymorphic_state.ps_static;
             if (_simple_property.virt_over_none_attr == proc_attribute.attr_virtual || _simple_property.virt_over_none_attr == proc_attribute.attr_override)
-                pn.polymorphic_state = SemanticTree.polymorphic_state.ps_virtual;
+                pn.polymorphic_state = polymorphic_state.ps_virtual;
             
             parameter_list pal_big = new parameter_list();
             //TODO: Спросить у Саши как получить тип параметра - var,const и т.д.
@@ -3995,7 +3994,7 @@ namespace PascalSharp.Internal.TreeConverter
                     parameter_list pal_small = new parameter_list();
                     foreach (SyntaxTree.ident id in pp.names.idents)
                     {
-                        common_parameter cp = new common_parameter(id.name, SemanticTree.parameter_type.value, null,
+                        common_parameter cp = new common_parameter(id.name, parameter_type.value, null,
                             concrete_parameter_type.cpt_none, get_location(id));
                         pal_small.AddElement(cp);
                     }
@@ -4130,9 +4129,9 @@ namespace PascalSharp.Internal.TreeConverter
                             {
                                 AddError(loc1, "PROPERTY_TYPE_MISMATCH_ACCESSOR_FIELD_TYPE");
                             }
-                            if (pn.polymorphic_state == SemanticTree.polymorphic_state.ps_static && cfield.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                            if (pn.polymorphic_state == polymorphic_state.ps_static && cfield.polymorphic_state != polymorphic_state.ps_static)
                         		AddError(get_location(_simple_property.accessors.read_accessor.accessor_name), "ACCESSOR_{0}_MUST_BE_STATIC", cfield.name);
-                    		if (pn.polymorphic_state != SemanticTree.polymorphic_state.ps_static && cfield.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                    		if (pn.polymorphic_state != polymorphic_state.ps_static && cfield.polymorphic_state == polymorphic_state.ps_static)
                                 AddError(get_location(_simple_property.accessors.read_accessor.accessor_name), "ACCESSOR_{0}_CANNOT_BE_STATIC", cfield.name);
                             read_accessor = GenerateGetMethodForField(pn, compiler_string_consts.GetGetAccessorName(pn.name), cfield, loc1);
                         }
@@ -4140,9 +4139,9 @@ namespace PascalSharp.Internal.TreeConverter
                         //Вот здесь уже можем добавить акцессор для чтения.
                         pn.internal_get_function = read_accessor;
                     }
-                    if (pn.internal_get_function != null && pn.polymorphic_state == SemanticTree.polymorphic_state.ps_static && pn.internal_get_function.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                    if (pn.internal_get_function != null && pn.polymorphic_state == polymorphic_state.ps_static && pn.internal_get_function.polymorphic_state != polymorphic_state.ps_static)
                         AddError(get_location(_simple_property.accessors.read_accessor.accessor_name), "ACCESSOR_{0}_MUST_BE_STATIC", pn.internal_get_function.name);
-                    if (pn.internal_get_function != null && pn.polymorphic_state != SemanticTree.polymorphic_state.ps_static && pn.internal_get_function.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                    if (pn.internal_get_function != null && pn.polymorphic_state != polymorphic_state.ps_static && pn.internal_get_function.polymorphic_state == polymorphic_state.ps_static)
                         AddError(get_location(_simple_property.accessors.read_accessor.accessor_name),  "ACCESSOR_{0}_CANNOT_BE_STATIC", pn.internal_get_function.name);
                 }
 
@@ -4258,18 +4257,18 @@ namespace PascalSharp.Internal.TreeConverter
                                 {
                                     AddError(loc2, "PROPERTY_TYPE_MISMATCH_ACCESSOR_FIELD_TYPE");
                                 }
-                                if (pn.polymorphic_state == SemanticTree.polymorphic_state.ps_static && cfield.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                                if (pn.polymorphic_state == polymorphic_state.ps_static && cfield.polymorphic_state != polymorphic_state.ps_static)
                         			AddError(get_location(_simple_property.accessors.write_accessor.accessor_name), "ACCESSOR_{0}_MUST_BE_STATIC", cfield.name);
-                    			if (pn.polymorphic_state != SemanticTree.polymorphic_state.ps_static && cfield.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                    			if (pn.polymorphic_state != polymorphic_state.ps_static && cfield.polymorphic_state == polymorphic_state.ps_static)
                         			AddError(get_location(_simple_property.accessors.write_accessor.accessor_name), "ACCESSOR_{0}_CANNOT_BE_STATIC", cfield.name);
                                 write_accessor = GenerateSetMethodForField(pn, compiler_string_consts.GetSetAccessorName(pn.name), cfield, loc2);
                             }
                             //Вот здесь уже можем добавить акцессор для чтения.
                             pn.internal_set_function = write_accessor;
                         }
-                    if (pn.internal_set_function != null && pn.polymorphic_state == SemanticTree.polymorphic_state.ps_static && pn.internal_set_function.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                    if (pn.internal_set_function != null && pn.polymorphic_state == polymorphic_state.ps_static && pn.internal_set_function.polymorphic_state != polymorphic_state.ps_static)
                         AddError(get_location(_simple_property.accessors.write_accessor.accessor_name), "ACCESSOR_{0}_MUST_BE_STATIC", pn.internal_set_function.name);
-                    if (pn.internal_set_function != null && pn.polymorphic_state != SemanticTree.polymorphic_state.ps_static && pn.internal_set_function.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                    if (pn.internal_set_function != null && pn.polymorphic_state != polymorphic_state.ps_static && pn.internal_set_function.polymorphic_state == polymorphic_state.ps_static)
                         AddError(get_location(_simple_property.accessors.write_accessor.accessor_name), "ACCESSOR_{0}_CANNOT_BE_STATIC", pn.internal_set_function.name);
                 }
             }
@@ -4305,7 +4304,7 @@ namespace PascalSharp.Internal.TreeConverter
                 cmn.parameters.AddElement(new_cp);
             }
             expression_node meth_call;
-            if (cpn.polymorphic_state == SemanticTree.polymorphic_state.ps_common || cpn.polymorphic_state == SemanticTree.polymorphic_state.ps_virtual)
+            if (cpn.polymorphic_state == polymorphic_state.ps_common || cpn.polymorphic_state == polymorphic_state.ps_virtual)
             {
                 meth_call = new common_method_call(accessor, new this_node(cpn.common_comprehensive_type, loc), loc);
                 foreach (common_parameter cp in cmn.parameters)
@@ -4340,7 +4339,7 @@ namespace PascalSharp.Internal.TreeConverter
                 cmn.parameters.AddElement(new_cp);
             }
             expression_node meth_call;
-            if (cpn.polymorphic_state == SemanticTree.polymorphic_state.ps_common || cpn.polymorphic_state == SemanticTree.polymorphic_state.ps_virtual)
+            if (cpn.polymorphic_state == polymorphic_state.ps_common || cpn.polymorphic_state == polymorphic_state.ps_virtual)
             {
                 meth_call = new common_method_call(accessor, new this_node(cpn.common_comprehensive_type, loc), loc);
                 foreach (common_parameter cp in cmn.parameters)
@@ -4384,13 +4383,13 @@ namespace PascalSharp.Internal.TreeConverter
                 cf.polymorphic_state, context.get_field_access_level(), null);
             cpn.common_comprehensive_type.methods.AddElement(cmn);
             common_parameter cp = new common_parameter(
-                compiler_string_consts.value, cf.type, SemanticTree.parameter_type.value,
+                compiler_string_consts.value, cf.type, parameter_type.value,
                 cmn, concrete_parameter_type.cpt_none, null, loc);
             cmn.parameters.AddElement(cp);
             cmn.is_overload = true;
             common_parameter_reference cpr = new common_parameter_reference(cp, 0, loc);
             expression_node var_ref;
-            if (cf.polymorphic_state == SemanticTree.polymorphic_state.ps_common)
+            if (cf.polymorphic_state == polymorphic_state.ps_common)
             {
                 var_ref = new class_field_reference(cf, new this_node(cf.type, loc), loc);
             }
@@ -4432,7 +4431,7 @@ namespace PascalSharp.Internal.TreeConverter
             cmn.return_value_type = cf.type;
             cmn.is_overload = true;
             expression_node var_ref;
-            if (cf.polymorphic_state == SemanticTree.polymorphic_state.ps_common)
+            if (cf.polymorphic_state == polymorphic_state.ps_common)
             {
                 var_ref = new class_field_reference(cf, new this_node(cf.type, loc), loc);
             }
@@ -4480,7 +4479,7 @@ namespace PascalSharp.Internal.TreeConverter
                 //    if (par.name == 
                 //}
                 common_parameter accp = new common_parameter(compiler_string_consts.value_in_accessor_name,
-                    SemanticTree.parameter_type.value, cmn, concrete_parameter_type.cpt_none, null);
+                    parameter_type.value, cmn, concrete_parameter_type.cpt_none, null);
                 accp.type = pn.internal_property_type;
                 cmn.parameters.AddElement(accp);
             }
@@ -4579,15 +4578,15 @@ namespace PascalSharp.Internal.TreeConverter
             tnl.AddElement(left.type);
             tnl.AddElement(right.type);
             elem_type = convertion_data_and_alghoritms.select_base_type(tnl);
-            expression_node l = convertion_data_and_alghoritms.explicit_convert_type(left, SystemLibrary.integer_type);
-            expression_node r = convertion_data_and_alghoritms.explicit_convert_type(right, SystemLibrary.integer_type);
+            expression_node l = convertion_data_and_alghoritms.explicit_convert_type(left, integer_type);
+            expression_node r = convertion_data_and_alghoritms.explicit_convert_type(right, integer_type);
             if (SystemLibInitializer.CreateDiapason.sym_info is common_namespace_function_node)
             {
                 common_namespace_function_node cnfn = SystemLibInitializer.CreateDiapason.sym_info as common_namespace_function_node;
-                if (elem_type == SystemLibrary.char_type || elem_type == SystemLibrary.bool_type || elem_type.IsEnum)
+                if (elem_type == char_type || elem_type == bool_type || elem_type.IsEnum)
                     cnfn = SystemLibInitializer.CreateObjDiapason.sym_info as common_namespace_function_node;
                 common_namespace_function_call cnfc = new common_namespace_function_call(cnfn, get_location(_diapason_expr));
-                if (elem_type != SystemLibrary.char_type && elem_type != SystemLibrary.bool_type && !elem_type.IsEnum)
+                if (elem_type != char_type && elem_type != bool_type && !elem_type.IsEnum)
                 {
                     cnfc.parameters.AddElement(l);
                     cnfc.parameters.AddElement(r);
@@ -4602,10 +4601,10 @@ namespace PascalSharp.Internal.TreeConverter
             else
             {
                 compiled_function_node cnfn = SystemLibInitializer.CreateDiapason.sym_info as compiled_function_node;
-                if (elem_type == SystemLibrary.char_type || elem_type == SystemLibrary.bool_type || elem_type.IsEnum)
+                if (elem_type == char_type || elem_type == bool_type || elem_type.IsEnum)
                     cnfn = SystemLibInitializer.CreateObjDiapason.sym_info as compiled_function_node;
                 compiled_static_method_call cnfc = new compiled_static_method_call(cnfn, get_location(_diapason_expr));
-                if (elem_type != SystemLibrary.char_type && elem_type != SystemLibrary.bool_type && !elem_type.IsEnum)
+                if (elem_type != char_type && elem_type != bool_type && !elem_type.IsEnum)
                 {
                     cnfc.parameters.AddElement(l);
                     cnfc.parameters.AddElement(r);
@@ -4645,8 +4644,8 @@ namespace PascalSharp.Internal.TreeConverter
                     {
                         expression_node en = convert_strong(e);
                         if (en is typed_expression) en = convert_typed_expression_to_function_call(en as typed_expression);
-                        if (en.type.type_special_kind == SemanticTree.type_special_kind.short_string)
-                        	en.type = SystemLibrary.string_type;
+                        if (en.type.type_special_kind == type_special_kind.short_string)
+                        	en.type = string_type;
                         consts.AddElement(en);
                         types.AddElement(en.type);
                     }
@@ -4838,13 +4837,13 @@ namespace PascalSharp.Internal.TreeConverter
                 if (sil != null)
                     if (sil.First().sym_info is common_method_node)
                     {
-                        if ((sil.First().sym_info as common_method_node).polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract)
+                        if ((sil.First().sym_info as common_method_node).polymorphic_state == polymorphic_state.ps_virtual_abstract)
                             AddError(get_location(inh_id), "CANNOT_CALL_ABSTRACT_METHOD");
                     }
                     else
                     if (sil.First().sym_info is compiled_function_node)
                     {
-                        if ((sil.First().sym_info as compiled_function_node).polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract)
+                        if ((sil.First().sym_info as compiled_function_node).polymorphic_state == polymorphic_state.ps_virtual_abstract)
                             AddError(get_location(inh_id), "CANNOT_CALL_ABSTRACT_METHOD");
                     }
                 id = inh_id;
@@ -4998,25 +4997,25 @@ namespace PascalSharp.Internal.TreeConverter
                                                 if (si.sym_info is common_namespace_function_node)
                                                 {
                                                     common_namespace_function_node cnfn = si.sym_info as common_namespace_function_node;
-                                                    if (cnfn.polymorphic_state != SemanticTree.polymorphic_state.ps_static || cnfn.ConnectedToType != null)
+                                                    if (cnfn.polymorphic_state != polymorphic_state.ps_static || cnfn.ConnectedToType != null)
                                                         new_sil.Add(si);
-                                                    if (cnfn.polymorphic_state != SemanticTree.polymorphic_state.ps_static && cnfn.ConnectedToType == null)
+                                                    if (cnfn.polymorphic_state != polymorphic_state.ps_static && cnfn.ConnectedToType == null)
                                                         has_obj_methods = true;
                                                 }
                                                 else if (si.sym_info is compiled_function_node)
                                                 {
                                                     compiled_function_node cfn = si.sym_info as compiled_function_node;
-                                                    if (cfn.polymorphic_state != SemanticTree.polymorphic_state.ps_static || cfn.ConnectedToType != null)
+                                                    if (cfn.polymorphic_state != polymorphic_state.ps_static || cfn.ConnectedToType != null)
                                                         new_sil.Add(si);
-                                                    if (cfn.polymorphic_state != SemanticTree.polymorphic_state.ps_static && cfn.ConnectedToType == null)
+                                                    if (cfn.polymorphic_state != polymorphic_state.ps_static && cfn.ConnectedToType == null)
                                                         has_obj_methods = true;
                                                 }
                                                 else if (si.sym_info is common_method_node)
                                                 {
                                                     common_method_node cfn = si.sym_info as common_method_node;
-                                                    if (cfn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                                                    if (cfn.polymorphic_state != polymorphic_state.ps_static)
                                                         new_sil.Add(si);
-                                                    if (cfn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                                                    if (cfn.polymorphic_state != polymorphic_state.ps_static)
                                                         has_obj_methods = true;
                                                 }
                                             }
@@ -5337,7 +5336,7 @@ namespace PascalSharp.Internal.TreeConverter
                                             }
                                             ThrowCompilationError = true;
                                         }
-                                        SemanticTree.IGenericInstance igi = fn as SemanticTree.IGenericInstance;
+                                        IGenericInstance igi = fn as IGenericInstance;
                                         if (igi != null)
                                         {
                                             //проверяем на соответствие ограничителям
@@ -6075,7 +6074,7 @@ namespace PascalSharp.Internal.TreeConverter
                     if (_method_call.parameters != null && _method_call.parameters.expressions.Count == 1)
                     {
                         expression_node param0 = convert_strong(_method_call.parameters.expressions[0]);
-                        if (param0.type.type_special_kind == SemanticTree.type_special_kind.array_kind)
+                        if (param0.type.type_special_kind == type_special_kind.array_kind)
                         {
                             location loc = get_location(_method_call);
                             expression_node en = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ArrayCopyFunction.sym_info as function_node, loc, param0);
@@ -6086,17 +6085,17 @@ namespace PascalSharp.Internal.TreeConverter
                         }
                     }
                 }
-                else if (SystemLibInitializer.SetLengthProcedure.Equal(sil) || SystemLibrary.resize_func == sil.First().sym_info as function_node)
+                else if (SystemLibInitializer.SetLengthProcedure.Equal(sil) || resize_func == sil.First().sym_info as function_node)
                 {
                     if (_method_call.parameters != null && _method_call.parameters.expressions.Count >= 2)
                     {
                         expression_node param0 = convert_strong(_method_call.parameters.expressions[0]);
                         if (!param0.is_addressed)
                             AddError(new ThisExpressionCanNotBePassedAsVarParameter(param0));
-                        if (param0.type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                        if (param0.type.type_special_kind == type_special_kind.short_string)
                         {
                             expression_node param1 = convert_strong(_method_call.parameters.expressions[1]);
-                            param1 = convertion_data_and_alghoritms.convert_type(param1, SystemLibrary.integer_type);
+                            param1 = convertion_data_and_alghoritms.convert_type(param1, integer_type);
                             base_function_call cnfn = null;
                             if (SystemLibInitializer.SetLengthForShortStringProcedure.sym_info is common_namespace_function_node)
                                 cnfn = new common_namespace_function_call(SystemLibInitializer.SetLengthForShortStringProcedure.sym_info as common_namespace_function_node, get_location(_method_call));
@@ -6124,7 +6123,7 @@ namespace PascalSharp.Internal.TreeConverter
                                     }
                             }
                         }
-                        else if (param0.type.type_special_kind == SemanticTree.type_special_kind.array_kind)
+                        else if (param0.type.type_special_kind == type_special_kind.array_kind)
                         {
                             int rank = 1;
                             if (param0.type is compiled_type_node)
@@ -6143,7 +6142,7 @@ namespace PascalSharp.Internal.TreeConverter
                                 for (int i = 1; i < _method_call.parameters.expressions.Count; i++)
                                 {
                                     expression_node expr = convert_strong(_method_call.parameters.expressions[i]); ;
-                                    expr = convertion_data_and_alghoritms.convert_type(expr, SystemLibrary.integer_type);
+                                    expr = convertion_data_and_alghoritms.convert_type(expr, integer_type);
                                     if (expr is int_const_node && (expr as int_const_node).constant_value < 0)
                                         AddError(expr.location, "NEGATIVE_ARRAY_LENGTH_({0})_NOT_ALLOWED", (expr as int_const_node).constant_value);
                                     lst.Add(expr);
@@ -6171,12 +6170,12 @@ namespace PascalSharp.Internal.TreeConverter
                         //expression_node param0 = convert_strong(_method_call.parameters.expressions[0]);
                         expression_node param1 = convert_strong(_method_call.parameters.expressions[1]);
                         //expression_node param2 = convert_strong(_method_call.parameters.expressions[2]);
-                        if (param1.type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                        if (param1.type.type_special_kind == type_special_kind.short_string)
                         {
                             expression_node param0 = convert_strong(_method_call.parameters.expressions[0]);
                             expression_node param2 = convert_strong(_method_call.parameters.expressions[2]);
-                            param0 = convertion_data_and_alghoritms.convert_type(param0, SystemLibrary.string_type);
-                            param2 = convertion_data_and_alghoritms.convert_type(param2, SystemLibrary.integer_type);
+                            param0 = convertion_data_and_alghoritms.convert_type(param0, string_type);
+                            param2 = convertion_data_and_alghoritms.convert_type(param2, integer_type);
                             base_function_call cnfn = null;
                             if (SystemLibInitializer.InsertInShortStringProcedure.sym_info is common_namespace_function_node)
                                 cnfn = new common_namespace_function_call(SystemLibInitializer.InsertInShortStringProcedure.sym_info as common_namespace_function_node, get_location(_method_call));
@@ -6214,12 +6213,12 @@ namespace PascalSharp.Internal.TreeConverter
                         //expression_node param0 = convert_strong(_method_call.parameters.expressions[0]);
                         expression_node param0 = convert_strong(_method_call.parameters.expressions[0]);
                         //expression_node param2 = convert_strong(_method_call.parameters.expressions[2]);
-                        if (param0.type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                        if (param0.type.type_special_kind == type_special_kind.short_string)
                         {
                             expression_node param1 = convert_strong(_method_call.parameters.expressions[1]);
                             expression_node param2 = convert_strong(_method_call.parameters.expressions[2]);
-                            param1 = convertion_data_and_alghoritms.convert_type(param1, SystemLibrary.integer_type);
-                            param2 = convertion_data_and_alghoritms.convert_type(param2, SystemLibrary.integer_type);
+                            param1 = convertion_data_and_alghoritms.convert_type(param1, integer_type);
+                            param2 = convertion_data_and_alghoritms.convert_type(param2, integer_type);
                             base_function_call cnfn = null;
                             if (SystemLibInitializer.DeleteProcedure.sym_info is common_namespace_function_node)
                                 cnfn = new common_namespace_function_call(SystemLibInitializer.DeleteProcedure.sym_info as common_namespace_function_node, get_location(_method_call));
@@ -6428,7 +6427,7 @@ namespace PascalSharp.Internal.TreeConverter
                     if (_method_call.parameters != null && _method_call.parameters.expressions.Count == 1)
                     {
                         expression_node param0 = convert_strong(_method_call.parameters.expressions[0]);
-                        if (param0.type.type_special_kind == SemanticTree.type_special_kind.array_wrapper)
+                        if (param0.type.type_special_kind == type_special_kind.array_wrapper)
                         {
                             bounded_array_interface bai = param0.type.get_internal_interface(internal_interface_kind.bounded_array_interface) as bounded_array_interface;
                             expression_node en = new int_const_node(bai.ordinal_type_interface.ordinal_type_to_int(bai.ordinal_type_interface.lower_value), get_location(_method_call));
@@ -6458,7 +6457,7 @@ namespace PascalSharp.Internal.TreeConverter
                     if (_method_call.parameters != null && _method_call.parameters.expressions.Count == 1)
                     {
                         expression_node param0 = convert_strong(_method_call.parameters.expressions[0]);
-                        if (param0.type.type_special_kind == SemanticTree.type_special_kind.array_wrapper)
+                        if (param0.type.type_special_kind == type_special_kind.array_wrapper)
                         {
                             bounded_array_interface bai = param0.type.get_internal_interface(internal_interface_kind.bounded_array_interface) as bounded_array_interface;
                             expression_node en = new int_const_node(bai.ordinal_type_interface.ordinal_type_to_int(bai.ordinal_type_interface.upper_value), get_location(_method_call));
@@ -6553,7 +6552,7 @@ namespace PascalSharp.Internal.TreeConverter
                 if (sil.First().sym_info.general_node_type == general_node_type.type_node)
                 {
                     to_type = ((type_node)(sil.First().sym_info));
-                    /*if (to_type == SystemLibrary.void_type)
+                    /*if (to_type == void_type)
                     {
                         throw new VoidNotValid(subloc2);
                     }*/
@@ -7061,21 +7060,21 @@ namespace PascalSharp.Internal.TreeConverter
                 if (write_proc && exprs.Count > 1)
                 {
                     //возможно это запись в типизированый файл
-                    if (exprs[0].type.type_special_kind == SemanticTree.type_special_kind.typed_file)
+                    if (exprs[0].type.type_special_kind == type_special_kind.typed_file)
                     //да, точно это типизированый файл!
                     {
                         //Проверим типы параметров вызова на совпадение с типом элементов файла
                         type_node element_type = exprs[0].type.element_type;
                         for (int i = 1; i < exprs.Count; i++)
                             convertion_data_and_alghoritms.check_convert_type(exprs[i], element_type, exprs[i].location);
-                        if (element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                        if (element_type.type_special_kind == type_special_kind.short_string)
                         {
                             for (int i = 1; i < exprs.Count; i++)
                             {
                                 //common_namespace_function_call cmc = new common_namespace_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as common_namespace_function_node,null);
                                 //cmc.parameters.AddElement(exprs[i]);
                                 //cmc.parameters.AddElement(new int_const_node((element_type as short_string_type_node).Length,null));
-                                expression_node cmc = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node, null, convertion_data_and_alghoritms.convert_type(exprs[i], SystemLibrary.string_type), new int_const_node((element_type as short_string_type_node).Length, null));
+                                expression_node cmc = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node, null, convertion_data_and_alghoritms.convert_type(exprs[i], string_type), new int_const_node((element_type as short_string_type_node).Length, null));
                                 exprs[i] = cmc;
                             }
                         }
@@ -7084,7 +7083,7 @@ namespace PascalSharp.Internal.TreeConverter
                     }
                     else
                         //(ssyy) а может быть, в бинарный!
-                        if (exprs[0].type.type_special_kind == SemanticTree.type_special_kind.binary_file)
+                        if (exprs[0].type.type_special_kind == type_special_kind.binary_file)
                     {
                         //(ssyy) действительно, бинарный
                         for (int i = 1; i < exprs.Count; i++)
@@ -7116,7 +7115,7 @@ namespace PascalSharp.Internal.TreeConverter
                 {
                     if (exprs.Count != 2) AddError(new NoFunctionWithSameArguments(loc, true));
                     type_node element_type = exprs[0].type.element_type;
-                    if (exprs[0].type.type_special_kind != SemanticTree.type_special_kind.base_set_type && exprs[0].type.type_special_kind != SemanticTree.type_special_kind.set_type)
+                    if (exprs[0].type.type_special_kind != type_special_kind.base_set_type && exprs[0].type.type_special_kind != type_special_kind.set_type)
                     {
                         AddError(new NoFunctionWithSameArguments(loc, true));
                     }
@@ -7145,7 +7144,7 @@ namespace PascalSharp.Internal.TreeConverter
 
                 if (sil.First() == SystemLibInitializer.NewProcedure || sil.First() == SystemLibInitializer.DisposeProcedure)
                 {
-                    if (exprs[0].type == SystemLibrary.pointer_type)
+                    if (exprs[0].type == pointer_type)
                         AddError(exprs[0].location, "EXPECTED_TYPED_POINTER_IN_PROCEDURE{0}", (sil.First().sym_info as function_node).name);
                 }
             }
@@ -7157,7 +7156,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (parameters.expressions.Count == 1)
             {
                 expression_node param0 = convert_strong(parameters.expressions[0]);
-                if (!param0.type.IsPointer || param0.type == SystemLibrary.pointer_type)
+                if (!param0.type.IsPointer || param0.type == pointer_type)
                     AddError(new NoFunctionWithSameArguments(loc, true));
                 if (!param0.is_addressed)
                 {
@@ -7174,9 +7173,9 @@ namespace PascalSharp.Internal.TreeConverter
                                 class_field cf = bai.int_array;
                                 expression_node left = new class_field_reference(cf, cmc.obj, cmc.location);
                                 expression_node right = cmc.parameters[0];
-                                //right = convert_type(right, SystemLibrary.integer_type);
+                                //right = convert_type(right, integer_type);
                                 right = convertion_data_and_alghoritms.convert_type(right, (ii as bounded_array_interface).ordinal_type_interface.elems_type);
-                                right = convertion_data_and_alghoritms.create_simple_function_call(SystemLibrary.int_sub, cmc.location, right,
+                                right = convertion_data_and_alghoritms.create_simple_function_call(int_sub, cmc.location, right,
                                     new int_const_node(bai.ordinal_type_interface.ordinal_type_to_int(bai.ordinal_type_interface.lower_value), cmc.location));
                                 param0 = new simple_array_indexing(left, right, cmc.type, cmc.location);
                                 is_pascal_array_ref = true;
@@ -7215,7 +7214,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (parameters.expressions.Count == 1)
             {
                 expression_node param0 = convert_strong(parameters.expressions[0]);
-                if (!param0.type.IsPointer || param0.type == SystemLibrary.pointer_type)
+                if (!param0.type.IsPointer || param0.type == pointer_type)
                     AddError(new NoFunctionWithSameArguments(loc, true));
                 if (!param0.is_addressed)
                 {
@@ -7232,9 +7231,9 @@ namespace PascalSharp.Internal.TreeConverter
                                 class_field cf = bai.int_array;
                                 expression_node left = new class_field_reference(cf, cmc.obj, cmc.location);
                                 expression_node right = cmc.parameters[0];
-                                //right = convert_type(right, SystemLibrary.integer_type);
+                                //right = convert_type(right, integer_type);
                                 right = convertion_data_and_alghoritms.convert_type(right, (ii as bounded_array_interface).ordinal_type_interface.elems_type);
-                                right = convertion_data_and_alghoritms.create_simple_function_call(SystemLibrary.int_sub, cmc.location, right,
+                                right = convertion_data_and_alghoritms.create_simple_function_call(int_sub, cmc.location, right,
                                     new int_const_node(bai.ordinal_type_interface.ordinal_type_to_int(bai.ordinal_type_interface.lower_value), cmc.location));
                                 param0 = new simple_array_indexing(left, right, cmc.type, cmc.location);
                                 is_pascal_array_ref = true;
@@ -7304,12 +7303,12 @@ namespace PascalSharp.Internal.TreeConverter
                         return cnfc;
                     }
                 }
-                else if (param0.type.IsEnum || param0.type.type_special_kind == SemanticTree.type_special_kind.diap_type)
+                else if (param0.type.IsEnum || param0.type.type_special_kind == type_special_kind.diap_type)
                 {
                     el = new expressions_list();
                     el.AddElement(new int_const_node(1, null));
                     fn = convertion_data_and_alghoritms.select_function(el, sil, loc);
-                    //bfc = new basic_function_call(SystemLibrary.int_add as basic_function_node,loc);
+                    //bfc = new basic_function_call(int_add as basic_function_node,loc);
                     //bfc.ret_type = param0.type;
                     if (fn is common_namespace_function_node)
                     {
@@ -7382,7 +7381,7 @@ namespace PascalSharp.Internal.TreeConverter
         			el = new expressions_list();
         			el.AddElement(new int_const_node(1,null));
         			fn = convertion_data_and_alghoritms.select_function(el,sil,loc);
-        			//bfc = new basic_function_call(SystemLibrary.int_add as basic_function_node,loc);
+        			//bfc = new basic_function_call(int_add as basic_function_node,loc);
         			//bfc.ret_type = param0.type;
                     if (fn is common_namespace_function_node)
                     {
@@ -7457,7 +7456,7 @@ namespace PascalSharp.Internal.TreeConverter
         			el = new expressions_list();
         			el.AddElement(new int_const_node(1,null));
         			fn = convertion_data_and_alghoritms.select_function(el,sil,loc);
-        			//bfc = new basic_function_call(SystemLibrary.int_add as basic_function_node,loc);
+        			//bfc = new basic_function_call(int_add as basic_function_node,loc);
         			//bfc.ret_type = param0.type;
                     if (fn is common_namespace_function_node)
                     {
@@ -7513,9 +7512,9 @@ namespace PascalSharp.Internal.TreeConverter
                                 class_field cf = bai.int_array;
                                 expression_node left = new class_field_reference(cf, cmc.obj, cmc.location);
                                 expression_node right = cmc.parameters[0];
-                                //right = convert_type(right, SystemLibrary.integer_type);
+                                //right = convert_type(right, integer_type);
                                 right = convertion_data_and_alghoritms.convert_type(right, (ii as bounded_array_interface).ordinal_type_interface.elems_type);
-                                right = convertion_data_and_alghoritms.create_simple_function_call(SystemLibrary.int_sub, cmc.location, right,
+                                right = convertion_data_and_alghoritms.create_simple_function_call(int_sub, cmc.location, right,
                                     new int_const_node(bai.ordinal_type_interface.ordinal_type_to_int(bai.ordinal_type_interface.lower_value), cmc.location));
                                 param0 = new simple_array_indexing(left, right, cmc.type, cmc.location);
                                 is_pascal_array_ref = true;
@@ -7530,13 +7529,13 @@ namespace PascalSharp.Internal.TreeConverter
                     else if (param0 is compiled_function_call)
                     {
                     	compiled_function_call cfc = param0 as compiled_function_call;
-                    	if ((cfc.function_node.return_value_type == SystemLibrary.char_type && cfc.function_node.cont_type == SystemLibrary.string_type
+                    	if ((cfc.function_node.return_value_type == char_type && cfc.function_node.cont_type == string_type
                     	      && cfc.function_node == cfc.function_node.cont_type.default_property_node.get_function))
                     	{
                     		expressions_list exl = new expressions_list();
                             exl.AddElement(cfc.obj);
                             exl.AddElement(cfc.parameters[0]);
-                            basic_function_call bfc2 = new basic_function_call(SystemLibrary.int_add as basic_function_node,loc);
+                            basic_function_call bfc2 = new basic_function_call(int_add as basic_function_node,loc);
                             bfc2.parameters.AddElement(param0);
                             expression_node _param1 = null;
                             if (parameters.expressions.Count == 2) 
@@ -7544,11 +7543,11 @@ namespace PascalSharp.Internal.TreeConverter
         						_param1 = convert_strong(parameters.expressions[1]);
         					}
                             if (_param1 != null)
-                            	bfc2.parameters.AddElement(convertion_data_and_alghoritms.convert_type(_param1,SystemLibrary.integer_type));
+                            	bfc2.parameters.AddElement(convertion_data_and_alghoritms.convert_type(_param1,integer_type));
                             else
                             	bfc2.parameters.AddElement(new int_const_node(1,null));
                             expressions_list el = new expressions_list();
-                            el.AddElement(convertion_data_and_alghoritms.convert_type(bfc2,SystemLibrary.ushort_type));
+                            el.AddElement(convertion_data_and_alghoritms.convert_type(bfc2,ushort_type));
                             function_node chr_func = convertion_data_and_alghoritms.select_function(el, SystemLibInitializer.ChrUnicodeFunction.SymbolInfo, loc);
                             exl.AddElement(convertion_data_and_alghoritms.create_simple_function_call(chr_func, loc, el.ToArray()));
                             function_node fn = convertion_data_and_alghoritms.select_function(exl, SystemLibInitializer.StringDefaultPropertySetProcedure.SymbolInfo, loc);
@@ -7571,79 +7570,79 @@ namespace PascalSharp.Internal.TreeConverter
         		if (parameters.expressions.Count == 2) 
         		{
         			param1 = convert_strong(parameters.expressions[1]);
-        			//param1 = convertion_data_and_alghoritms.convert_type(param1,SystemLibrary.integer_type);
+        			//param1 = convertion_data_and_alghoritms.convert_type(param1,integer_type);
         		}
         		basic_function_call ass = null;
         		basic_function_call bfc = null;
-        		if (param0.type == SystemLibrary.integer_type)
+        		if (param0.type == integer_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.int_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_add as basic_function_node,loc);
+        			ass = new basic_function_call(int_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_add as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.char_type)
+        		else if (param0.type == char_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.char_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_add as basic_function_node,loc);
+        			ass = new basic_function_call(char_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_add as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.byte_type)
+        		else if (param0.type == byte_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.byte_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_add as basic_function_node,loc);
+        			ass = new basic_function_call(byte_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_add as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.sbyte_type)
+        		else if (param0.type == sbyte_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.sbyte_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_add as basic_function_node,loc);
+        			ass = new basic_function_call(sbyte_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_add as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.short_type)
+        		else if (param0.type == short_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.short_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_add as basic_function_node,loc);
+        			ass = new basic_function_call(short_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_add as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.ushort_type)
+        		else if (param0.type == ushort_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.ushort_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_add as basic_function_node,loc);
+        			ass = new basic_function_call(ushort_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_add as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.uint_type)
+        		else if (param0.type == uint_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.uint_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.uint_add as basic_function_node,loc);
+        			ass = new basic_function_call(uint_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(uint_add as basic_function_node,loc);
         			type_flag = 2;
         			is_uint = true;
         		}
-        		else if (param0.type == SystemLibrary.int64_type)
+        		else if (param0.type == int64_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.long_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.long_add as basic_function_node,loc);
+        			ass = new basic_function_call(long_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(long_add as basic_function_node,loc);
         			type_flag = 1;
         		}
-        		else if (param0.type == SystemLibrary.uint64_type)
+        		else if (param0.type == uint64_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.ulong_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.ulong_add as basic_function_node,loc);
+        			ass = new basic_function_call(ulong_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(ulong_add as basic_function_node,loc);
         			type_flag = 2;
         		}
-        		else if (param0.type == SystemLibrary.bool_type)
+        		else if (param0.type == bool_type)
         		{
         			if (param1 == null)
         			{
-        				ass = new basic_function_call(SystemLibrary.bool_assign as basic_function_node,loc);
-        				bfc = new basic_function_call(SystemLibrary.bool_not as basic_function_node,loc);
+        				ass = new basic_function_call(bool_assign as basic_function_node,loc);
+        				bfc = new basic_function_call(bool_not as basic_function_node,loc);
         				type_flag = 4;
         			}
         			else
         			{
-        				basic_function_call mod_expr = new basic_function_call(SystemLibrary.int_mod as basic_function_node,loc);
-        				mod_expr.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param1,SystemLibrary.integer_type));
+        				basic_function_call mod_expr = new basic_function_call(int_mod as basic_function_node,loc);
+        				mod_expr.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param1,integer_type));
         				mod_expr.parameters.AddElement(new int_const_node(2,loc));
-        				basic_function_call condition = new basic_function_call(SystemLibrary.int_eq as basic_function_node,loc);
+        				basic_function_call condition = new basic_function_call(int_eq as basic_function_node,loc);
         				condition.parameters.AddElement(mod_expr);
         				condition.parameters.AddElement(new int_const_node(0,loc));
-        				basic_function_call not_expr = new basic_function_call(SystemLibrary.bool_not as basic_function_node,loc);
+        				basic_function_call not_expr = new basic_function_call(bool_not as basic_function_node,loc);
         				not_expr.parameters.AddElement(param0);
         				question_colon_expression qce = new question_colon_expression(condition, param0, not_expr, loc);
-        				ass = new basic_function_call(SystemLibrary.bool_assign as basic_function_node,loc);
+        				ass = new basic_function_call(bool_assign as basic_function_node,loc);
         				ass.parameters.AddElement(param0);
         				ass.parameters.AddElement(qce);
         				type_flag = 5;
@@ -7651,14 +7650,14 @@ namespace PascalSharp.Internal.TreeConverter
         		}
         		else if (param0.type.type_special_kind == type_special_kind.diap_type || param0.type.IsEnum)
         		{
-        			ass = new basic_function_call(SystemLibrary.int_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_add as basic_function_node,loc);
+        			ass = new basic_function_call(int_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_add as basic_function_node,loc);
         			if (param0.type.type_special_kind == type_special_kind.diap_type)
         			{
         				type_node bt = param0.type.base_type;
-        				if (bt == SystemLibrary.int64_type) type_flag = 1;
-        				else if (bt == SystemLibrary.uint64_type) type_flag = 2;
-        				else if (bt == SystemLibrary.uint_type) 
+        				if (bt == int64_type) type_flag = 1;
+        				else if (bt == uint64_type) type_flag = 2;
+        				else if (bt == uint_type) 
         				{
         					type_flag =2;
         					is_uint = true;
@@ -7676,18 +7675,18 @@ namespace PascalSharp.Internal.TreeConverter
                     if (param1 != null)
                         switch (type_flag)
                         {
-                            case 0: param1 = convertion_data_and_alghoritms.convert_type(param1, SystemLibrary.integer_type); break;
+                            case 0: param1 = convertion_data_and_alghoritms.convert_type(param1, integer_type); break;
                             case 3:
-                            case 1: param1 = convertion_data_and_alghoritms.convert_type(param1, SystemLibrary.int64_type); break;
-                            case 2: param1 = convertion_data_and_alghoritms.convert_type(param1, SystemLibrary.uint64_type); break;
+                            case 1: param1 = convertion_data_and_alghoritms.convert_type(param1, int64_type); break;
+                            case 2: param1 = convertion_data_and_alghoritms.convert_type(param1, uint64_type); break;
                         }
-                    if (param0.type != SystemLibrary.char_type && !is_enum && param0.type != SystemLibrary.bool_type)
+                    if (param0.type != char_type && !is_enum && param0.type != bool_type)
                         switch (type_flag)
                         {
-                            case 0: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, SystemLibrary.integer_type)); break;
+                            case 0: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, integer_type)); break;
                             case 3:
-                            case 1: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, SystemLibrary.int64_type)); break;
-                            case 2: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, SystemLibrary.uint64_type)); break;
+                            case 1: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, int64_type)); break;
+                            case 2: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, uint64_type)); break;
                         }
 
                     else bfc.parameters.AddElement(param0);
@@ -7706,12 +7705,12 @@ namespace PascalSharp.Internal.TreeConverter
                         bfc.parameters.AddElement(param1);
                     ass.parameters.AddElement(param0);
                     if (is_uint)
-                        ass.parameters.AddElement(convertion_data_and_alghoritms.convert_type(bfc, SystemLibrary.uint_type));
+                        ass.parameters.AddElement(convertion_data_and_alghoritms.convert_type(bfc, uint_type));
                     else
-                        if (param0.type == SystemLibrary.char_type)
+                        if (param0.type == char_type)
                         {
                             expressions_list el = new expressions_list();
-                            el.AddElement(convertion_data_and_alghoritms.convert_type(bfc, SystemLibrary.ushort_type));
+                            el.AddElement(convertion_data_and_alghoritms.convert_type(bfc, ushort_type));
                             function_node chr_func = convertion_data_and_alghoritms.select_function(el, SystemLibInitializer.ChrUnicodeFunction.SymbolInfo, loc);
                             ass.parameters.AddElement(convertion_data_and_alghoritms.create_simple_function_call(chr_func, loc, el.ToArray()));
                         }
@@ -7746,9 +7745,9 @@ namespace PascalSharp.Internal.TreeConverter
                                 class_field cf = bai.int_array;
                                 expression_node left = new class_field_reference(cf, cmc.obj, cmc.location);
                                 expression_node right = cmc.parameters[0];
-                                //right = convert_type(right, SystemLibrary.integer_type);
+                                //right = convert_type(right, integer_type);
                                 right = convertion_data_and_alghoritms.convert_type(right, (ii as bounded_array_interface).ordinal_type_interface.elems_type);
-                                right = convertion_data_and_alghoritms.create_simple_function_call(SystemLibrary.int_sub, cmc.location, right,
+                                right = convertion_data_and_alghoritms.create_simple_function_call(int_sub, cmc.location, right,
                                     new int_const_node(bai.ordinal_type_interface.ordinal_type_to_int(bai.ordinal_type_interface.lower_value), cmc.location));
                                 param0 = new simple_array_indexing(left, right, cmc.type, cmc.location);
                                 is_pascal_array_ref = true;
@@ -7764,13 +7763,13 @@ namespace PascalSharp.Internal.TreeConverter
                     else if (param0 is compiled_function_call)
                     {
                     	compiled_function_call cfc = param0 as compiled_function_call;
-                    	if ((cfc.function_node.return_value_type == SystemLibrary.char_type && cfc.function_node.cont_type == SystemLibrary.string_type
+                    	if ((cfc.function_node.return_value_type == char_type && cfc.function_node.cont_type == string_type
                     	      && cfc.function_node == cfc.function_node.cont_type.default_property_node.get_function))
                     	{
                     		expressions_list exl = new expressions_list();
                             exl.AddElement(cfc.obj);
                             exl.AddElement(cfc.parameters[0]);
-                            basic_function_call bfc2 = new basic_function_call(SystemLibrary.int_sub as basic_function_node,loc);
+                            basic_function_call bfc2 = new basic_function_call(int_sub as basic_function_node,loc);
                             bfc2.parameters.AddElement(param0);
                             expression_node _param1 = null;
                             if (parameters.expressions.Count == 2) 
@@ -7778,11 +7777,11 @@ namespace PascalSharp.Internal.TreeConverter
         						_param1 = convert_strong(parameters.expressions[1]);
         					}
                             if (_param1 != null)
-                            	bfc2.parameters.AddElement(convertion_data_and_alghoritms.convert_type(_param1,SystemLibrary.integer_type));
+                            	bfc2.parameters.AddElement(convertion_data_and_alghoritms.convert_type(_param1,integer_type));
                             else
                             	bfc2.parameters.AddElement(new int_const_node(1,null));
                             expressions_list el = new expressions_list();
-                            el.AddElement(convertion_data_and_alghoritms.convert_type(bfc2,SystemLibrary.ushort_type));
+                            el.AddElement(convertion_data_and_alghoritms.convert_type(bfc2,ushort_type));
                             function_node chr_func = convertion_data_and_alghoritms.select_function(el,SystemLibInitializer.ChrUnicodeFunction.SymbolInfo, loc);
                             exl.AddElement(convertion_data_and_alghoritms.create_simple_function_call(chr_func, loc, el.ToArray()));
                             function_node fn = convertion_data_and_alghoritms.select_function(exl, SystemLibInitializer.StringDefaultPropertySetProcedure.SymbolInfo, loc);
@@ -7805,79 +7804,79 @@ namespace PascalSharp.Internal.TreeConverter
         		if (parameters.expressions.Count == 2) 
         		{
         			param1 = convert_strong(parameters.expressions[1]);
-        			param1 = convertion_data_and_alghoritms.convert_type(param1,SystemLibrary.integer_type);
+        			param1 = convertion_data_and_alghoritms.convert_type(param1,integer_type);
         		}
         		basic_function_call ass = null;
         		basic_function_call bfc = null;
-        		if (param0.type == SystemLibrary.integer_type)
+        		if (param0.type == integer_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.int_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_sub as basic_function_node,loc);
+        			ass = new basic_function_call(int_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_sub as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.char_type)
+        		else if (param0.type == char_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.char_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_sub as basic_function_node,loc);
+        			ass = new basic_function_call(char_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_sub as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.byte_type)
+        		else if (param0.type == byte_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.byte_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_sub as basic_function_node,loc);
+        			ass = new basic_function_call(byte_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_sub as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.sbyte_type)
+        		else if (param0.type == sbyte_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.sbyte_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_sub as basic_function_node,loc);
+        			ass = new basic_function_call(sbyte_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_sub as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.short_type)
+        		else if (param0.type == short_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.short_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_sub as basic_function_node,loc);
+        			ass = new basic_function_call(short_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_sub as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.ushort_type)
+        		else if (param0.type == ushort_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.ushort_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_sub as basic_function_node,loc);
+        			ass = new basic_function_call(ushort_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_sub as basic_function_node,loc);
         		}
-        		else if (param0.type == SystemLibrary.uint_type)
+        		else if (param0.type == uint_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.uint_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.uint_sub as basic_function_node,loc);
+        			ass = new basic_function_call(uint_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(uint_sub as basic_function_node,loc);
         			type_flag = 2;
         			is_uint = true;
         		}
-        		else if (param0.type == SystemLibrary.int64_type)
+        		else if (param0.type == int64_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.long_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.long_sub as basic_function_node,loc);
+        			ass = new basic_function_call(long_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(long_sub as basic_function_node,loc);
         			type_flag = 1;
         		}
-        		else if (param0.type == SystemLibrary.uint64_type)
+        		else if (param0.type == uint64_type)
         		{
-        			ass = new basic_function_call(SystemLibrary.ulong_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.ulong_sub as basic_function_node,loc);
+        			ass = new basic_function_call(ulong_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(ulong_sub as basic_function_node,loc);
         			type_flag = 2;
         		}
-        		else if (param0.type == SystemLibrary.bool_type)
+        		else if (param0.type == bool_type)
         		{
         			if (param1 == null)
         			{
-        				ass = new basic_function_call(SystemLibrary.bool_assign as basic_function_node,loc);
-        				bfc = new basic_function_call(SystemLibrary.bool_not as basic_function_node,loc);
+        				ass = new basic_function_call(bool_assign as basic_function_node,loc);
+        				bfc = new basic_function_call(bool_not as basic_function_node,loc);
         				type_flag = 4;
         			}
         			else
         			{
-        				basic_function_call mod_expr = new basic_function_call(SystemLibrary.int_mod as basic_function_node,loc);
-        				mod_expr.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param1,SystemLibrary.integer_type));
+        				basic_function_call mod_expr = new basic_function_call(int_mod as basic_function_node,loc);
+        				mod_expr.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param1,integer_type));
         				mod_expr.parameters.AddElement(new int_const_node(2,loc));
-        				basic_function_call condition = new basic_function_call(SystemLibrary.int_eq as basic_function_node,loc);
+        				basic_function_call condition = new basic_function_call(int_eq as basic_function_node,loc);
         				condition.parameters.AddElement(mod_expr);
         				condition.parameters.AddElement(new int_const_node(0,loc));
-        				basic_function_call not_expr = new basic_function_call(SystemLibrary.bool_not as basic_function_node,loc);
+        				basic_function_call not_expr = new basic_function_call(bool_not as basic_function_node,loc);
         				not_expr.parameters.AddElement(param0);
         				question_colon_expression qce = new question_colon_expression(condition, param0, not_expr, loc);
-        				ass = new basic_function_call(SystemLibrary.bool_assign as basic_function_node,loc);
+        				ass = new basic_function_call(bool_assign as basic_function_node,loc);
         				ass.parameters.AddElement(param0);
         				ass.parameters.AddElement(qce);
         				type_flag = 5;
@@ -7885,14 +7884,14 @@ namespace PascalSharp.Internal.TreeConverter
         		}
         		else if (param0.type.type_special_kind == type_special_kind.diap_type || param0.type.IsEnum)
         		{
-        			ass = new basic_function_call(SystemLibrary.int_assign as basic_function_node,loc);
-        			bfc = new basic_function_call(SystemLibrary.int_sub as basic_function_node,loc);
+        			ass = new basic_function_call(int_assign as basic_function_node,loc);
+        			bfc = new basic_function_call(int_sub as basic_function_node,loc);
         			if (param0.type.type_special_kind == type_special_kind.diap_type)
         			{
         				type_node bt = param0.type.base_type;
-        				if (bt == SystemLibrary.int64_type) type_flag = 1;
-        				else if (bt == SystemLibrary.uint64_type) type_flag = 2;
-        				else if (bt == SystemLibrary.uint_type) 
+        				if (bt == int64_type) type_flag = 1;
+        				else if (bt == uint64_type) type_flag = 2;
+        				else if (bt == uint_type) 
         				{
         					type_flag =2;
         					is_uint = true;
@@ -7907,19 +7906,19 @@ namespace PascalSharp.Internal.TreeConverter
                     if (param1 != null)
                         switch (type_flag)
                         {
-                            case 0: param1 = convertion_data_and_alghoritms.convert_type(param1, SystemLibrary.integer_type); break;
+                            case 0: param1 = convertion_data_and_alghoritms.convert_type(param1, integer_type); break;
                             case 3:
-                            case 1: param1 = convertion_data_and_alghoritms.convert_type(param1, SystemLibrary.int64_type); break;
-                            case 2: param1 = convertion_data_and_alghoritms.convert_type(param1, SystemLibrary.uint64_type); break;
+                            case 1: param1 = convertion_data_and_alghoritms.convert_type(param1, int64_type); break;
+                            case 2: param1 = convertion_data_and_alghoritms.convert_type(param1, uint64_type); break;
                         }
                     //bfc.parameters.AddElement(param0);
-                    if (param0.type != SystemLibrary.char_type && !is_enum && param0.type != SystemLibrary.bool_type)
+                    if (param0.type != char_type && !is_enum && param0.type != bool_type)
                         switch (type_flag)
                         {
-                            case 0: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, SystemLibrary.integer_type)); break;
+                            case 0: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, integer_type)); break;
                             case 3:
-                            case 1: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, SystemLibrary.int64_type)); break;
-                            case 2: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, SystemLibrary.uint64_type)); break;
+                            case 1: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, int64_type)); break;
+                            case 2: bfc.parameters.AddElement(convertion_data_and_alghoritms.convert_type(param0, uint64_type)); break;
                         }
                     else bfc.parameters.AddElement(param0);
                     if (param1 == null)
@@ -7934,7 +7933,7 @@ namespace PascalSharp.Internal.TreeConverter
                     else bfc.parameters.AddElement(param1);
                     ass.parameters.AddElement(param0);
                     if (is_uint)
-                        ass.parameters.AddElement(convertion_data_and_alghoritms.convert_type(bfc, SystemLibrary.uint_type));
+                        ass.parameters.AddElement(convertion_data_and_alghoritms.convert_type(bfc, uint_type));
                     else
                         ass.parameters.AddElement(bfc);
                 }
@@ -7989,7 +7988,7 @@ namespace PascalSharp.Internal.TreeConverter
                             file = param0;
                             read_from_text_file = true;
                         }
-                        if (param0.type.type_special_kind == SemanticTree.type_special_kind.typed_file
+                        if (param0.type.type_special_kind == type_special_kind.typed_file
                             && parameters.expressions.Count > 1                        //это можно внести во внутрь
                             )//и побросать приличные исключения
                         {
@@ -8007,7 +8006,7 @@ namespace PascalSharp.Internal.TreeConverter
                                 read_from_typed_file = true;
                             }
                         }
-                        if (param0.type.type_special_kind == SemanticTree.type_special_kind.binary_file
+                        if (param0.type.type_special_kind == type_special_kind.binary_file
                             && parameters.expressions.Count > 1                        //это можно внести во внутрь
                             )//и побросать приличные исключения
                         {
@@ -8059,10 +8058,10 @@ namespace PascalSharp.Internal.TreeConverter
                             {
                                 compiled_function_call cfc = en as compiled_function_call;
                                 
-                                if ((cfc.function_node.return_value_type == SystemLibrary.char_type && cfc.function_node.cont_type == SystemLibrary.string_type
+                                if ((cfc.function_node.return_value_type == char_type && cfc.function_node.cont_type == string_type
                                       && cfc.function_node == cfc.function_node.cont_type.default_property_node.get_function))
                                 {
-                                    en = new simple_array_indexing((en as compiled_function_call).obj, (en as compiled_function_call).parameters[0], SystemLibrary.char_type, en.location);
+                                    en = new simple_array_indexing((en as compiled_function_call).obj, (en as compiled_function_call).parameters[0], char_type, en.location);
                                     is_char_getter = true;
                                 }
                                 
@@ -8099,7 +8098,7 @@ namespace PascalSharp.Internal.TreeConverter
                         try
                         {
                         	function_node fn = null;
-                        	if (en.type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                        	if (en.type.type_special_kind == type_special_kind.short_string)
                         	{
                         		exl.AddElement(new int_const_node((en.type as short_string_type_node).Length,null));
                         		if (!read_from_file)
@@ -8107,7 +8106,7 @@ namespace PascalSharp.Internal.TreeConverter
                         		else
                         		last_call = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.read_short_string_from_file_procedure.sym_info as function_node,get_location(ex),exl.ToArray());
                         	}
-                        	else if (en.type.type_special_kind == SemanticTree.type_special_kind.diap_type)
+                        	else if (en.type.type_special_kind == type_special_kind.diap_type)
                         	{
                         		exl.remove(en);
                         		en.type = en.type.base_type;
@@ -8118,7 +8117,7 @@ namespace PascalSharp.Internal.TreeConverter
                         	else
                         	{
                                 /// SSM 21/05/16 - read_from_text_file && - bug fix #161
-                                if (read_from_text_file && SystemLibInitializer.readln_procedure.Equal(sil) && parameters.expressions.Count == 2 && en.type == SystemLibrary.string_type)
+                                if (read_from_text_file && SystemLibInitializer.readln_procedure.Equal(sil) && parameters.expressions.Count == 2 && en.type == string_type)
                                 {
                                     fn = convertion_data_and_alghoritms.select_function(exl, SystemLibInitializer.readln_procedure.SymbolInfo, loc);
                                     readln_string_file = true;
@@ -8187,9 +8186,9 @@ namespace PascalSharp.Internal.TreeConverter
             		case semantic_node_type.class_field : if (!(dn as class_field).IsStatic) AddError(new CanNotReferenceToNonStaticFieldWithType(dn as class_field,loc,null)); break;
             		case semantic_node_type.compiled_variable_definition : if (!(dn as compiled_variable_definition).IsStatic) AddError(new CanNotReferenceToNonStaticFieldWithType(dn as class_field,loc,null)); break;
             		case semantic_node_type.compiled_property_node:
-            		case semantic_node_type.common_property_node : if ((dn as property_node).polymorphic_state != SemanticTree.polymorphic_state.ps_static) AddError(new CanNotReferenceToNonStaticPropertyWithType(dn as property_node,loc,null)); break;
+            		case semantic_node_type.common_property_node : if ((dn as property_node).polymorphic_state != polymorphic_state.ps_static) AddError(new CanNotReferenceToNonStaticPropertyWithType(dn as property_node,loc,null)); break;
             		case semantic_node_type.compiled_function_node:
-            		case semantic_node_type.common_method_node:  if ((dn as function_node).polymorphic_state != SemanticTree.polymorphic_state.ps_static) AddError(new CanNotReferenceToNonStaticMethodWithType((dn as function_node).name,loc)); break;
+            		case semantic_node_type.common_method_node:  if ((dn as function_node).polymorphic_state != polymorphic_state.ps_static) AddError(new CanNotReferenceToNonStaticMethodWithType((dn as function_node).name,loc)); break;
             	}
             }
             if (context.inStaticArea())
@@ -8268,12 +8267,12 @@ namespace PascalSharp.Internal.TreeConverter
                 	if (vr == null)
                 	{
                     	location sl = get_location(s_expr);
-                    	if (expr.type.type_special_kind != SemanticTree.type_special_kind.record)
+                    	if (expr.type.type_special_kind != type_special_kind.record)
                     	vr = convertion_data_and_alghoritms.CreateVariableReference(context.add_var_definition(compiler_string_consts.GetTempVariableName(), sl, expr.type, expr), sl);
                     	else
                     		expr = create_with_expression(expr);
                 	}
-                	if (vr != null && vr is class_field_reference && vr.type.type_special_kind == SemanticTree.type_special_kind.record)
+                	if (vr != null && vr is class_field_reference && vr.type.type_special_kind == type_special_kind.record)
                 	{
                 		vr = null;
                 		expr = create_with_expression(expr);
@@ -8284,7 +8283,7 @@ namespace PascalSharp.Internal.TreeConverter
                         if (vr.type.Scope == null)
                         {
                             if (vr.type is compiled_type_node)
-                                (vr.type as compiled_type_node).scope = new NetTypeScope((vr.type as compiled_type_node).compiled_type, SystemLibrary.symtab);
+                                (vr.type as compiled_type_node).scope = new NetTypeScope((vr.type as compiled_type_node).compiled_type, symtab);
                             else
                                 throw new CompilerInternalError("Cannot create With statement because variable reference scope == null");
                         }
@@ -8482,7 +8481,7 @@ namespace PascalSharp.Internal.TreeConverter
                 case semantic_node_type.class_field:
                     {
                         class_field cf = (class_field)dn;
-                        if (cf.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                        if (cf.polymorphic_state != polymorphic_state.ps_static)
                         {
                             AddError(new CanNotReferenceToNonStaticFieldWithType(cf, get_location(id_right), tn));
                         }
@@ -8492,7 +8491,7 @@ namespace PascalSharp.Internal.TreeConverter
                 case semantic_node_type.compiled_variable_definition:
                     {
                         compiled_variable_definition cvd = (compiled_variable_definition)dn;
-                        if (cvd.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                        if (cvd.polymorphic_state != polymorphic_state.ps_static)
                         {
                             AddError(new CanNotReferenceToNonStaticFieldWithType(cvd, get_location(id_right), tn));
                         }
@@ -8524,7 +8523,7 @@ namespace PascalSharp.Internal.TreeConverter
                 case general_node_type.property_node:
                     {
                         property_node pn = (property_node)dn;
-                        if (pn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                        if (pn.polymorphic_state != polymorphic_state.ps_static)
                         {
                             AddError(new CanNotReferenceToNonStaticPropertyWithType(pn, get_location(id_right), tn));
                         }
@@ -8590,7 +8589,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (fn.semantic_node_type == semantic_node_type.common_method_node)
             {
                 common_method_node cmn = (common_method_node)fn;
-                if (cmn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                if (cmn.polymorphic_state != polymorphic_state.ps_static)
                 {
                     //ssyy изменил
                     if (!cmn.is_constructor)
@@ -8615,7 +8614,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (fn.semantic_node_type == semantic_node_type.compiled_function_node)
             {
                 compiled_function_node cfn = (compiled_function_node)fn;
-                if (cfn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                if (cfn.polymorphic_state != polymorphic_state.ps_static)
                 {
                     AddError(new CanNotCallNonStaticMethodWithClass(tn, loc, fn));
                 }
@@ -8700,7 +8699,7 @@ namespace PascalSharp.Internal.TreeConverter
                 case general_node_type.property_node:
                     {
                         property_node pn = (property_node)dn;
-                        if (pn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                        if (pn.polymorphic_state != polymorphic_state.ps_static)
                         {
                             AddError(new CanNotReferenceToNonStaticPropertyWithType(pn, get_location(id_right), tn));
                         }
@@ -8904,7 +8903,7 @@ namespace PascalSharp.Internal.TreeConverter
                 || fn.parameters.Count > 0 && fn.num_of_default_parameters == fn.parameters.Count)
             {
                 fn = convertion_data_and_alghoritms.select_function(bfc.parameters, new SymbolInfoList(new SymbolInfo(fn)), bfc.location);
-                if (fn.polymorphic_state == SemanticTree.polymorphic_state.ps_static || fn is common_namespace_function_node || fn is basic_function_node)
+                if (fn.polymorphic_state == polymorphic_state.ps_static || fn is common_namespace_function_node || fn is basic_function_node)
                     bfc = convertion_data_and_alghoritms.create_simple_function_call(fn, bfc.location, bfc.parameters.ToArray()) as base_function_call;
                 else
                 {
@@ -8956,7 +8955,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (dn.semantic_node_type == semantic_node_type.class_field)
             {
                 class_field cf = (class_field)dn;
-                if (cf.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                if (cf.polymorphic_state == polymorphic_state.ps_static)
                 {
                     AddError(new CanNotReferanceToStaticFieldWithExpression(cf, get_location(id_right), en));
                 }
@@ -8967,7 +8966,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (dn.semantic_node_type == semantic_node_type.compiled_variable_definition)
             {
                 compiled_variable_definition cfd = (compiled_variable_definition)dn;
-                if (cfd.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                if (cfd.polymorphic_state == polymorphic_state.ps_static)
                 {
                     AddError(new CanNotReferanceToStaticFieldWithExpression(cfd, get_location(id_right), en));
                 }
@@ -9000,7 +8999,7 @@ namespace PascalSharp.Internal.TreeConverter
                     common_static_method_call csmc = new common_static_method_call(cmn, loc);
                     return csmc;
                 }
-                if (cmn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                if (cmn.polymorphic_state == polymorphic_state.ps_static)
                 {
                     AddError(new CanNotCallStaticMethodWithExpression(en, fn));
                 }
@@ -9019,7 +9018,7 @@ namespace PascalSharp.Internal.TreeConverter
                 }
                 else
                 {
-                    if (cfn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                    if (cfn.polymorphic_state == polymorphic_state.ps_static)
                     {
                         if (!cfn.is_extension_method)
                             AddError(new CanNotCallStaticMethodWithExpression(en, fn));
@@ -9116,7 +9115,7 @@ namespace PascalSharp.Internal.TreeConverter
                                         }
                                     }
                             function_node fn = convertion_data_and_alghoritms.select_function(pars, sil, get_location(id_right));
-                            if (!fn.is_extension_method && fn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                            if (!fn.is_extension_method && fn.polymorphic_state != polymorphic_state.ps_static)
                                 return create_not_static_method_call(fn, en, get_location(id_right), false);
                             else
                                 return create_static_method_call_with_params(fn, get_location(id_right), fn.return_value_type, false, pars);
@@ -9125,7 +9124,7 @@ namespace PascalSharp.Internal.TreeConverter
                 case general_node_type.property_node:
                     {
                         property_node pn = (property_node)dn;
-                        if (pn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                        if (pn.polymorphic_state == polymorphic_state.ps_static)
                         {
                             AddError(new CanNotReferenceToStaticPropertyWithExpression(pn, get_location(id_right), pn.comprehensive_type));
                         }
@@ -9175,7 +9174,7 @@ namespace PascalSharp.Internal.TreeConverter
                 case general_node_type.property_node:
                     {
                         property_node pn = (property_node)dn;
-                        if (pn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                        if (pn.polymorphic_state == polymorphic_state.ps_static)
                         {
                             AddError(new CanNotReferenceToStaticPropertyWithExpression(pn, get_location(id_right), pn.comprehensive_type));
                         }
@@ -9626,7 +9625,7 @@ namespace PascalSharp.Internal.TreeConverter
                             AddError(get_location(_method_name), "NO_METHOD_{0}_IN_CLASS_{1}", _method_name.meth_name.name, tp.PrintableName);
                     }
                 }
-                else if (def_temp as compiled_type_node == SystemLibrary.void_type)
+                else if (def_temp as compiled_type_node == void_type)
                     AddError(get_location(_method_name.class_name), "VOID_NOT_VALID");
             }
             else
@@ -9777,7 +9776,7 @@ namespace PascalSharp.Internal.TreeConverter
 
         private long_const_node convert_long_const_to_switch(expression_node switch_expr, location loc)
         {
-            convertion_data_and_alghoritms.convert_type(switch_expr, SystemLibrary.int64_type, loc);
+            convertion_data_and_alghoritms.convert_type(switch_expr, int64_type, loc);
             if (switch_expr is long_const_node)
                 return switch_expr as long_const_node;
             //switch_expr = convertion_data_and_alghoritms.create_simple_function_call(oti.value_to_int,
@@ -9813,7 +9812,7 @@ namespace PascalSharp.Internal.TreeConverter
 
         private ulong_const_node convert_ulong_const_to_switch(expression_node switch_expr, location loc)
         {
-            convertion_data_and_alghoritms.convert_type(switch_expr, SystemLibrary.uint64_type, loc);
+            convertion_data_and_alghoritms.convert_type(switch_expr, uint64_type, loc);
             if (switch_expr is ulong_const_node)
                 return switch_expr as ulong_const_node;
             //switch_expr = convertion_data_and_alghoritms.create_simple_function_call(oti.value_to_int,
@@ -9894,11 +9893,11 @@ namespace PascalSharp.Internal.TreeConverter
             type_node case_expr_type = en.type;
 
             internal_interface ii = en.type.get_internal_interface(internal_interface_kind.ordinal_interface);
-            if (ii == null && en.type != SystemLibrary.string_type)
+            if (ii == null && en.type != string_type)
             {
                 AddError(new OrdinalOrStringTypeExpected(en.location));
             }
-            if (ii != null && en.type != SystemLibrary.int64_type && en.type != SystemLibrary.uint64_type)
+            if (ii != null && en.type != int64_type && en.type != uint64_type)
             {
                 ordinal_type_interface oti = (ordinal_type_interface)ii;
                 en = convertion_data_and_alghoritms.create_simple_function_call(oti.value_to_int, en.location, en);
@@ -9954,11 +9953,11 @@ namespace PascalSharp.Internal.TreeConverter
                 sn.default_statement = else_statement;
                 return_value(sn);
             }
-            else if (en.type == SystemLibrary.string_type)
+            else if (en.type == string_type)
             {
                 if_node main_ifn = null;
                 if_node ifn = null;
-                compiled_function_node str_eq_meth = SystemLibrary.string_type.find_first_in_type("=").sym_info as compiled_function_node;
+                compiled_function_node str_eq_meth = string_type.find_first_in_type("=").sym_info as compiled_function_node;
                 Dictionary<string, string> case_constants = new Dictionary<string, string>();
                 foreach (SyntaxTree.case_variant cv in _case_node.conditions.variants)
                 {
@@ -9969,8 +9968,8 @@ namespace PascalSharp.Internal.TreeConverter
                     foreach (SyntaxTree.expression expr in cv.conditions.expressions)
                     {
                         expression_node cn = convert_strong(expr);
-                        if (cn.type != SystemLibrary.string_type)
-                            AddError(new CanNotConvertTypes(cn, cn.type, SystemLibrary.string_type, cn.location));
+                        if (cn.type != string_type)
+                            AddError(new CanNotConvertTypes(cn, cn.type, string_type, cn.location));
                         string_const_node scn = convert_string_const_to_switch(cn, cn.location);
                         if (!case_constants.ContainsKey(scn.constant_value))
                             case_constants.Add(scn.constant_value, scn.constant_value);
@@ -9986,7 +9985,7 @@ namespace PascalSharp.Internal.TreeConverter
                         if (eq_node == null)
                             eq_node = eq_call;
                         else
-                            eq_node = new basic_function_call(SystemLibrary.bool_or as basic_function_node, null, eq_node, eq_call);
+                            eq_node = new basic_function_call(bool_or as basic_function_node, null, eq_node, eq_call);
                     }
                     context.enter_code_block_with_bind();
                     CheckToEmbeddedStatementCannotBeADeclaration(cv.exec_if_true);
@@ -10014,11 +10013,11 @@ namespace PascalSharp.Internal.TreeConverter
                 ifn.else_body = else_statement;
                 return_value(main_ifn);
             }
-            else if (en.type == SystemLibrary.int64_type)
+            else if (en.type == int64_type)
             {
                 if_node main_ifn = null;
                 if_node ifn = null;
-                basic_function_node int64_eq_meth = SystemLibrary.int64_type.find_first_in_type("=", true).sym_info as basic_function_node;
+                basic_function_node int64_eq_meth = int64_type.find_first_in_type("=", true).sym_info as basic_function_node;
                 
                 Dictionary<long, long> case_constants = new Dictionary<long, long>();
                 foreach (SyntaxTree.case_variant cv in _case_node.conditions.variants)
@@ -10053,15 +10052,15 @@ namespace PascalSharp.Internal.TreeConverter
                             {
                                 AddError(get_location(diap.right), "LEFT_RANGE_GREATER_THEN_RIGHT");
                             }
-                            basic_function_node int64_greq_meth = SystemLibrary.int64_type.find_first_in_type(">=", true).sym_info as basic_function_node;
-                            basic_function_node int64_leq_meth = SystemLibrary.int64_type.find_first_in_type("<=", true).sym_info as basic_function_node;
+                            basic_function_node int64_greq_meth = int64_type.find_first_in_type(">=", true).sym_info as basic_function_node;
+                            basic_function_node int64_leq_meth = int64_type.find_first_in_type("<=", true).sym_info as basic_function_node;
                             basic_function_call greq_call = new basic_function_call(int64_greq_meth, left_cn.location);
                             greq_call.parameters.AddElement(en);
                             greq_call.parameters.AddElement(left_scn);
                             basic_function_call leq_call = new basic_function_call(int64_leq_meth, right_cn.location);
                             leq_call.parameters.AddElement(en);
                             leq_call.parameters.AddElement(right_scn);
-                            basic_function_node in_diap_meth = SystemLibrary.bool_type.find_first_in_type("and", true).sym_info as basic_function_node;
+                            basic_function_node in_diap_meth = bool_type.find_first_in_type("and", true).sym_info as basic_function_node;
                             basic_function_call in_diap_call = new basic_function_call(in_diap_meth, left_cn.location);
                             in_diap_call.parameters.AddElement(greq_call);
                             in_diap_call.parameters.AddElement(leq_call);
@@ -10073,7 +10072,7 @@ namespace PascalSharp.Internal.TreeConverter
                         if (eq_node == null)
                             eq_node = eq_call;
                         else
-                            eq_node = new basic_function_call(SystemLibrary.bool_or as basic_function_node, null, eq_node, eq_call);
+                            eq_node = new basic_function_call(bool_or as basic_function_node, null, eq_node, eq_call);
                     }
                     context.enter_code_block_with_bind();
                     CheckToEmbeddedStatementCannotBeADeclaration(cv.exec_if_true);
@@ -10105,7 +10104,7 @@ namespace PascalSharp.Internal.TreeConverter
             {
                 if_node main_ifn = null;
                 if_node ifn = null;
-                basic_function_node uint64_eq_meth = SystemLibrary.uint64_type.find_first_in_type("=", true).sym_info as basic_function_node;
+                basic_function_node uint64_eq_meth = uint64_type.find_first_in_type("=", true).sym_info as basic_function_node;
                 Dictionary<ulong, ulong> case_constants = new Dictionary<ulong, ulong>();
                 foreach (SyntaxTree.case_variant cv in _case_node.conditions.variants)
                 {
@@ -10139,15 +10138,15 @@ namespace PascalSharp.Internal.TreeConverter
                             {
                                 AddError(get_location(diap.right), "LEFT_RANGE_GREATER_THEN_RIGHT");
                             }
-                            basic_function_node uint64_greq_meth = SystemLibrary.uint64_type.find_first_in_type(">=", true).sym_info as basic_function_node;
-                            basic_function_node uint64_leq_meth = SystemLibrary.uint64_type.find_first_in_type("<=", true).sym_info as basic_function_node;
+                            basic_function_node uint64_greq_meth = uint64_type.find_first_in_type(">=", true).sym_info as basic_function_node;
+                            basic_function_node uint64_leq_meth = uint64_type.find_first_in_type("<=", true).sym_info as basic_function_node;
                             basic_function_call greq_call = new basic_function_call(uint64_greq_meth, left_cn.location);
                             greq_call.parameters.AddElement(en);
                             greq_call.parameters.AddElement(left_scn);
                             basic_function_call leq_call = new basic_function_call(uint64_leq_meth, right_cn.location);
                             leq_call.parameters.AddElement(en);
                             leq_call.parameters.AddElement(right_scn);
-                            basic_function_node in_diap_meth = SystemLibrary.bool_type.find_first_in_type("and", true).sym_info as basic_function_node;
+                            basic_function_node in_diap_meth = bool_type.find_first_in_type("and", true).sym_info as basic_function_node;
                             basic_function_call in_diap_call = new basic_function_call(in_diap_meth, left_cn.location);
                             in_diap_call.parameters.AddElement(greq_call);
                             in_diap_call.parameters.AddElement(leq_call);
@@ -10159,7 +10158,7 @@ namespace PascalSharp.Internal.TreeConverter
                         if (eq_node == null)
                             eq_node = eq_call;
                         else
-                            eq_node = new basic_function_call(SystemLibrary.bool_or as basic_function_node, null, eq_node, eq_call);
+                            eq_node = new basic_function_call(bool_or as basic_function_node, null, eq_node, eq_call);
                     }
                     context.enter_code_block_with_bind();
                     CheckToEmbeddedStatementCannotBeADeclaration(cv.exec_if_true);
@@ -10229,7 +10228,7 @@ namespace PascalSharp.Internal.TreeConverter
         public override void visit(SyntaxTree.program_module _program_module)
         {
             //MikhailoMMX Инициализация OpenMP
-            OpenMP.InitOpenMP(_program_module.compiler_directives, this, _program_module);
+            OpenMP.OpenMP.InitOpenMP(_program_module.compiler_directives, this, _program_module);
             //\MikhailoMMX
 
             string namespace_name = "";
@@ -10309,7 +10308,7 @@ namespace PascalSharp.Internal.TreeConverter
         public override void visit(SyntaxTree.unit_module _unit_module)
         {
             //MikhailoMMX Инициализация OpenMP
-            OpenMP.InitOpenMP(_unit_module.compiler_directives, this, _unit_module);
+            OpenMP.OpenMP.InitOpenMP(_unit_module.compiler_directives, this, _unit_module);
             //\MikhailoMMX
             
             //current_document=new document(_unit_module.file_name);
@@ -10650,7 +10649,7 @@ namespace PascalSharp.Internal.TreeConverter
                     CheckConstantRecordNotBeContainsMethods(tn as common_type_node, get_location(_typed_const_definition.const_type));
                 if (!SemanticRules.InheritanceConstantRecord)
                 	//mnozhestvo zdes iskljuchenie
-                    if (tn.base_type is common_type_node && tn.base_type.type_special_kind != SemanticTree.type_special_kind.base_set_type/*tn.base_type != SystemLibInitializer.TypedSetType.sym_info as type_node*/)
+                    if (tn.base_type is common_type_node && tn.base_type.type_special_kind != type_special_kind.base_set_type/*tn.base_type != SystemLibInitializer.TypedSetType.sym_info as type_node*/)
                         AddError(get_location(_typed_const_definition.const_type), "CONSTANT_RECORD_CAN_NOT_BE_INHERITANCE");
             }
             const_def_type = tn.element_type;
@@ -10739,26 +10738,26 @@ namespace PascalSharp.Internal.TreeConverter
                 foreach (SyntaxTree.typed_parameters tpars in syn_parametres.params_list)
                 {
                     temp_params.clear();
-                    SemanticTree.parameter_type pt = SemanticTree.parameter_type.value;
+                    parameter_type pt = parameter_type.value;
                     concrete_parameter_type cpt = concrete_parameter_type.cpt_none;
                     switch (tpars.param_kind)
                     {
                         //TODO: Params parameter.
                         case SyntaxTree.parametr_kind.var_parametr:
                             {
-                                pt = SemanticTree.parameter_type.var;
+                                pt = parameter_type.var;
                                 cpt = concrete_parameter_type.cpt_var;
                                 break;
                             }
                         case parametr_kind.const_parametr:
                             {
-                                pt = SemanticTree.parameter_type.value;
+                                pt = parameter_type.value;
                                 cpt = concrete_parameter_type.cpt_const;
                                 break;
                             }
                         case parametr_kind.out_parametr:
                             {
-                                pt = SemanticTree.parameter_type.var;
+                                pt = parameter_type.var;
                                 cpt = concrete_parameter_type.cpt_var;
                                 break;
                             }
@@ -10873,9 +10872,9 @@ namespace PascalSharp.Internal.TreeConverter
                 }
             if (context.top_function != null && context.converted_type != null && context.converted_type.is_generic_type_definition)
             {
-                //List<SemanticTree.ICommonTypeNode> gparams = context.converted_type.generic_params;
+                //List<ICommonTypeNode> gparams = context.converted_type.generic_params;
                 foreach (SyntaxTree.ident id in idents)
-                    foreach(SemanticTree.ICommonTypeNode ictn in context.converted_type.generic_params)
+                    foreach(ICommonTypeNode ictn in context.converted_type.generic_params)
                         if (string.Equals(id.name, ictn.name, StringComparison.InvariantCultureIgnoreCase))
                         {
                             AddError(get_location(id), "TEMPLATE_PARAMETER_{0}_REDEFINITION", id.name);
@@ -10892,15 +10891,15 @@ namespace PascalSharp.Internal.TreeConverter
             }
             ctn.is_generic_type_definition = true;
             check_param_redeclared(idents);
-            ctn.generic_params = new List<SemanticTree.ICommonTypeNode>();
+            ctn.generic_params = new List<ICommonTypeNode>();
             foreach (SyntaxTree.ident id in idents)
             {
                 common_type_node par = new common_type_node(
-                    id.name, SemanticTree.type_access_level.tal_public, context.converted_namespace,
-                    convertion_data_and_alghoritms.symbol_table.CreateInterfaceScope(null, SystemLibrary.object_type.Scope, null),
+                    id.name, type_access_level.tal_public, context.converted_namespace,
+                    convertion_data_and_alghoritms.symbol_table.CreateInterfaceScope(null, object_type.Scope, null),
                     get_location(id));
-                SystemLibrary.init_reference_type(par);
-                par.SetBaseType(SystemLibrary.object_type);
+                init_reference_type(par);
+                par.SetBaseType(object_type);
                 par.generic_type_container = ctn;
                 ctn.generic_params.Add(par);
                 ctn.scope.AddSymbol(id.name, new SymbolInfo(par));
@@ -10908,9 +10907,9 @@ namespace PascalSharp.Internal.TreeConverter
                 {
                     class_field cf = new class_field(
                         compiler_string_consts.generic_param_kind_prefix + id.name,
-                        SystemLibrary.byte_type,
+                        byte_type,
                         ctn, polymorphic_state.ps_static,
-                        SemanticTree.field_access_level.fal_public, null);
+                        field_access_level.fal_public, null);
                     ctn.fields.AddElement(cf);
                     par.runtime_initialization_marker = cf;
                 }
@@ -10920,15 +10919,15 @@ namespace PascalSharp.Internal.TreeConverter
         private void visit_generic_params(common_function_node cfn, List<SyntaxTree.ident> idents)
         {
             check_param_redeclared(idents);
-            cfn.generic_params = new List<SemanticTree.ICommonTypeNode>();
+            cfn.generic_params = new List<ICommonTypeNode>();
             foreach (SyntaxTree.ident id in idents)
             {
                 common_type_node par = new common_type_node(
-                    id.name, SemanticTree.type_access_level.tal_public, context.converted_namespace,
-                    convertion_data_and_alghoritms.symbol_table.CreateInterfaceScope(null, SystemLibrary.object_type.Scope, null),
+                    id.name, type_access_level.tal_public, context.converted_namespace,
+                    convertion_data_and_alghoritms.symbol_table.CreateInterfaceScope(null, object_type.Scope, null),
                     get_location(id));
-                SystemLibrary.init_reference_type(par);
-                par.SetBaseType(SystemLibrary.object_type);
+                init_reference_type(par);
+                par.SetBaseType(object_type);
                 par.generic_function_container = cfn;
                 cfn.generic_params.Add(par);
                 cfn.scope.AddSymbol(id.name, new SymbolInfo(par));
@@ -11240,9 +11239,9 @@ namespace PascalSharp.Internal.TreeConverter
         		common_type_node ctn = tn as common_type_node;
         		for (int i=0; i<ctn.attributes.Count; i++)
         		{
-        			if (ctn.attributes[i].attribute_type == SystemLibrary.usage_attribute_type)
+        			if (ctn.attributes[i].attribute_type == usage_attribute_type)
         			{
-        				int ind = ctn.attributes[i].prop_names.IndexOf(SystemLibrary.usage_attribute_type.find_first_in_type("AllowMultiple").sym_info as property_node);
+        				int ind = ctn.attributes[i].prop_names.IndexOf(usage_attribute_type.find_first_in_type("AllowMultiple").sym_info as property_node);
         				if (ind != -1)
         					allowMultiple = (bool)ctn.attributes[i].prop_initializers[ind].get_object_value();
         				return (AttributeTargets)ctn.attributes[i].args[0].get_object_value();
@@ -11253,7 +11252,7 @@ namespace PascalSharp.Internal.TreeConverter
         	else 
         	{
         		compiled_type_node ctn = tn as compiled_type_node;
-        		Attribute attr = Attribute.GetCustomAttribute(ctn.compiled_type,SystemLibrary.usage_attribute_type.compiled_type);
+        		Attribute attr = Attribute.GetCustomAttribute(ctn.compiled_type,usage_attribute_type.compiled_type);
         		if (attr != null)
         		{
         			allowMultiple = (attr as AttributeUsageAttribute).AllowMultiple;
@@ -11264,7 +11263,7 @@ namespace PascalSharp.Internal.TreeConverter
         	}
         }
         
-        private void check_for_usage_attribute(definition_node dn, AttributeTargets targets, string name, location loc, SemanticTree.attribute_qualifier_kind qualifier)
+        private void check_for_usage_attribute(definition_node dn, AttributeTargets targets, string name, location loc, attribute_qualifier_kind qualifier)
         {
         	switch (dn.semantic_node_type)
         	{
@@ -11306,11 +11305,11 @@ namespace PascalSharp.Internal.TreeConverter
         					AddError(loc, "ATTRIBUTE_{0}_NOT_APPLICABLE_TO_CONSTRUCTOR", name);
         			}
         			else
-        				if ((targets & AttributeTargets.Method) != AttributeTargets.Method && qualifier != SemanticTree.attribute_qualifier_kind.return_kind)
+        				if ((targets & AttributeTargets.Method) != AttributeTargets.Method && qualifier != attribute_qualifier_kind.return_kind)
         					AddError(loc, "ATTRIBUTE_{0}_NOT_APPLICABLE_TO_METHOD", name);
         			break;
         		case semantic_node_type.common_namespace_function_node:
-        			if ((targets & AttributeTargets.Method) != AttributeTargets.Method && qualifier != SemanticTree.attribute_qualifier_kind.return_kind)
+        			if ((targets & AttributeTargets.Method) != AttributeTargets.Method && qualifier != attribute_qualifier_kind.return_kind)
         				AddError(loc, "ATTRIBUTE_{0}_NOT_APPLICABLE_TO_METHOD", name);
         			break;
         		case semantic_node_type.class_field:
@@ -11341,7 +11340,7 @@ namespace PascalSharp.Internal.TreeConverter
         {
         	foreach (attribute_node attr in attrs)
         	{
-        		if (attr.attribute_type == SystemLibrary.field_offset_attribute_type)
+        		if (attr.attribute_type == field_offset_attribute_type)
         			return true;
         	}
         	return false;
@@ -11371,7 +11370,7 @@ namespace PascalSharp.Internal.TreeConverter
                         type_node tmp = tn;
                         while (tmp.base_type != null && !is_attr)
                         {
-                            is_attr = tmp.base_type == SystemLibrary.attribute_type;
+                            is_attr = tmp.base_type == attribute_type;
                             tmp = tmp.base_type;
                         }
                         if (!is_attr)
@@ -11384,7 +11383,7 @@ namespace PascalSharp.Internal.TreeConverter
                         }
                         else
                             ht[tn] = tn;
-                        SemanticTree.attribute_qualifier_kind qualifier = SemanticTree.attribute_qualifier_kind.none_kind;
+                        attribute_qualifier_kind qualifier = attribute_qualifier_kind.none_kind;
                         if (attr.qualifier != null)
                             if (j == 0)
                             {
@@ -11392,10 +11391,10 @@ namespace PascalSharp.Internal.TreeConverter
                                 {
                                     if (context.top_function == null)
                                         AddError(get_location(attr), "ATTRIBUTE_APPLICABLE_ONLY_TO_METHOD");
-                                    if (context.top_function.return_value_type == null || context.top_function.return_value_type == SystemLibrary.void_type)
+                                    if (context.top_function.return_value_type == null || context.top_function.return_value_type == void_type)
                                         AddError(get_location(attr), "EXPECTED_RETURN_VALUE_FOR_ATTRIBUTE");
                                     throw new NotSupportedError(get_location(attr.qualifier));
-                                    qualifier = SemanticTree.attribute_qualifier_kind.return_kind;
+                                    qualifier = attribute_qualifier_kind.return_kind;
                                 }
                                 else
                                     throw new NotSupportedError(get_location(attr.qualifier));
@@ -11430,7 +11429,7 @@ namespace PascalSharp.Internal.TreeConverter
                         }
 
                         base_function_call bfc = create_constructor_call(tn, args, get_location(attr));
-                        if (ctn is common_type_node && tn == SystemLibrary.struct_layout_attribute_type)
+                        if (ctn is common_type_node && tn == struct_layout_attribute_type)
                         {
                             if ((System.Runtime.InteropServices.LayoutKind)Convert.ToInt32((args[0] as constant_node).get_object_value()) == System.Runtime.InteropServices.LayoutKind.Explicit)
                             {
@@ -11516,7 +11515,7 @@ namespace PascalSharp.Internal.TreeConverter
                         type_node tmp = tn;
                         while (tmp.base_type != null && !is_attr)
                         {
-                            is_attr = tmp.base_type == SystemLibrary.attribute_type;
+                            is_attr = tmp.base_type == attribute_type;
                             tmp = tmp.base_type;
                         }
                         if (!is_attr)
@@ -11529,7 +11528,7 @@ namespace PascalSharp.Internal.TreeConverter
                         }
                         else
                             ht[tn] = tn;
-                        SemanticTree.attribute_qualifier_kind qualifier = SemanticTree.attribute_qualifier_kind.none_kind;
+                        attribute_qualifier_kind qualifier = attribute_qualifier_kind.none_kind;
                         if (attr.qualifier != null)
                             if (j == 0)
                             {
@@ -11537,10 +11536,10 @@ namespace PascalSharp.Internal.TreeConverter
                                 {
                                     if (context.top_function == null)
                                         AddError(get_location(attr), "ATTRIBUTE_APPLICABLE_ONLY_TO_METHOD");
-                                    if (context.top_function.return_value_type == null || context.top_function.return_value_type == SystemLibrary.void_type)
+                                    if (context.top_function.return_value_type == null || context.top_function.return_value_type == void_type)
                                         AddError(get_location(attr), "EXPECTED_RETURN_VALUE_FOR_ATTRIBUTE");
                                     throw new NotSupportedError(get_location(attr.qualifier));
-                                    qualifier = SemanticTree.attribute_qualifier_kind.return_kind;
+                                    qualifier = attribute_qualifier_kind.return_kind;
                                 }
                                 else
                                     throw new NotSupportedError(get_location(attr.qualifier));
@@ -11666,7 +11665,7 @@ namespace PascalSharp.Internal.TreeConverter
         
         internal void check_for_type_allowed(type_node tn, location loc)
         {
-        	if (tn == SystemLibrary.void_type)
+        	if (tn == void_type)
         		AddError(loc, "TYPE_{0}_NOT_VALID", tn.name);
         }
         
@@ -11693,7 +11692,7 @@ namespace PascalSharp.Internal.TreeConverter
                 return;
             }
             context.BeginSkipGenericInstanceChecking();
-            List<SemanticTree.ICommonTypeNode> gparams = null;
+            List<ICommonTypeNode> gparams = null;
             common_function_node cfn = context.top_function;
             if (cfn != null)
             {
@@ -11793,7 +11792,7 @@ namespace PascalSharp.Internal.TreeConverter
                     else
                     {
                         type_node spec_type = ret.visit(ntr);
-                        if (spec_type is ref_type_node || spec_type == SystemLibrary.void_type || spec_type == SystemLibrary.pointer_type)
+                        if (spec_type is ref_type_node || spec_type == void_type || spec_type == pointer_type)
                             ErrorsList.Add(new SimpleSemanticError(get_location(specificators[i]), "INAVLID_TYPE"));
                         if (spec_type.IsInterface)
                         {
@@ -11817,11 +11816,11 @@ namespace PascalSharp.Internal.TreeConverter
                             else
                             {
                                 //Тип-предок
-                                if (spec_type == SystemLibrary.object_type)
+                                if (spec_type == object_type)
                                 {
                                     AddError(get_location(specificators[i]), "OBJECT_CAN_NOT_BE_USED_AS_PARENT_SPECIFICATOR");
                                 }
-                                if (spec_type == SystemLibrary.enum_base_type)
+                                if (spec_type == enum_base_type)
                                 {
                                     AddError(get_location(specificators[i]), "ENUM_CAN_NOT_BE_USED_AS_PARENT_SPECIFICATOR");
                                 }
@@ -11893,7 +11892,7 @@ namespace PascalSharp.Internal.TreeConverter
             {
             	check_parameter_on_complex_type(_function_header.return_type);
             	tn = convert_strong(_function_header.return_type);
-				//if (tn == SystemLibrary.void_type)
+				//if (tn == void_type)
             	//    AddError(new VoidNotValid(get_location(_function_header.return_type)));
             	check_for_type_allowed(tn,get_location(_function_header.return_type));
             }
@@ -11922,7 +11921,7 @@ namespace PascalSharp.Internal.TreeConverter
                 //{
                 //    throw new OverloadOperatorMustBeStaticFunction(get_location(_function_header), context.top_function);
                 //}
-                if (cmmn != null && cmmn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                if (cmmn != null && cmmn.polymorphic_state != polymorphic_state.ps_static)
                 {
                     AddError(get_location(_function_header), "OVERLOADED_OPERATOR_MUST_BE_STATIC_FUNCTION");
                 }
@@ -11940,7 +11939,7 @@ namespace PascalSharp.Internal.TreeConverter
 			if (context.top_function != null && context.top_function is common_namespace_function_node && (context.top_function as common_namespace_function_node).ConnectedToType != null && !context.top_function.IsOperator)
             {
                 concrete_parameter_type cpt = concrete_parameter_type.cpt_none;
-                SemanticTree.parameter_type pt = parameter_type.value;
+                parameter_type pt = parameter_type.value;
                 if ((context.top_function as common_namespace_function_node).ConnectedToType.is_value_type)
                 {
                     cpt = concrete_parameter_type.cpt_var;
@@ -12248,14 +12247,14 @@ namespace PascalSharp.Internal.TreeConverter
         	if (sl == null) return;
         	foreach (common_parameter prm in cfn.parameters)
         	{
-        		if (prm.type.type_special_kind == SemanticTree.type_special_kind.set_type && prm.parameter_type == SemanticTree.parameter_type.value ||
-        		   prm.is_params && prm.type.element_type.type_special_kind == SemanticTree.type_special_kind.set_type)
+        		if (prm.type.type_special_kind == type_special_kind.set_type && prm.parameter_type == parameter_type.value ||
+        		   prm.is_params && prm.type.element_type.type_special_kind == type_special_kind.set_type)
         		{
         			if (!prm.is_params)
         			{
         				ordinal_type_interface oti = prm.type.element_type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
         				if (oti == null)
-        				if (prm.type.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+        				if (prm.type.element_type.type_special_kind == type_special_kind.short_string)
         				{
                             base_function_call cmc2 = null;
                             if (SystemLibInitializer.ClipShortStringInSetProcedure.sym_info is common_namespace_function_node)
@@ -12287,7 +12286,7 @@ namespace PascalSharp.Internal.TreeConverter
         				ordinal_type_interface oti = prm.type.element_type.element_type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
         				bool short_str = false;
         				if (oti == null)
-        				if (prm.type.element_type.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+        				if (prm.type.element_type.element_type.type_special_kind == type_special_kind.short_string)
         				{
         					short_str = true;
         				}
@@ -12325,8 +12324,8 @@ namespace PascalSharp.Internal.TreeConverter
         				sl.statements.AddElementFirst(fn);
         			}
         		}
-        		else if (prm.type.type_special_kind == SemanticTree.type_special_kind.short_string && prm.parameter_type == SemanticTree.parameter_type.value
-        		        || prm.is_params && prm.type.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+        		else if (prm.type.type_special_kind == type_special_kind.short_string && prm.parameter_type == parameter_type.value
+        		        || prm.is_params && prm.type.element_type.type_special_kind == type_special_kind.short_string)
         		{
                     if (!prm.is_params)
                     {
@@ -12346,8 +12345,8 @@ namespace PascalSharp.Internal.TreeConverter
                     {
                         common_parameter_reference cpr = new common_parameter_reference(prm, 0, null);
                         compiled_function_node get_func = (prm.type.find_first_in_type("Length").sym_info as compiled_property_node).get_function as compiled_function_node;
-                        local_variable var = context.create_for_temp_variable(SystemLibrary.integer_type, null) as local_variable;
-                        local_variable len_var = context.create_for_temp_variable(SystemLibrary.integer_type, null) as local_variable;
+                        local_variable var = context.create_for_temp_variable(integer_type, null) as local_variable;
+                        local_variable len_var = context.create_for_temp_variable(integer_type, null) as local_variable;
                         statements_list body = new statements_list(null);
                         //compiled_property_node item_prop = prm.type.find_in_type("Item").sym_info as compiled_property_node;
                         base_function_call cmc = null;
@@ -12355,20 +12354,20 @@ namespace PascalSharp.Internal.TreeConverter
                             cmc = new common_namespace_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as common_namespace_function_node, null);
                         else
                             cmc = new compiled_static_method_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as compiled_function_node, null);
-                        expression_node cond = new basic_function_call(SystemLibrary.int_sm as basic_function_node, null, new local_variable_reference(var, 0, null), new local_variable_reference(len_var, 0, null));
+                        expression_node cond = new basic_function_call(int_sm as basic_function_node, null, new local_variable_reference(var, 0, null), new local_variable_reference(len_var, 0, null));
                         //compiled_function_call get_item = new compiled_function_call(item_prop.get_function as compiled_function_node,cpr,null);
                         //get_item.parameters.AddElement(new local_variable_reference(var,0,null));
                         cmc.parameters.AddElement(new simple_array_indexing(cpr, new local_variable_reference(var, 0, null), prm.type.element_type, null));
                         cmc.parameters.AddElement(new int_const_node((prm.type.element_type as short_string_type_node).Length, null));
 
                         body.statements.AddElement(find_operator(compiler_string_consts.assign_name, new simple_array_indexing(cpr, new local_variable_reference(var, 0, null), prm.type.element_type, null), cmc, null));
-                        body.statements.AddElement(new basic_function_call(SystemLibrary.int_assign as basic_function_node, null, new local_variable_reference(var, 0, null),
-                                                                           new basic_function_call(SystemLibrary.int_add as basic_function_node, null, new local_variable_reference(var, 0, null), new int_const_node(1, null))));
+                        body.statements.AddElement(new basic_function_call(int_assign as basic_function_node, null, new local_variable_reference(var, 0, null),
+                                                                           new basic_function_call(int_add as basic_function_node, null, new local_variable_reference(var, 0, null), new int_const_node(1, null))));
 
 
                         while_node wn = new while_node(cond, body, null);
                         sl.statements.AddElementFirst(wn);
-                        sl.statements.AddElementFirst(new basic_function_call(SystemLibrary.int_assign as basic_function_node, null,
+                        sl.statements.AddElementFirst(new basic_function_call(int_assign as basic_function_node, null,
                                                                            new local_variable_reference(len_var, 0, null), new compiled_function_call(get_func, cpr, null)));
                     }	
         			
@@ -12379,7 +12378,7 @@ namespace PascalSharp.Internal.TreeConverter
         internal void CheckOverrideOrReintroduceExpectedWarning(location loc)
         {
             common_method_node cmn = context.top_function as common_method_node;
-            if (!current_converted_method_not_in_class_defined && cmn != null && !cmn.IsReintroduce && cmn.polymorphic_state == SemanticTree.polymorphic_state.ps_common)
+            if (!current_converted_method_not_in_class_defined && cmn != null && !cmn.IsReintroduce && cmn.polymorphic_state == polymorphic_state.ps_common)
                 if (context.FindMethodToOverride(cmn) != null)
                 {
                     WarningsList.Add(new OverrideOrReintroduceExpected(loc));
@@ -12445,7 +12444,7 @@ namespace PascalSharp.Internal.TreeConverter
                 if (context.top_function is common_method_node)
                 {
                     common_method_node cmmn = context.top_function as common_method_node;
-                    if (cmmn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                    if (cmmn.polymorphic_state != polymorphic_state.ps_static)
                     {
                         AddError(get_location(_function_header), "OVERLOADED_OPERATOR_MUST_BE_STATIC_FUNCTION");
                     }
@@ -12547,7 +12546,7 @@ namespace PascalSharp.Internal.TreeConverter
 			if (context.top_function != null && context.top_function is common_namespace_function_node && (context.top_function as common_namespace_function_node).ConnectedToType != null && !context.top_function.IsOperator)
             {
                 concrete_parameter_type cpt = concrete_parameter_type.cpt_none;
-                SemanticTree.parameter_type pt = parameter_type.value;
+                parameter_type pt = parameter_type.value;
                 if ((context.top_function as common_namespace_function_node).ConnectedToType.is_value_type)
                 {
                     cpt = concrete_parameter_type.cpt_var;
@@ -12647,7 +12646,7 @@ namespace PascalSharp.Internal.TreeConverter
         {
         	for (int i=0; i<fn.parameters.Count; i++)
         	{
-        		if (fn.parameters[i].type == SystemLibrary.char_type && fn.parameters[i].parameter_type == SemanticTree.parameter_type.var)
+        		if (fn.parameters[i].type == char_type && fn.parameters[i].parameter_type == parameter_type.var)
         			return true;
         	}
         	return false;
@@ -12696,7 +12695,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (context.top_function != null && context.top_function is common_namespace_function_node && (context.top_function as common_namespace_function_node).ConnectedToType != null && !context.top_function.IsOperator)
             {
                 concrete_parameter_type cpt = concrete_parameter_type.cpt_none;
-                SemanticTree.parameter_type pt = parameter_type.value;
+                parameter_type pt = parameter_type.value;
                 if ((context.top_function as common_namespace_function_node).ConnectedToType.is_value_type)
                 {
                     cpt = concrete_parameter_type.cpt_var;
@@ -12747,7 +12746,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (context.converted_type != null)
             {
             	common_method_node cmnode = context.top_function as common_method_node;
-            	if (cmnode != null && cmnode.polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract && body_exists)
+            	if (cmnode != null && cmnode.polymorphic_state == polymorphic_state.ps_virtual_abstract && body_exists)
             	{
             		AddError(new AbstractMethodWithBody(get_location(_procedure_header)));
             	}
@@ -12883,7 +12882,7 @@ namespace PascalSharp.Internal.TreeConverter
                                 AddError(get_location(_procedure_attributes_list.proc_attributes[i]), "{0}_KEYWORD_ALLOWED_ONLY_WITH_METHOD", _procedure_attributes_list.proc_attributes[i].name);
                             }
                             common_method_node cmn = ccfn as common_method_node;
-                            if (cmn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                            if (cmn.polymorphic_state == polymorphic_state.ps_static)
                             {
                                 AddError(get_location(_procedure_attributes_list.proc_attributes[i]), "CAN_NOT_BE_VIRTUAL_STATIC_METHOD");
                             }
@@ -12920,7 +12919,7 @@ namespace PascalSharp.Internal.TreeConverter
                                 AddError(get_location(_procedure_attributes_list.proc_attributes[i]), "{0}_KEYWORD_ALLOWED_ONLY_WITH_METHOD", _procedure_attributes_list.proc_attributes[i].name);
                             }
                             common_method_node cmn = ccfn as common_method_node;
-                            if (cmn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                            if (cmn.polymorphic_state == polymorphic_state.ps_static)
                             {
                                 AddError(get_location(_procedure_attributes_list.proc_attributes[i]), "CAN_NOT_BE_VIRTUAL_STATIC_METHOD");
                             }
@@ -12941,7 +12940,7 @@ namespace PascalSharp.Internal.TreeConverter
                             
                             context.set_override(cmn);
                             if (is_abstract)
-                                cmn.polymorphic_state = SemanticTree.polymorphic_state.ps_virtual_abstract;
+                                cmn.polymorphic_state = polymorphic_state.ps_virtual_abstract;
                             if (cmn.field_access_level < cmn.overrided_method.field_access_level)
                                 AddError(cmn.loc, "CAN_NOT_BE_DOWN_ACCESS_LEVEL_FOR_METH");
                             break;
@@ -12969,15 +12968,15 @@ namespace PascalSharp.Internal.TreeConverter
                                 AddError(get_location(_procedure_attributes_list.proc_attributes[i]), "STATIC_KEYWORD_ALLOWED_ONLY_WITH_METHOD");
                             }
                             common_method_node cmn = ccfn as common_method_node;
-                            if (cmn.polymorphic_state == SemanticTree.polymorphic_state.ps_virtual)
+                            if (cmn.polymorphic_state == polymorphic_state.ps_virtual)
                             {
                                 AddError(get_location(_procedure_attributes_list.proc_attributes[i]), "CAN_NOT_BE_VIRTUAL_STATIC_METHOD");
                             }
-                            if (cmn.polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract)
+                            if (cmn.polymorphic_state == polymorphic_state.ps_virtual_abstract)
                             {
                                 AddError(get_location(_procedure_attributes_list.proc_attributes[i]), "CANNOT_BE_ABSTRACT_STATIC_METHOD");
                             }
-                            cmn.polymorphic_state = SemanticTree.polymorphic_state.ps_static;
+                            cmn.polymorphic_state = polymorphic_state.ps_static;
                             break;
                         }
                 	case SyntaxTree.proc_attribute.attr_abstract:
@@ -12999,11 +12998,11 @@ namespace PascalSharp.Internal.TreeConverter
                             {
                                 AddError(get_location(_procedure_attributes_list.proc_attributes[i]), "ABSTRACT_METHOD_IN_RECORD");
                             }
-                			if (ccfn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                			if (ccfn.polymorphic_state == polymorphic_state.ps_static)
                             {
                                 AddError(get_location(_procedure_attributes_list.proc_attributes[i]), "CANNOT_BE_ABSTRACT_STATIC_METHOD");
                 			}
-                            cmn.polymorphic_state = SemanticTree.polymorphic_state.ps_virtual_abstract;
+                            cmn.polymorphic_state = polymorphic_state.ps_virtual_abstract;
                             if (context.converted_type.IsSealed)
                                 AddError(get_location(_procedure_attributes_list.proc_attributes[i]), "ABSTRACT_METHOD_IN_SEALED_CLASS");
                             context.converted_type.SetIsAbstract(true);
@@ -13021,7 +13020,7 @@ namespace PascalSharp.Internal.TreeConverter
                                 AddError(get_location(_procedure_attributes_list), "EXTENSION_ATTRIBUTE_ONLY_FOR_NAMESPACE_FUNCTIONS_ALLOWED");
                             if (context.top_function.parameters.Count == 0)
                                 AddError(context.top_function.loc, "EXTENSION_METHODS_MUST_HAVE_LEAST_ONE_PARAMETER");
-                            if (!context.top_function.IsOperator && context.top_function.parameters[0].parameter_type != SemanticTree.parameter_type.value)
+                            if (!context.top_function.IsOperator && context.top_function.parameters[0].parameter_type != parameter_type.value)
                                 AddError(context.top_function.loc, "FIRST_PARAMETER_SHOULDBE_ONLY_VALUE_PARAMETER");
                             if (!context.top_function.IsOperator && context.top_function.parameters[0].name.ToLower() != compiler_string_consts.self_word)
                                 AddError(context.top_function.loc,"FIRST_PARAMETER_MUST_HAVE_NAME_SELF");
@@ -13034,7 +13033,7 @@ namespace PascalSharp.Internal.TreeConverter
                             if (top_function.ConnectedToType.Scope == null)
                                 AddError(context.top_function.loc, "EXTENSION_METHODS_FOR_CONSTRUCTED_TYPES_NOT_ALLOWED");
                             top_function.ConnectedToType.Scope.AddSymbol(top_function.name, new SymbolInfo(context.top_function));
-                            if (top_function.ConnectedToType.type_special_kind == SemanticTree.type_special_kind.array_kind && top_function.ConnectedToType.element_type.is_generic_parameter)
+                            if (top_function.ConnectedToType.type_special_kind == type_special_kind.array_kind && top_function.ConnectedToType.element_type.is_generic_parameter)
                                 top_function.ConnectedToType.base_type.Scope.AddSymbol(top_function.name, new SymbolInfo(context.top_function));
                             else if (top_function.ConnectedToType.is_generic_parameter)
                                 top_function.ConnectedToType.base_type.Scope.AddSymbol(top_function.name, new SymbolInfo(context.top_function));
@@ -13044,7 +13043,7 @@ namespace PascalSharp.Internal.TreeConverter
                                 top_function.ConnectedToType.original_generic.Scope.AddSymbol(top_function.name, new SymbolInfo(context.top_function));
                             else if (top_function.ConnectedToType.IsDelegate && top_function.ConnectedToType.base_type.IsDelegate)
                                 compiled_type_node.get_type_node(typeof(Delegate)).Scope.AddSymbol(top_function.name, new SymbolInfo(context.top_function));
-                            else if (top_function.ConnectedToType.type_special_kind == SemanticTree.type_special_kind.typed_file && top_function.ConnectedToType.element_type.is_generic_parameter && SystemLibInitializer.TypedFileType.sym_info != null)
+                            else if (top_function.ConnectedToType.type_special_kind == type_special_kind.typed_file && top_function.ConnectedToType.element_type.is_generic_parameter && SystemLibInitializer.TypedFileType.sym_info != null)
                                 (SystemLibInitializer.TypedFileType.sym_info as type_node).Scope.AddSymbol(top_function.name, new SymbolInfo(context.top_function));
                             if (top_function.ConnectedToType.IsDelegate && context.top_function.IsOperator && (context.top_function.name == "+" || context.top_function.name == "-" || context.top_function.name == "+=" || context.top_function.name == "-="))
                                 AddError(get_location(_procedure_attributes_list), "CANNOT_EXTEND_STANDARD_OPERATORS_FOR_DELEGATE");
@@ -13141,39 +13140,39 @@ namespace PascalSharp.Internal.TreeConverter
             {
                 AddError(get_location(type), "STRUCT_TYPE_DEFINITION_IN_FORMAL_PARAM");
             }
-            if (context.top_function is common_method_node && (context.converted_type.IsInterface || context.top_function.polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract ) 
+            if (context.top_function is common_method_node && (context.converted_type.IsInterface || context.top_function.polymorphic_state == polymorphic_state.ps_virtual_abstract ) 
                 && (type is function_header || type is procedure_header))
                 AddError(get_location(type), "ANONYMOUS_DELEGATE_IN_INTERFACE_NOT_ALLOWED");
         }
 
         public override void visit(SyntaxTree.typed_parameters _typed_parametres)
         {
-            SemanticTree.parameter_type par_type = SemanticTree.parameter_type.value;
+            parameter_type par_type = parameter_type.value;
             concrete_parameter_type cpt = concrete_parameter_type.cpt_none;
             bool is_params = false;
             switch (_typed_parametres.param_kind)
             {
                 case SyntaxTree.parametr_kind.const_parametr:
                     {
-                        par_type = SemanticTree.parameter_type.value;
+                        par_type = parameter_type.value;
                         cpt = concrete_parameter_type.cpt_const;
                         break;
                     }
                 case SyntaxTree.parametr_kind.none:
                     {
-                        par_type = SemanticTree.parameter_type.value;
+                        par_type = parameter_type.value;
                         cpt = concrete_parameter_type.cpt_none;
                         break;
                     }
                 case SyntaxTree.parametr_kind.out_parametr:
                     {
-                        par_type = SemanticTree.parameter_type.var;
+                        par_type = parameter_type.var;
                         cpt = concrete_parameter_type.cpt_var;
                         break;
                     }
                 case SyntaxTree.parametr_kind.var_parametr:
                     {
-                        par_type = SemanticTree.parameter_type.var;
+                        par_type = parameter_type.var;
                         cpt = concrete_parameter_type.cpt_var;
                         break;
                     }
@@ -13361,7 +13360,7 @@ namespace PascalSharp.Internal.TreeConverter
             {
                 type_node ret = null;
                 type_node et = convert_strong(_array_type.elements_type);
-                //if (et == SystemLibrary.void_type)
+                //if (et == void_type)
             	//AddError(new VoidNotValid(get_location(_array_type.elemets_types)));
                 check_for_type_allowed(et,get_location(_array_type.elements_type));
                 ret = convertion_data_and_alghoritms.type_constructor.create_unsized_array(et,
@@ -13378,15 +13377,15 @@ namespace PascalSharp.Internal.TreeConverter
                 {
                     AddError(new OrdinalTypeExpected(get_location(td)));
                 }
-                if (tn.type_special_kind == SemanticTree.type_special_kind.diap_type)
+                if (tn.type_special_kind == type_special_kind.diap_type)
                 {
-                	if (tn.base_type == SystemLibrary.uint_type || tn.base_type == SystemLibrary.int64_type || 
-                	   tn.base_type == SystemLibrary.uint64_type)
+                	if (tn.base_type == uint_type || tn.base_type == int64_type || 
+                	   tn.base_type == uint64_type)
                 	//ordinal_type_interface oti = tn.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
                     AddError(get_location(td), "RANGE_TOO_LARGE");
                 }
-                else if (tn == SystemLibrary.uint_type || tn == SystemLibrary.int64_type ||
-                        tn == SystemLibrary.uint64_type)
+                else if (tn == uint_type || tn == int64_type ||
+                        tn == uint64_type)
                     AddError(get_location(td), "RANGE_TOO_LARGE");
                 ind_types.AddElement(tn);
             }
@@ -13429,7 +13428,7 @@ namespace PascalSharp.Internal.TreeConverter
                 return convert_strong_to_constant_node(exp, tn);
             if (exp is array_initializer)
             {
-            	//if (tn.type_special_kind != SemanticTree.type_special_kind.array_wrapper)
+            	//if (tn.type_special_kind != type_special_kind.array_wrapper)
             	{
             		//exp.type = DeduceType(exp.type,exp.location);
             		exp = ConvertArrayInitializer(tn, exp as array_initializer);
@@ -13442,7 +13441,7 @@ namespace PascalSharp.Internal.TreeConverter
 //            		return exp;
 //            	}
             }
-            else if (exp is compiled_static_method_call && (exp.type.type_special_kind == SemanticTree.type_special_kind.set_type || exp.type.type_special_kind == SemanticTree.type_special_kind.base_set_type))
+            else if (exp is compiled_static_method_call && (exp.type.type_special_kind == type_special_kind.set_type || exp.type.type_special_kind == type_special_kind.base_set_type))
             {
                 if (!(tn == exp.type) && !type_table.is_derived(tn, exp.type) && !(convertion_data_and_alghoritms.can_convert_type(exp, tn)))
                 {
@@ -13460,7 +13459,7 @@ namespace PascalSharp.Internal.TreeConverter
                         cmc.ret_type = tn;
                         return new compiled_static_method_call_as_constant(cmc, null);
                     }
-                    else if (tn.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                    else if (tn.element_type.type_special_kind == type_special_kind.short_string)
                     {
                         compiled_static_method_call cmc = new compiled_static_method_call(SystemLibInitializer.ClipShortStringInSetFunction.sym_info as compiled_function_node, null);
                         cmc.parameters.AddElement(exp);
@@ -13471,7 +13470,7 @@ namespace PascalSharp.Internal.TreeConverter
                 }
                 return new compiled_static_method_call_as_constant(exp as compiled_static_method_call, null);
             }
-            else if (exp is common_namespace_function_call && (exp.type.type_special_kind == SemanticTree.type_special_kind.set_type || exp.type.type_special_kind == SemanticTree.type_special_kind.base_set_type))
+            else if (exp is common_namespace_function_call && (exp.type.type_special_kind == type_special_kind.set_type || exp.type.type_special_kind == type_special_kind.base_set_type))
             {
                 if (!(tn == exp.type) && !type_table.is_derived(tn, exp.type) && !(convertion_data_and_alghoritms.can_convert_type(exp, tn)))
                 {
@@ -13489,7 +13488,7 @@ namespace PascalSharp.Internal.TreeConverter
                         cmc.ret_type = tn;
                         return new common_namespace_function_call_as_constant(cmc, null);
                     }
-                    else if (tn.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                    else if (tn.element_type.type_special_kind == type_special_kind.short_string)
                     {
                         common_namespace_function_call cmc = new common_namespace_function_call(SystemLibInitializer.ClipShortStringInSetFunction.sym_info as common_namespace_function_node, null);
                         cmc.parameters.AddElement(exp);
@@ -13565,7 +13564,7 @@ namespace PascalSharp.Internal.TreeConverter
             {
                 compiled_static_method_call csmc = expr as compiled_static_method_call;
 
-                if (/*csmc.parameters.Count == 0 &&*/ csmc.type != null && csmc.type != SystemLibrary.void_type)
+                if (/*csmc.parameters.Count == 0 &&*/ csmc.type != null && csmc.type != void_type)
                     constant = new compiled_static_method_call_as_constant(csmc, expr.location);
             }
             else if (expr is common_namespace_function_call && SystemLibInitializer.CreateSetProcedure != null && (expr as common_namespace_function_call).function_node == SystemLibInitializer.CreateSetProcedure.sym_info as common_namespace_function_node)
@@ -13635,7 +13634,7 @@ namespace PascalSharp.Internal.TreeConverter
             {
             	constant = (expr as namespace_constant_reference).constant.const_value;
             	convertion_data_and_alghoritms.check_convert_type(constant,tn,expr.location);
-            	if ((tn.type_special_kind == SemanticTree.type_special_kind.set_type || tn.type_special_kind == SemanticTree.type_special_kind.base_set_type) && tn.element_type != null)
+            	if ((tn.type_special_kind == type_special_kind.set_type || tn.type_special_kind == type_special_kind.base_set_type) && tn.element_type != null)
                 {
                     ordinal_type_interface oti = tn.element_type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
                     if (oti != null)
@@ -13647,7 +13646,7 @@ namespace PascalSharp.Internal.TreeConverter
         				cmc.ret_type = tn;
         				constant = new common_namespace_function_call_as_constant(cmc,null);
                     }
-                    else if (tn.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                    else if (tn.element_type.type_special_kind == type_special_kind.short_string)
                     {
                     	common_namespace_function_call cmc = new common_namespace_function_call(SystemLibInitializer.ClipShortStringInSetFunction.sym_info as common_namespace_function_node,null);
         				cmc.parameters.AddElement(expr);
@@ -13657,12 +13656,12 @@ namespace PascalSharp.Internal.TreeConverter
                     }
                  }
             	else
-            	if (tn.type_special_kind == SemanticTree.type_special_kind.short_string)
+            	if (tn.type_special_kind == type_special_kind.short_string)
             	{
             		/*common_namespace_function_call cmc = new common_namespace_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as common_namespace_function_node,null);
         			cmc.parameters.AddElement(expr);
         			cmc.parameters.AddElement(new int_const_node((tn as short_string_type_node).Length,null));*/
-            		expression_node cmc = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(expr,SystemLibrary.string_type),new int_const_node((tn as short_string_type_node).Length,null));
+            		expression_node cmc = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(expr,string_type),new int_const_node((tn as short_string_type_node).Length,null));
         			constant = new common_namespace_function_call_as_constant(cmc as common_namespace_function_call,null);
             	}
             	/*expression_node e = convertion_data_and_alghoritms.convert_type(constant.get_constant_copy(expr.location), tn);
@@ -13713,7 +13712,7 @@ namespace PascalSharp.Internal.TreeConverter
             {
             	constant = (expr as function_constant_reference).constant.const_value;
             	convertion_data_and_alghoritms.check_convert_type(constant,tn,expr.location);
-            	if ((tn.type_special_kind == SemanticTree.type_special_kind.set_type || tn.type_special_kind == SemanticTree.type_special_kind.base_set_type) && tn.element_type != null)
+            	if ((tn.type_special_kind == type_special_kind.set_type || tn.type_special_kind == type_special_kind.base_set_type) && tn.element_type != null)
                 {
                     ordinal_type_interface oti = tn.element_type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
                     if (oti != null)
@@ -13725,7 +13724,7 @@ namespace PascalSharp.Internal.TreeConverter
         				cmc.ret_type = tn;
         				constant = new common_namespace_function_call_as_constant(cmc,null);
                     }
-                    else if (tn.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                    else if (tn.element_type.type_special_kind == type_special_kind.short_string)
                     {
                     	common_namespace_function_call cmc = new common_namespace_function_call(SystemLibInitializer.ClipShortStringInSetFunction.sym_info as common_namespace_function_node,null);
         				cmc.parameters.AddElement(expr);
@@ -13735,12 +13734,12 @@ namespace PascalSharp.Internal.TreeConverter
                     }
                  }
             	else
-            	if (tn.type_special_kind == SemanticTree.type_special_kind.short_string)
+            	if (tn.type_special_kind == type_special_kind.short_string)
             	{
             		/*common_namespace_function_call cmc = new common_namespace_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as common_namespace_function_node,null);
         			cmc.parameters.AddElement(expr);
         			cmc.parameters.AddElement(new int_const_node((tn as short_string_type_node).Length,null));*/
-            		expression_node cmc = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(expr,SystemLibrary.string_type),new int_const_node((tn as short_string_type_node).Length,null));
+            		expression_node cmc = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(expr,string_type),new int_const_node((tn as short_string_type_node).Length,null));
         			constant = new common_namespace_function_call_as_constant(cmc as common_namespace_function_call,null);
             	}
             	return constant;
@@ -13753,12 +13752,12 @@ namespace PascalSharp.Internal.TreeConverter
             else
             {
                 constant = expr as constant_node;
-                if (tn.type_special_kind == SemanticTree.type_special_kind.short_string)
+                if (tn.type_special_kind == type_special_kind.short_string)
                 {
                     /*common_namespace_function_call cmc = new common_namespace_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as common_namespace_function_node,null);
                     cmc.parameters.AddElement(expr);
                     cmc.parameters.AddElement(new int_const_node((tn as short_string_type_node).Length,null));*/
-                    expression_node cmc = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node, null, convertion_data_and_alghoritms.convert_type(expr, SystemLibrary.string_type), new int_const_node((tn as short_string_type_node).Length, null));
+                    expression_node cmc = convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node, null, convertion_data_and_alghoritms.convert_type(expr, string_type), new int_const_node((tn as short_string_type_node).Length, null));
                     if (cmc is common_namespace_function_call)
                         constant = new common_namespace_function_call_as_constant(cmc as common_namespace_function_call, null);
                     else
@@ -13787,7 +13786,7 @@ namespace PascalSharp.Internal.TreeConverter
             else
                 if (tn is common_type_node)
                 {
-                    if (tn.type_special_kind != SemanticTree.type_special_kind.set_type && tn.type_special_kind != SemanticTree.type_special_kind.base_set_type && tn.type_special_kind != SemanticTree.type_special_kind.diap_type)
+                    if (tn.type_special_kind != type_special_kind.set_type && tn.type_special_kind != type_special_kind.base_set_type && tn.type_special_kind != type_special_kind.diap_type)
                     {
                         if (!tn.is_value)
                         {
@@ -13810,7 +13809,7 @@ namespace PascalSharp.Internal.TreeConverter
                             AddError(loc, "RECORD_CONST_EXPECTED");
                         constant = ConvertRecordConst(tn as common_type_node, constant as record_constant);
                     }
-                    else if (tn.type_special_kind == SemanticTree.type_special_kind.diap_type)
+                    else if (tn.type_special_kind == type_special_kind.diap_type)
                     {
                     	constant = expr as constant_node;
                     	if (constant == null)
@@ -13858,7 +13857,7 @@ namespace PascalSharp.Internal.TreeConverter
                                 else
                                     constant = new compiled_static_method_call_as_constant(cmc as compiled_static_method_call, null);
                     		}
-                    		else if (tn.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                    		else if (tn.element_type.type_special_kind == type_special_kind.short_string)
                     		{
                                 base_function_call cmc = null;
                                 if (SystemLibInitializer.ClipShortStringInSetFunction.sym_info is common_namespace_function_node)
@@ -13994,11 +13993,11 @@ namespace PascalSharp.Internal.TreeConverter
                     	return cnst;
                     }
                 }
-            else if (tn == SystemLibrary.complex_type && constant.element_values.Count == 2)
+            else if (tn == complex_type && constant.element_values.Count == 2)
             {
-                compiled_constructor_call cccall = new compiled_constructor_call(SystemLibrary.complex_type_constructor, null);
-                cccall.parameters.AddElement(convertion_data_and_alghoritms.convert_type(constant.element_values[0], SystemLibrary.double_type));
-                cccall.parameters.AddElement(convertion_data_and_alghoritms.convert_type(constant.element_values[1], SystemLibrary.double_type));
+                compiled_constructor_call cccall = new compiled_constructor_call(complex_type_constructor, null);
+                cccall.parameters.AddElement(convertion_data_and_alghoritms.convert_type(constant.element_values[0], double_type));
+                cccall.parameters.AddElement(convertion_data_and_alghoritms.convert_type(constant.element_values[1], double_type));
                 compiled_constructor_call_as_constant cccall_cnst = new compiled_constructor_call_as_constant(cccall, null);
                 return cccall_cnst;
             }
@@ -14143,8 +14142,8 @@ namespace PascalSharp.Internal.TreeConverter
                 }
                 else
                 {
-                    if (!tn.is_value /*&& tn.type_special_kind != SemanticTree.type_special_kind.array_kind && tn.type_special_kind != SemanticTree.type_special_kind.set_type && tn.type_special_kind != SemanticTree.type_special_kind.array_wrapper && tn.type_special_kind != SemanticTree.type_special_kind.binary_file
-                        && tn.type_special_kind != SemanticTree.type_special_kind.binary_file*/ && !(tn is ref_type_node) && tn != SystemLibrary.pointer_type && tn.type_special_kind != SemanticTree.type_special_kind.short_string && tn.type_special_kind != SemanticTree.type_special_kind.diap_type && !tn.IsEnum &&
+                    if (!tn.is_value /*&& tn.type_special_kind != type_special_kind.array_kind && tn.type_special_kind != type_special_kind.set_type && tn.type_special_kind != type_special_kind.array_wrapper && tn.type_special_kind != type_special_kind.binary_file
+                        && tn.type_special_kind != type_special_kind.binary_file*/ && !(tn is ref_type_node) && tn != pointer_type && tn.type_special_kind != type_special_kind.short_string && tn.type_special_kind != type_special_kind.diap_type && !tn.IsEnum &&
                         !(tn.semantic_node_type == semantic_node_type.indefinite_type))
                         AddError(get_location(_ref_type), "POINTERS_OF_REF_TYPES_NOT_ALLOWED");
                 }
@@ -14159,7 +14158,7 @@ namespace PascalSharp.Internal.TreeConverter
                 }
                 else
                 {
-                	return_value(SystemLibrary.pointer_type);
+                	return_value(pointer_type);
                 }
             }
         }
@@ -14208,7 +14207,7 @@ namespace PascalSharp.Internal.TreeConverter
             type_node btn = null;
             if (tn is ref_type_node)
                 return FindBadTypeNodeForPointersInDotNetFramework((tn as ref_type_node).pointed_type);
-            if (tn == SystemLibrary.pointer_type || tn == SystemLibrary.void_type)
+            if (tn == pointer_type || tn == void_type)
                 return null;
             if (tn.is_value)
             {
@@ -14225,7 +14224,7 @@ namespace PascalSharp.Internal.TreeConverter
                 }
                 if (tn is common_type_node)
                 {
-                	if (tn.IsEnum || tn.type_special_kind == SemanticTree.type_special_kind.diap_type) return null;
+                	if (tn.IsEnum || tn.type_special_kind == type_special_kind.diap_type) return null;
                 	common_type_node ctn = tn as common_type_node;
                     foreach (class_field cf in ctn.fields)
                         if ((btn = FindBadTypeNodeForPointersInDotNetFramework(cf.type)) != null)
@@ -14251,9 +14250,9 @@ namespace PascalSharp.Internal.TreeConverter
                 bounded_array_interface bai = (bounded_array_interface)el_type.get_internal_interface(internal_interface_kind.bounded_array_interface);
                 return CanUseThisTypeForTypedFiles(bai.element_type);
             }*/
-            if (tn == SystemLibrary.string_type || tn.type_special_kind == SemanticTree.type_special_kind.set_type || tn.type_special_kind == SemanticTree.type_special_kind.short_string || tn.type_special_kind == SemanticTree.type_special_kind.array_wrapper
-               || tn.type_special_kind == SemanticTree.type_special_kind.typed_file || tn.type_special_kind == SemanticTree.type_special_kind.binary_file || tn.type_special_kind == SemanticTree.type_special_kind.text_file
-              || tn.type_special_kind == SemanticTree.type_special_kind.array_kind) return null;
+            if (tn == string_type || tn.type_special_kind == type_special_kind.set_type || tn.type_special_kind == type_special_kind.short_string || tn.type_special_kind == type_special_kind.array_wrapper
+               || tn.type_special_kind == type_special_kind.typed_file || tn.type_special_kind == type_special_kind.binary_file || tn.type_special_kind == type_special_kind.text_file
+              || tn.type_special_kind == type_special_kind.array_kind) return null;
             return tn;
         }
 
@@ -14267,7 +14266,7 @@ namespace PascalSharp.Internal.TreeConverter
                     SyntaxTree.if_node _if_node = stmt as SyntaxTree.if_node;
 
                     expression_node condition = convert_strong(_if_node.condition);
-                    condition = convertion_data_and_alghoritms.convert_type(condition, SystemLibrary.bool_type);
+                    condition = convertion_data_and_alghoritms.convert_type(condition, bool_type);
 
                     statements_list sl = new statements_list(get_location(_if_node.then_body));
                     convertion_data_and_alghoritms.statement_list_stack_push(sl);
@@ -14320,7 +14319,7 @@ namespace PascalSharp.Internal.TreeConverter
         public override void visit(SyntaxTree.if_node _if_node)
         {
             expression_node condition = convert_strong(_if_node.condition);
-            condition = convertion_data_and_alghoritms.convert_type(condition, SystemLibrary.bool_type);
+            condition = convertion_data_and_alghoritms.convert_type(condition, bool_type);
 
             // SSM 29/08/16
             var cc = condition as bool_const_node;
@@ -14375,7 +14374,7 @@ namespace PascalSharp.Internal.TreeConverter
         public override void visit(SyntaxTree.while_node _while_node)
         {
             expression_node expr = convert_strong(_while_node.expr);
-            expr = convertion_data_and_alghoritms.convert_type(expr, SystemLibrary.bool_type);
+            expr = convertion_data_and_alghoritms.convert_type(expr, bool_type);
 
             CheckToEmbeddedStatementCannotBeADeclaration(_while_node.statements);
 
@@ -14423,7 +14422,7 @@ namespace PascalSharp.Internal.TreeConverter
 
             rep.body = st;
             expression_node expr = convert_strong(_repeat_node.expr);
-            expr = convertion_data_and_alghoritms.convert_type(expr, SystemLibrary.bool_type);
+            expr = convertion_data_and_alghoritms.convert_type(expr, bool_type);
             rep.condition = expr;
             context.cycle_stack.pop();
             return_value(rep);
@@ -14434,7 +14433,7 @@ namespace PascalSharp.Internal.TreeConverter
 
         private expression_node additional_indexer_convertion(expression_node ind_expr, type_node array_type)
         {
-            return convertion_data_and_alghoritms.convert_type(ind_expr, SystemLibrary.integer_type);
+            return convertion_data_and_alghoritms.convert_type(ind_expr, integer_type);
         }
 
         private void indexer_as_expression_index(expression_node expr, SyntaxTree.expression_list parameters,
@@ -14479,7 +14478,7 @@ namespace PascalSharp.Internal.TreeConverter
             }
             // end SSM 09.01.16 Tuple t[i]
 
-            if (expr.type.type_special_kind == SemanticTree.type_special_kind.array_kind)
+            if (expr.type.type_special_kind == type_special_kind.array_kind)
             {
                 internal_interface ii = expr.type.get_internal_interface(internal_interface_kind.unsized_array_interface);
                 array_internal_interface aii = (array_internal_interface)ii;
@@ -14537,7 +14536,7 @@ namespace PascalSharp.Internal.TreeConverter
                 }
                 return;
             }
-            else if (expr.type.type_special_kind == SemanticTree.type_special_kind.short_string)
+            else if (expr.type.type_special_kind == type_special_kind.short_string)
             {
             	if (parameters.expressions.Count != 1)
                     AddError(loc, "INVALID_PARAMETER_COUNT_IN_INDEXER");
@@ -14548,7 +14547,7 @@ namespace PascalSharp.Internal.TreeConverter
                 {
                     case motivation.address_reciving:
                         {
-                            simple_array_indexing sai = new simple_array_indexing(expr, ind_expr, SystemLibrary.char_type, loc);
+                            simple_array_indexing sai = new simple_array_indexing(expr, ind_expr, char_type, loc);
                             return_addressed_value(sai);
                             //return_addressed_value(convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.SetCharInShortStringProcedure.sym_info as function_node,loc,expr,ind_expr) as common_namespace_function_call);
                             break;
@@ -14567,7 +14566,7 @@ namespace PascalSharp.Internal.TreeConverter
                 return;
             	
             }
-            /*else if (expr.type.type_special_kind == SemanticTree.type_special_kind.array_wrapper)
+            /*else if (expr.type.type_special_kind == type_special_kind.array_wrapper)
             {
             	internal_interface ii = expr.type.get_internal_interface(internal_interface_kind.bounded_array_interface);
                 array_internal_interface aii = (array_internal_interface)ii;
@@ -14585,7 +14584,7 @@ namespace PascalSharp.Internal.TreeConverter
                     }
                     aii = (array_internal_interface)ii;
                     ind_expr = convert_strong(parameters.expressions[i]);
-                    ind_expr = create_simple_function_call(SystemLibrary.int_sub, cmc.location, ind_expr,
+                    ind_expr = create_simple_function_call(int_sub, cmc.location, ind_expr,
                                             new int_const_node(ii.ordinal_type_interface.ordinal_type_to_int(bai.ordinal_type_interface.lower_value),cmc.location));
                     ind_expr = additional_indexer_convertion(ind_expr, sai.type);
                     sai = new simple_array_indexing(sai, ind_expr, aii.element_type, lloc);
@@ -14622,9 +14621,9 @@ namespace PascalSharp.Internal.TreeConverter
                                         class_field cf = bai.int_array;
                                         expression_node left = new class_field_reference(cf, cmc.obj, cmc.location);
                                         expression_node right = cmc.parameters[0];
-                                        //right = convert_type(right, SystemLibrary.integer_type);
+                                        //right = convert_type(right, integer_type);
                                         right = convert_type(right, (ii as bounded_array_interface).ordinal_type_interface.elems_type);
-                                        right = create_simple_function_call(SystemLibrary.int_sub, cmc.location, right,
+                                        right = create_simple_function_call(int_sub, cmc.location, right,
                                             new int_const_node(bai.ordinal_type_interface.ordinal_type_to_int(bai.ordinal_type_interface.lower_value),cmc.location));
                                         factparams[i] = new simple_array_indexing(left, right, cmc.type, cmc.location);
                                         is_pascal_array_ref = true;
@@ -14644,14 +14643,14 @@ namespace PascalSharp.Internal.TreeConverter
                 }
             }
 
-            if (expr.type.default_property_node.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+            if (expr.type.default_property_node.polymorphic_state == polymorphic_state.ps_static)
             {
                 AddError(new CanNotReferenceToStaticPropertyWithExpression(expr.type.default_property_node, loc, expr.type));
             }
             non_static_property_reference nspr = new non_static_property_reference(expr.type.default_property_node, expr, loc);
             indexer_as_property_indexes(nspr, parameters, mot, loc);
             //eto vrode rabotaet normalno. no imet v vidu
-            if (expr.type.type_special_kind == SemanticTree.type_special_kind.array_wrapper)
+            if (expr.type.type_special_kind == type_special_kind.array_wrapper)
             {
             	expression_node en = ret.get_expression();
                 if (en is non_static_property_reference)
@@ -14666,9 +14665,9 @@ namespace PascalSharp.Internal.TreeConverter
                             class_field cf = bai.int_array;
                             expression_node left = new class_field_reference(cf, cmc.expression, cmc.location);
                             expression_node right = cmc.fact_parametres[0];
-                            //right = convert_type(right, SystemLibrary.integer_type);
+                            //right = convert_type(right, integer_type);
                             right = convertion_data_and_alghoritms.convert_type(right, (ii as bounded_array_interface).ordinal_type_interface.elems_type);
-                            right = convertion_data_and_alghoritms.create_simple_function_call(SystemLibrary.int_sub, cmc.location, right,
+                            right = convertion_data_and_alghoritms.create_simple_function_call(int_sub, cmc.location, right,
                                                 new int_const_node(bai.ordinal_type_interface.ordinal_type_to_int(bai.ordinal_type_interface.lower_value), cmc.location));
                             en = new simple_array_indexing(left, right, cmc.type, cmc.location);
                             //is_pascal_array_ref = true;
@@ -14687,9 +14686,9 @@ namespace PascalSharp.Internal.TreeConverter
                             class_field cf = bai.int_array;
                             expression_node left = new class_field_reference(cf, cmc.obj, cmc.location);
                             expression_node right = cmc.parameters[0];
-                            //right = convert_type(right, SystemLibrary.integer_type);
+                            //right = convert_type(right, integer_type);
                             right = convertion_data_and_alghoritms.convert_type(right, (ii as bounded_array_interface).ordinal_type_interface.elems_type);
-                            right = convertion_data_and_alghoritms.create_simple_function_call(SystemLibrary.int_sub, cmc.location, right,
+                            right = convertion_data_and_alghoritms.create_simple_function_call(int_sub, cmc.location, right,
                                                 new int_const_node(bai.ordinal_type_interface.ordinal_type_to_int(bai.ordinal_type_interface.lower_value), cmc.location));
                             en = new simple_array_indexing(left, right, cmc.type, cmc.location);
                             //is_pascal_array_ref = true;
@@ -14716,7 +14715,7 @@ namespace PascalSharp.Internal.TreeConverter
                     AddError(loc, "NO_DEFAULT_PROPERTY_TO_FUNCTION_TYPE");
                 }
             }
-            if (type.default_property_node.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+            if (type.default_property_node.polymorphic_state != polymorphic_state.ps_static)
             {
                 AddError(new CanNotReferenceToNonStaticPropertyWithType(type.default_property_node, loc, type));
             }
@@ -14848,7 +14847,7 @@ namespace PascalSharp.Internal.TreeConverter
                 {
                     //String 1 based
                     if (parameters.expressions.Count == 1 &&
-                       nspr.property.comprehensive_type == SystemLibrary.string_type &&
+                       nspr.property.comprehensive_type == string_type &&
                        !SemanticRules.NullBasedStrings)
                     {
                         nspr.fact_parametres.AddElement(
@@ -14957,7 +14956,7 @@ namespace PascalSharp.Internal.TreeConverter
                 if (sil.First().sym_info.general_node_type == general_node_type.property_node)
                 {
                     property_node pn = (property_node)sil.First().sym_info;
-                    if (pn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                    if (pn.polymorphic_state == polymorphic_state.ps_static)
                     {
                         static_property_reference spr = new static_property_reference(pn, get_location(idi));
                         indexer_as_property_indexes(spr, _indexer.indexes, mot, get_location(idi));
@@ -15043,7 +15042,7 @@ namespace PascalSharp.Internal.TreeConverter
                                 if (sil.First().sym_info.general_node_type == general_node_type.property_node)
                                 {
                                     property_node pn = (property_node)sil.First().sym_info;
-                                    if (pn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                                    if (pn.polymorphic_state == polymorphic_state.ps_static)
                                     {
                                         AddError(new CanNotReferenceToStaticPropertyWithExpression(pn, get_location(dotnd), ex.type));
                                     }
@@ -15227,7 +15226,7 @@ namespace PascalSharp.Internal.TreeConverter
                     mc.dereferencing_value = new dot_node(new ident("Tuple"), new ident("Create"));
                     return mc;
                 }
-                else if (expr is SyntaxTree.bracket_expr && (tn.type_special_kind == SemanticTree.type_special_kind.array_kind || tn.type_special_kind == SemanticTree.type_special_kind.array_wrapper))
+                else if (expr is SyntaxTree.bracket_expr && (tn.type_special_kind == type_special_kind.array_kind || tn.type_special_kind == type_special_kind.array_wrapper))
                 {
                     array_internal_interface aii = tn.get_internal_interface(internal_interface_kind.unsized_array_interface) as array_internal_interface;
                     if (aii != null && aii.rank > 1)
@@ -15238,7 +15237,7 @@ namespace PascalSharp.Internal.TreeConverter
                     arr.elements.expressions.Add(get_possible_array_const((expr as SyntaxTree.bracket_expr).expr, tn.element_type));
                     return arr;
                 }
-                else if (expr is SyntaxTree.array_const && (tn.type_special_kind == SemanticTree.type_special_kind.array_kind || tn.type_special_kind == SemanticTree.type_special_kind.array_wrapper))
+                else if (expr is SyntaxTree.array_const && (tn.type_special_kind == type_special_kind.array_kind || tn.type_special_kind == type_special_kind.array_wrapper))
                 {
                     array_internal_interface aii = tn.get_internal_interface(internal_interface_kind.unsized_array_interface) as array_internal_interface;
                     if (aii != null && aii.rank > 1)
@@ -15376,9 +15375,9 @@ namespace PascalSharp.Internal.TreeConverter
             foreach (SyntaxTree.ident id in _var_def_statement.vars.idents)
             {
                 location lid = get_location(id);
-                SemanticTree.polymorphic_state ps = SemanticTree.polymorphic_state.ps_common;
+                polymorphic_state ps = polymorphic_state.ps_common;
                 if (_var_def_statement.var_attr == SyntaxTree.definition_attribute.Static)
-                    ps = SemanticTree.polymorphic_state.ps_static;
+                    ps = polymorphic_state.ps_static;
                 if (!is_event)
                 {
                 	var_definition_node vdn = context.add_var_definition(id.name, lid, ps);
@@ -15392,7 +15391,7 @@ namespace PascalSharp.Internal.TreeConverter
 				{
                     event_node ce = null;
                     if (context.converted_type != null && context.converted_type.IsInterface)
-                        ps = SemanticTree.polymorphic_state.ps_virtual_abstract;
+                        ps = polymorphic_state.ps_virtual_abstract;
                     if (context.converted_type != null)
                         ce = context.add_event_definition(id.name, lid, tn, ps, context.converted_type.IsInterface);
                     else if (context.top_function == null)
@@ -15425,7 +15424,7 @@ namespace PascalSharp.Internal.TreeConverter
         		AddError(new CircuralityInPointer(loc));
         	if (right is ref_type_node)
         		CheckForCircularityInPointers(left, (right as ref_type_node).pointed_type, loc);
-        	else if (right.type_special_kind == SemanticTree.type_special_kind.array_kind || right.type_special_kind == SemanticTree.type_special_kind.array_wrapper)
+        	else if (right.type_special_kind == type_special_kind.array_kind || right.type_special_kind == type_special_kind.array_wrapper)
         		CheckForCircularityInPointers(left,right.element_type,loc);
         }
 
@@ -15441,13 +15440,13 @@ namespace PascalSharp.Internal.TreeConverter
                 if (ctn.is_value_type)
                 {
                     foreach (class_field fld in ctn.fields)
-                        if (fld.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                        if (fld.polymorphic_state != polymorphic_state.ps_static)
                             CheckForCircuralInRecord(fld.type, loc);
                 }
                 else
                 {
                     foreach (class_field fld in ctn.fields)
-                        if (fld.polymorphic_state != SemanticTree.polymorphic_state.ps_static && fld.type is simple_array)
+                        if (fld.polymorphic_state != polymorphic_state.ps_static && fld.type is simple_array)
                             CheckForCircuralInRecord((fld.type as simple_array).element_type, loc);
                 }
             }
@@ -15529,7 +15528,7 @@ namespace PascalSharp.Internal.TreeConverter
                 case general_node_type.property_node:
                     {
                         property_node pn = (property_node)dn;
-                        if (pn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                        if (pn.polymorphic_state == polymorphic_state.ps_static)
                         {
                             static_property_reference spr = new static_property_reference(pn, lloc);
                             return spr;
@@ -15643,7 +15642,7 @@ namespace PascalSharp.Internal.TreeConverter
                         {
                             AddError(new ThisPropertyCanNotBeReaded(pn, lloc));
                         }
-                        if (pn.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                        if (pn.polymorphic_state == polymorphic_state.ps_static)
                         {
                             return create_static_method_call(fn, lloc, pn.comprehensive_type, false);
                         }
@@ -15796,7 +15795,7 @@ namespace PascalSharp.Internal.TreeConverter
                 SymbolInfoList sil = context.top_function.scope.FindOnlyInScope(_ident.name);//context.find_only_in_namespace(_ident.name);
                 if (sil == null)
                 {
-                    int comp = SystemLibrary.string_comparer.Compare(_ident.name, context.top_function.name);
+                    int comp = string_comparer.Compare(_ident.name, context.top_function.name);
                     if (comp == 0)
                     {
                         local_variable lv = context.top_function.return_variable;
@@ -15838,7 +15837,7 @@ namespace PascalSharp.Internal.TreeConverter
                 case semantic_node_type.class_field:
                     {
                         class_field cf = (class_field)dn;
-                        if (cf.polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                        if (cf.polymorphic_state == polymorphic_state.ps_static)
                         {
                             return new static_class_field_reference(cf, lloc);
                         }
@@ -15879,14 +15878,14 @@ namespace PascalSharp.Internal.TreeConverter
             if (sil != null) 
             if (sil.First().sym_info is common_method_node)
             {
-            	if ((sil.First().sym_info as common_method_node).polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract)
+            	if ((sil.First().sym_info as common_method_node).polymorphic_state == polymorphic_state.ps_virtual_abstract)
                     AddError(get_location(_ident), "CANNOT_CALL_ABSTRACT_METHOD");
             	constr = (sil.First().sym_info as common_method_node).is_constructor;
             }
             else
             if (sil.First().sym_info is compiled_function_node)
             {
-            	if ((sil.First().sym_info as compiled_function_node).polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract)
+            	if ((sil.First().sym_info as compiled_function_node).polymorphic_state == polymorphic_state.ps_virtual_abstract)
                     AddError(get_location(_ident), "CANNOT_CALL_ABSTRACT_METHOD");
             }
             else if (sil.First().sym_info is compiled_constructor_node)
@@ -15900,7 +15899,7 @@ namespace PascalSharp.Internal.TreeConverter
             int depth = context.converted_func_stack.size-1;
             if (!constr)
             {
-            	if (fn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+            	if (fn.polymorphic_state != polymorphic_state.ps_static)
             	{
             		bfc = create_not_static_method_call(fn,new this_node(context.converted_type,loc),loc,true);
             		if (bfc is common_method_call)
@@ -15953,13 +15952,13 @@ namespace PascalSharp.Internal.TreeConverter
             if (sil != null) 
             if (sil.First().sym_info is common_method_node)
             {
-            	if ((sil.First().sym_info as common_method_node).polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract)
+            	if ((sil.First().sym_info as common_method_node).polymorphic_state == polymorphic_state.ps_virtual_abstract)
                     AddError(get_location(_ident), "CANNOT_CALL_ABSTRACT_METHOD");
             }
             else
             if (sil.First().sym_info is compiled_function_node)
             {
-            	if ((sil.First().sym_info as compiled_function_node).polymorphic_state == SemanticTree.polymorphic_state.ps_virtual_abstract)
+            	if ((sil.First().sym_info as compiled_function_node).polymorphic_state == polymorphic_state.ps_virtual_abstract)
                     AddError(get_location(_ident), "CANNOT_CALL_ABSTRACT_METHOD");
             }
             return ident_value_reciving(sil, _ident);
@@ -16169,7 +16168,7 @@ namespace PascalSharp.Internal.TreeConverter
             expression_node res = find_operator(_bin_expr.operation_type, left, right, get_location(_bin_expr));
             if (res.type is undefined_type)
                 AddError(get_location(_bin_expr), "OPERATOR_RETURN_TYPE_UNDEFINED_{0}", name_reflector.get_name(_bin_expr.operation_type));
-            if (res.type.type_special_kind == SemanticTree.type_special_kind.base_set_type)
+            if (res.type.type_special_kind == type_special_kind.base_set_type)
             {
                 if (left.type.element_type == right.type.element_type)
                     res.type = left.type;
@@ -16178,7 +16177,7 @@ namespace PascalSharp.Internal.TreeConverter
                 else if (type_table.compare_types(left.type, right.type) == type_compare.less_type)
                     res.type = right.type;
                 else if (type_table.compare_types(left.type, right.type) == type_compare.non_comparable_type)
-                    res.type = context.create_set_type(SystemLibrary.object_type, get_location(_bin_expr));
+                    res.type = context.create_set_type(object_type, get_location(_bin_expr));
             }
             //ssyy, 15.05.2009
             switch (_bin_expr.operation_type)
@@ -16188,12 +16187,12 @@ namespace PascalSharp.Internal.TreeConverter
                     if (left.type.is_generic_parameter && right.type.is_generic_parameter)
                     {
                         compiled_static_method_call cfc = new compiled_static_method_call(
-                            SystemLibrary.object_equals_method, get_location(_bin_expr));
+                            object_equals_method, get_location(_bin_expr));
                         cfc.parameters.AddElement(left);
                         cfc.parameters.AddElement(right);
                         if (_bin_expr.operation_type == Operators.NotEqual)
                         {
-                            res = new basic_function_call(SystemLibrary.bool_not as basic_function_node, get_location(_bin_expr), cfc);
+                            res = new basic_function_call(bool_not as basic_function_node, get_location(_bin_expr), cfc);
                         }
                         else
                         {
@@ -16322,8 +16321,8 @@ namespace PascalSharp.Internal.TreeConverter
             #region MikhailoMMX, обработка omp parallel section
             bool isGenerateParallel = false;
             bool isGenerateSequential = true;
-            if (OpenMP.SectionsFound)                               //если в программе есть хоть одна директива parallel sections - проверяем:
-                if (DirectivesToNodesLinks.ContainsKey(_statement_list) && OpenMP.IsParallelSectionsDirective(DirectivesToNodesLinks[_statement_list]))
+            if (OpenMP.OpenMP.SectionsFound)                               //если в программе есть хоть одна директива parallel sections - проверяем:
+                if (DirectivesToNodesLinks.ContainsKey(_statement_list) && OpenMP.OpenMP.IsParallelSectionsDirective(DirectivesToNodesLinks[_statement_list]))
                 {
                     //перед этим узлом есть директива parallel sections
                     if (CurrentParallelPosition == ParallelPosition.Outside)            //входим в самый внешний параллельный sections
@@ -16388,7 +16387,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (isGenerateParallel)
             {
                 CurrentParallelPosition = ParallelPosition.InsideParallel;
-                statements_list omp_stl = OpenMP.TryConvertSections(stl, _statement_list, this);
+                statements_list omp_stl = OpenMP.OpenMP.TryConvertSections(stl, _statement_list, this);
                 CurrentParallelPosition = ParallelPosition.Outside;
                 if (omp_stl != null)
                 {
@@ -16410,7 +16409,7 @@ namespace PascalSharp.Internal.TreeConverter
         {
         	foreach (attribute_node attr in cfn.attributes)
         	{
-        		if (attr.attribute_type == SystemLibrary.dllimport_type)
+        		if (attr.attribute_type == dllimport_type)
         			return true;
         	}
         	return false;
@@ -16429,7 +16428,7 @@ namespace PascalSharp.Internal.TreeConverter
         {
         	foreach (attribute_node attr in cfn.attributes)
         	{
-        		if (attr.attribute_type == SystemLibrary.dllimport_type)
+        		if (attr.attribute_type == dllimport_type)
         			return attr;
         	}
         	return null;
@@ -16439,7 +16438,7 @@ namespace PascalSharp.Internal.TreeConverter
         {
             string module_name = "";
             string name = "";
-            if (context.converted_func_stack.top() is common_method_node && (context.converted_func_stack.top() as common_method_node).polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+            if (context.converted_func_stack.top() is common_method_node && (context.converted_func_stack.top() as common_method_node).polymorphic_state != polymorphic_state.ps_static)
                 AddError(context.top_function.loc, "EXTERNAL_METHOD_SHOULD_BE_STATIC");
             if (_external_directive.modulename == null)
             {
@@ -16530,7 +16529,7 @@ namespace PascalSharp.Internal.TreeConverter
             }
             if (_return_stmt.expr == null)
             {
-                if (context.top_function.return_value_type != null && context.top_function.return_value_type != SystemLibrary.void_type)
+                if (context.top_function.return_value_type != null && context.top_function.return_value_type != void_type)
                 {
                     AddError(get_location(_return_stmt), "FUNCTION_SHOULD_RETURN_VALUE");
                     ret.return_value(new empty_statement(null));
@@ -16541,7 +16540,7 @@ namespace PascalSharp.Internal.TreeConverter
             else
             {
                 type_node rettype = context.top_function.return_value_type;
-                if (rettype == null || rettype == SystemLibrary.void_type)
+                if (rettype == null || rettype == void_type)
                 {
                     AddError(get_location(_return_stmt.expr), "FUNCTION_SHOULD_NOT_RETURN_VALUE");
                     ret.return_value(new empty_statement(null));
@@ -16564,7 +16563,7 @@ namespace PascalSharp.Internal.TreeConverter
             compiled_type_node ctn = compiled_type_node.get_type_node(NetHelper.FindType(compiler_string_consts.IEnumerableInterfaceName));
             if (tn == ctn)
                 return true;
-            foreach (SemanticTree.ITypeNode itn in tn.ImplementingInterfaces)
+            foreach (ITypeNode itn in tn.ImplementingInterfaces)
             {
                 if (itn == ctn)
                 {
@@ -16660,11 +16659,11 @@ namespace PascalSharp.Internal.TreeConverter
                     }
 
                     var ttt = tn.ImplementingInterfaces;
-                    foreach (SemanticTree.ITypeNode itn in tn.ImplementingInterfaces)
+                    foreach (ITypeNode itn in tn.ImplementingInterfaces)
                     {
                         if (itn == ctn)
                         {
-                            elem_type = SystemLibrary.object_type;
+                            elem_type = object_type;
                             sys_coll_ienum = true;
                             return true;
                         }
@@ -16696,7 +16695,7 @@ namespace PascalSharp.Internal.TreeConverter
                     return true;
                 }
 
-                foreach (SemanticTree.ITypeNode itn in tn.ImplementingInterfaces) // Ищем интерфейс IEnumerable<T> и возвращаем T в качестве elem_type
+                foreach (ITypeNode itn in tn.ImplementingInterfaces) // Ищем интерфейс IEnumerable<T> и возвращаем T в качестве elem_type
                 {
                     if (itn is compiled_generic_instance_type_node)
                     {
@@ -16710,7 +16709,7 @@ namespace PascalSharp.Internal.TreeConverter
                     }
                 }
 
-                foreach (SemanticTree.ITypeNode itn in tn.ImplementingInterfaces) // если не нашли - ищем интерфейс IEnumerable и возвращаем object в качестве elem_type
+                foreach (ITypeNode itn in tn.ImplementingInterfaces) // если не нашли - ищем интерфейс IEnumerable и возвращаем object в качестве elem_type
                 {
                     if (itn is compiled_type_node)
                     {
@@ -16728,7 +16727,7 @@ namespace PascalSharp.Internal.TreeConverter
                         else */
                         if (itn == ctn)
                         {
-                            elem_type = SystemLibrary.object_type;
+                            elem_type = object_type;
                             sys_coll_ienum = true;
                             return true;
                         }
@@ -16763,7 +16762,7 @@ namespace PascalSharp.Internal.TreeConverter
         public override void visit(SyntaxTree.question_colon_expression node)
         {
             expression_node condition = convert_strong(node.condition);
-            condition = convertion_data_and_alghoritms.convert_type(condition, SystemLibrary.bool_type);
+            condition = convertion_data_and_alghoritms.convert_type(condition, bool_type);
             expression_node left = convert_strong(node.ret_if_true);
             expression_node right = convert_strong(node.ret_if_false);
 
@@ -17010,7 +17009,7 @@ namespace PascalSharp.Internal.TreeConverter
             context.last_created_function = null;
             bool current_record_created = _record_created;
             _record_created = false;
-            SemanticTree.field_access_level current_fal = context.get_field_access_level();
+            field_access_level current_fal = context.get_field_access_level();
             document current_doc = current_document;
             current_document = tc.cur_document;
             bool current_body_exists = body_exists;
@@ -17021,7 +17020,7 @@ namespace PascalSharp.Internal.TreeConverter
             context.allow_inherited_ctor_call = false;
             bool current_type_section_converting = type_section_converting;
             type_section_converting = true;
-            SemanticTree.field_access_level curr_fal = context.get_field_access_level();
+            field_access_level curr_fal = context.get_field_access_level();
             List<var_definition_node> current_var_defs = context.var_defs;
             context.var_defs = new List<var_definition_node>();
             Hashtable current_member_decls = context.member_decls;
@@ -17404,13 +17403,13 @@ namespace PascalSharp.Internal.TreeConverter
 		
         private expression_node clip_expression_if_need(expression_node expr, type_node tn)
         {
-        	if (!(tn is short_string_type_node) && tn.type_special_kind != SemanticTree.type_special_kind.set_type)
+        	if (!(tn is short_string_type_node) && tn.type_special_kind != type_special_kind.set_type)
         		return expr;
         	if (tn is short_string_type_node)
         	{
-        		return convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(expr,SystemLibrary.string_type),new int_const_node((tn as short_string_type_node).Length,null));
+        		return convertion_data_and_alghoritms.create_simple_function_call(SystemLibInitializer.ClipShortStringProcedure.sym_info as function_node,null,convertion_data_and_alghoritms.convert_type(expr,string_type),new int_const_node((tn as short_string_type_node).Length,null));
         	}
-            else if (tn.type_special_kind == SemanticTree.type_special_kind.set_type && tn.element_type != null)
+            else if (tn.type_special_kind == type_special_kind.set_type && tn.element_type != null)
             {
                 ordinal_type_interface oti = tn.element_type.get_internal_interface(internal_interface_kind.ordinal_interface) as ordinal_type_interface;
                 if (oti != null)
@@ -17426,7 +17425,7 @@ namespace PascalSharp.Internal.TreeConverter
                     cmc.ret_type = tn;
                     return cmc;
                 }
-                else if (tn.element_type.type_special_kind == SemanticTree.type_special_kind.short_string)
+                else if (tn.element_type.type_special_kind == type_special_kind.short_string)
                 {
                     base_function_call cmc = null;
                     if (SystemLibInitializer.ClipShortStringInSetFunction.sym_info is common_namespace_function_node)
@@ -17445,7 +17444,7 @@ namespace PascalSharp.Internal.TreeConverter
         public override void visit(SyntaxTree.new_expr _new_expr)
         {
             type_node tn = ret.visit(_new_expr.type);
-            //if (tn == SystemLibrary.void_type)
+            //if (tn == void_type)
             //	AddError(new VoidNotValid(get_location(_new_expr.type)));
             check_for_type_allowed(tn,get_location(_new_expr.type));
             location loc = get_location(_new_expr);
@@ -17483,7 +17482,7 @@ namespace PascalSharp.Internal.TreeConverter
                     for (int i=0; i<exprs.Count; i++)
                     {
                     	expression_node expr = exprs[i];
-                    	expr = convertion_data_and_alghoritms.convert_type(expr, SystemLibrary.integer_type);
+                    	expr = convertion_data_and_alghoritms.convert_type(expr, integer_type);
                     	if (expr is int_const_node && (expr as int_const_node).constant_value < 0)
                     		AddError(expr.location, "NEGATIVE_ARRAY_LENGTH_({0})_NOT_ALLOWED", (expr as int_const_node).constant_value);
                     	lst.Add(expr);
@@ -17564,11 +17563,11 @@ namespace PascalSharp.Internal.TreeConverter
         {
             if (tn is compiled_type_node)
             {
-                if (tn.type_special_kind == SemanticTree.type_special_kind.array_wrapper || tn.type_special_kind == SemanticTree.type_special_kind.set_type
-                    || tn.type_special_kind == SemanticTree.type_special_kind.short_string || tn.type_special_kind == SemanticTree.type_special_kind.typed_file || tn.type_special_kind == SemanticTree.type_special_kind.text_file
-                   || tn.type_special_kind == SemanticTree.type_special_kind.binary_file || tn.type_special_kind == SemanticTree.type_special_kind.array_kind)
+                if (tn.type_special_kind == type_special_kind.array_wrapper || tn.type_special_kind == type_special_kind.set_type
+                    || tn.type_special_kind == type_special_kind.short_string || tn.type_special_kind == type_special_kind.typed_file || tn.type_special_kind == type_special_kind.text_file
+                   || tn.type_special_kind == type_special_kind.binary_file || tn.type_special_kind == type_special_kind.array_kind)
                     return true;
-                if (tn.type_special_kind == SemanticTree.type_special_kind.diap_type || tn.type_special_kind == SemanticTree.type_special_kind.enum_kind)
+                if (tn.type_special_kind == type_special_kind.diap_type || tn.type_special_kind == type_special_kind.enum_kind)
                     return true;
                 if (tn.IsPointer)
                     return true;
@@ -17579,11 +17578,11 @@ namespace PascalSharp.Internal.TreeConverter
         	{
         		common_type_node ctn = tn as common_type_node;
         		
-        		if (ctn.type_special_kind == SemanticTree.type_special_kind.diap_type || ctn.type_special_kind == SemanticTree.type_special_kind.enum_kind)
+        		if (ctn.type_special_kind == type_special_kind.diap_type || ctn.type_special_kind == type_special_kind.enum_kind)
         			return true;
-                if (tn.type_special_kind == SemanticTree.type_special_kind.array_wrapper || tn.type_special_kind == SemanticTree.type_special_kind.set_type || tn.type_special_kind == SemanticTree.type_special_kind.short_string 
-                    || tn.type_special_kind == SemanticTree.type_special_kind.typed_file || tn.type_special_kind == SemanticTree.type_special_kind.text_file
-                    || tn.type_special_kind == SemanticTree.type_special_kind.binary_file || tn.type_special_kind == SemanticTree.type_special_kind.array_kind)
+                if (tn.type_special_kind == type_special_kind.array_wrapper || tn.type_special_kind == type_special_kind.set_type || tn.type_special_kind == type_special_kind.short_string 
+                    || tn.type_special_kind == type_special_kind.typed_file || tn.type_special_kind == type_special_kind.text_file
+                    || tn.type_special_kind == type_special_kind.binary_file || tn.type_special_kind == type_special_kind.array_kind)
                     return true;
                 if (tn.IsPointer)
                     return true;
@@ -17611,7 +17610,7 @@ namespace PascalSharp.Internal.TreeConverter
                 type_node tn = find_type(ntr, get_location(ntr));
                 switch (tn.type_special_kind)
                 {
-                	case SemanticTree.type_special_kind.enum_kind:
+                	case type_special_kind.enum_kind:
                 		return_value(new int_const_node(sizeof(int),get_location(ntr))); break;
                 default:
                 	if (tn.is_generic_parameter || tn.is_generic_type_definition || tn.is_generic_type_instance)
@@ -17720,7 +17719,7 @@ namespace PascalSharp.Internal.TreeConverter
                     {
                         //Генерируем унаследованный конструктор
                         location loc = null;
-                        SemanticTree.polymorphic_state ps;
+                        polymorphic_state ps;
                         if (mconstr != null)
                         {
                             loc = mconstr.loc;
@@ -17745,7 +17744,7 @@ namespace PascalSharp.Internal.TreeConverter
                         {
                             //(ssyy) Интересно, зачем это.
                             concrete_parameter_type cpt =
-                                (par.parameter_type == SemanticTree.parameter_type.var) ?
+                                (par.parameter_type == parameter_type.var) ?
                                 concrete_parameter_type.cpt_var :
                                 concrete_parameter_type.cpt_none;
                             common_parameter c_p = new common_parameter(par.name,
@@ -17795,18 +17794,18 @@ namespace PascalSharp.Internal.TreeConverter
         public void generate_inherited_from_base_and_interface_function(common_type_node ctype, function_node func)
         {
             common_method_node gen_func = context.create_function(func.name, null) as common_method_node;
-            gen_func.polymorphic_state = SemanticTree.polymorphic_state.ps_common;
+            gen_func.polymorphic_state = polymorphic_state.ps_common;
             gen_func.newslot_awaited = true;
             gen_func.is_final = true;
             gen_func.is_overload = true;
-            gen_func.field_access_level = SemanticTree.field_access_level.fal_public;
+            gen_func.field_access_level = field_access_level.fal_public;
             gen_func.return_value_type = func.return_value_type;
             //gen_func.return_variable = func.retu
 
             foreach (parameter par in func.parameters)
             {
                 concrete_parameter_type cpt =
-                    (par.parameter_type == SemanticTree.parameter_type.value) ?
+                    (par.parameter_type == parameter_type.value) ?
                     concrete_parameter_type.cpt_const :
                     concrete_parameter_type.cpt_var;
                 common_parameter c_p = new common_parameter(par.name,
@@ -18339,7 +18338,7 @@ namespace PascalSharp.Internal.TreeConverter
             {
                 AddError(get_location(_default_operator), "TYPE_REFERENCE_EXPECTED");
             }
-            if (tn == SystemLibrary.void_type)
+            if (tn == void_type)
             {
                 AddError(get_location(_default_operator.type_name), "INAVLID_TYPE");
             }
@@ -18480,7 +18479,7 @@ namespace PascalSharp.Internal.TreeConverter
                             procDecl.proc_header.where_defs = whereSection;
                         }
 
-                        if (!context.func_stack.Empty && context.func_stack.top().polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+                        if (!context.func_stack.Empty && context.func_stack.top().polymorphic_state == polymorphic_state.ps_static)
                         {
                             procDecl.proc_header.class_keyword = true;
                             if (procDecl.proc_header.proc_attributes == null)
@@ -18641,7 +18640,7 @@ namespace PascalSharp.Internal.TreeConverter
                     tn = tn1;
                 else
                     tn = convert_strong(_function_header.return_type);
-                //if (tn == SystemLibrary.void_type)
+                //if (tn == void_type)
                 //    AddError(new VoidNotValid(get_location(_function_header.return_type)));
                 check_for_type_allowed(tn, get_location(_function_header.return_type));
             }
@@ -18670,7 +18669,7 @@ namespace PascalSharp.Internal.TreeConverter
                 //{
                 //    throw new OverloadOperatorMustBeStaticFunction(get_location(_function_header), context.top_function);
                 //}
-                if (cmmn != null && cmmn.polymorphic_state != SemanticTree.polymorphic_state.ps_static)
+                if (cmmn != null && cmmn.polymorphic_state != polymorphic_state.ps_static)
                 {
                     AddError(get_location(_function_header), "OVERLOADED_OPERATOR_MUST_BE_STATIC_FUNCTION");
                 }
@@ -18688,7 +18687,7 @@ namespace PascalSharp.Internal.TreeConverter
             if (context.top_function != null && context.top_function is common_namespace_function_node && (context.top_function as common_namespace_function_node).ConnectedToType != null && !context.top_function.IsOperator)
             {
                 concrete_parameter_type cpt = concrete_parameter_type.cpt_none;
-                SemanticTree.parameter_type pt = parameter_type.value;
+                parameter_type pt = parameter_type.value;
                 if ((context.top_function as common_namespace_function_node).ConnectedToType.is_value_type)
                 {
                     cpt = concrete_parameter_type.cpt_var;
@@ -18750,7 +18749,7 @@ namespace PascalSharp.Internal.TreeConverter
                     var ex = (SyntaxTree.expression)sem.param[0];
                     expression_node en = convert_strong(ex);
                     en.location = get_location(ex);
-                    if (en.type != SystemLibrary.integer_type)
+                    if (en.type != integer_type)
                         AddError(get_location(ex), "STRING_CONSTANT_OR_IDENTIFIER_EXPECTED");
                     break;
                 case " ":
@@ -19010,19 +19009,19 @@ namespace PascalSharp.Internal.TreeConverter
 
         private bool CheckIsStaticName(definition_node dn)
         {
-            if (dn is class_field && (dn as class_field).polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+            if (dn is class_field && (dn as class_field).polymorphic_state == polymorphic_state.ps_static)
                 return true;
 
-            if (dn is common_method_node && (dn as common_method_node).polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+            if (dn is common_method_node && (dn as common_method_node).polymorphic_state == polymorphic_state.ps_static)
                 return true;
 
-            if (dn is common_property_node && (dn as common_property_node).polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+            if (dn is common_property_node && (dn as common_property_node).polymorphic_state == polymorphic_state.ps_static)
                 return true;
 
-            if (dn is compiled_function_node && (dn as compiled_function_node).polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+            if (dn is compiled_function_node && (dn as compiled_function_node).polymorphic_state == polymorphic_state.ps_static)
                 return true;
 
-            if (dn is compiled_property_node && (dn as compiled_property_node).polymorphic_state == SemanticTree.polymorphic_state.ps_static)
+            if (dn is compiled_property_node && (dn as compiled_property_node).polymorphic_state == polymorphic_state.ps_static)
                 return true;
 
             return false;
@@ -19031,7 +19030,7 @@ namespace PascalSharp.Internal.TreeConverter
         private bool CheckUnknownIdentNeedsClassCapture(SyntaxTree.yield_unknown_ident _unk, out bool isStaticIdent)
         {
 
-            string Consts__Self = YieldHelpers.YieldConsts.Self;
+            string Consts__Self = YieldConsts.Self;
 
             // Find semantic class containing iterator (yield-method) with unknown ident
             var iteratorContainingClass = context._ctn.fields.Where(f => f.name == Consts__Self).First().type;
@@ -19096,7 +19095,7 @@ namespace PascalSharp.Internal.TreeConverter
             {
                 return new dot_node(unk.ClassName, unk.UnknownID);
             }
-            string Consts__Self = YieldHelpers.YieldConsts.Self;
+            string Consts__Self = YieldConsts.Self;
 
             return new dot_node(new dot_node(new ident("self"), new ident(Consts__Self)), unk.UnknownID);
         }

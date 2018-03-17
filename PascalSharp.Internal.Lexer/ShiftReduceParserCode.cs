@@ -8,7 +8,6 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Diagnostics.CodeAnalysis;
-using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.SyntaxTree;
 
 namespace QUT.Gppg

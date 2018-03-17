@@ -1,21 +1,23 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PascalABCCompiler.SystemLibrary;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
-using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
+using for_node = PascalSharp.Internal.SyntaxTree.for_node;
+using goto_statement = PascalSharp.Internal.SyntaxTree.goto_statement;
 
-namespace TreeConverter.LambdaExpressions.Closure
+namespace PascalSharp.Internal.TreeConverter.LambdaExpressions.Closure
 {
     internal class CapturedVariablesTreeBuilder : WalkingVisitorNew
     {
-        private readonly syntax_tree_visitor _visitor;
+        private readonly TreeConversion.syntax_tree_visitor _visitor;
         private CapturedVariablesTreeNode _currentTreeNode;
         private readonly Dictionary<int, CapturedVariablesTreeNode> _scopesCapturedVarsNodesDictionary;
         private Stack<CapturedVariablesTreeNodeLambdaScope> _currentLambdaScopeNodeStack = new Stack<CapturedVariablesTreeNodeLambdaScope>();
@@ -58,7 +60,7 @@ namespace TreeConverter.LambdaExpressions.Closure
                 return _currentLambdaScopeNodeStack.Count > 0;
             }
         }
-        public CapturedVariablesTreeBuilder(syntax_tree_visitor visitor)
+        public CapturedVariablesTreeBuilder(TreeConversion.syntax_tree_visitor visitor)
         {
             _visitor = visitor;
             _scopesCapturedVarsNodesDictionary = new Dictionary<int, CapturedVariablesTreeNode>();
@@ -201,7 +203,7 @@ namespace TreeConverter.LambdaExpressions.Closure
                 {
                     if (si.sym_info.semantic_node_type == semantic_node_type.local_variable)
                     {
-                        if (!(idName == compiler_string_consts.self_word && si.scope is SymbolTable.ClassMethodScope && _classScope != null) && InLambdaContext)
+                        if (!(idName == compiler_string_consts.self_word && si.scope is PascalSharp.Internal.TreeConverter.SymbolTable.ClassMethodScope && _classScope != null) && InLambdaContext)
                         {
                             _visitor.AddError(new ThisTypeOfVariablesCannotBeCaptured(_visitor.get_location(id)));
                         }
@@ -211,7 +213,7 @@ namespace TreeConverter.LambdaExpressions.Closure
                         _visitor.AddError(new CannotCaptureNonValueParameters(_visitor.get_location(id)));
                     }
                     
-                    if (idName == compiler_string_consts.self_word && si.scope is SymbolTable.ClassMethodScope &&
+                    if (idName == compiler_string_consts.self_word && si.scope is PascalSharp.Internal.TreeConverter.SymbolTable.ClassMethodScope &&
                         _classScope != null)
                     {
                         var selfField = _classScope.VariablesDefinedInScope.Find(var => var.SymbolInfo == si);

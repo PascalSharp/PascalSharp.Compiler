@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.SyntaxTree;
 
 namespace PascalSharp.Internal.ParserTools
 {

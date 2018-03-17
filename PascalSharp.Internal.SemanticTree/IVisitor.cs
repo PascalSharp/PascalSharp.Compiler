@@ -1,11 +1,10 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-namespace PascalABCCompiler.SemanticTree
-{
 
+namespace PascalSharp.Internal.SemanticTree
+{
 	public interface ISemanticVisitor
 	{
-
 		void visit(ISemanticNode value);
 
 		void visit(IDefinitionNode value);

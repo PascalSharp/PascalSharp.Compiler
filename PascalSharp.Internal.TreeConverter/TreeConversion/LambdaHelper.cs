@@ -2,10 +2,13 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System.Collections.Generic;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.TreeConverter;
+using System.Linq;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
-using TreeConverter.LambdaExpressions;
+using PascalSharp.Internal.TreeConverter.LambdaExpressions;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.SystemLib;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
@@ -120,7 +123,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeConversion
 
         public static type_definition ConvertSemanticTypeToSyntaxType(type_node semType)
         {
-            return OpenMP.ConvertToSyntaxType(semType);
+            return OpenMP.OpenMP.ConvertToSyntaxType(semType);
         }
 
         public static int processingLambdaParametersForTypeInference = 0; // Счетчик для подсчета лямбд

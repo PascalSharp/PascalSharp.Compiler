@@ -2,11 +2,10 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System.Collections.Generic;
-using PascalABCCompiler;
-using PascalABCCompiler.SemanticTree;
 using PascalSharp.Compiler.SemanticTreeConverters;
 using PascalSharp.Internal.Errors;
 using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
 
 ///В разработке DarkStar

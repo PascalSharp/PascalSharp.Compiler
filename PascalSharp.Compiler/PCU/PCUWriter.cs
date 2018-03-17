@@ -6,11 +6,21 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
-using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
+using array_const = PascalSharp.Internal.TreeConverter.TreeRealization.array_const;
+using empty_statement = PascalSharp.Internal.TreeConverter.TreeRealization.empty_statement;
+using for_node = PascalSharp.Internal.TreeConverter.TreeRealization.for_node;
+using goto_statement = PascalSharp.Internal.TreeConverter.TreeRealization.goto_statement;
+using if_node = PascalSharp.Internal.TreeConverter.TreeRealization.if_node;
+using labeled_statement = PascalSharp.Internal.TreeConverter.TreeRealization.labeled_statement;
+using question_colon_expression = PascalSharp.Internal.TreeConverter.TreeRealization.question_colon_expression;
+using repeat_node = PascalSharp.Internal.TreeConverter.TreeRealization.repeat_node;
+using sizeof_operator = PascalSharp.Internal.TreeConverter.TreeRealization.sizeof_operator;
+using typeof_operator = PascalSharp.Internal.TreeConverter.TreeRealization.typeof_operator;
+using while_node = PascalSharp.Internal.TreeConverter.TreeRealization.while_node;
 
 namespace PascalSharp.Compiler.PCU
 {

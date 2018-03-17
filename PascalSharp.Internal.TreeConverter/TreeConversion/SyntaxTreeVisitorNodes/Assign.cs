@@ -1,19 +1,12 @@
-﻿using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.SystemLibrary;
+﻿using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
-using SymTable = SymbolTable;
 
-namespace PascalSharp.Internal.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
     public partial class syntax_tree_visitor
     {
-
-
-
         public bool internal_is_assign;
 
 

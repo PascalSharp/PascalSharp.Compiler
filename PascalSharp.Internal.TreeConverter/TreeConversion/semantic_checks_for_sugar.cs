@@ -1,15 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.SystemLibrary;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
-using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 
-namespace PascalSharp.Internal.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
     public partial class syntax_tree_visitor
     {
@@ -27,7 +23,7 @@ namespace PascalSharp.Internal.TreeConverter
                 AddError(expr.location, "TUPLE_EXPECTED");
 
             var n = vars.variables.Count();
-            if (n > t.GetGenericArguments().Count())
+            if (n > Enumerable.Count<Type>(t.GetGenericArguments()))
                 AddError(get_location(vars), "TOO_MANY_ELEMENTS_ON_LEFT_SIDE_OF_TUPLE_ASSIGNMRNT");
         }
 
@@ -45,7 +41,7 @@ namespace PascalSharp.Internal.TreeConverter
                 AddError(expr.location, "TUPLE_EXPECTED");
 
             var n = vars.idents.Count();
-            if (n > t.GetGenericArguments().Count())
+            if (n > Enumerable.Count<Type>(t.GetGenericArguments()))
                 AddError(get_location(vars), "TOO_MANY_ELEMENTS_ON_LEFT_SIDE_OF_TUPLE_ASSIGNMRNT");
         }
 

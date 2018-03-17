@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 /*
     ProgramScopeSyntax
@@ -15,7 +13,7 @@ using System.Text;
                 StatListScopeSyntax (1)
 */
 
-namespace PascalABCCompiler.SyntaxTree
+namespace PascalSharp.Internal.SyntaxTree.Visitors.LightSymInfoVisitors
 {
     public enum SymKind { var, field, param, procname, funcname, classname, recordname, interfacename };
 

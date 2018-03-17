@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.ParserTools;
 using PascalSharp.Internal.SyntaxTree;
 
 //using ICSharpCode.SharpDevelop.Dom;

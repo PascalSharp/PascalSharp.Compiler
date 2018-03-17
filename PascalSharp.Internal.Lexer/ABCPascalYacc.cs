@@ -2,7 +2,7 @@
 
 // GPPG version 1.3.6
 // Machine:  ANDREWPC
-// DateTime: 3/13/2018 21:24:48
+// DateTime: 3/15/2018 18:11:01
 // UserName: boyar
 // Input file <ABCPascal.y>
 
@@ -18,7 +18,7 @@ using PascalSharp.Internal.ParserTools;
 using PascalSharp.Internal.Errors;
 using System.Linq;
 
-namespace PascalSharp.Internal.Lexer
+namespace PascalSharp.Internal.Lexer.PascalLanguage
 {
 public enum Tokens {
     error=1,EOF=2,tkDirectiveName=3,tkAmpersend=4,tkColon=5,tkDotDot=6,

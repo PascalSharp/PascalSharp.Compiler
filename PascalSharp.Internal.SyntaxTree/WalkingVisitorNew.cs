@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using PascalABCCompiler.SyntaxTree;
 
 namespace PascalSharp.Internal.SyntaxTree
 {

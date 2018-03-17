@@ -2,6 +2,9 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
@@ -867,7 +870,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
             if (is_derived(to, from) || (from.IsInterface && to == SystemLibrary.object_type))
             {
-                add_conversion(ret, PascalSharp.Internal.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(from, to, true), from, to);
+                add_conversion(ret, convertion_data_and_alghoritms.get_empty_conversion(from, to, true), from, to);
                 //add_conversion(ret, SystemLibrary.empty_method, from, to);
             }
 
@@ -933,7 +936,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                     if (dii.parameters.Count == to_dii.parameters.Count)
                     {
                         //ms100 error fixed (DS)
-                        bool eq = PascalSharp.Internal.TreeConverter.convertion_data_and_alghoritms.function_eq_params_and_result(dii.invoke_method, to_dii.invoke_method);
+                        bool eq = convertion_data_and_alghoritms.function_eq_params_and_result(dii.invoke_method, to_dii.invoke_method);
                         if (eq)
                         {
                             delegate_to_delegate_type_converter dtdtc = new delegate_to_delegate_type_converter(to);

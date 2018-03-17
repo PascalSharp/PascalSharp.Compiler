@@ -11,7 +11,7 @@
 	LexLocation currentLexLocation;
 %}
 
-%namespace PascalSharp.Internal.Lexer
+%namespace PascalSharp.Internal.Lexer.PascalLanguage
 
 %using PascalSharp.Internal.SyntaxTree;
 %using PascalSharp.Internal.ParserTools;

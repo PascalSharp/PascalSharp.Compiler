@@ -1,16 +1,12 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
+
 using System.Collections.Generic;
-using System.Text;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
-using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
-using for_node = PascalSharp.Internal.TreeConverter.TreeRealization.for_node;
 
 //Визитор предназначен для обхода поддерева синтаксического дерева и поиска
 //обращений к константам и элементам массива - их не получится найти в семантическом дереве.
@@ -21,7 +17,7 @@ using for_node = PascalSharp.Internal.TreeConverter.TreeRealization.for_node;
 //- Список локальных блочных переменных. Если они есть - генерировать объект-функцию и включать в нее все локальные переменные,
 //      иначе можно обойтись просто локальной функцией и переменные не включать.
 
-namespace PascalSharp.Internal.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.OpenMP
 {
     class VarFinderSyntaxVisitor : WalkingVisitorNew
     {
@@ -116,7 +112,7 @@ namespace PascalSharp.Internal.TreeConverter
         }
         public override void visit(SyntaxTree.for_node _for_node)
         {
-            if (!for_node.create_loop_variable && (_for_node.type_name == null))
+            if (!_for_node.create_loop_variable && (_for_node.type_name == null))
                 throw new OpenMPException("Счетчик цикла должен быть обьявлен в заголовке цикла", _for_node.source_context);
 
             bool _isForNode = isForNode;

@@ -2,7 +2,7 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System;
-using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SemanticTree;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -232,7 +232,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return TreeRealization.function_node;
+                return function_node;
             }
         }
     }
@@ -296,7 +296,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return TreeRealization.function_node;
+                return function_node;
             }
         }
 
@@ -370,7 +370,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return TreeRealization.function_node;
+                return function_node;
             }
         }
 
@@ -420,7 +420,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return TreeRealization.function_node;
+                return function_node;
             }
         }
 
@@ -516,7 +516,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return TreeRealization.function_node;
+                return function_node;
             }
         }
 
@@ -606,7 +606,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return TreeRealization.function_node;
+                return function_node;
             }
         }
 
@@ -704,7 +704,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return TreeRealization.function_node;
+                return function_node;
             }
         }
 
@@ -736,7 +736,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return TreeRealization.function_node.compiled_type;
+                return function_node.compiled_type;
             }
         }
 
@@ -757,7 +757,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return TreeRealization.function_node.comprehensive_type;
+                return function_node.comprehensive_type;
             }
         }
 
@@ -765,7 +765,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return TreeRealization.function_node;
+                return function_node;
             }
         }
         //ssyy

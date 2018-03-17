@@ -2,7 +2,8 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System;
-using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {

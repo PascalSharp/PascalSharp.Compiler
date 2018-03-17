@@ -1,9 +1,8 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
-using PascalABCCompiler.SyntaxTree;
-using SyntaxVisitors;
-using SyntaxVisitors.SugarVisitors;
+using PascalSharp.Internal.SyntaxTree.Visitors.SugarVisitors;
+using PascalSharp.Internal.SyntaxTree.Visitors.YieldVisitors;
 
 namespace PascalSharp.Internal.SyntaxTree.Converters
 {

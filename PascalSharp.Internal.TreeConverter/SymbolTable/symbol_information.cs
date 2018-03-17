@@ -3,7 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections;
-using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalSharp.Internal.TreeConverter.SymbolTable

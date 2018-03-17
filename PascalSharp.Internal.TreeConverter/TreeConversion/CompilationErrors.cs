@@ -2,11 +2,10 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Все типы семантических ошибок компилятора.
 using System;
-
-using PascalABCCompiler.SemanticTree;
 using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.CompilerTools.Errors;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 

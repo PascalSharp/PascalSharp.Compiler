@@ -1,13 +1,9 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
-using PascalABCCompiler.SyntaxTree;
-
-namespace SyntaxVisitors.SugarVisitors
+namespace PascalSharp.Internal.SyntaxTree.Visitors.SugarVisitors
 {
     public class QuestionPointDesugarVisitor : BaseChangeVisitor
     {

@@ -1,12 +1,10 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using PascalABCCompiler.SyntaxTree;
 
-namespace PascalABCSavParser
+using System.Collections.Generic;
+using PascalSharp.Internal.SyntaxTree;
+
+namespace PascalSharp.Internal.Lexer
 {
     public class ParserLambdaHelper
     {

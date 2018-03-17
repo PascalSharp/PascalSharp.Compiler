@@ -9,20 +9,19 @@
 //Теперь здесь только одна переменная ret_semantic типа semantic_node.
 //Она приводится при необходимости к нужному типу.
 //Внешне при этом работа с классом returner не изменилась.
-using System;
+
 using PascalSharp.Internal.SyntaxTree;
-using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 
-namespace PascalSharp.Internal.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
 	public class returner
 	{
         private semantic_node ret_semantic;
 
-        private syntax_tree_visitor syntax_tree_visitor;
+        private TreeConversion.syntax_tree_visitor syntax_tree_visitor;
 
-		public returner(syntax_tree_visitor stv)
+		public returner(TreeConversion.syntax_tree_visitor stv)
 		{
             syntax_tree_visitor = stv;
 		}

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using PascalSharp.Internal.Errors;
-using PascalSharp.Internal.ParserTools;
 using PascalSharp.Internal.SyntaxTree;
 
 namespace PascalSharp.Internal.ParserTools

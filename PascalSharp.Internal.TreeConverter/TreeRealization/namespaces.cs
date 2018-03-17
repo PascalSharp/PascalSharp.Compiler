@@ -3,10 +3,10 @@
 
 using System;
 using System.Collections.Generic;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization

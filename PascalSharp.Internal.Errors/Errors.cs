@@ -3,8 +3,6 @@
 
 using System;
 using System.IO;
-using PascalABCCompiler;
-using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.Localization;
 using PascalSharp.Internal.SyntaxTree;
 

@@ -3,7 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SemanticTree;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {

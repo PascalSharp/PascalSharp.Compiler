@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace PascalABCCompiler.SyntaxTree
+namespace PascalSharp.Internal.SyntaxTree
 {
     public class SyntaxTreeBuilder
     {

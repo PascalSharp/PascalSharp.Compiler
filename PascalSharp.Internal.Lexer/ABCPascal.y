@@ -24,7 +24,7 @@
 %using PascalSharp.Internal.Errors;
 %using System.Linq;
 
-%namespace PascalSharp.Internal.Lexer
+%namespace PascalSharp.Internal.Lexer.PascalLanguage
 
 %YYSTYPE PascalSharp.Internal.Lexer.Union
 

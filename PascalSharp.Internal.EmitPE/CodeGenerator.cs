@@ -8,7 +8,7 @@
  ***************************************************************************/
 
 using System.Collections;
-using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SemanticTree;
 
 namespace PascalSharp.Internal.EmitPE
 {

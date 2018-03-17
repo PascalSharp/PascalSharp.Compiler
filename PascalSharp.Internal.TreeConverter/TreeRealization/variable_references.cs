@@ -2,7 +2,8 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System;
-using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -307,7 +308,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             {
                 bool flag;
                 general_node_type gnd;
-            	return !PascalSharp.Internal.TreeConverter.convertion_data_and_alghoritms.check_for_constant_or_readonly(this,out flag, out gnd);
+            	return !convertion_data_and_alghoritms.check_for_constant_or_readonly(this,out flag, out gnd);
             }
         }
 	}

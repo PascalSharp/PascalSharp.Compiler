@@ -4,6 +4,8 @@
 using System;
 using System.Collections.Generic;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
 namespace PascalSharp.Internal.Optimizer
 {

@@ -1,16 +1,17 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Инициализация системной библиотеки
-using System;
-using PascalSharp.Internal.TreeConverter;
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.TreeConverter.NetWrappers;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 
-namespace PascalABCCompiler.SystemLibrary
+namespace PascalSharp.Internal.TreeConverter.SystemLib
 {
         
     //TODO: Все базовые методы должны быть определены здесь как статические и использовать их отсюда, а не создавать их по два раза.
@@ -81,7 +82,7 @@ namespace PascalABCCompiler.SystemLibrary
         //\ssyy
 
         //ssyy добавил 26.06.2007
-        public static syntax_tree_visitor syn_visitor = null;
+        public static TreeConversion.syntax_tree_visitor syn_visitor = null;
         //\ssyy
 
         //ssyy добавил 05.07.2007
@@ -89,7 +90,7 @@ namespace PascalABCCompiler.SystemLibrary
         //\ssyy
 
 		private static TreeConverterSymbolTable _symtab;
-        private static System.Collections.Generic.Dictionary<SemanticTree.basic_function_type, basic_function_node> ht = new System.Collections.Generic.Dictionary<SemanticTree.basic_function_type, basic_function_node>();
+        private static System.Collections.Generic.Dictionary<basic_function_type, basic_function_node> ht = new System.Collections.Generic.Dictionary<basic_function_type, basic_function_node>();
 
         private static System.Collections.Hashtable writable_in_typed_files_types = new System.Collections.Hashtable();
 
@@ -496,11 +497,11 @@ namespace PascalABCCompiler.SystemLibrary
         private static System.StringComparer _string_comparer = StringComparer.Ordinal;
 
         private static basic_function_node make_unary_function(type_node param_type,
-            SemanticTree.basic_function_type bft,type_node ret_val_type)
+            basic_function_type bft,type_node ret_val_type)
         {
             basic_function_node bfn = new basic_function_node(bft, ret_val_type, true);
             basic_parameter bpar = new basic_parameter(compiler_string_consts.unary_param_name, param_type,
-                SemanticTree.parameter_type.value, bfn);
+                parameter_type.value, bfn);
             bfn.parameters.AddElement(bpar);
             add_stand_type(bft, bfn);
             return bfn;
@@ -508,13 +509,13 @@ namespace PascalABCCompiler.SystemLibrary
 
         public static basic_function_node make_common_binary_operation(string operator_name,
             type_node def_type,type_node left,type_node right, 
-            SemanticTree.basic_function_type bft,type_node ret_value_type)
+            basic_function_type bft,type_node ret_value_type)
         {
             basic_function_node bfn = new basic_function_node(bft, ret_value_type,true,operator_name);
             basic_parameter par_left = new basic_parameter(compiler_string_consts.left_param_name, left,
-                SemanticTree.parameter_type.value, bfn);
+                parameter_type.value, bfn);
             basic_parameter par_right = new basic_parameter(compiler_string_consts.right_param_name, right,
-                SemanticTree.parameter_type.value, bfn);
+                parameter_type.value, bfn);
             bfn.parameters.AddElement(par_left);
             bfn.parameters.AddElement(par_right);
             def_type.add_name(operator_name, new SymbolInfo(bfn));
@@ -523,18 +524,18 @@ namespace PascalABCCompiler.SystemLibrary
         }
 
         public static basic_function_node make_unary_operator(string operator_name, type_node to,
-            SemanticTree.basic_function_type bft, type_node ret_value_type)
+            basic_function_type bft, type_node ret_value_type)
         {
             basic_function_node bfn = new basic_function_node(bft, ret_value_type,true);
             basic_parameter par = new basic_parameter(compiler_string_consts.unary_param_name, to,
-                SemanticTree.parameter_type.value, bfn);
+                parameter_type.value, bfn);
             bfn.parameters.AddElement(par);
             to.add_name(operator_name, new SymbolInfo(bfn));
             add_stand_type(bft, bfn);
             return bfn;
         }
 
-        public static basic_function_node make_unary_operator(string operator_name, type_node to, SemanticTree.basic_function_type bft)
+        public static basic_function_node make_unary_operator(string operator_name, type_node to, basic_function_type bft)
         {
             return make_unary_operator(operator_name, to, bft, to);
         }
@@ -548,12 +549,12 @@ namespace PascalABCCompiler.SystemLibrary
         }
 
         public static basic_function_node make_binary_operator(string operator_name, type_node to,
-            SemanticTree.basic_function_type bft, type_node ret_value_type)
+            basic_function_type bft, type_node ret_value_type)
         {
             return make_common_binary_operation(operator_name, to, to, to, bft, ret_value_type);
         }
 
-        public static basic_function_node make_binary_operator(string operator_name, type_node to, SemanticTree.basic_function_type bft)
+        public static basic_function_node make_binary_operator(string operator_name, type_node to, basic_function_type bft)
         {
             return make_binary_operator(operator_name, to, bft, to);
         }
@@ -564,17 +565,17 @@ namespace PascalABCCompiler.SystemLibrary
         }
 
         public static basic_function_node make_type_conversion(type_node from, type_node to, type_compare tc,
-            SemanticTree.basic_function_type bft)
+            basic_function_type bft)
         {
             return make_type_conversion(from, to, tc, bft, true);
         }
 
         public static basic_function_node make_type_conversion(type_node from, type_node to, type_compare tc,
-            SemanticTree.basic_function_type bft, bool is_implicit)
+            basic_function_type bft, bool is_implicit)
         {
             basic_function_node conv_method = new basic_function_node(bft, to,false);
             basic_parameter bp = new basic_parameter(compiler_string_consts.unary_param_name,
-                from, SemanticTree.parameter_type.value, conv_method);
+                from, parameter_type.value, conv_method);
             conv_method.parameters.AddElement(bp);
 
             type_table.add_type_conversion_from_defined(from, to, conv_method, tc, is_implicit);
@@ -585,11 +586,11 @@ namespace PascalABCCompiler.SystemLibrary
             return conv_method;
         }
         public static basic_function_node make_generated_type_conversion(type_node from, type_node to, type_compare tc,
-            SemanticTree.basic_function_type bft, bool is_implicit)
+            basic_function_type bft, bool is_implicit)
         {
             basic_function_node conv_method = new basic_function_node(bft, to, false);
             basic_parameter bp = new basic_parameter(compiler_string_consts.unary_param_name,
-                from, SemanticTree.parameter_type.value, conv_method);
+                from, parameter_type.value, conv_method);
             conv_method.parameters.AddElement(bp);
             type_table.add_generated_type_conversion_from_defined(from, to, conv_method, tc, is_implicit);
             return conv_method;
@@ -604,17 +605,17 @@ namespace PascalABCCompiler.SystemLibrary
             to.add_generated_name(oper_name, new SymbolInfo(fn));
         }
 
-        private static basic_function_node create_oti_method(SemanticTree.basic_function_type bft, type_node type)
+        private static basic_function_node create_oti_method(basic_function_type bft, type_node type)
         {
             basic_function_node bfn = new basic_function_node(bft, type,true);
             basic_parameter cp = new basic_parameter(compiler_string_consts.unary_param_name, type,
-                SemanticTree.parameter_type.value, bfn);
+                parameter_type.value, bfn);
             bfn.parameters.AddElement(cp);
 			add_stand_type(bft, bfn);
             return bfn;
         }
 
-        private static basic_function_node create_oti_method(SemanticTree.basic_function_type bft, type_node type, SemanticTree.parameter_type pt)
+        private static basic_function_node create_oti_method(basic_function_type bft, type_node type, parameter_type pt)
         {
             basic_function_node bfn = new basic_function_node(bft, type, true);
             basic_parameter cp = new basic_parameter(compiler_string_consts.unary_param_name, type,
@@ -687,30 +688,30 @@ namespace PascalABCCompiler.SystemLibrary
             return null;
         }
 
-        private static basic_function_node create_inc_value_method(SemanticTree.basic_function_type bft, type_node type)
+        private static basic_function_node create_inc_value_method(basic_function_type bft, type_node type)
         {
-            basic_function_node bfn = create_oti_method(bft, type,SemanticTree.parameter_type.value);
+            basic_function_node bfn = create_oti_method(bft, type,parameter_type.value);
             bfn.compile_time_executor = inc_value_compile_time_executor;
             return bfn;
         }
 
-        private static basic_function_node create_dec_value_method(SemanticTree.basic_function_type bft, type_node type)
+        private static basic_function_node create_dec_value_method(basic_function_type bft, type_node type)
         {
-            basic_function_node bfn = create_oti_method(bft, type, SemanticTree.parameter_type.value);
+            basic_function_node bfn = create_oti_method(bft, type, parameter_type.value);
             bfn.compile_time_executor = dec_value_compile_time_executor;
             return bfn;
         }
 
-        private static basic_function_node create_inc_method(SemanticTree.basic_function_type bft, type_node type)
+        private static basic_function_node create_inc_method(basic_function_type bft, type_node type)
         {
-            basic_function_node bfn = create_oti_method(bft, type, SemanticTree.parameter_type.var);
+            basic_function_node bfn = create_oti_method(bft, type, parameter_type.var);
             bfn.compile_time_executor = inc_compile_time_executor;
             return bfn;
         }
 
-        private static basic_function_node create_dec_method(SemanticTree.basic_function_type bft, type_node type)
+        private static basic_function_node create_dec_method(basic_function_type bft, type_node type)
         {
-            basic_function_node bfn = create_oti_method(bft, type, SemanticTree.parameter_type.var);
+            basic_function_node bfn = create_oti_method(bft, type, parameter_type.var);
             bfn.compile_time_executor = dec_compile_time_executor;
             return bfn;
         }
@@ -908,12 +909,12 @@ namespace PascalABCCompiler.SystemLibrary
         */
         private static basic_function_node create_emty_function(type_node ret_type, string name)
         {
-            basic_function_node bfn = new basic_function_node(SemanticTree.basic_function_type.none, ret_type, true, name);
+            basic_function_node bfn = new basic_function_node(basic_function_type.none, ret_type, true, name);
             basic_parameter par = new basic_parameter(compiler_string_consts.unary_param_name, ret_type,
-                SemanticTree.parameter_type.value, bfn);
+                parameter_type.value, bfn);
             bfn.parameters.AddElement(par);
             bfn.compile_time_executor = delegated_empty_method;
-			add_stand_type(SemanticTree.basic_function_type.none, bfn);
+			add_stand_type(basic_function_type.none, bfn);
             return bfn;
         }
         /*
@@ -945,16 +946,16 @@ namespace PascalABCCompiler.SystemLibrary
         }
         */
         private static void mark_type_as_ordinal(type_node type,
-            SemanticTree.basic_function_type inc,SemanticTree.basic_function_type dec,
-            SemanticTree.basic_function_type vinc, SemanticTree.basic_function_type vdec,
+            basic_function_type inc,basic_function_type dec,
+            basic_function_type vinc, basic_function_type vdec,
             constant_node lower_value, constant_node upper_value,
             function_node t2i,ordinal_type_to_int t2i_comp)
         {
-            basic_function_node inc_value = create_oti_method(inc, type, SemanticTree.parameter_type.value);
-            basic_function_node dec_value = create_oti_method(dec, type, SemanticTree.parameter_type.value);
+            basic_function_node inc_value = create_oti_method(inc, type, parameter_type.value);
+            basic_function_node dec_value = create_oti_method(dec, type, parameter_type.value);
 
-            basic_function_node inc_var = create_oti_method(vinc, type, SemanticTree.parameter_type.var);
-            basic_function_node dec_var = create_oti_method(vdec, type, SemanticTree.parameter_type.var);
+            basic_function_node inc_var = create_oti_method(vinc, type, parameter_type.var);
+            basic_function_node dec_var = create_oti_method(vdec, type, parameter_type.var);
 
             var si = type.find_first_in_type(compiler_string_consts.greq_name);
             basic_function_node greq = (basic_function_node)si.sym_info;
@@ -1168,7 +1169,7 @@ namespace PascalABCCompiler.SystemLibrary
             _assert_method = compiled_function_node.get_compiled_method(typeof(System.Diagnostics.Debug).GetMethod("Assert",new Type[1]{typeof(bool)}));
             _decimal_type = compiled_type_node.get_type_node(typeof(decimal), symtab);
             //_decimal_type.SetName(compiler_string_consts.decimal_type_name);
-            make_assign_operator(_decimal_type, SemanticTree.basic_function_type.objassign);
+            make_assign_operator(_decimal_type, basic_function_type.objassign);
 
             _bool_type = compiled_type_node.get_type_node(typeof(bool), symtab);
             _bool_type.SetName(compiler_string_consts.bool_type_name);
@@ -1185,7 +1186,7 @@ namespace PascalABCCompiler.SystemLibrary
             _string_type = compiled_type_node.get_type_node(typeof(string), symtab);
             _string_type.SetName(compiler_string_consts.string_type_name);
 
-            _pointer_type = compiled_type_node.get_type_node(void_ptr_type, symtab);
+            _pointer_type = compiled_type_node.get_type_node(NetHelper.void_ptr_type, symtab);
             _pointer_type.SetName(compiler_string_consts.pointer_type_name);
 
             _object_type = compiled_type_node.get_type_node(typeof(object), symtab);
@@ -1234,66 +1235,66 @@ namespace PascalABCCompiler.SystemLibrary
             
             //integer type
             //Преобразования типов.
-            _int_to_byte = make_type_conversion(_integer_type, _byte_type, type_compare.greater_type, SemanticTree.basic_function_type.itob);
-            _int_to_sbyte = make_type_conversion(_integer_type, _sbyte_type, type_compare.greater_type, SemanticTree.basic_function_type.itosb);
-            _int_to_short = make_type_conversion(_integer_type, _short_type, type_compare.greater_type, SemanticTree.basic_function_type.itos);
-            _int_to_ushort = make_type_conversion(_integer_type, _ushort_type, type_compare.greater_type, SemanticTree.basic_function_type.itous);
-            _int_to_uint = make_type_conversion(_integer_type, _uint_type, type_compare.less_type, SemanticTree.basic_function_type.itoui);
-            _int_to_long = make_type_conversion(_integer_type, _int64_type, type_compare.less_type, SemanticTree.basic_function_type.itol);
-            _int_to_ulong = make_type_conversion(_integer_type, _uint64_type, type_compare.less_type, SemanticTree.basic_function_type.itoul);
-            _int_to_char = make_type_conversion(_integer_type, _char_type, type_compare.greater_type, SemanticTree.basic_function_type.itochar, false);
-            _int_to_double=make_type_conversion(_integer_type, _double_type, type_compare.less_type, SemanticTree.basic_function_type.itod);
+            _int_to_byte = make_type_conversion(_integer_type, _byte_type, type_compare.greater_type, basic_function_type.itob);
+            _int_to_sbyte = make_type_conversion(_integer_type, _sbyte_type, type_compare.greater_type, basic_function_type.itosb);
+            _int_to_short = make_type_conversion(_integer_type, _short_type, type_compare.greater_type, basic_function_type.itos);
+            _int_to_ushort = make_type_conversion(_integer_type, _ushort_type, type_compare.greater_type, basic_function_type.itous);
+            _int_to_uint = make_type_conversion(_integer_type, _uint_type, type_compare.less_type, basic_function_type.itoui);
+            _int_to_long = make_type_conversion(_integer_type, _int64_type, type_compare.less_type, basic_function_type.itol);
+            _int_to_ulong = make_type_conversion(_integer_type, _uint64_type, type_compare.less_type, basic_function_type.itoul);
+            _int_to_char = make_type_conversion(_integer_type, _char_type, type_compare.greater_type, basic_function_type.itochar, false);
+            _int_to_double=make_type_conversion(_integer_type, _double_type, type_compare.less_type, basic_function_type.itod);
             //make_type_conversion(_integer_type, _long_type, type_compare.less_type, SemanticTree.basic_function_type.itol);
-            _int_to_float = make_type_conversion(_integer_type, _float_type, type_compare.less_type, SemanticTree.basic_function_type.itof);
+            _int_to_float = make_type_conversion(_integer_type, _float_type, type_compare.less_type, basic_function_type.itof);
             //Присваивание для integer.
-            _int_assign=make_assign_operator(_integer_type, SemanticTree.basic_function_type.iassign);
+            _int_assign=make_assign_operator(_integer_type, basic_function_type.iassign);
             //Унарные операции.
-            _int_unmin=make_unary_operator(compiler_string_consts.minus_name, _integer_type, SemanticTree.basic_function_type.iunmin);
-            _int_not = make_unary_operator(compiler_string_consts.not_name, _integer_type, SemanticTree.basic_function_type.inot);
+            _int_unmin=make_unary_operator(compiler_string_consts.minus_name, _integer_type, basic_function_type.iunmin);
+            _int_not = make_unary_operator(compiler_string_consts.not_name, _integer_type, basic_function_type.inot);
             make_unary_empty_operator(compiler_string_consts.plus_name, _integer_type, _integer_type);
             //Арифметические операции.
-            _int_add = make_binary_operator(compiler_string_consts.plus_name, _integer_type, SemanticTree.basic_function_type.iadd);            
-            _int_sub = make_binary_operator(compiler_string_consts.minus_name, _integer_type, SemanticTree.basic_function_type.isub);
-            _int_mul=make_binary_operator(compiler_string_consts.mul_name, _integer_type, SemanticTree.basic_function_type.imul);
-            _int_idiv=make_binary_operator(compiler_string_consts.idiv_name, _integer_type, SemanticTree.basic_function_type.idiv);
-            _int_mod=make_binary_operator(compiler_string_consts.mod_name, _integer_type, SemanticTree.basic_function_type.imod);
+            _int_add = make_binary_operator(compiler_string_consts.plus_name, _integer_type, basic_function_type.iadd);            
+            _int_sub = make_binary_operator(compiler_string_consts.minus_name, _integer_type, basic_function_type.isub);
+            _int_mul=make_binary_operator(compiler_string_consts.mul_name, _integer_type, basic_function_type.imul);
+            _int_idiv=make_binary_operator(compiler_string_consts.idiv_name, _integer_type, basic_function_type.idiv);
+            _int_mod=make_binary_operator(compiler_string_consts.mod_name, _integer_type, basic_function_type.imod);
             //Операция / для integer.
             _int_div = make_common_binary_operation(compiler_string_consts.div_name, _integer_type, _double_type, _double_type,
-                SemanticTree.basic_function_type.ddiv, _double_type);
+                basic_function_type.ddiv, _double_type);
             //_int_div = make_common_binary_operation(compiler_string_consts.div_name, _integer_type, _integer_type, _integer_type,
             //    SemanticTree.basic_function_type.ddiv, _real_type);
             //Опрерации сравнения.
-            _int_gr=make_binary_operator(compiler_string_consts.gr_name, _integer_type, SemanticTree.basic_function_type.igr, _bool_type);
-            _int_greq=make_binary_operator(compiler_string_consts.greq_name, _integer_type, SemanticTree.basic_function_type.igreq, _bool_type);
-            _int_sm=make_binary_operator(compiler_string_consts.sm_name, _integer_type, SemanticTree.basic_function_type.ism, _bool_type);
-            _int_smeq=make_binary_operator(compiler_string_consts.smeq_name, _integer_type, SemanticTree.basic_function_type.ismeq, _bool_type);
-            _int_eq=make_binary_operator(compiler_string_consts.eq_name, _integer_type, SemanticTree.basic_function_type.ieq, _bool_type);
-            _int_noteq=make_binary_operator(compiler_string_consts.noteq_name, _integer_type, SemanticTree.basic_function_type.inoteq, _bool_type);
+            _int_gr=make_binary_operator(compiler_string_consts.gr_name, _integer_type, basic_function_type.igr, _bool_type);
+            _int_greq=make_binary_operator(compiler_string_consts.greq_name, _integer_type, basic_function_type.igreq, _bool_type);
+            _int_sm=make_binary_operator(compiler_string_consts.sm_name, _integer_type, basic_function_type.ism, _bool_type);
+            _int_smeq=make_binary_operator(compiler_string_consts.smeq_name, _integer_type, basic_function_type.ismeq, _bool_type);
+            _int_eq=make_binary_operator(compiler_string_consts.eq_name, _integer_type, basic_function_type.ieq, _bool_type);
+            _int_noteq=make_binary_operator(compiler_string_consts.noteq_name, _integer_type, basic_function_type.inoteq, _bool_type);
             //Логические опреции.
-            _int_and=make_binary_operator(compiler_string_consts.and_name, _integer_type, SemanticTree.basic_function_type.iand);
-            _int_or=make_binary_operator(compiler_string_consts.or_name, _integer_type, SemanticTree.basic_function_type.ior);
-            _int_xor=make_binary_operator(compiler_string_consts.xor_name, _integer_type, SemanticTree.basic_function_type.ixor);
-            _int_shl=make_binary_operator(compiler_string_consts.shl_name, _integer_type, SemanticTree.basic_function_type.ishl);
-            _int_shr=make_binary_operator(compiler_string_consts.shr_name, _integer_type, SemanticTree.basic_function_type.ishr);
+            _int_and=make_binary_operator(compiler_string_consts.and_name, _integer_type, basic_function_type.iand);
+            _int_or=make_binary_operator(compiler_string_consts.or_name, _integer_type, basic_function_type.ior);
+            _int_xor=make_binary_operator(compiler_string_consts.xor_name, _integer_type, basic_function_type.ixor);
+            _int_shl=make_binary_operator(compiler_string_consts.shl_name, _integer_type, basic_function_type.ishl);
+            _int_shr=make_binary_operator(compiler_string_consts.shr_name, _integer_type, basic_function_type.ishr);
 
 
             //byte type.
             //Assign.
-            _byte_assign = make_assign_operator(_byte_type, SemanticTree.basic_function_type.bassign);
+            _byte_assign = make_assign_operator(_byte_type, basic_function_type.bassign);
             //Преобразования типов.
-            _byte_to_sbyte = make_type_conversion(_byte_type, _sbyte_type, type_compare.greater_type, SemanticTree.basic_function_type.btosb);
-            _byte_to_short = make_type_conversion(_byte_type, _short_type, type_compare.less_type, SemanticTree.basic_function_type.btos);
-            _byte_to_ushort = make_type_conversion(_byte_type, _ushort_type, type_compare.less_type, SemanticTree.basic_function_type.btous);
-            _byte_to_uint = make_type_conversion(_byte_type, _uint_type, type_compare.less_type, SemanticTree.basic_function_type.btoui);
-            _byte_to_long = make_type_conversion(_byte_type, _int64_type, type_compare.less_type, SemanticTree.basic_function_type.btol);
-            _byte_to_ulong = make_type_conversion(_byte_type, _uint64_type, type_compare.less_type, SemanticTree.basic_function_type.btoul);
-            _byte_to_int = make_type_conversion(_byte_type, _integer_type, type_compare.less_type, SemanticTree.basic_function_type.btoi);
-            _byte_to_char = make_type_conversion(_byte_type, _char_type, type_compare.less_type, SemanticTree.basic_function_type.btochar,false);
-            _byte_to_float = make_type_conversion(_byte_type, _float_type, type_compare.less_type, SemanticTree.basic_function_type.btof);
-            _byte_to_double = make_type_conversion(_byte_type, _double_type, type_compare.less_type, SemanticTree.basic_function_type.btod);
+            _byte_to_sbyte = make_type_conversion(_byte_type, _sbyte_type, type_compare.greater_type, basic_function_type.btosb);
+            _byte_to_short = make_type_conversion(_byte_type, _short_type, type_compare.less_type, basic_function_type.btos);
+            _byte_to_ushort = make_type_conversion(_byte_type, _ushort_type, type_compare.less_type, basic_function_type.btous);
+            _byte_to_uint = make_type_conversion(_byte_type, _uint_type, type_compare.less_type, basic_function_type.btoui);
+            _byte_to_long = make_type_conversion(_byte_type, _int64_type, type_compare.less_type, basic_function_type.btol);
+            _byte_to_ulong = make_type_conversion(_byte_type, _uint64_type, type_compare.less_type, basic_function_type.btoul);
+            _byte_to_int = make_type_conversion(_byte_type, _integer_type, type_compare.less_type, basic_function_type.btoi);
+            _byte_to_char = make_type_conversion(_byte_type, _char_type, type_compare.less_type, basic_function_type.btochar,false);
+            _byte_to_float = make_type_conversion(_byte_type, _float_type, type_compare.less_type, basic_function_type.btof);
+            _byte_to_double = make_type_conversion(_byte_type, _double_type, type_compare.less_type, basic_function_type.btod);
             //Унарные операции.
-            _byte_unmin = make_unary_operator(compiler_string_consts.minus_name, _byte_type, SemanticTree.basic_function_type.bunmin, _integer_type);
-            _byte_not = make_unary_operator(compiler_string_consts.not_name, _byte_type, SemanticTree.basic_function_type.bnot);
+            _byte_unmin = make_unary_operator(compiler_string_consts.minus_name, _byte_type, basic_function_type.bunmin, _integer_type);
+            _byte_not = make_unary_operator(compiler_string_consts.not_name, _byte_type, basic_function_type.bnot);
             make_unary_empty_operator(compiler_string_consts.plus_name, _byte_type, _byte_type);
             //Опрерации сравнения.
             /*
@@ -1334,12 +1335,12 @@ namespace PascalABCCompiler.SystemLibrary
             */
             //Операция / для byte.
             _byte_div = make_common_binary_operation(compiler_string_consts.div_name, _byte_type, _double_type, _double_type,
-                SemanticTree.basic_function_type.ddiv, _double_type);
+                basic_function_type.ddiv, _double_type);
             //Логические опреции.
             
-            _byte_and = make_common_binary_operation(compiler_string_consts.and_name, _byte_type, _byte_type, _byte_type, SemanticTree.basic_function_type.band, _byte_type);
-            _byte_or = make_common_binary_operation(compiler_string_consts.or_name, _byte_type, _byte_type, _byte_type, SemanticTree.basic_function_type.bor, _byte_type);
-            _byte_xor = make_common_binary_operation(compiler_string_consts.xor_name, _byte_type, _byte_type, _byte_type, SemanticTree.basic_function_type.bxor, _byte_type);
+            _byte_and = make_common_binary_operation(compiler_string_consts.and_name, _byte_type, _byte_type, _byte_type, basic_function_type.band, _byte_type);
+            _byte_or = make_common_binary_operation(compiler_string_consts.or_name, _byte_type, _byte_type, _byte_type, basic_function_type.bor, _byte_type);
+            _byte_xor = make_common_binary_operation(compiler_string_consts.xor_name, _byte_type, _byte_type, _byte_type, basic_function_type.bxor, _byte_type);
             
             add_function_to_type(compiler_string_consts.shl_name, _byte_type, _int_shl);
             add_function_to_type(compiler_string_consts.shr_name, _byte_type, _int_shr);
@@ -1348,21 +1349,21 @@ namespace PascalABCCompiler.SystemLibrary
 
             //sbyte type.
             //Assign.
-            _sbyte_assign = make_assign_operator(_sbyte_type, SemanticTree.basic_function_type.sbassign);
+            _sbyte_assign = make_assign_operator(_sbyte_type, basic_function_type.sbassign);
             //Преобразования sbyteов.
-	        _sbyte_to_byte = make_type_conversion(_sbyte_type, _byte_type, type_compare.less_type, SemanticTree.basic_function_type.sbtob);
-            _sbyte_to_short = make_type_conversion(_sbyte_type, _short_type, type_compare.less_type, SemanticTree.basic_function_type.sbtos);
-            _sbyte_to_ushort = make_type_conversion(_sbyte_type, _ushort_type, type_compare.less_type, SemanticTree.basic_function_type.sbtous);
-            _sbyte_to_uint = make_type_conversion(_sbyte_type, _uint_type, type_compare.less_type, SemanticTree.basic_function_type.sbtoui);
-            _sbyte_to_long = make_type_conversion(_sbyte_type, _int64_type, type_compare.less_type, SemanticTree.basic_function_type.sbtol);
-            _sbyte_to_ulong = make_type_conversion(_sbyte_type, _uint64_type, type_compare.less_type, SemanticTree.basic_function_type.sbtoul);
-            _sbyte_to_int = make_type_conversion(_sbyte_type, _integer_type, type_compare.less_type, SemanticTree.basic_function_type.sbtoi);
-            _sbyte_to_char = make_type_conversion(_sbyte_type, _char_type, type_compare.less_type, SemanticTree.basic_function_type.sbtochar,false);
-            _sbyte_to_float = make_type_conversion(_sbyte_type, _float_type, type_compare.less_type, SemanticTree.basic_function_type.sbtof);
-            _sbyte_to_double = make_type_conversion(_sbyte_type, _double_type, type_compare.less_type, SemanticTree.basic_function_type.sbtod);
+	        _sbyte_to_byte = make_type_conversion(_sbyte_type, _byte_type, type_compare.less_type, basic_function_type.sbtob);
+            _sbyte_to_short = make_type_conversion(_sbyte_type, _short_type, type_compare.less_type, basic_function_type.sbtos);
+            _sbyte_to_ushort = make_type_conversion(_sbyte_type, _ushort_type, type_compare.less_type, basic_function_type.sbtous);
+            _sbyte_to_uint = make_type_conversion(_sbyte_type, _uint_type, type_compare.less_type, basic_function_type.sbtoui);
+            _sbyte_to_long = make_type_conversion(_sbyte_type, _int64_type, type_compare.less_type, basic_function_type.sbtol);
+            _sbyte_to_ulong = make_type_conversion(_sbyte_type, _uint64_type, type_compare.less_type, basic_function_type.sbtoul);
+            _sbyte_to_int = make_type_conversion(_sbyte_type, _integer_type, type_compare.less_type, basic_function_type.sbtoi);
+            _sbyte_to_char = make_type_conversion(_sbyte_type, _char_type, type_compare.less_type, basic_function_type.sbtochar,false);
+            _sbyte_to_float = make_type_conversion(_sbyte_type, _float_type, type_compare.less_type, basic_function_type.sbtof);
+            _sbyte_to_double = make_type_conversion(_sbyte_type, _double_type, type_compare.less_type, basic_function_type.sbtod);
             //Унарные операции.
-            _sbyte_unmin = make_unary_operator(compiler_string_consts.minus_name, _sbyte_type, SemanticTree.basic_function_type.sbunmin, _integer_type);
-            _sbyte_not = make_unary_operator(compiler_string_consts.not_name, _sbyte_type, SemanticTree.basic_function_type.sbnot);
+            _sbyte_unmin = make_unary_operator(compiler_string_consts.minus_name, _sbyte_type, basic_function_type.sbunmin, _integer_type);
+            _sbyte_not = make_unary_operator(compiler_string_consts.not_name, _sbyte_type, basic_function_type.sbnot);
             make_unary_empty_operator(compiler_string_consts.plus_name, _sbyte_type, _sbyte_type);
 
             add_function_to_type(compiler_string_consts.not_name, _sbyte_type, _int_unmin);
@@ -1383,33 +1384,33 @@ namespace PascalABCCompiler.SystemLibrary
 			
             //Операция / для byte.
             _sbyte_div = make_common_binary_operation(compiler_string_consts.div_name, _sbyte_type, _double_type, _double_type,
-                SemanticTree.basic_function_type.ddiv, _double_type);
+                basic_function_type.ddiv, _double_type);
             //Логические опреции.
             
-            _sbyte_and = make_common_binary_operation(compiler_string_consts.and_name, _sbyte_type, _sbyte_type, _sbyte_type, SemanticTree.basic_function_type.sband, _sbyte_type);
-            _sbyte_or = make_common_binary_operation(compiler_string_consts.or_name, _sbyte_type, _sbyte_type, _sbyte_type, SemanticTree.basic_function_type.sbor, _sbyte_type);
-            _sbyte_xor = make_common_binary_operation(compiler_string_consts.xor_name, _sbyte_type,_sbyte_type, _sbyte_type, SemanticTree.basic_function_type.sbxor, _sbyte_type);
+            _sbyte_and = make_common_binary_operation(compiler_string_consts.and_name, _sbyte_type, _sbyte_type, _sbyte_type, basic_function_type.sband, _sbyte_type);
+            _sbyte_or = make_common_binary_operation(compiler_string_consts.or_name, _sbyte_type, _sbyte_type, _sbyte_type, basic_function_type.sbor, _sbyte_type);
+            _sbyte_xor = make_common_binary_operation(compiler_string_consts.xor_name, _sbyte_type,_sbyte_type, _sbyte_type, basic_function_type.sbxor, _sbyte_type);
             
             add_function_to_type(compiler_string_consts.shl_name, _sbyte_type, _int_shl);
             add_function_to_type(compiler_string_consts.shr_name, _sbyte_type, _int_shr);
 
             	    //short type.
             //Assign.
-            _short_assign = make_assign_operator(_short_type, SemanticTree.basic_function_type.sassign);
+            _short_assign = make_assign_operator(_short_type, basic_function_type.sassign);
             //Преобразования shortов.
-	        _short_to_byte = make_type_conversion(_short_type, _byte_type, type_compare.greater_type, SemanticTree.basic_function_type.stob);
-            _short_to_sbyte = make_type_conversion(_short_type, _sbyte_type, type_compare.greater_type, SemanticTree.basic_function_type.stosb);
-            _short_to_ushort = make_type_conversion(_short_type, _ushort_type, type_compare.less_type, SemanticTree.basic_function_type.stous);
-            _short_to_uint = make_type_conversion(_short_type, _uint_type, type_compare.less_type, SemanticTree.basic_function_type.stoui);
-            _short_to_long = make_type_conversion(_short_type, _int64_type, type_compare.less_type, SemanticTree.basic_function_type.stol);
-            _short_to_ulong = make_type_conversion(_short_type, _uint64_type, type_compare.less_type, SemanticTree.basic_function_type.stoul);
-            _short_to_int = make_type_conversion(_short_type, _integer_type, type_compare.less_type, SemanticTree.basic_function_type.stoi);
-            _short_to_char = make_type_conversion(_short_type, _char_type, type_compare.greater_type, SemanticTree.basic_function_type.stochar,false);
-            _short_to_float = make_type_conversion(_short_type, _float_type, type_compare.less_type, SemanticTree.basic_function_type.stof);
-            _short_to_double = make_type_conversion(_short_type, _double_type, type_compare.less_type, SemanticTree.basic_function_type.stod);
+	        _short_to_byte = make_type_conversion(_short_type, _byte_type, type_compare.greater_type, basic_function_type.stob);
+            _short_to_sbyte = make_type_conversion(_short_type, _sbyte_type, type_compare.greater_type, basic_function_type.stosb);
+            _short_to_ushort = make_type_conversion(_short_type, _ushort_type, type_compare.less_type, basic_function_type.stous);
+            _short_to_uint = make_type_conversion(_short_type, _uint_type, type_compare.less_type, basic_function_type.stoui);
+            _short_to_long = make_type_conversion(_short_type, _int64_type, type_compare.less_type, basic_function_type.stol);
+            _short_to_ulong = make_type_conversion(_short_type, _uint64_type, type_compare.less_type, basic_function_type.stoul);
+            _short_to_int = make_type_conversion(_short_type, _integer_type, type_compare.less_type, basic_function_type.stoi);
+            _short_to_char = make_type_conversion(_short_type, _char_type, type_compare.greater_type, basic_function_type.stochar,false);
+            _short_to_float = make_type_conversion(_short_type, _float_type, type_compare.less_type, basic_function_type.stof);
+            _short_to_double = make_type_conversion(_short_type, _double_type, type_compare.less_type, basic_function_type.stod);
             //Унарные операции.
-            _short_unmin = make_unary_operator(compiler_string_consts.minus_name, _short_type, SemanticTree.basic_function_type.sunmin,_integer_type);
-            _short_not = make_unary_operator(compiler_string_consts.not_name, _short_type, SemanticTree.basic_function_type.snot);
+            _short_unmin = make_unary_operator(compiler_string_consts.minus_name, _short_type, basic_function_type.sunmin,_integer_type);
+            _short_not = make_unary_operator(compiler_string_consts.not_name, _short_type, basic_function_type.snot);
             make_unary_empty_operator(compiler_string_consts.plus_name, _short_type, _short_type);
 
             add_function_to_type(compiler_string_consts.not_name, _short_type, _int_unmin);
@@ -1434,33 +1435,33 @@ namespace PascalABCCompiler.SystemLibrary
 
             //Операция / для byte.
             _short_div = make_common_binary_operation(compiler_string_consts.div_name, _short_type, _double_type, _double_type,
-                SemanticTree.basic_function_type.ddiv, _double_type);
+                basic_function_type.ddiv, _double_type);
             //Логические опреции.
             
-            _short_and = make_common_binary_operation(compiler_string_consts.and_name, _short_type, _short_type, _short_type, SemanticTree.basic_function_type.sand, _short_type);
-            _short_or = make_common_binary_operation(compiler_string_consts.or_name, _short_type, _short_type, _short_type, SemanticTree.basic_function_type.sor, _short_type);
-            _short_xor = make_common_binary_operation(compiler_string_consts.xor_name, _short_type, _short_type, _short_type, SemanticTree.basic_function_type.sxor, _short_type);
+            _short_and = make_common_binary_operation(compiler_string_consts.and_name, _short_type, _short_type, _short_type, basic_function_type.sand, _short_type);
+            _short_or = make_common_binary_operation(compiler_string_consts.or_name, _short_type, _short_type, _short_type, basic_function_type.sor, _short_type);
+            _short_xor = make_common_binary_operation(compiler_string_consts.xor_name, _short_type, _short_type, _short_type, basic_function_type.sxor, _short_type);
             
             add_function_to_type(compiler_string_consts.shl_name, _short_type, _int_shl);
             add_function_to_type(compiler_string_consts.shr_name, _short_type, _int_shr);
 
             //ushort type.
             //Assign.
-            _ushort_assign = make_assign_operator(_ushort_type, SemanticTree.basic_function_type.usassign);
+            _ushort_assign = make_assign_operator(_ushort_type, basic_function_type.usassign);
             //Преобразования ushortов.
-	        _ushort_to_byte = make_type_conversion(_ushort_type, _byte_type, type_compare.greater_type, SemanticTree.basic_function_type.ustob);
-            _ushort_to_sbyte = make_type_conversion(_ushort_type, _sbyte_type, type_compare.greater_type, SemanticTree.basic_function_type.ustosb);
-            _ushort_to_short = make_type_conversion(_ushort_type, _short_type, type_compare.greater_type, SemanticTree.basic_function_type.ustos);
-            _ushort_to_uint = make_type_conversion(_ushort_type, _uint_type, type_compare.less_type, SemanticTree.basic_function_type.ustoui);
-            _ushort_to_long = make_type_conversion(_ushort_type, _int64_type, type_compare.less_type, SemanticTree.basic_function_type.ustol);
-            _ushort_to_ulong = make_type_conversion(_ushort_type, _uint64_type, type_compare.less_type, SemanticTree.basic_function_type.ustoul);
-            _ushort_to_int = make_type_conversion(_ushort_type, _integer_type, type_compare.less_type, SemanticTree.basic_function_type.ustoi);
-            _ushort_to_char = make_type_conversion(_ushort_type, _char_type, type_compare.greater_type, SemanticTree.basic_function_type.ustochar,false);
-            _ushort_to_float = make_type_conversion(_ushort_type, _float_type, type_compare.less_type, SemanticTree.basic_function_type.ustof);
-            _ushort_to_double = make_type_conversion(_ushort_type, _double_type, type_compare.less_type, SemanticTree.basic_function_type.ustod);
+	        _ushort_to_byte = make_type_conversion(_ushort_type, _byte_type, type_compare.greater_type, basic_function_type.ustob);
+            _ushort_to_sbyte = make_type_conversion(_ushort_type, _sbyte_type, type_compare.greater_type, basic_function_type.ustosb);
+            _ushort_to_short = make_type_conversion(_ushort_type, _short_type, type_compare.greater_type, basic_function_type.ustos);
+            _ushort_to_uint = make_type_conversion(_ushort_type, _uint_type, type_compare.less_type, basic_function_type.ustoui);
+            _ushort_to_long = make_type_conversion(_ushort_type, _int64_type, type_compare.less_type, basic_function_type.ustol);
+            _ushort_to_ulong = make_type_conversion(_ushort_type, _uint64_type, type_compare.less_type, basic_function_type.ustoul);
+            _ushort_to_int = make_type_conversion(_ushort_type, _integer_type, type_compare.less_type, basic_function_type.ustoi);
+            _ushort_to_char = make_type_conversion(_ushort_type, _char_type, type_compare.greater_type, basic_function_type.ustochar,false);
+            _ushort_to_float = make_type_conversion(_ushort_type, _float_type, type_compare.less_type, basic_function_type.ustof);
+            _ushort_to_double = make_type_conversion(_ushort_type, _double_type, type_compare.less_type, basic_function_type.ustod);
             //Унарные операции.
-            _ushort_unmin = make_unary_operator(compiler_string_consts.minus_name, _ushort_type, SemanticTree.basic_function_type.usunmin, _integer_type);
-            _ushort_not = make_unary_operator(compiler_string_consts.not_name, _ushort_type, SemanticTree.basic_function_type.usnot);
+            _ushort_unmin = make_unary_operator(compiler_string_consts.minus_name, _ushort_type, basic_function_type.usunmin, _integer_type);
+            _ushort_not = make_unary_operator(compiler_string_consts.not_name, _ushort_type, basic_function_type.usnot);
             make_unary_empty_operator(compiler_string_consts.plus_name, _ushort_type, _ushort_type);
 
             add_function_to_type(compiler_string_consts.not_name, _ushort_type, _int_unmin);
@@ -1502,12 +1503,12 @@ namespace PascalABCCompiler.SystemLibrary
             */
             //Операция / для byte.
             _ushort_div = make_common_binary_operation(compiler_string_consts.div_name, _ushort_type, _double_type, _double_type,
-                SemanticTree.basic_function_type.ddiv, _double_type);
+                basic_function_type.ddiv, _double_type);
             //Логические опреции.
             
-            _ushort_and = make_common_binary_operation(compiler_string_consts.and_name, _ushort_type, _ushort_type, _ushort_type, SemanticTree.basic_function_type.usand, _ushort_type);
-            _ushort_or = make_common_binary_operation(compiler_string_consts.or_name, _ushort_type, _ushort_type, _ushort_type, SemanticTree.basic_function_type.usor, _ushort_type);
-            _ushort_xor = make_common_binary_operation(compiler_string_consts.xor_name, _ushort_type, _ushort_type, _ushort_type, SemanticTree.basic_function_type.usxor, _ushort_type);
+            _ushort_and = make_common_binary_operation(compiler_string_consts.and_name, _ushort_type, _ushort_type, _ushort_type, basic_function_type.usand, _ushort_type);
+            _ushort_or = make_common_binary_operation(compiler_string_consts.or_name, _ushort_type, _ushort_type, _ushort_type, basic_function_type.usor, _ushort_type);
+            _ushort_xor = make_common_binary_operation(compiler_string_consts.xor_name, _ushort_type, _ushort_type, _ushort_type, basic_function_type.usxor, _ushort_type);
             
             add_function_to_type(compiler_string_consts.shl_name, _ushort_type, _int_shl);
             add_function_to_type(compiler_string_consts.shr_name, _ushort_type, _int_shr);
@@ -1516,29 +1517,29 @@ namespace PascalABCCompiler.SystemLibrary
 
             //uint type.
             //Assign.
-            _uint_assign = make_assign_operator(_uint_type, SemanticTree.basic_function_type.uiassign);
+            _uint_assign = make_assign_operator(_uint_type, basic_function_type.uiassign);
             //Преобразования uintов.
-	        _uint_to_byte = make_type_conversion(_uint_type, _byte_type, type_compare.greater_type, SemanticTree.basic_function_type.uitob);
-            _uint_to_sbyte = make_type_conversion(_uint_type, _sbyte_type, type_compare.greater_type, SemanticTree.basic_function_type.uitosb);
-            _uint_to_short = make_type_conversion(_uint_type, _short_type, type_compare.greater_type, SemanticTree.basic_function_type.uitos);
-            _uint_to_ushort = make_type_conversion(_uint_type, _ushort_type, type_compare.greater_type, SemanticTree.basic_function_type.uitous);
-            _uint_to_long = make_type_conversion(_uint_type, _int64_type, type_compare.less_type, SemanticTree.basic_function_type.uitol);
-            _uint_to_ulong = make_type_conversion(_uint_type, _uint64_type, type_compare.less_type, SemanticTree.basic_function_type.uitoul);
-            _uint_to_int = make_type_conversion(_uint_type, _integer_type, type_compare.greater_type, SemanticTree.basic_function_type.uitoi);
-            _uint_to_char = make_type_conversion(_uint_type, _char_type, type_compare.greater_type, SemanticTree.basic_function_type.uitochar,false);
-            _uint_to_float = make_type_conversion(_uint_type, _float_type, type_compare.less_type, SemanticTree.basic_function_type.uitof);
-            _uint_to_double = make_type_conversion(_uint_type, _double_type, type_compare.less_type, SemanticTree.basic_function_type.uitod);
+	        _uint_to_byte = make_type_conversion(_uint_type, _byte_type, type_compare.greater_type, basic_function_type.uitob);
+            _uint_to_sbyte = make_type_conversion(_uint_type, _sbyte_type, type_compare.greater_type, basic_function_type.uitosb);
+            _uint_to_short = make_type_conversion(_uint_type, _short_type, type_compare.greater_type, basic_function_type.uitos);
+            _uint_to_ushort = make_type_conversion(_uint_type, _ushort_type, type_compare.greater_type, basic_function_type.uitous);
+            _uint_to_long = make_type_conversion(_uint_type, _int64_type, type_compare.less_type, basic_function_type.uitol);
+            _uint_to_ulong = make_type_conversion(_uint_type, _uint64_type, type_compare.less_type, basic_function_type.uitoul);
+            _uint_to_int = make_type_conversion(_uint_type, _integer_type, type_compare.greater_type, basic_function_type.uitoi);
+            _uint_to_char = make_type_conversion(_uint_type, _char_type, type_compare.greater_type, basic_function_type.uitochar,false);
+            _uint_to_float = make_type_conversion(_uint_type, _float_type, type_compare.less_type, basic_function_type.uitof);
+            _uint_to_double = make_type_conversion(_uint_type, _double_type, type_compare.less_type, basic_function_type.uitod);
             //Унарные операции.
-            _uint_unmin = make_unary_operator(compiler_string_consts.minus_name, _uint_type, SemanticTree.basic_function_type.uiunmin, _int64_type);
-            _uint_not = make_unary_operator(compiler_string_consts.not_name, _uint_type, SemanticTree.basic_function_type.uinot);
+            _uint_unmin = make_unary_operator(compiler_string_consts.minus_name, _uint_type, basic_function_type.uiunmin, _int64_type);
+            _uint_not = make_unary_operator(compiler_string_consts.not_name, _uint_type, basic_function_type.uinot);
             make_unary_empty_operator(compiler_string_consts.plus_name, _uint_type, _uint_type);
             //Опрерации сравнения.
-            _uint_gr = make_binary_operator(compiler_string_consts.gr_name, _uint_type, SemanticTree.basic_function_type.uigr, _bool_type);
-            _uint_greq = make_binary_operator(compiler_string_consts.greq_name, _uint_type, SemanticTree.basic_function_type.uigreq, _bool_type);
-            _uint_sm = make_binary_operator(compiler_string_consts.sm_name, _uint_type, SemanticTree.basic_function_type.uism, _bool_type);
-            _uint_smeq = make_binary_operator(compiler_string_consts.smeq_name, _uint_type, SemanticTree.basic_function_type.uismeq, _bool_type);
-            _uint_eq = make_binary_operator(compiler_string_consts.eq_name, _uint_type, SemanticTree.basic_function_type.uieq, _bool_type);
-            _uint_noteq = make_binary_operator(compiler_string_consts.noteq_name, _uint_type, SemanticTree.basic_function_type.uinoteq, _bool_type);
+            _uint_gr = make_binary_operator(compiler_string_consts.gr_name, _uint_type, basic_function_type.uigr, _bool_type);
+            _uint_greq = make_binary_operator(compiler_string_consts.greq_name, _uint_type, basic_function_type.uigreq, _bool_type);
+            _uint_sm = make_binary_operator(compiler_string_consts.sm_name, _uint_type, basic_function_type.uism, _bool_type);
+            _uint_smeq = make_binary_operator(compiler_string_consts.smeq_name, _uint_type, basic_function_type.uismeq, _bool_type);
+            _uint_eq = make_binary_operator(compiler_string_consts.eq_name, _uint_type, basic_function_type.uieq, _bool_type);
+            _uint_noteq = make_binary_operator(compiler_string_consts.noteq_name, _uint_type, basic_function_type.uinoteq, _bool_type);
             //Арифметические операции.
             /*_uint_add = make_common_binary_operation(compiler_string_consts.plus_name, _uint_type, _uint_type, _uint_type, SemanticTree.basic_function_type.uiadd, _uint_type);
             _uint_sub = make_common_binary_operation(compiler_string_consts.minus_name, _uint_type, _uint_type, _uint_type, SemanticTree.basic_function_type.uisub, _uint_type);
@@ -1557,22 +1558,22 @@ namespace PascalABCCompiler.SystemLibrary
             _uint_shl = make_common_binary_operation(compiler_string_consts.shl_name, _uint_type, _uint_type, _integer_type, SemanticTree.basic_function_type.uishl,_uint_type);
             _uint_shr = make_common_binary_operation(compiler_string_consts.shr_name, _uint_type, _uint_type, _integer_type, SemanticTree.basic_function_type.uishr, _uint_type);*/
 			
-            _uint_add = make_common_binary_operation(compiler_string_consts.plus_name, _uint_type, _uint_type, _uint_type, SemanticTree.basic_function_type.uiadd, _int64_type);
-            _uint_sub = make_common_binary_operation(compiler_string_consts.minus_name, _uint_type, _uint_type, _uint_type, SemanticTree.basic_function_type.uisub, _int64_type);
-            _uint_mul = make_common_binary_operation(compiler_string_consts.mul_name, _uint_type, _uint_type, _uint_type, SemanticTree.basic_function_type.uimul, _int64_type);
-            _uint_idiv = make_common_binary_operation(compiler_string_consts.idiv_name, _uint_type, _uint_type, _uint_type, SemanticTree.basic_function_type.uidiv, _int64_type);
-            _uint_mod = make_common_binary_operation(compiler_string_consts.mod_name, _uint_type, _uint_type, _uint_type, SemanticTree.basic_function_type.uimod, _int64_type);
+            _uint_add = make_common_binary_operation(compiler_string_consts.plus_name, _uint_type, _uint_type, _uint_type, basic_function_type.uiadd, _int64_type);
+            _uint_sub = make_common_binary_operation(compiler_string_consts.minus_name, _uint_type, _uint_type, _uint_type, basic_function_type.uisub, _int64_type);
+            _uint_mul = make_common_binary_operation(compiler_string_consts.mul_name, _uint_type, _uint_type, _uint_type, basic_function_type.uimul, _int64_type);
+            _uint_idiv = make_common_binary_operation(compiler_string_consts.idiv_name, _uint_type, _uint_type, _uint_type, basic_function_type.uidiv, _int64_type);
+            _uint_mod = make_common_binary_operation(compiler_string_consts.mod_name, _uint_type, _uint_type, _uint_type, basic_function_type.uimod, _int64_type);
             //Операция / для byte.
             _uint_div = make_common_binary_operation(compiler_string_consts.div_name, _uint_type, _double_type, _double_type,
-                SemanticTree.basic_function_type.ddiv, _double_type);
+                basic_function_type.ddiv, _double_type);
             //Логические опреции.
-            _uint_and = make_common_binary_operation(compiler_string_consts.and_name, _uint_type, _uint_type, _uint_type, SemanticTree.basic_function_type.uiand, _uint_type);
-            _uint_or = make_common_binary_operation(compiler_string_consts.or_name, _uint_type, _uint_type, _uint_type, SemanticTree.basic_function_type.uior, _uint_type);
-            _uint_xor = make_common_binary_operation(compiler_string_consts.xor_name, _uint_type, _uint_type, _uint_type, SemanticTree.basic_function_type.uixor, _uint_type);
+            _uint_and = make_common_binary_operation(compiler_string_consts.and_name, _uint_type, _uint_type, _uint_type, basic_function_type.uiand, _uint_type);
+            _uint_or = make_common_binary_operation(compiler_string_consts.or_name, _uint_type, _uint_type, _uint_type, basic_function_type.uior, _uint_type);
+            _uint_xor = make_common_binary_operation(compiler_string_consts.xor_name, _uint_type, _uint_type, _uint_type, basic_function_type.uixor, _uint_type);
             //add_funtion_to_type(compiler_string_consts.shl_name, _uint_type, _int_shl);
             //add_funtion_to_type(compiler_string_consts.shr_name, _uint_type, _int_shr);
-            _uint_shl = make_common_binary_operation(compiler_string_consts.shl_name, _uint_type, _uint_type, _integer_type, SemanticTree.basic_function_type.uishl,_uint_type);
-            _uint_shr = make_common_binary_operation(compiler_string_consts.shr_name, _uint_type, _uint_type, _integer_type, SemanticTree.basic_function_type.uishr, _uint_type);
+            _uint_shl = make_common_binary_operation(compiler_string_consts.shl_name, _uint_type, _uint_type, _integer_type, basic_function_type.uishl,_uint_type);
+            _uint_shr = make_common_binary_operation(compiler_string_consts.shr_name, _uint_type, _uint_type, _integer_type, basic_function_type.uishr, _uint_type);
             
             /*make_function_comparison(_int_add, _uint_add, function_compare.greater);
             make_function_comparison(_int_sub, _uint_sub, function_compare.greater);
@@ -1606,46 +1607,46 @@ namespace PascalABCCompiler.SystemLibrary
 
             //long type.
             //Assign.
-            _long_assign = make_assign_operator(_int64_type, SemanticTree.basic_function_type.lassign);
+            _long_assign = make_assign_operator(_int64_type, basic_function_type.lassign);
             //Преобразования longов.
-	        _long_to_byte = make_type_conversion(_int64_type, _byte_type, type_compare.greater_type, SemanticTree.basic_function_type.ltob);
-            _long_to_sbyte = make_type_conversion(_int64_type, _sbyte_type, type_compare.greater_type, SemanticTree.basic_function_type.ltosb);
-            _long_to_short = make_type_conversion(_int64_type, _short_type, type_compare.greater_type, SemanticTree.basic_function_type.ltos);
-            _long_to_ushort = make_type_conversion(_int64_type, _ushort_type, type_compare.greater_type, SemanticTree.basic_function_type.ltous);
-            _long_to_uint = make_type_conversion(_int64_type, _uint_type, type_compare.greater_type, SemanticTree.basic_function_type.ltoui);
-            _long_to_ulong = make_type_conversion(_int64_type, _uint64_type, type_compare.less_type, SemanticTree.basic_function_type.ltoul);
-            _long_to_int = make_type_conversion(_int64_type, _integer_type, type_compare.greater_type, SemanticTree.basic_function_type.ltoi);
-            _long_to_char = make_type_conversion(_int64_type, _char_type, type_compare.greater_type, SemanticTree.basic_function_type.ltochar,false);
-            _long_to_float = make_type_conversion(_int64_type, _float_type, type_compare.less_type, SemanticTree.basic_function_type.ltof);
-            _long_to_double = make_type_conversion(_int64_type, _double_type, type_compare.less_type, SemanticTree.basic_function_type.ltod);
+	        _long_to_byte = make_type_conversion(_int64_type, _byte_type, type_compare.greater_type, basic_function_type.ltob);
+            _long_to_sbyte = make_type_conversion(_int64_type, _sbyte_type, type_compare.greater_type, basic_function_type.ltosb);
+            _long_to_short = make_type_conversion(_int64_type, _short_type, type_compare.greater_type, basic_function_type.ltos);
+            _long_to_ushort = make_type_conversion(_int64_type, _ushort_type, type_compare.greater_type, basic_function_type.ltous);
+            _long_to_uint = make_type_conversion(_int64_type, _uint_type, type_compare.greater_type, basic_function_type.ltoui);
+            _long_to_ulong = make_type_conversion(_int64_type, _uint64_type, type_compare.less_type, basic_function_type.ltoul);
+            _long_to_int = make_type_conversion(_int64_type, _integer_type, type_compare.greater_type, basic_function_type.ltoi);
+            _long_to_char = make_type_conversion(_int64_type, _char_type, type_compare.greater_type, basic_function_type.ltochar,false);
+            _long_to_float = make_type_conversion(_int64_type, _float_type, type_compare.less_type, basic_function_type.ltof);
+            _long_to_double = make_type_conversion(_int64_type, _double_type, type_compare.less_type, basic_function_type.ltod);
             //Унарные операции.
-            _long_unmin = make_unary_operator(compiler_string_consts.minus_name, _int64_type, SemanticTree.basic_function_type.lunmin);
-            _long_not = make_unary_operator(compiler_string_consts.not_name, _int64_type, SemanticTree.basic_function_type.lnot);
+            _long_unmin = make_unary_operator(compiler_string_consts.minus_name, _int64_type, basic_function_type.lunmin);
+            _long_not = make_unary_operator(compiler_string_consts.not_name, _int64_type, basic_function_type.lnot);
             make_unary_empty_operator(compiler_string_consts.plus_name, _int64_type, _int64_type);
             //Опрерации сравнения.
-            _long_gr = make_binary_operator(compiler_string_consts.gr_name, _int64_type, SemanticTree.basic_function_type.lgr, _bool_type);
-            _long_greq = make_binary_operator(compiler_string_consts.greq_name, _int64_type, SemanticTree.basic_function_type.lgreq, _bool_type);
-            _long_sm = make_binary_operator(compiler_string_consts.sm_name, _int64_type, SemanticTree.basic_function_type.lsm, _bool_type);
-            _long_smeq = make_binary_operator(compiler_string_consts.smeq_name, _int64_type, SemanticTree.basic_function_type.lsmeq, _bool_type);
-            _long_eq = make_binary_operator(compiler_string_consts.eq_name, _int64_type, SemanticTree.basic_function_type.leq, _bool_type);
-            _long_noteq = make_binary_operator(compiler_string_consts.noteq_name, _int64_type, SemanticTree.basic_function_type.lnoteq, _bool_type);
+            _long_gr = make_binary_operator(compiler_string_consts.gr_name, _int64_type, basic_function_type.lgr, _bool_type);
+            _long_greq = make_binary_operator(compiler_string_consts.greq_name, _int64_type, basic_function_type.lgreq, _bool_type);
+            _long_sm = make_binary_operator(compiler_string_consts.sm_name, _int64_type, basic_function_type.lsm, _bool_type);
+            _long_smeq = make_binary_operator(compiler_string_consts.smeq_name, _int64_type, basic_function_type.lsmeq, _bool_type);
+            _long_eq = make_binary_operator(compiler_string_consts.eq_name, _int64_type, basic_function_type.leq, _bool_type);
+            _long_noteq = make_binary_operator(compiler_string_consts.noteq_name, _int64_type, basic_function_type.lnoteq, _bool_type);
             //Арифметические операции.
-            _long_add = make_common_binary_operation(compiler_string_consts.plus_name, _int64_type, _int64_type, _int64_type, SemanticTree.basic_function_type.ladd, _int64_type);
-            _long_sub = make_common_binary_operation(compiler_string_consts.minus_name, _int64_type, _int64_type, _int64_type, SemanticTree.basic_function_type.lsub, _int64_type);
-            _long_mul = make_common_binary_operation(compiler_string_consts.mul_name, _int64_type, _int64_type, _int64_type, SemanticTree.basic_function_type.lmul, _int64_type);
-            _long_idiv = make_common_binary_operation(compiler_string_consts.idiv_name, _int64_type, _int64_type, _int64_type, SemanticTree.basic_function_type.ldiv, _int64_type);
-            _long_mod = make_common_binary_operation(compiler_string_consts.mod_name, _int64_type, _int64_type, _int64_type, SemanticTree.basic_function_type.lmod, _int64_type);
+            _long_add = make_common_binary_operation(compiler_string_consts.plus_name, _int64_type, _int64_type, _int64_type, basic_function_type.ladd, _int64_type);
+            _long_sub = make_common_binary_operation(compiler_string_consts.minus_name, _int64_type, _int64_type, _int64_type, basic_function_type.lsub, _int64_type);
+            _long_mul = make_common_binary_operation(compiler_string_consts.mul_name, _int64_type, _int64_type, _int64_type, basic_function_type.lmul, _int64_type);
+            _long_idiv = make_common_binary_operation(compiler_string_consts.idiv_name, _int64_type, _int64_type, _int64_type, basic_function_type.ldiv, _int64_type);
+            _long_mod = make_common_binary_operation(compiler_string_consts.mod_name, _int64_type, _int64_type, _int64_type, basic_function_type.lmod, _int64_type);
             //Операция / для byte.
             _long_div = make_common_binary_operation(compiler_string_consts.div_name, _int64_type, _double_type, _double_type,
-                SemanticTree.basic_function_type.ddiv, _double_type);
+                basic_function_type.ddiv, _double_type);
             //Логические опреции.
-            _long_and = make_common_binary_operation(compiler_string_consts.and_name, _int64_type, _int64_type, _int64_type, SemanticTree.basic_function_type.land, _int64_type);
-            _long_or = make_common_binary_operation(compiler_string_consts.or_name, _int64_type, _int64_type, _int64_type, SemanticTree.basic_function_type.lor, _int64_type);
-            _long_xor = make_common_binary_operation(compiler_string_consts.xor_name, _int64_type, _int64_type, _int64_type, SemanticTree.basic_function_type.lxor, _int64_type);
+            _long_and = make_common_binary_operation(compiler_string_consts.and_name, _int64_type, _int64_type, _int64_type, basic_function_type.land, _int64_type);
+            _long_or = make_common_binary_operation(compiler_string_consts.or_name, _int64_type, _int64_type, _int64_type, basic_function_type.lor, _int64_type);
+            _long_xor = make_common_binary_operation(compiler_string_consts.xor_name, _int64_type, _int64_type, _int64_type, basic_function_type.lxor, _int64_type);
             //add_funtion_to_type(compiler_string_consts.shl_name, _long_type, _int_shl);
             //add_funtion_to_type(compiler_string_consts.shr_name, _long_type, _int_shr);
-            _long_shl = make_common_binary_operation(compiler_string_consts.shl_name, _int64_type, _int64_type, _integer_type, SemanticTree.basic_function_type.lshl, _int64_type);
-            _long_shr = make_common_binary_operation(compiler_string_consts.shr_name, _int64_type, _int64_type, _integer_type, SemanticTree.basic_function_type.lshr, _int64_type);
+            _long_shl = make_common_binary_operation(compiler_string_consts.shl_name, _int64_type, _int64_type, _integer_type, basic_function_type.lshl, _int64_type);
+            _long_shr = make_common_binary_operation(compiler_string_consts.shr_name, _int64_type, _int64_type, _integer_type, basic_function_type.lshr, _int64_type);
 
             make_function_comparison(_long_add, _uint_add, function_compare.greater);
             make_function_comparison(_long_sub, _uint_sub, function_compare.greater);
@@ -1679,46 +1680,46 @@ namespace PascalABCCompiler.SystemLibrary
 
             	    //ulong type.
             //Assign.
-            _ulong_assign = make_assign_operator(_uint64_type, SemanticTree.basic_function_type.ulassign);
+            _ulong_assign = make_assign_operator(_uint64_type, basic_function_type.ulassign);
             //Преобразования ulongов.
-	        _ulong_to_byte = make_type_conversion(_uint64_type, _byte_type, type_compare.greater_type, SemanticTree.basic_function_type.ultob);
-            _ulong_to_sbyte = make_type_conversion(_uint64_type, _sbyte_type, type_compare.greater_type, SemanticTree.basic_function_type.ultosb);
-            _ulong_to_short = make_type_conversion(_uint64_type, _short_type, type_compare.greater_type, SemanticTree.basic_function_type.ultos);
-            _ulong_to_ushort = make_type_conversion(_uint64_type, _ushort_type, type_compare.greater_type, SemanticTree.basic_function_type.ultous);
-            _ulong_to_uint = make_type_conversion(_uint64_type, _uint_type, type_compare.greater_type, SemanticTree.basic_function_type.ultoui);
-            _ulong_to_long = make_type_conversion(_uint64_type, _int64_type, type_compare.greater_type, SemanticTree.basic_function_type.ultol);
-            _ulong_to_int = make_type_conversion(_uint64_type, _integer_type, type_compare.greater_type, SemanticTree.basic_function_type.ultoi);
-            _ulong_to_char = make_type_conversion(_uint64_type, _char_type, type_compare.greater_type, SemanticTree.basic_function_type.ultochar,false);
-            _ulong_to_float = make_type_conversion(_uint64_type, _float_type, type_compare.less_type, SemanticTree.basic_function_type.ultof);
-            _ulong_to_double = make_type_conversion(_uint64_type, _double_type, type_compare.less_type, SemanticTree.basic_function_type.ultod);
+	        _ulong_to_byte = make_type_conversion(_uint64_type, _byte_type, type_compare.greater_type, basic_function_type.ultob);
+            _ulong_to_sbyte = make_type_conversion(_uint64_type, _sbyte_type, type_compare.greater_type, basic_function_type.ultosb);
+            _ulong_to_short = make_type_conversion(_uint64_type, _short_type, type_compare.greater_type, basic_function_type.ultos);
+            _ulong_to_ushort = make_type_conversion(_uint64_type, _ushort_type, type_compare.greater_type, basic_function_type.ultous);
+            _ulong_to_uint = make_type_conversion(_uint64_type, _uint_type, type_compare.greater_type, basic_function_type.ultoui);
+            _ulong_to_long = make_type_conversion(_uint64_type, _int64_type, type_compare.greater_type, basic_function_type.ultol);
+            _ulong_to_int = make_type_conversion(_uint64_type, _integer_type, type_compare.greater_type, basic_function_type.ultoi);
+            _ulong_to_char = make_type_conversion(_uint64_type, _char_type, type_compare.greater_type, basic_function_type.ultochar,false);
+            _ulong_to_float = make_type_conversion(_uint64_type, _float_type, type_compare.less_type, basic_function_type.ultof);
+            _ulong_to_double = make_type_conversion(_uint64_type, _double_type, type_compare.less_type, basic_function_type.ultod);
             //Унарные операции.
-            _ulong_unmin = make_unary_operator(compiler_string_consts.minus_name, _uint64_type, SemanticTree.basic_function_type.ulunmin, _uint64_type);
-            _ulong_not = make_unary_operator(compiler_string_consts.not_name, _uint64_type, SemanticTree.basic_function_type.ulnot);
+            _ulong_unmin = make_unary_operator(compiler_string_consts.minus_name, _uint64_type, basic_function_type.ulunmin, _uint64_type);
+            _ulong_not = make_unary_operator(compiler_string_consts.not_name, _uint64_type, basic_function_type.ulnot);
             make_unary_empty_operator(compiler_string_consts.plus_name, _uint64_type, _uint64_type);
             //Опрерации сравнения.
-            _ulong_gr = make_binary_operator(compiler_string_consts.gr_name, _uint64_type, SemanticTree.basic_function_type.ulgr, _bool_type);
-            _ulong_greq = make_binary_operator(compiler_string_consts.greq_name, _uint64_type, SemanticTree.basic_function_type.ulgreq, _bool_type);
-            _ulong_sm = make_binary_operator(compiler_string_consts.sm_name, _uint64_type, SemanticTree.basic_function_type.ulsm, _bool_type);
-            _ulong_smeq = make_binary_operator(compiler_string_consts.smeq_name, _uint64_type, SemanticTree.basic_function_type.ulsmeq, _bool_type);
-            _ulong_eq = make_binary_operator(compiler_string_consts.eq_name, _uint64_type, SemanticTree.basic_function_type.uleq, _bool_type);
-            _ulong_noteq = make_binary_operator(compiler_string_consts.noteq_name, _uint64_type, SemanticTree.basic_function_type.ulnoteq, _bool_type);
+            _ulong_gr = make_binary_operator(compiler_string_consts.gr_name, _uint64_type, basic_function_type.ulgr, _bool_type);
+            _ulong_greq = make_binary_operator(compiler_string_consts.greq_name, _uint64_type, basic_function_type.ulgreq, _bool_type);
+            _ulong_sm = make_binary_operator(compiler_string_consts.sm_name, _uint64_type, basic_function_type.ulsm, _bool_type);
+            _ulong_smeq = make_binary_operator(compiler_string_consts.smeq_name, _uint64_type, basic_function_type.ulsmeq, _bool_type);
+            _ulong_eq = make_binary_operator(compiler_string_consts.eq_name, _uint64_type, basic_function_type.uleq, _bool_type);
+            _ulong_noteq = make_binary_operator(compiler_string_consts.noteq_name, _uint64_type, basic_function_type.ulnoteq, _bool_type);
             //Арифметические операции.
-            _ulong_add = make_common_binary_operation(compiler_string_consts.plus_name, _uint64_type, _uint64_type, _uint64_type, SemanticTree.basic_function_type.uladd, _uint64_type);
-            _ulong_sub = make_common_binary_operation(compiler_string_consts.minus_name, _uint64_type, _uint64_type, _uint64_type, SemanticTree.basic_function_type.ulsub, _uint64_type);
-            _ulong_mul = make_common_binary_operation(compiler_string_consts.mul_name, _uint64_type, _uint64_type, _uint64_type, SemanticTree.basic_function_type.ulmul, _uint64_type);
-            _ulong_idiv = make_common_binary_operation(compiler_string_consts.idiv_name, _uint64_type, _uint64_type, _uint64_type, SemanticTree.basic_function_type.uldiv, _uint64_type);
-            _ulong_mod = make_common_binary_operation(compiler_string_consts.mod_name, _uint64_type, _uint64_type, _uint64_type, SemanticTree.basic_function_type.ulmod, _uint64_type);
+            _ulong_add = make_common_binary_operation(compiler_string_consts.plus_name, _uint64_type, _uint64_type, _uint64_type, basic_function_type.uladd, _uint64_type);
+            _ulong_sub = make_common_binary_operation(compiler_string_consts.minus_name, _uint64_type, _uint64_type, _uint64_type, basic_function_type.ulsub, _uint64_type);
+            _ulong_mul = make_common_binary_operation(compiler_string_consts.mul_name, _uint64_type, _uint64_type, _uint64_type, basic_function_type.ulmul, _uint64_type);
+            _ulong_idiv = make_common_binary_operation(compiler_string_consts.idiv_name, _uint64_type, _uint64_type, _uint64_type, basic_function_type.uldiv, _uint64_type);
+            _ulong_mod = make_common_binary_operation(compiler_string_consts.mod_name, _uint64_type, _uint64_type, _uint64_type, basic_function_type.ulmod, _uint64_type);
             //Операция / для byte.
             _ulong_div = make_common_binary_operation(compiler_string_consts.div_name, _uint64_type, _double_type, _double_type,
-                SemanticTree.basic_function_type.ddiv, _double_type);
+                basic_function_type.ddiv, _double_type);
             //Логические опреции.
-            _ulong_and = make_common_binary_operation(compiler_string_consts.and_name, _uint64_type, _uint64_type, _uint64_type, SemanticTree.basic_function_type.uland, _uint64_type);
-            _ulong_or = make_common_binary_operation(compiler_string_consts.or_name, _uint64_type, _uint64_type, _uint64_type, SemanticTree.basic_function_type.ulor, _uint64_type);
-            _ulong_xor = make_common_binary_operation(compiler_string_consts.xor_name, _uint64_type, _uint64_type, _uint64_type, SemanticTree.basic_function_type.ulxor, _uint64_type);
+            _ulong_and = make_common_binary_operation(compiler_string_consts.and_name, _uint64_type, _uint64_type, _uint64_type, basic_function_type.uland, _uint64_type);
+            _ulong_or = make_common_binary_operation(compiler_string_consts.or_name, _uint64_type, _uint64_type, _uint64_type, basic_function_type.ulor, _uint64_type);
+            _ulong_xor = make_common_binary_operation(compiler_string_consts.xor_name, _uint64_type, _uint64_type, _uint64_type, basic_function_type.ulxor, _uint64_type);
             //add_funtion_to_type(compiler_string_consts.shl_name, _ulong_type, _int_shl);
             //add_funtion_to_type(compiler_string_consts.shr_name, _ulong_type, _int_shr);
-            _ulong_shl = make_common_binary_operation(compiler_string_consts.shl_name, _uint64_type, _uint64_type, _integer_type, SemanticTree.basic_function_type.ulshl, _uint64_type);
-            _ulong_shr = make_common_binary_operation(compiler_string_consts.shr_name, _uint64_type, _uint64_type, _integer_type, SemanticTree.basic_function_type.ulshr, _uint64_type);
+            _ulong_shl = make_common_binary_operation(compiler_string_consts.shl_name, _uint64_type, _uint64_type, _integer_type, basic_function_type.ulshl, _uint64_type);
+            _ulong_shr = make_common_binary_operation(compiler_string_consts.shr_name, _uint64_type, _uint64_type, _integer_type, basic_function_type.ulshr, _uint64_type);
 
             /*make_function_comparison(_long_add, _ulong_add, function_compare.greater);
             make_function_comparison(_long_sub, _ulong_sub, function_compare.greater);
@@ -1784,7 +1785,7 @@ namespace PascalABCCompiler.SystemLibrary
 
             //real type.
             //Assign.
-            _real_assign=make_assign_operator(_double_type, SemanticTree.basic_function_type.dassign);
+            _real_assign=make_assign_operator(_double_type, basic_function_type.dassign);
             /*
             _real_to_byte = make_type_conversion(_ulong_type, _byte_type, type_compare.greater_type, SemanticTree.basic_function_type.ultob);
             _real_to_sbyte = make_type_conversion(_ulong_type, _sbyte_type, type_compare.non_comparable_type, SemanticTree.basic_function_type.ultosb);
@@ -1796,45 +1797,45 @@ namespace PascalABCCompiler.SystemLibrary
             _real_to_int = make_type_conversion(_ulong_type, _integer_type, type_compare.non_comparable_type, SemanticTree.basic_function_type.ultoi);
             _real_to_char = make_type_conversion(_ulong_type, _char_type, type_compare.greater_type, SemanticTree.basic_function_type.ultochar);
             */
-            _double_to_float = make_type_conversion(_double_type, _float_type, type_compare.greater_type, SemanticTree.basic_function_type.dtof);
+            _double_to_float = make_type_conversion(_double_type, _float_type, type_compare.greater_type, basic_function_type.dtof);
             //Унарные операции.
-            _real_unmin=make_unary_operator(compiler_string_consts.minus_name, _double_type, SemanticTree.basic_function_type.dunmin);
+            _real_unmin=make_unary_operator(compiler_string_consts.minus_name, _double_type, basic_function_type.dunmin);
             //make_empty_operator(compiler_string_consts.plus_name, _real_type);
             make_unary_empty_operator(compiler_string_consts.plus_name, _double_type, _double_type);
             //Арифметические операции.
-            _real_add=make_binary_operator(compiler_string_consts.plus_name, _double_type, SemanticTree.basic_function_type.dadd);
-            _real_sub=make_binary_operator(compiler_string_consts.minus_name, _double_type, SemanticTree.basic_function_type.dsub);
-            _real_mul=make_binary_operator(compiler_string_consts.mul_name, _double_type, SemanticTree.basic_function_type.dmul);
-            _real_div=make_binary_operator(compiler_string_consts.div_name, _double_type, SemanticTree.basic_function_type.ddiv);
+            _real_add=make_binary_operator(compiler_string_consts.plus_name, _double_type, basic_function_type.dadd);
+            _real_sub=make_binary_operator(compiler_string_consts.minus_name, _double_type, basic_function_type.dsub);
+            _real_mul=make_binary_operator(compiler_string_consts.mul_name, _double_type, basic_function_type.dmul);
+            _real_div=make_binary_operator(compiler_string_consts.div_name, _double_type, basic_function_type.ddiv);
 
             //Опрерации сравнения.
-            _real_gr=make_binary_operator(compiler_string_consts.gr_name, _double_type, SemanticTree.basic_function_type.dgr, _bool_type);
-            _real_greq=make_binary_operator(compiler_string_consts.greq_name, _double_type, SemanticTree.basic_function_type.dgreq, _bool_type);
-            _real_sm=make_binary_operator(compiler_string_consts.sm_name, _double_type, SemanticTree.basic_function_type.dsm, _bool_type);
-            _real_smeq=make_binary_operator(compiler_string_consts.smeq_name, _double_type, SemanticTree.basic_function_type.dsmeq, _bool_type);
-            _real_eq=make_binary_operator(compiler_string_consts.eq_name, _double_type, SemanticTree.basic_function_type.deq, _bool_type);
-            _real_noteq=make_binary_operator(compiler_string_consts.noteq_name, _double_type, SemanticTree.basic_function_type.dnoteq, _bool_type);
+            _real_gr=make_binary_operator(compiler_string_consts.gr_name, _double_type, basic_function_type.dgr, _bool_type);
+            _real_greq=make_binary_operator(compiler_string_consts.greq_name, _double_type, basic_function_type.dgreq, _bool_type);
+            _real_sm=make_binary_operator(compiler_string_consts.sm_name, _double_type, basic_function_type.dsm, _bool_type);
+            _real_smeq=make_binary_operator(compiler_string_consts.smeq_name, _double_type, basic_function_type.dsmeq, _bool_type);
+            _real_eq=make_binary_operator(compiler_string_consts.eq_name, _double_type, basic_function_type.deq, _bool_type);
+            _real_noteq=make_binary_operator(compiler_string_consts.noteq_name, _double_type, basic_function_type.dnoteq, _bool_type);
 
             //float type
-            _float_assign = make_assign_operator(_float_type, SemanticTree.basic_function_type.fassign);
-            _float_to_double = make_type_conversion(_float_type, _double_type, type_compare.less_type, SemanticTree.basic_function_type.ftod);
+            _float_assign = make_assign_operator(_float_type, basic_function_type.fassign);
+            _float_to_double = make_type_conversion(_float_type, _double_type, type_compare.less_type, basic_function_type.ftod);
             //Унарные операции.
-            _float_unmin = make_unary_operator(compiler_string_consts.minus_name, _float_type, SemanticTree.basic_function_type.funmin);
+            _float_unmin = make_unary_operator(compiler_string_consts.minus_name, _float_type, basic_function_type.funmin);
             //make_empty_operator(compiler_string_consts.plus_name, _real_type);
             make_unary_empty_operator(compiler_string_consts.plus_name, _float_type, _float_type);
             //Арифметические операции.
-            _float_add = make_binary_operator(compiler_string_consts.plus_name, _float_type, SemanticTree.basic_function_type.fadd);
-            _float_sub = make_binary_operator(compiler_string_consts.minus_name, _float_type, SemanticTree.basic_function_type.fsub);
-            _float_mul = make_binary_operator(compiler_string_consts.mul_name, _float_type, SemanticTree.basic_function_type.fmul);
-            _float_div = make_binary_operator(compiler_string_consts.div_name, _float_type, SemanticTree.basic_function_type.fdiv);
+            _float_add = make_binary_operator(compiler_string_consts.plus_name, _float_type, basic_function_type.fadd);
+            _float_sub = make_binary_operator(compiler_string_consts.minus_name, _float_type, basic_function_type.fsub);
+            _float_mul = make_binary_operator(compiler_string_consts.mul_name, _float_type, basic_function_type.fmul);
+            _float_div = make_binary_operator(compiler_string_consts.div_name, _float_type, basic_function_type.fdiv);
 
             //Опрерации сравнения.
-            _float_gr = make_binary_operator(compiler_string_consts.gr_name, _float_type, SemanticTree.basic_function_type.fgr, _bool_type);
-            _float_greq = make_binary_operator(compiler_string_consts.greq_name, _float_type, SemanticTree.basic_function_type.fgreq, _bool_type);
-            _float_sm = make_binary_operator(compiler_string_consts.sm_name, _float_type, SemanticTree.basic_function_type.fsm, _bool_type);
-            _float_smeq = make_binary_operator(compiler_string_consts.smeq_name, _float_type, SemanticTree.basic_function_type.fsmeq, _bool_type);
-            _float_eq = make_binary_operator(compiler_string_consts.eq_name, _float_type, SemanticTree.basic_function_type.feq, _bool_type);
-            _float_noteq = make_binary_operator(compiler_string_consts.noteq_name, _float_type, SemanticTree.basic_function_type.fnoteq, _bool_type);
+            _float_gr = make_binary_operator(compiler_string_consts.gr_name, _float_type, basic_function_type.fgr, _bool_type);
+            _float_greq = make_binary_operator(compiler_string_consts.greq_name, _float_type, basic_function_type.fgreq, _bool_type);
+            _float_sm = make_binary_operator(compiler_string_consts.sm_name, _float_type, basic_function_type.fsm, _bool_type);
+            _float_smeq = make_binary_operator(compiler_string_consts.smeq_name, _float_type, basic_function_type.fsmeq, _bool_type);
+            _float_eq = make_binary_operator(compiler_string_consts.eq_name, _float_type, basic_function_type.feq, _bool_type);
+            _float_noteq = make_binary_operator(compiler_string_consts.noteq_name, _float_type, basic_function_type.fnoteq, _bool_type);
 
             make_function_comparison(_real_add, _float_add, function_compare.greater);
             make_function_comparison(_real_sub, _float_sub, function_compare.greater);
@@ -1848,59 +1849,59 @@ namespace PascalABCCompiler.SystemLibrary
 
             //char type.
             //Assign.
-            _char_assign = make_assign_operator(_char_type, SemanticTree.basic_function_type.charassign);
-            _char_to_byte = make_type_conversion(_char_type, _byte_type, type_compare.greater_type, SemanticTree.basic_function_type.chartob,false);
-            _char_to_sbyte = make_type_conversion(_char_type, _sbyte_type, type_compare.greater_type, SemanticTree.basic_function_type.chartosb,false);
-            _char_to_short = make_type_conversion(_char_type, _short_type, type_compare.less_type, SemanticTree.basic_function_type.chartos,false);
-            _char_to_ushort = make_type_conversion(_char_type, _ushort_type, type_compare.less_type, SemanticTree.basic_function_type.chartous,false);
-            _char_to_uint = make_type_conversion(_char_type, _uint_type, type_compare.less_type, SemanticTree.basic_function_type.chartoui,false);
-            _char_to_long = make_type_conversion(_char_type, _int64_type, type_compare.less_type, SemanticTree.basic_function_type.chartol,false);
-            _char_to_ulong = make_type_conversion(_char_type, _uint64_type, type_compare.less_type, SemanticTree.basic_function_type.chartoul,false);
-            _char_to_int = make_type_conversion(_char_type, _integer_type, type_compare.less_type, SemanticTree.basic_function_type.chartoi, false);
-            _char_to_float = make_type_conversion(_char_type, _float_type, type_compare.less_type, SemanticTree.basic_function_type.chartof, false);
-            _char_to_double = make_type_conversion(_char_type, _double_type, type_compare.less_type, SemanticTree.basic_function_type.chartod, false);
+            _char_assign = make_assign_operator(_char_type, basic_function_type.charassign);
+            _char_to_byte = make_type_conversion(_char_type, _byte_type, type_compare.greater_type, basic_function_type.chartob,false);
+            _char_to_sbyte = make_type_conversion(_char_type, _sbyte_type, type_compare.greater_type, basic_function_type.chartosb,false);
+            _char_to_short = make_type_conversion(_char_type, _short_type, type_compare.less_type, basic_function_type.chartos,false);
+            _char_to_ushort = make_type_conversion(_char_type, _ushort_type, type_compare.less_type, basic_function_type.chartous,false);
+            _char_to_uint = make_type_conversion(_char_type, _uint_type, type_compare.less_type, basic_function_type.chartoui,false);
+            _char_to_long = make_type_conversion(_char_type, _int64_type, type_compare.less_type, basic_function_type.chartol,false);
+            _char_to_ulong = make_type_conversion(_char_type, _uint64_type, type_compare.less_type, basic_function_type.chartoul,false);
+            _char_to_int = make_type_conversion(_char_type, _integer_type, type_compare.less_type, basic_function_type.chartoi, false);
+            _char_to_float = make_type_conversion(_char_type, _float_type, type_compare.less_type, basic_function_type.chartof, false);
+            _char_to_double = make_type_conversion(_char_type, _double_type, type_compare.less_type, basic_function_type.chartod, false);
             //Опрерации сравнения.
-            _char_gr = make_binary_operator(compiler_string_consts.gr_name, _char_type, SemanticTree.basic_function_type.chargr, _bool_type);
-            _char_greq = make_binary_operator(compiler_string_consts.greq_name, _char_type, SemanticTree.basic_function_type.chargreq, _bool_type);
-            _char_sm = make_binary_operator(compiler_string_consts.sm_name, _char_type, SemanticTree.basic_function_type.charsm, _bool_type);
-            _char_smeq = make_binary_operator(compiler_string_consts.smeq_name, _char_type, SemanticTree.basic_function_type.charsmeq, _bool_type);
-            _char_eq = make_binary_operator(compiler_string_consts.eq_name, _char_type, SemanticTree.basic_function_type.chareq, _bool_type);
-            _char_noteq = make_binary_operator(compiler_string_consts.noteq_name, _char_type, SemanticTree.basic_function_type.charnoteq, _bool_type);
+            _char_gr = make_binary_operator(compiler_string_consts.gr_name, _char_type, basic_function_type.chargr, _bool_type);
+            _char_greq = make_binary_operator(compiler_string_consts.greq_name, _char_type, basic_function_type.chargreq, _bool_type);
+            _char_sm = make_binary_operator(compiler_string_consts.sm_name, _char_type, basic_function_type.charsm, _bool_type);
+            _char_smeq = make_binary_operator(compiler_string_consts.smeq_name, _char_type, basic_function_type.charsmeq, _bool_type);
+            _char_eq = make_binary_operator(compiler_string_consts.eq_name, _char_type, basic_function_type.chareq, _bool_type);
+            _char_noteq = make_binary_operator(compiler_string_consts.noteq_name, _char_type, basic_function_type.charnoteq, _bool_type);
 
             
             //boolean type.
             //Assign.
-            _bool_assign=make_assign_operator(_bool_type, SemanticTree.basic_function_type.boolassign);
+            _bool_assign=make_assign_operator(_bool_type, basic_function_type.boolassign);
 
             //Логические операции.
             //Унарные операции.
-            _bool_not=make_unary_operator(compiler_string_consts.not_name, _bool_type, SemanticTree.basic_function_type.boolnot);
+            _bool_not=make_unary_operator(compiler_string_consts.not_name, _bool_type, basic_function_type.boolnot);
 
             //Логическме операции.
-            _bool_and=make_binary_operator(compiler_string_consts.and_name, _bool_type, SemanticTree.basic_function_type.booland);
-            _bool_or=make_binary_operator(compiler_string_consts.or_name, _bool_type, SemanticTree.basic_function_type.boolor);
-            _bool_xor=make_binary_operator(compiler_string_consts.xor_name, _bool_type, SemanticTree.basic_function_type.boolxor);
+            _bool_and=make_binary_operator(compiler_string_consts.and_name, _bool_type, basic_function_type.booland);
+            _bool_or=make_binary_operator(compiler_string_consts.or_name, _bool_type, basic_function_type.boolor);
+            _bool_xor=make_binary_operator(compiler_string_consts.xor_name, _bool_type, basic_function_type.boolxor);
 
             //Опрерации сравнения.
-            _bool_gr=make_binary_operator(compiler_string_consts.gr_name, _bool_type, SemanticTree.basic_function_type.boolgr);
-            _bool_greq=make_binary_operator(compiler_string_consts.greq_name, _bool_type, SemanticTree.basic_function_type.boolgreq);
-            _bool_sm=make_binary_operator(compiler_string_consts.sm_name, _bool_type, SemanticTree.basic_function_type.boolsm);
-            _bool_smeq=make_binary_operator(compiler_string_consts.smeq_name, _bool_type, SemanticTree.basic_function_type.boolsmeq);
-            _bool_eq=make_binary_operator(compiler_string_consts.eq_name, _bool_type, SemanticTree.basic_function_type.booleq);
-            _bool_noteq=make_binary_operator(compiler_string_consts.noteq_name, _bool_type, SemanticTree.basic_function_type.boolnoteq);
-			_bool_to_int=make_type_conversion(_bool_type, _integer_type, type_compare.less_type, SemanticTree.basic_function_type.booltoi, false);
-            _bool_to_byte = make_type_conversion(_bool_type, _byte_type, type_compare.greater_type, SemanticTree.basic_function_type.booltob, false);
-            _bool_to_sbyte = make_type_conversion(_bool_type, _sbyte_type, type_compare.greater_type, SemanticTree.basic_function_type.booltosb, false);
-            _bool_to_short = make_type_conversion(_bool_type, _short_type, type_compare.less_type, SemanticTree.basic_function_type.booltos, false);
-            _bool_to_ushort = make_type_conversion(_bool_type, _ushort_type, type_compare.less_type, SemanticTree.basic_function_type.booltous, false);
-            _bool_to_uint = make_type_conversion(_bool_type, _uint_type, type_compare.less_type, SemanticTree.basic_function_type.booltoui, false);
-            _bool_to_long = make_type_conversion(_bool_type, _int64_type, type_compare.less_type, SemanticTree.basic_function_type.booltol, false);
-            _bool_to_ulong = make_type_conversion(_bool_type, _uint64_type, type_compare.less_type, SemanticTree.basic_function_type.booltoul, false);
+            _bool_gr=make_binary_operator(compiler_string_consts.gr_name, _bool_type, basic_function_type.boolgr);
+            _bool_greq=make_binary_operator(compiler_string_consts.greq_name, _bool_type, basic_function_type.boolgreq);
+            _bool_sm=make_binary_operator(compiler_string_consts.sm_name, _bool_type, basic_function_type.boolsm);
+            _bool_smeq=make_binary_operator(compiler_string_consts.smeq_name, _bool_type, basic_function_type.boolsmeq);
+            _bool_eq=make_binary_operator(compiler_string_consts.eq_name, _bool_type, basic_function_type.booleq);
+            _bool_noteq=make_binary_operator(compiler_string_consts.noteq_name, _bool_type, basic_function_type.boolnoteq);
+			_bool_to_int=make_type_conversion(_bool_type, _integer_type, type_compare.less_type, basic_function_type.booltoi, false);
+            _bool_to_byte = make_type_conversion(_bool_type, _byte_type, type_compare.greater_type, basic_function_type.booltob, false);
+            _bool_to_sbyte = make_type_conversion(_bool_type, _sbyte_type, type_compare.greater_type, basic_function_type.booltosb, false);
+            _bool_to_short = make_type_conversion(_bool_type, _short_type, type_compare.less_type, basic_function_type.booltos, false);
+            _bool_to_ushort = make_type_conversion(_bool_type, _ushort_type, type_compare.less_type, basic_function_type.booltous, false);
+            _bool_to_uint = make_type_conversion(_bool_type, _uint_type, type_compare.less_type, basic_function_type.booltoui, false);
+            _bool_to_long = make_type_conversion(_bool_type, _int64_type, type_compare.less_type, basic_function_type.booltol, false);
+            _bool_to_ulong = make_type_conversion(_bool_type, _uint64_type, type_compare.less_type, basic_function_type.booltoul, false);
 
-            _obj_to_obj=make_unary_function(_object_type, SemanticTree.basic_function_type.objtoobj, _object_type);
+            _obj_to_obj=make_unary_function(_object_type, basic_function_type.objtoobj, _object_type);
 
             //TODO: Закончить с инициализацией строк.
-            make_assign_operator(_string_type, SemanticTree.basic_function_type.objassign);
+            make_assign_operator(_string_type, basic_function_type.objassign);
 
             _string_add = make_binary_compiled_operator(_string_type, compiler_string_consts.string_concat_method_name, compiler_string_consts.plus_name);
             _char_add = make_binary_compiled_operator(_string_type, _char_type, compiler_string_consts.string_concat_method_name, compiler_string_consts.plus_name, _char_type);
@@ -1966,44 +1967,44 @@ namespace PascalABCCompiler.SystemLibrary
 
 
 
-            mark_type_as_ordinal(_integer_type, SemanticTree.basic_function_type.iinc, SemanticTree.basic_function_type.idec,
-                SemanticTree.basic_function_type.isinc, SemanticTree.basic_function_type.isdec,
+            mark_type_as_ordinal(_integer_type, basic_function_type.iinc, basic_function_type.idec,
+                basic_function_type.isinc, basic_function_type.isdec,
                 new int_const_node(int.MinValue,null), new int_const_node(int.MaxValue,null), create_emty_function(_integer_type,null), int_to_int);
 			
-            mark_type_as_ordinal(_uint_type, SemanticTree.basic_function_type.uiinc, SemanticTree.basic_function_type.uidec,
-                SemanticTree.basic_function_type.uisinc, SemanticTree.basic_function_type.uisdec,
+            mark_type_as_ordinal(_uint_type, basic_function_type.uiinc, basic_function_type.uidec,
+                basic_function_type.uisinc, basic_function_type.uisdec,
                 new uint_const_node(uint.MinValue, null), new uint_const_node(uint.MaxValue, null), _uint_to_int, uint_to_int);
             
-            mark_type_as_ordinal(_int64_type, SemanticTree.basic_function_type.linc, SemanticTree.basic_function_type.ldec,
-                SemanticTree.basic_function_type.lsinc, SemanticTree.basic_function_type.lsdec,
+            mark_type_as_ordinal(_int64_type, basic_function_type.linc, basic_function_type.ldec,
+                basic_function_type.lsinc, basic_function_type.lsdec,
                 new long_const_node(long.MinValue, null), new long_const_node(long.MaxValue, null), _long_to_int, long_to_int);
 			
-            mark_type_as_ordinal(_uint64_type, SemanticTree.basic_function_type.ulinc, SemanticTree.basic_function_type.uldec,
-                SemanticTree.basic_function_type.ulsinc, SemanticTree.basic_function_type.ulsdec,
+            mark_type_as_ordinal(_uint64_type, basic_function_type.ulinc, basic_function_type.uldec,
+                basic_function_type.ulsinc, basic_function_type.ulsdec,
                 new ulong_const_node(ulong.MinValue, null), new ulong_const_node(ulong.MaxValue, null), _ulong_to_int, ulong_to_int);
             
-            mark_type_as_ordinal(_byte_type, SemanticTree.basic_function_type.binc, SemanticTree.basic_function_type.bdec,
-                SemanticTree.basic_function_type.bsinc, SemanticTree.basic_function_type.bsdec,
+            mark_type_as_ordinal(_byte_type, basic_function_type.binc, basic_function_type.bdec,
+                basic_function_type.bsinc, basic_function_type.bsdec,
                 new byte_const_node(byte.MinValue, null), new byte_const_node(byte.MaxValue, null), _byte_to_int, byte_to_int);
 
-            mark_type_as_ordinal(_sbyte_type, SemanticTree.basic_function_type.sbinc, SemanticTree.basic_function_type.sbdec,
-                SemanticTree.basic_function_type.sbsinc, SemanticTree.basic_function_type.sbsdec,
+            mark_type_as_ordinal(_sbyte_type, basic_function_type.sbinc, basic_function_type.sbdec,
+                basic_function_type.sbsinc, basic_function_type.sbsdec,
                 new sbyte_const_node(sbyte.MinValue, null), new sbyte_const_node(sbyte.MaxValue, null), _sbyte_to_int, sbyte_to_int);
 
-            mark_type_as_ordinal(_short_type, SemanticTree.basic_function_type.sinc, SemanticTree.basic_function_type.sdec,
-                SemanticTree.basic_function_type.ssinc, SemanticTree.basic_function_type.ssdec,
+            mark_type_as_ordinal(_short_type, basic_function_type.sinc, basic_function_type.sdec,
+                basic_function_type.ssinc, basic_function_type.ssdec,
                 new short_const_node(short.MinValue, null), new short_const_node(short.MaxValue, null), _short_to_int, short_to_int);
 
-            mark_type_as_ordinal(_ushort_type, SemanticTree.basic_function_type.usinc, SemanticTree.basic_function_type.usdec,
-                SemanticTree.basic_function_type.ussinc, SemanticTree.basic_function_type.ussdec,
+            mark_type_as_ordinal(_ushort_type, basic_function_type.usinc, basic_function_type.usdec,
+                basic_function_type.ussinc, basic_function_type.ussdec,
                 new ushort_const_node(ushort.MinValue, null), new ushort_const_node(ushort.MaxValue, null), _ushort_to_int, ushort_to_int);
 
-            mark_type_as_ordinal(_char_type, SemanticTree.basic_function_type.cinc, SemanticTree.basic_function_type.cdec,
-                SemanticTree.basic_function_type.csinc, SemanticTree.basic_function_type.csdec,
+            mark_type_as_ordinal(_char_type, basic_function_type.cinc, basic_function_type.cdec,
+                basic_function_type.csinc, basic_function_type.csdec,
                 new char_const_node(char.MinValue, null), new char_const_node(char.MaxValue, null), _char_to_int, char_to_int);
 			
-            mark_type_as_ordinal(_bool_type, SemanticTree.basic_function_type.boolinc, SemanticTree.basic_function_type.booldec,
-                SemanticTree.basic_function_type.boolsinc, SemanticTree.basic_function_type.boolsdec,
+            mark_type_as_ordinal(_bool_type, basic_function_type.boolinc, basic_function_type.booldec,
+                basic_function_type.boolsinc, basic_function_type.boolsdec,
                 new bool_const_node(false, null), new bool_const_node(true, null), _bool_to_int, bool_to_int);
             
             _empty_string = new string_const_node(string.Empty, null);
@@ -2132,9 +2133,9 @@ namespace PascalABCCompiler.SystemLibrary
 
         private static void make_methods()
         {
-            _empty_method = new basic_function_node(SemanticTree.basic_function_type.none, null, true);
+            _empty_method = new basic_function_node(basic_function_type.none, null, true);
             basic_parameter bp = new basic_parameter(compiler_string_consts.unary_param_name, null,
-                SemanticTree.parameter_type.value, _empty_method);
+                parameter_type.value, _empty_method);
             _empty_method.parameters.AddElement(bp);
             _empty_method.compile_time_executor = delegated_empty_method;
 
@@ -2143,9 +2144,9 @@ namespace PascalABCCompiler.SystemLibrary
             System.Reflection.MethodInfo resize_func_mi = arr_type.GetMethod("Resize");
             _resize_func = compiled_function_node.get_compiled_method(resize_func_mi);
             _resize_func.parameters.clear();
-            common_parameter par0 = new common_parameter("Array", _object_type, SemanticTree.parameter_type.value, null,
+            common_parameter par0 = new common_parameter("Array", _object_type, parameter_type.value, null,
                 concrete_parameter_type.cpt_none, null, null);
-            common_parameter par1 = new common_parameter("Length", _integer_type, SemanticTree.parameter_type.value, null,
+            common_parameter par1 = new common_parameter("Length", _integer_type, parameter_type.value, null,
                 concrete_parameter_type.cpt_none, null, null);
             _resize_func.parameters.AddElement(par0);
             _resize_func.parameters.AddElement(par1);
@@ -2159,14 +2160,14 @@ namespace PascalABCCompiler.SystemLibrary
             _false_constant = new bool_const_node(false, null);
         }
 
-        private static basic_function_node make_object_operator(type_node ctn, SemanticTree.basic_function_type bas_ft,
-            string name, type_node ret_type, SemanticTree.parameter_type first_parameter_type)
+        private static basic_function_node make_object_operator(type_node ctn, basic_function_type bas_ft,
+            string name, type_node ret_type, parameter_type first_parameter_type)
         {
             basic_function_node bfn = new basic_function_node(bas_ft, ret_type,true,name);
             basic_parameter to = new basic_parameter(compiler_string_consts.left_param_name, ctn,
                 first_parameter_type, bfn);
             basic_parameter from = new basic_parameter(compiler_string_consts.right_param_name, ctn,
-                SemanticTree.parameter_type.value, bfn);
+                parameter_type.value, bfn);
             bfn.parameters.AddElement(to);
             bfn.parameters.AddElement(from);
             ctn.add_name(name, new SymbolInfo(bfn)); 
@@ -2174,33 +2175,33 @@ namespace PascalABCCompiler.SystemLibrary
             return bfn;
         }
 
-        private static basic_function_node make_object_operator(type_node ctn, SemanticTree.basic_function_type bas_ft, string name,
+        private static basic_function_node make_object_operator(type_node ctn, basic_function_type bas_ft, string name,
             type_node ret_type)
         {
-            return make_object_operator(ctn, bas_ft, name, ret_type, SemanticTree.parameter_type.value);
+            return make_object_operator(ctn, bas_ft, name, ret_type, parameter_type.value);
         }
 
-        public static basic_function_node make_assign_operator(type_node ctn,SemanticTree.basic_function_type assign_method)
+        public static basic_function_node make_assign_operator(type_node ctn,basic_function_type assign_method)
         {
             basic_function_node ret = make_object_operator(ctn, assign_method, compiler_string_consts.assign_name,
-                ctn, SemanticTree.parameter_type.var);
+                ctn, parameter_type.var);
             ret.operation_kind = special_operation_kind.assign;
             return ret;
         }
 
         private static basic_function_node make_assign_operator(type_node ctn)
         {
-            return make_assign_operator(ctn, SemanticTree.basic_function_type.objassign);
+            return make_assign_operator(ctn, basic_function_type.objassign);
         }
 
         public static basic_function_node make_equivalence_operator(type_node ctn)
         {
-            return make_object_operator(ctn, SemanticTree.basic_function_type.objeq, compiler_string_consts.eq_name, _bool_type);
+            return make_object_operator(ctn, basic_function_type.objeq, compiler_string_consts.eq_name, _bool_type);
         }
 
         public static basic_function_node make_not_equivalence_operator(type_node ctn)
         {
-            return make_object_operator(ctn, SemanticTree.basic_function_type.objnoteq, compiler_string_consts.noteq_name, _bool_type);
+            return make_object_operator(ctn, basic_function_type.objnoteq, compiler_string_consts.noteq_name, _bool_type);
         }
 
         public static void init_reference_type(type_node ctn)
@@ -2219,12 +2220,12 @@ namespace PascalABCCompiler.SystemLibrary
             }
         }
 
-        public static basic_function_node find_operator(SemanticTree.basic_function_type bft)
+        public static basic_function_node find_operator(basic_function_type bft)
         {
             return ht[bft];
         }
 
-        private static void add_stand_type(SemanticTree.basic_function_type bft, basic_function_node bfn)
+        private static void add_stand_type(basic_function_type bft, basic_function_node bfn)
         {
             ht[bft] = bfn;
         }

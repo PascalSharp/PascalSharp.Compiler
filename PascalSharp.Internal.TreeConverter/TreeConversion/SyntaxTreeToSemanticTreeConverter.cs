@@ -8,21 +8,19 @@
  *
  ***************************************************************************/
 
-using System;
 using System.Collections.Generic;
-using PascalABCCompiler.SystemLibrary;
 using PascalSharp.Internal.Errors;
 using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 using compiler_directive = PascalSharp.Internal.SyntaxTree.compiler_directive;
 
-namespace PascalSharp.Internal.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
 	public class SyntaxTreeToSemanticTreeConverter 
 	{
-        private PascalSharp.Internal.TreeConverter.syntax_tree_visitor stv=new PascalSharp.Internal.TreeConverter.syntax_tree_visitor();
+        private syntax_tree_visitor stv=new syntax_tree_visitor();
 
         public SyntaxTreeToSemanticTreeConverter()
         {

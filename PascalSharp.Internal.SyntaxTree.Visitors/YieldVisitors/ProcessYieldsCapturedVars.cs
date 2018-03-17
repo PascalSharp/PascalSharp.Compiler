@@ -1,17 +1,14 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
+
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-using PascalABCCompiler;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.YieldHelpers;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.SyntaxTree.Visitors.BaseVisitors;
+using PascalSharp.Internal.SyntaxTree.Visitors.UniversalVisitors;
+using PascalSharp.Internal.YieldHelpers;
 
-namespace SyntaxVisitors
+namespace PascalSharp.Internal.SyntaxTree.Visitors.YieldVisitors
 {
 
     public static class CapturedNamesHelper
@@ -416,7 +413,7 @@ namespace SyntaxVisitors
             {
                 if (pd.proc_header.where_defs != null)
                 {
-                    return ObjectCopier.Clone(pd.proc_header.where_defs);
+                    return ObjectCopier.ObjectCopier.Clone(pd.proc_header.where_defs);
                     //return pd.proc_header.where_defs.TypedClone();
                 }
                 else
@@ -428,7 +425,7 @@ namespace SyntaxVisitors
                                 && lpd.proc_header.proc_attributes.proc_attributes.FindIndex(attr => attr.attribute_type == proc_attribute.attr_forward) != -1);
                     if (pdPredefs.Count() > 0)
                     {
-                        return ObjectCopier.Clone(pdPredefs.First().proc_header.where_defs);
+                        return ObjectCopier.ObjectCopier.Clone(pdPredefs.First().proc_header.where_defs);
                         //return pdPredefs.First().proc_header.where_defs.TypedClone();
                     }
                 }
@@ -438,7 +435,7 @@ namespace SyntaxVisitors
                 class_definition cd = GetMethodClassDefinition(pd);
                 if (cd != null)
                 {
-                    return ObjectCopier.Clone(cd.where_section);
+                    return ObjectCopier.ObjectCopier.Clone(cd.where_section);
                 }
             }
 
@@ -569,7 +566,7 @@ namespace SyntaxVisitors
 
 
                     // Вставляем предописание метода-хелпера 
-                    var helperPredefHeader = ObjectCopier.Clone(helper.proc_header);
+                    var helperPredefHeader = ObjectCopier.ObjectCopier.Clone(helper.proc_header);
                     helperPredefHeader.name.class_name = null;
                     classMembers.First().members.Insert(0, helperPredefHeader);
 
@@ -617,7 +614,7 @@ namespace SyntaxVisitors
             // Выполняем определение типов локальных переменных с автовыводом типов
 
             // Клонируем исходный метод для вставки оберток-хелперов для локальных переменных и дальнейшей обработки на семантике
-            var pdCloned = ObjectCopier.Clone(pd);
+            var pdCloned = ObjectCopier.ObjectCopier.Clone(pd);
             //pd.
             //var pdCloned = (procedure_definition)pd.Clone();
 
@@ -864,12 +861,12 @@ namespace SyntaxVisitors
             if (!isPredefined)
             {
 
-                var fh = ObjectCopier.Clone(pd.proc_header as function_header);
+                var fh = ObjectCopier.ObjectCopier.Clone(pd.proc_header as function_header);
                 fh.proc_attributes.Add(new procedure_attribute(proc_attribute.attr_forward));
 
                 procedure_definition predef = new procedure_definition() { proc_header = fh };
                 // frninja 05/06/16 - для шаблонов с where
-                predef.proc_header.where_defs = ObjectCopier.Clone(pd.proc_header.where_defs);
+                predef.proc_header.where_defs = ObjectCopier.ObjectCopier.Clone(pd.proc_header.where_defs);
 
                 UpperTo<declarations>().InsertBefore(pd, predef);
 

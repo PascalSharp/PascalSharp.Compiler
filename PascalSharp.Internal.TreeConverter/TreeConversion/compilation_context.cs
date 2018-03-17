@@ -1,22 +1,22 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Класс, хранящий текущий контекст. Где находится компилятор (в какой функции, типе, пространстве имен).
-using System;
-using System.Linq;
-using System.Collections.Generic;
+
 using System.Collections;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.SystemLibrary;
+using System.Collections.Generic;
+using System.Linq;
 using PascalSharp.Internal.CompilerTools;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter.NetWrappers;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
+using if_node = PascalSharp.Internal.TreeConverter.TreeRealization.if_node;
+using typeof_operator = PascalSharp.Internal.TreeConverter.TreeRealization.typeof_operator;
 
-namespace PascalSharp.Internal.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
 	public enum block_type {function_block,type_block,namespace_block,compiled_type_block, lambda_block}; //lroman//
 
@@ -254,7 +254,7 @@ namespace PascalSharp.Internal.TreeConverter
 
 		private field_access_level _fal;
         private bool _has_nested_functions;
-        internal syntax_tree_visitor syntax_tree_visitor;
+        internal TreeConversion.syntax_tree_visitor syntax_tree_visitor;
 		
         private static compilation_context _instance;
 
@@ -262,7 +262,7 @@ namespace PascalSharp.Internal.TreeConverter
         internal System.Collections.Hashtable member_decls = new System.Collections.Hashtable();
         internal bool namespace_converted = false;
 
-        public compilation_context(convertion_data_and_alghoritms convertion_data_and_alghoritms, syntax_tree_visitor syntax_tree_visitor)
+        public compilation_context(convertion_data_and_alghoritms convertion_data_and_alghoritms, TreeConversion.syntax_tree_visitor syntax_tree_visitor)
         {
             this.convertion_data_and_alghoritms = convertion_data_and_alghoritms;
             this.syntax_tree_visitor = syntax_tree_visitor;

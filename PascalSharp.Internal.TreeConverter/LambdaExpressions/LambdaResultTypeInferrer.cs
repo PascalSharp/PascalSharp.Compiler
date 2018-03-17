@@ -1,22 +1,23 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
-using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Internal.SyntaxTree;
-using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
-namespace TreeConverter.LambdaExpressions
+namespace PascalSharp.Internal.TreeConverter.LambdaExpressions
 {
     internal class LambdaResultTypeInferrer : WalkingVisitorNew
     {
         private const string RESULT_KEY_WORD = "result";
         private readonly List<Tuple<type_node, expression, expression_node>> resultExpressionsTypes;
-        private readonly syntax_tree_visitor syntaxTreeVisitor;
+        private readonly TreeConversion.syntax_tree_visitor syntaxTreeVisitor;
         private readonly proc_block lambdaBody;
         private readonly function_header lambdaHeader;
 
-        public LambdaResultTypeInferrer(function_header lambdaHeader, proc_block lambdaBody, syntax_tree_visitor syntaxTreeVisitor)
+        public LambdaResultTypeInferrer(function_header lambdaHeader, proc_block lambdaBody, TreeConversion.syntax_tree_visitor syntaxTreeVisitor)
         {
             this.lambdaBody = lambdaBody;
             this.lambdaHeader = lambdaHeader;

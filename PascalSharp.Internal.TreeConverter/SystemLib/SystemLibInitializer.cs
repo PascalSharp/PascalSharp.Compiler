@@ -1,14 +1,16 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Инициализация системной библиотеки
+
 using System;
 using System.Collections.Generic;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.TreeConverter.NetWrappers;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 
-namespace PascalABCCompiler.SystemLibrary
+namespace PascalSharp.Internal.TreeConverter.SystemLib
 {
     public class UnitDefinitionItem
     {
@@ -29,7 +31,7 @@ namespace PascalABCCompiler.SystemLibrary
                 }
                 else
                 {
-                    Type t = PABCSystemType.Assembly.GetType("PABCSystem." + name);
+                    Type t = NetHelper.PABCSystemType.Assembly.GetType("PABCSystem." + name);
                     if (t != null)
                     {
                         _notCreatedSymbolInfo = new SymbolInfoList(new SymbolInfo(compiled_type_node.get_type_node(t, SystemLibrary.syn_visitor.SymbolTable)));
@@ -87,7 +89,7 @@ namespace PascalABCCompiler.SystemLibrary
                 }
                 else
                 {
-                    Type t = PABCSystemType.Assembly.GetType("PABCSystem." + name);
+                    Type t = NetHelper.PABCSystemType.Assembly.GetType("PABCSystem." + name);
                     if (t != null)
                     {
                         symbolInfo = new SymbolInfoList(new SymbolInfo(compiled_type_node.get_type_node(t, SystemLibrary.syn_visitor.SymbolTable)));
@@ -115,7 +117,7 @@ namespace PascalABCCompiler.SystemLibrary
                     {
                         
                         common_type_node tctn = symbolInfo.First().sym_info as common_type_node;
-                        tctn.type_special_kind = SemanticTree.type_special_kind.base_set_type;
+                        tctn.type_special_kind = type_special_kind.base_set_type;
                         tctn.scope.AddSymbol(compiler_string_consts.plus_name, SystemLibInitializer.SetUnionProcedure.SymbolInfo.First());
                         tctn.scope.AddSymbol(compiler_string_consts.mul_name, SystemLibInitializer.SetIntersectProcedure.SymbolInfo.First());
                         tctn.scope.AddSymbol(compiler_string_consts.in_name, SystemLibInitializer.InSetProcedure.SymbolInfo.First());
@@ -130,7 +132,7 @@ namespace PascalABCCompiler.SystemLibrary
                     else
                     {
                         compiled_type_node tctn = symbolInfo.First().sym_info as compiled_type_node;
-                        tctn.type_special_kind = SemanticTree.type_special_kind.base_set_type;
+                        tctn.type_special_kind = type_special_kind.base_set_type;
                         tctn.scope.AddSymbol(compiler_string_consts.plus_name, SystemLibInitializer.SetUnionProcedure.SymbolInfo.First());
                         tctn.scope.AddSymbol(compiler_string_consts.mul_name, SystemLibInitializer.SetIntersectProcedure.SymbolInfo.First());
                         tctn.scope.AddSymbol(compiler_string_consts.in_name, SystemLibInitializer.InSetProcedure.SymbolInfo.First());
@@ -148,7 +150,7 @@ namespace PascalABCCompiler.SystemLibrary
                     if (symbolInfo.First().sym_info is common_type_node)
                     {
                         common_type_node tctn = symbolInfo.First().sym_info as common_type_node;
-                        tctn.type_special_kind = SemanticTree.type_special_kind.text_file;
+                        tctn.type_special_kind = type_special_kind.text_file;
                     }
                     else
                     {
@@ -409,11 +411,11 @@ namespace PascalABCCompiler.SystemLibrary
         }
 
 
-        private static void init_temp_methods_and_consts(common_namespace_node system_namespace,SymbolTable.Scope where_add,
+        private static void init_temp_methods_and_consts(common_namespace_node system_namespace,Scope where_add,
             initialization_properties initialization_properties,location system_unit_location)
         {
-            //SymbolTable.Scope sc = system_namespace.scope;
-            SymbolTable.Scope sc = where_add;
+            //Scope sc = system_namespace.scope;
+            Scope sc = where_add;
             namespace_constant_definition _true_constant_definition = new namespace_constant_definition(
                 compiler_string_consts.true_const_name, SystemLibrary.true_constant, system_unit_location, system_namespace);
             system_namespace.constants.AddElement(_true_constant_definition);
@@ -433,63 +435,63 @@ namespace PascalABCCompiler.SystemLibrary
             System.Reflection.MethodInfo mi;
 
             //TODO: Сделать узел или базовый метод создания и удаления объекта.
-            common_namespace_function_node cnfn = new common_namespace_function_node(TreeConverter.compiler_string_consts.new_procedure_name, null, null, system_namespace, null);
-            cnfn.parameters.AddElement(new common_parameter("ptr", SystemLibrary.pointer_type, SemanticTree.parameter_type.value, cnfn,
+            common_namespace_function_node cnfn = new common_namespace_function_node(compiler_string_consts.new_procedure_name, null, null, system_namespace, null);
+            cnfn.parameters.AddElement(new common_parameter("ptr", SystemLibrary.pointer_type, parameter_type.value, cnfn,
                 concrete_parameter_type.cpt_var, null, null));
-            cnfn.SpecialFunctionKind = SemanticTree.SpecialFunctionKind.New;
+            cnfn.SpecialFunctionKind = SpecialFunctionKind.New;
             _NewProcedure = new SymbolInfo(cnfn);
-            _NewProcedure.symbol_kind = PascalSharp.Internal.TreeConverter.symbol_kind.sk_overload_function;
-            _NewProcedure.access_level = PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_public;
+            _NewProcedure.symbol_kind = symbol_kind.sk_overload_function;
+            _NewProcedure.access_level = access_level.al_public;
             _NewProcedureDecl = cnfn;
-            sc.AddSymbol(TreeConverter.compiler_string_consts.new_procedure_name,_NewProcedure);
+            sc.AddSymbol(compiler_string_consts.new_procedure_name,_NewProcedure);
 
-            cnfn = new common_namespace_function_node(TreeConverter.compiler_string_consts.dispose_procedure_name, null, null, system_namespace, null);
-            cnfn.parameters.AddElement(new common_parameter("ptr", SystemLibrary.pointer_type, SemanticTree.parameter_type.value,
+            cnfn = new common_namespace_function_node(compiler_string_consts.dispose_procedure_name, null, null, system_namespace, null);
+            cnfn.parameters.AddElement(new common_parameter("ptr", SystemLibrary.pointer_type, parameter_type.value,
                 cnfn, concrete_parameter_type.cpt_var, null, null));
             _DisposeProcedure = new SymbolInfo(cnfn);
-            _DisposeProcedure.symbol_kind = PascalSharp.Internal.TreeConverter.symbol_kind.sk_overload_function;
-            _DisposeProcedure.access_level = PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_public;
+            _DisposeProcedure.symbol_kind = symbol_kind.sk_overload_function;
+            _DisposeProcedure.access_level = access_level.al_public;
             _DisposeProcedureDecl = cnfn;
-            cnfn.SpecialFunctionKind = SemanticTree.SpecialFunctionKind.Dispose;
-            sc.AddSymbol(TreeConverter.compiler_string_consts.dispose_procedure_name, _DisposeProcedure);
+            cnfn.SpecialFunctionKind = SpecialFunctionKind.Dispose;
+            sc.AddSymbol(compiler_string_consts.dispose_procedure_name, _DisposeProcedure);
 
-            cnfn = new common_namespace_function_node(TreeConverter.compiler_string_consts.new_array_procedure_name, compiled_type_node.get_type_node(typeof(Array)), null, system_namespace, null);
-            cnfn.parameters.AddElement(new common_parameter("t", compiled_type_node.get_type_node(typeof(Type)), SemanticTree.parameter_type.value, cnfn,
+            cnfn = new common_namespace_function_node(compiler_string_consts.new_array_procedure_name, compiled_type_node.get_type_node(typeof(Array)), null, system_namespace, null);
+            cnfn.parameters.AddElement(new common_parameter("t", compiled_type_node.get_type_node(typeof(Type)), parameter_type.value, cnfn,
                 concrete_parameter_type.cpt_none, null, null));
-            cnfn.parameters.AddElement(new common_parameter("n", SystemLibrary.integer_type, SemanticTree.parameter_type.value, cnfn,
+            cnfn.parameters.AddElement(new common_parameter("n", SystemLibrary.integer_type, parameter_type.value, cnfn,
                 concrete_parameter_type.cpt_none, null, null));
-            cnfn.SpecialFunctionKind = SemanticTree.SpecialFunctionKind.NewArray;
+            cnfn.SpecialFunctionKind = SpecialFunctionKind.NewArray;
             _NewArrayProcedure = new SymbolInfo(cnfn);
             _NewArrayProcedureDecl = cnfn;
             //sc.AddSymbol(TreeConverter.compiler_string_consts.new_procedure_name, _NewProcedure);
             
-            basic_function_node break_procedure = new basic_function_node(SemanticTree.basic_function_type.none,
+            basic_function_node break_procedure = new basic_function_node(basic_function_type.none,
                 null, true);
             break_procedure.compile_time_executor = initialization_properties.break_executor;
             sc.AddSymbol(compiler_string_consts.break_procedure_name, new SymbolInfo(break_procedure));
             
-            basic_function_node continue_procedure = new basic_function_node(SemanticTree.basic_function_type.none,
+            basic_function_node continue_procedure = new basic_function_node(basic_function_type.none,
                 null, true);
             continue_procedure.compile_time_executor = initialization_properties.continue_executor;
             sc.AddSymbol(compiler_string_consts.continue_procedure_name, new SymbolInfo(continue_procedure));
 
-            basic_function_node exit_procedure = new basic_function_node(SemanticTree.basic_function_type.none,
+            basic_function_node exit_procedure = new basic_function_node(basic_function_type.none,
                 null, true);
             exit_procedure.compile_time_executor = initialization_properties.exit_executor;
             sc.AddSymbol(compiler_string_consts.exit_procedure_name, new SymbolInfo(exit_procedure));
 
             sc.AddSymbol(compiler_string_consts.set_length_procedure_name,
-                new SymbolInfo(SystemLibrary.resize_func, PascalSharp.Internal.TreeConverter.SymbolTable.access_level.al_public, PascalSharp.Internal.TreeConverter.symbol_kind.sk_overload_function));
+                new SymbolInfo(SystemLibrary.resize_func, access_level.al_public, symbol_kind.sk_overload_function));
         }
 
-        public static common_unit_node make_system_unit(SymbolTable.TreeConverterSymbolTable symbol_table,
+        public static common_unit_node make_system_unit(TreeConverterSymbolTable symbol_table,
             initialization_properties initialization_properties)
         {
             //TODO: В качестве location везде в этом методе следует указывать location system_unit-а. Имя файла мы знаем, а место - там где написано, что integer и прочие типы описаны как бы в модуле system.
             location system_unit_location = null;
-            SymbolTable.UnitInterfaceScope main_scope = symbol_table.CreateUnitInterfaceScope(new SymbolTable.Scope[0]);
-            SymbolTable.UnitImplementationScope impl_scope = symbol_table.CreateUnitImplementationScope(main_scope,
-                new SymbolTable.Scope[0]);
+            UnitInterfaceScope main_scope = symbol_table.CreateUnitInterfaceScope(new Scope[0]);
+            UnitImplementationScope impl_scope = symbol_table.CreateUnitImplementationScope(main_scope,
+                new Scope[0]);
             common_unit_node _system_unit = new common_unit_node(main_scope,impl_scope,null,null);
             
             common_namespace_node cnn = new common_namespace_node(null, _system_unit, compiler_string_consts.system_unit_name,
@@ -497,12 +499,12 @@ namespace PascalABCCompiler.SystemLibrary
 
             main_scope.AddSymbol(compiler_string_consts.system_unit_name, new SymbolInfo(cnn));
 
-            //SymbolTable.Scope sc = cnn.scope;
-            SymbolTable.Scope sc = main_scope;
+            //Scope sc = cnn.scope;
+            Scope sc = main_scope;
 
             //Добавляем типы.
             sc.AddSymbol(compiler_string_consts.byte_type_name, new SymbolInfo(SystemLibrary.byte_type));
-            //sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.decimal_type_name, new SymbolInfo(SystemLibrary.decimal_type));
+            //sc.AddSymbol(compiler_string_consts.decimal_type_name, new SymbolInfo(SystemLibrary.decimal_type));
             sc.AddSymbol(compiler_string_consts.sbyte_type_name, new SymbolInfo(SystemLibrary.sbyte_type));
             sc.AddSymbol(compiler_string_consts.short_type_name, new SymbolInfo(SystemLibrary.short_type));
             sc.AddSymbol(compiler_string_consts.ushort_type_name, new SymbolInfo(SystemLibrary.ushort_type));
@@ -515,9 +517,9 @@ namespace PascalABCCompiler.SystemLibrary
             sc.AddSymbol(compiler_string_consts.char_type_name, new SymbolInfo(SystemLibrary.char_type));
             sc.AddSymbol(compiler_string_consts.bool_type_name, new SymbolInfo(SystemLibrary.bool_type));
             sc.AddSymbol(compiler_string_consts.string_type_name, new SymbolInfo(SystemLibrary.string_type));
-            //sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.object_type_name, new SymbolInfo(SystemLibrary.object_type));
+            //sc.AddSymbol(compiler_string_consts.object_type_name, new SymbolInfo(SystemLibrary.object_type));
             sc.AddSymbol(compiler_string_consts.pointer_type_name, new SymbolInfo(SystemLibrary.pointer_type));
-            //sc.AddSymbol(PascalSharp.Internal.TreeConverter.compiler_string_consts.base_exception_class_name, new SymbolInfo(SystemLibrary.exception_base_type));
+            //sc.AddSymbol(compiler_string_consts.base_exception_class_name, new SymbolInfo(SystemLibrary.exception_base_type));
             sc.AddSymbol(compiler_string_consts.base_array_type_name, new SymbolInfo(SystemLibrary.array_base_type));
             sc.AddSymbol(compiler_string_consts.base_delegate_type_name, new SymbolInfo(SystemLibrary.delegate_base_type));
 

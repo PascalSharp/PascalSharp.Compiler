@@ -6,8 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.IO;
-using PascalABCCompiler.SemanticTree;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
 
 namespace PascalSharp.Internal.CompilerTools

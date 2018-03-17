@@ -1416,7 +1416,7 @@ namespace PascalSharp.Internal.ParserTools
         {
         }
 		
-		public override void visit(PascalABCCompiler.SyntaxTree.lambda_inferred_type lit) //lroman//
+		public override void visit(SyntaxTree.lambda_inferred_type lit) //lroman//
         {
         }
         #endregion

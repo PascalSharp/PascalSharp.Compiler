@@ -152,9 +152,6 @@ using System.IO;
 using System.Reflection;
 using Microsoft.Scripting;
 using Microsoft.Scripting.Hosting;
-using PascalABCCompiler;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SystemLibrary;
 using PascalSharp.Compiler.PCU;
 using PascalSharp.Compiler.SemanticTreeConverters;
 using PascalSharp.Internal.CompilerTools.Errors;
@@ -162,15 +159,16 @@ using PascalSharp.Internal.EmitPE;
 using PascalSharp.Internal.Errors;
 using PascalSharp.Internal.Localization;
 using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.SyntaxTree.Converters;
-using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.TreeConverter.NetWrappers;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 using compiler_directive = PascalSharp.Internal.TreeConverter.TreeRealization.compiler_directive;
 using CompilerInternalError = PascalSharp.Internal.Errors.CompilerInternalError;
-using Controller = PascalSharp.Internal.ParserTools.Controller;
+using Controller = PascalSharp.Internal.EmitPE.Controller;
 using IParser = ICSharpCode.NRefactory.IParser;
 using SourceLocation = PascalSharp.Internal.Errors.SourceLocation;
 using StringResources = PascalSharp.Internal.Localization.StringResources;
@@ -695,7 +693,7 @@ namespace PascalSharp.Compiler
         {
             List<string> ext = new List<string>();
             foreach (string ex in parser.FilesExtensions)
-                if (ex[ex.Length - 1] != Controller.HideParserExtensionPostfixChar)
+                if (ex[ex.Length - 1] != Internal.ParserTools.Controller.HideParserExtensionPostfixChar)
                     ext.Add(ex);
             if (ext.Count > 0)
                 return new SupportedSourceFile(ext.ToArray(), parser.Name);
@@ -867,8 +865,8 @@ namespace PascalSharp.Compiler
 
         internal Dictionary<string,CompilationUnit> DLLCashe = new Dictionary<string,CompilationUnit>();
 
-        private Controller parsersController = null;
-        public Controller ParsersController
+        private Internal.ParserTools.Controller parsersController = null;
+        public Internal.ParserTools.Controller ParsersController
         {
             get
             {
@@ -1032,8 +1030,8 @@ namespace PascalSharp.Compiler
             errorsList.Clear();
             Warnings.Clear();
             InternalDebug = new CompilerInternalDebug();
-            ParsersController = new Controller();
-            ParsersController.ParserConnected += new Controller.ParserConnectedDeleagte(ParsersController_ParserConnected);
+            ParsersController = new Internal.ParserTools.Controller();
+            ParsersController.ParserConnected += ParsersController_ParserConnected;
             ParsersController.SourceFilesProvider = sourceFilesProvider;
             ParsersController.Reload();
             SyntaxTreeToSemanticTreeConverter = new SyntaxTreeToSemanticTreeConverter();
@@ -3416,7 +3414,7 @@ namespace PascalSharp.Compiler
         {
         	List<Error> errors = new List<Error>();
             List<CompilerWarning> warnings = new List<CompilerWarning>();
-        	string doctagsParserExtension = Path.GetExtension(cu.file_name)+"dt"+Controller.HideParserExtensionPostfixChar;
+        	string doctagsParserExtension = Path.GetExtension(cu.file_name)+"dt"+ Internal.ParserTools.Controller.HideParserExtensionPostfixChar;
         	documentation_comment_list dt = ParsersController.Compile(System.IO.Path.ChangeExtension(cu.file_name, doctagsParserExtension), Text, errors, warnings, ParseMode.Normal) as documentation_comment_list;
         	if (errors.Count > 0) return null;
         	DocumentationConstructor docconst = new DocumentationConstructor();

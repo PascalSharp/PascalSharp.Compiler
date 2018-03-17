@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using PascalABCCompiler;
-using PascalABCCompiler.SyntaxTree;
 using PascalSharp.Compiler;
 using PascalSharp.Internal.Errors;
 using PascalSharp.Internal.ParserTools;

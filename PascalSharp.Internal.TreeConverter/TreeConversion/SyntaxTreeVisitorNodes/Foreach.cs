@@ -1,16 +1,13 @@
-﻿using PascalABCCompiler.SemanticTree;
+﻿using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.LambdaExpressions;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
-using TreeConverter.LambdaExpressions;
 using for_node = PascalSharp.Internal.SyntaxTree.for_node;
 
-namespace PascalSharp.Internal.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
     public partial class syntax_tree_visitor // SSM 02.01.17 менять на визитор с другим порядком обхода можно, но бессмысленно
     {
-
-
-
         public override void visit(foreach_stmt _foreach_stmt)
         {
             statements_list sl2 = new statements_list(get_location(_foreach_stmt));            

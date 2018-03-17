@@ -8,7 +8,6 @@ using System.Reflection;
 using PascalSharp.Internal.TreeConverter.NetWrappers;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
-using SymbolTable;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
 {
@@ -965,7 +964,7 @@ namespace PascalSharp.Internal.TreeConverter.SymbolTable
                     if (sc is NetScope)
                     {
                         NetScope netScope = sc as NetScope;
-                        if (NetHelper.PABCSystemType == null || netScope.Assembly != PABCSystemType.Assembly)
+                        if (NetHelper.PABCSystemType == null || netScope.Assembly != NetHelper.PABCSystemType.Assembly)
                         {
                             if (!assm_cache.Contains(netScope.Assembly))
                                 assm_cache.Add(netScope.Assembly);

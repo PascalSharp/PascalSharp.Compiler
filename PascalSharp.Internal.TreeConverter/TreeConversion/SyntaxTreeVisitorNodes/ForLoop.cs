@@ -1,13 +1,12 @@
 ﻿using System;
 using PascalSharp.Internal.SyntaxTree;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SystemLibrary;
-using PascalABCCompiler.TreeConverter;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.TreeConverter.OpenMP;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 using for_node = PascalSharp.Internal.SyntaxTree.for_node;
 
-namespace PascalSharp.Internal.TreeConverter
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
     public partial class syntax_tree_visitor
     {
@@ -16,11 +15,11 @@ namespace PascalSharp.Internal.TreeConverter
             #region MikhailoMMX, обработка omp parallel for
             bool isGenerateParallel = false;
             bool isGenerateSequential = true;
-            if (OpenMP.ForsFound)
+            if (OpenMP.OpenMP.ForsFound)
             {
-                OpenMP.LoopVariables.Push(_for_node.loop_variable.name.ToLower());
+                OpenMP.OpenMP.LoopVariables.Push(_for_node.loop_variable.name.ToLower());
                 //если в программе есть хоть одна директива parallel for - проверяем:
-                if (DirectivesToNodesLinks.ContainsKey(_for_node) && OpenMP.IsParallelForDirective(DirectivesToNodesLinks[_for_node]))
+                if (DirectivesToNodesLinks.ContainsKey(_for_node) && OpenMP.OpenMP.IsParallelForDirective(DirectivesToNodesLinks[_for_node]))
                 {
                     //перед этим узлом есть директива parallel for
                     if (CurrentParallelPosition == ParallelPosition.Outside)            //входим в самый внешний параллельный for
@@ -179,18 +178,18 @@ namespace PascalSharp.Internal.TreeConverter
             if (isGenerateParallel)
             {
                 CurrentParallelPosition = ParallelPosition.InsideParallel;
-                statements_list stl = OpenMP.TryConvertFor(head_stmts, _for_node, forNode, vdn, initialValue, finishValue, this);
+                statements_list stl = OpenMP.OpenMP.TryConvertFor(head_stmts, _for_node, forNode, vdn, initialValue, finishValue, this);
                 CurrentParallelPosition = ParallelPosition.Outside;
                 if (stl != null)
                 {
-                    OpenMP.LoopVariables.Pop();
+                    OpenMP.OpenMP.LoopVariables.Pop();
                     return_value(stl);
                     return;
                 }
             }
-            if (OpenMP.ForsFound)
+            if (OpenMP.OpenMP.ForsFound)
             {
-                OpenMP.LoopVariables.Pop();
+                OpenMP.OpenMP.LoopVariables.Pop();
             }
             #endregion
 

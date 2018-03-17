@@ -1,17 +1,13 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
-using System;
-using System.IO;
-using PascalABCCompiler.SyntaxTree;
-using System.Resources;
-using System.Reflection;
+
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using PascalSharp.Internal.Errors;
 using PascalSharp.Internal.ParserTools;
+using PascalSharp.Internal.SyntaxTree;
 
-
-namespace PascalABCCompiler.DocTagsParser
+namespace PascalSharp.Internal.Lexer.DocTagsParser
 {
 	
 	public class DocTagsLanguageParser:IParser
@@ -21,7 +17,7 @@ namespace PascalABCCompiler.DocTagsParser
         public DocTagsLanguageParser()
 		{
             filesExtensions = new string[1];
-            filesExtensions[0] = ".pasdt" + Parsers.Controller.HideParserExtensionPostfixChar;
+            filesExtensions[0] = ".pasdt" + Controller.HideParserExtensionPostfixChar;
             sectionNames.Add("summary");
             sectionNames.Add("returns");
 		}

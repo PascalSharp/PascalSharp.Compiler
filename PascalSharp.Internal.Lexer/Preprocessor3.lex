@@ -2,7 +2,7 @@
 %}
 %scannertype PreprocessorScanner
 
-%namespace PascalSharp.Internal.Lexer
+%namespace PascalSharp.Internal.Lexer.Preprocessor
 
 %using PascalSharp.Internal.SyntaxTree;
 %using QUT.Gppg;

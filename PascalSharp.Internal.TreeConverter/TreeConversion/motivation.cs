@@ -1,9 +1,8 @@
 // Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 //Причина обхода узла синтаксического дерева - получение выражения, адреса, типа узла.
-using System;
 
-namespace PascalSharp.Internal.TreeConverter.
+namespace PascalSharp.Internal.TreeConverter.TreeConversion
 {
     //TODO: Переименовать в request.
     /// <summary>

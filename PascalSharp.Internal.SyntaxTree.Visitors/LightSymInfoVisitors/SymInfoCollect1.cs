@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 
 /*
     ProgramScopeSyntax
@@ -16,7 +13,7 @@ using System.Text;
 */
 
 
-namespace PascalABCCompiler.SyntaxTree
+namespace PascalSharp.Internal.SyntaxTree.Visitors.LightSymInfoVisitors
 {
     public partial class CollectLightSymInfoVisitor : BaseEnterExitVisitor
     {

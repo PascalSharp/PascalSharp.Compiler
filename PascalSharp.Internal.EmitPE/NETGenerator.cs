@@ -12,9 +12,9 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using System.Security;
 using System.Threading;
-using PascalABCCompiler;
-using PascalABCCompiler.SemanticTree;
 using PascalSharp.Internal.CompilerTools;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalSharp.Internal.EmitPE

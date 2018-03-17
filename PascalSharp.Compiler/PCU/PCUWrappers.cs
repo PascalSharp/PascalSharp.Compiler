@@ -1,12 +1,10 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SystemLibrary;
-using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
-using SymbolTable;
 
 namespace PascalSharp.Compiler.PCU
 {

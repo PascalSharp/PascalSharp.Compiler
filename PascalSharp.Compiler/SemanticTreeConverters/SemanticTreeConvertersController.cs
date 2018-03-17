@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SemanticTree;
 
 namespace PascalSharp.Compiler.SemanticTreeConverters
 {

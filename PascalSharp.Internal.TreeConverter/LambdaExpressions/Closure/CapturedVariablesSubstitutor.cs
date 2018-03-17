@@ -1,19 +1,19 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.SystemLibrary;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
-using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
-using array_const = array_const;
-using for_node = for_node;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
+using array_const = PascalSharp.Internal.SyntaxTree.array_const;
+using for_node = PascalSharp.Internal.SyntaxTree.for_node;
 
-namespace TreeConverter.LambdaExpressions.Closure
+namespace PascalSharp.Internal.TreeConverter.LambdaExpressions.Closure
 {
     internal class SubstitutionKey
     {
@@ -74,7 +74,7 @@ namespace TreeConverter.LambdaExpressions.Closure
         private readonly Dictionary<SubstitutionKey, List<ident>> _identsReferences;
         private readonly Dictionary<int, CapturedVariablesSubstitutionClassGenerator.ScopeClassDefinition> _generatedScopeClassesInfo;
         private readonly Dictionary<SubstitutionKey, dot_node> _substitutionsInfo;
-        private readonly syntax_tree_visitor _visitor;
+        private readonly TreeConversion.syntax_tree_visitor _visitor;
         private readonly Stack<syntax_tree_node> _syntaxTreeNodeStack = new Stack<syntax_tree_node>();
         private readonly Dictionary<int, CapturedVariablesTreeNode> _capturedVarsTreeNodesDictionary;
         private readonly List<CapturedVariablesTreeNodeLambdaScope> _lambdasToBeAddedAsMethods;
@@ -86,7 +86,7 @@ namespace TreeConverter.LambdaExpressions.Closure
                                             Dictionary<SubstitutionKey, dot_node> substitutionsInfo,
                                             Dictionary<int, CapturedVariablesTreeNode> capturedVarsTreeNodesDictionary,
                                             Dictionary<string, Tuple<string, class_field, semantic_node>> mappingForNonPublicFieldsOfClass,
-                                            syntax_tree_visitor visitor)
+                                            TreeConversion.syntax_tree_visitor visitor)
         {
             _identsReferences = identsReferences;
             _generatedScopeClassesInfo = generatedScopeClassesInfo;

@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using System.Reflection;
 using System.Reflection.Emit;
-using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalSharp.Internal.EmitPE {

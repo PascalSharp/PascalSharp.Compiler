@@ -1,10 +1,13 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System.Collections.Generic;
 using System.Linq;
-using PascalABCCompiler.SyntaxTree;
+using PascalSharp.Internal.SemanticTree;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
-namespace TreeConverter.LambdaExpressions
+namespace PascalSharp.Internal.TreeConverter.LambdaExpressions
 {
     internal class LambdaCapturedSymbolsHelper
     {

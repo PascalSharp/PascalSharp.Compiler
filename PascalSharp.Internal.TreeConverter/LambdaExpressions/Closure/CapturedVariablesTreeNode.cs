@@ -1,11 +1,13 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
 using System.Collections.Generic;
-using PascalABCCompiler.SyntaxTree;
-using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.TreeRealization;
 
-namespace TreeConverter.LambdaExpressions.Closure
+namespace PascalSharp.Internal.TreeConverter.LambdaExpressions.Closure
 {
     internal abstract class CapturedVariablesTreeNode
     {

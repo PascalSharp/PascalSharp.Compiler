@@ -6,9 +6,10 @@ using System.Text;
 using System.Reflection;
 using System.Collections.Generic;
 using PascalSharp.Internal.SyntaxTree;
-using PascalSharp.Internal.Parsers;
 using PascalSharp.Internal.ParserTools;
 using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.Lexer.PascalLanguage;
+using PascalSharp.Internal.Lexer.Preprocessor;
 
 namespace PascalSharp.Internal.Lexer
 {

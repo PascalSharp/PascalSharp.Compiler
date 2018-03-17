@@ -3,11 +3,8 @@
 using System;
 using System.Collections;
 
-namespace SymbolTable
+namespace PascalSharp.Internal.TreeConverter.SymbolTable
 {
-	/// <summary>
-	/// 
-	/// </summary>
 	public class AreaArrayTable
 	{
 		private ArrayList data;

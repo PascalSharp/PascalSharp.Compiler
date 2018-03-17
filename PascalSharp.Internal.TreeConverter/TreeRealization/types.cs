@@ -5,10 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.TreeConverter;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.TreeConverter.NetWrappers;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
@@ -617,7 +617,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return this.semantic_node_type.common_type_node;///////////////////????
+                return semantic_node_type.common_type_node;///////////////////????
             }
         }
 
@@ -931,7 +931,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 				if (base.name != null)
                     return base.name;
 				if (_pointed_type != null && !check_for_circularity(_pointed_type,this))
-                return PascalABCCompiler.TreeConverter.compiler_string_consts.get_pointer_type_name_by_type_name(_pointed_type.name);
+                return compiler_string_consts.get_pointer_type_name_by_type_name(_pointed_type.name);
 				return "";
 			}
 		}
@@ -984,7 +984,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.ref_type_node;
+				return semantic_node_type.ref_type_node;
 			}
 		}
 		
@@ -1007,7 +1007,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             if (ctn == SystemLibrary.integer_type)
             {
-                return PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(this, ctn, false);
+                return convertion_data_and_alghoritms.get_empty_conversion(this, ctn, false);
             }
             return null;
         }
@@ -1018,7 +1018,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             {
                 if (ctn == SystemLibrary.pointer_type)
                 {
-                    return PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
+                    return convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
                 }
 
             }
@@ -1031,7 +1031,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             ref_type_node rtn = ctn as ref_type_node;
             if (ctn == SystemLibrary.pointer_type)
             {
-            	return PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(this, ctn, false);
+            	return convertion_data_and_alghoritms.get_empty_conversion(this, ctn, false);
             }
             if (rtn == null)
             {
@@ -1041,7 +1041,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 return null;
             if (type_table.is_derived(rtn.pointed_type, this.pointed_type))
             {
-                return PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(this, ctn, false);
+                return convertion_data_and_alghoritms.get_empty_conversion(this, ctn, false);
             }
             return null;
         }
@@ -1138,7 +1138,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return this.general_node_type.type_synonym;
+                return general_node_type.type_synonym;
             }
         }
 
@@ -1149,7 +1149,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return this.semantic_node_type.type_synonym;
+                return semantic_node_type.type_synonym;
             }
         }
 
@@ -2057,7 +2057,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.common_type_node;
+				return semantic_node_type.common_type_node;
 			}
 		}
 
@@ -2409,7 +2409,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.short_string;
+				return semantic_node_type.short_string;
 			}
 		}
         
@@ -2504,7 +2504,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             {
                 if(cv.ContainsKey(ctn))
                     return cv[ctn];
-                function_node fn =PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
+                function_node fn =convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
                 cv.Add(ctn,fn);
                 return fn;
             }*/
@@ -3464,7 +3464,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.compiled_type_node;
+				return semantic_node_type.compiled_type_node;
 			}
 		}
 
@@ -3606,7 +3606,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 if ((this == SystemLibrary.integer_type && ctn == SystemLibrary.pointer_type) ||
                     (this == SystemLibrary.pointer_type && ctn == SystemLibrary.integer_type))
                 {
-                    fn = PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
+                    fn = convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
                     _explicit_convertions_from.Add(ctn, fn);
                     return fn;
                 }
@@ -3616,7 +3616,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
             if ((ctn.base_type == SystemLibrary.enum_base_type && this == SystemLibrary.integer_type)
               || (this.base_type == SystemLibrary.enum_base_type && ctn == SystemLibrary.integer_type))
             {
-                fn = PascalABCCompiler.TreeConverter.convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
+                fn = convertion_data_and_alghoritms.get_empty_conversion(ctn, this, false);
                 _explicit_convertions_from.Add(ctn, fn);
                 return fn;
             }
@@ -3733,7 +3733,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.simple_array;
+				return semantic_node_type.simple_array;
 			}
 		}
 
@@ -3751,7 +3751,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
                 {
                     return base.name;
                 }
-				return PascalABCCompiler.TreeConverter.compiler_string_consts.simple_array_name;
+				return compiler_string_consts.simple_array_name;
 			}
 		}
 		
@@ -3921,7 +3921,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 		{
 			get
 			{
-				return this.semantic_node_type.simple_array_indexing;
+				return semantic_node_type.simple_array_indexing;
 			}
 		}
 
@@ -4040,7 +4040,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return this.semantic_node_type.null_type_node;
+                return semantic_node_type.null_type_node;
             }
         }
 
@@ -4560,7 +4560,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
         {
             get
             {
-                return this.semantic_node_type.delegated_method;
+                return semantic_node_type.delegated_method;
             }
         }
     }
@@ -4867,7 +4867,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
         public override semantic_node_type semantic_node_type
         {
-            get { return this.semantic_node_type.none; }
+            get { return semantic_node_type.none; }
         }
     }
 

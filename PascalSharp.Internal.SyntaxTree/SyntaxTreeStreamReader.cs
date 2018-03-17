@@ -4,12 +4,12 @@ PascalABC.NET: syntax tree generator  v1.5(с) Водолазов Н., Ткач�
 
 Вручную не редактировать!
 *********************************************************************************************/
-using System;
-using System.IO;
-using System.Collections.Generic;
-using PascalSharp.Internal.SyntaxTree;
 
-namespace PascalABCCompiler.SyntaxTree
+using System;
+using System.Collections.Generic;
+using System.IO;
+
+namespace PascalSharp.Internal.SyntaxTree
 {
 
 	public class SyntaxTreeStreamReader:IVisitor

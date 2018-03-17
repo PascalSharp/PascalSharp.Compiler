@@ -2,6 +2,7 @@
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
 
 using System.Collections.Generic;
+using PascalSharp.Internal.SyntaxTree;
 
 namespace PascalSharp.Internal.ParserTools
 {

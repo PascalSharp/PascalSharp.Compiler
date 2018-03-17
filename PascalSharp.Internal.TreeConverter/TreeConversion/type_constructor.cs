@@ -7,10 +7,10 @@
 
 using System;
 using System.Collections.Generic;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SystemLibrary;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.TreeConverter.NetWrappers;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 using PascalSharp.Internal.TreeConverter.TreeRealization;
 

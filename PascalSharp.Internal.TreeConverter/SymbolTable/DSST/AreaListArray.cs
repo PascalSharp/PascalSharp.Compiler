@@ -3,6 +3,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
 
 namespace System.Linq
 {
@@ -18,7 +19,7 @@ namespace System.Linq
     }
 }
 
-namespace SymbolTable
+namespace PascalSharp.Internal.TreeConverter.SymbolTable
 {
 	public class AreaNodesList
 	{

@@ -1,19 +1,10 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PascalABCCompiler.SyntaxTree;
 
-namespace SyntaxVisitors
+namespace PascalSharp.Internal.SyntaxTree.Visitors.YieldVisitors.ObjectCopier
 {
-    using System;
-    using System.IO;
-    using System.Runtime.Serialization;
-    using System.Runtime.Serialization.Formatters.Binary;
-
     /// <summary>
     /// Reference Article http://www.codeproject.com/KB/tips/SerializedObjectCloner.aspx
     /// Provides a method for performing a deep copy of an object.

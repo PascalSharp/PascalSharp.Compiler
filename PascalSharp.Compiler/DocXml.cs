@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Xml;
-using PascalABCCompiler.SemanticTree;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.TreeConverter.TreeConversion;

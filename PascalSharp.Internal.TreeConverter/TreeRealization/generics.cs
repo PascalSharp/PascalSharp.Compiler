@@ -8,13 +8,10 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using PascalABCCompiler.SemanticTree;
-using PascalABCCompiler.SyntaxTree;
-using PascalABCCompiler.SystemLibrary;
+using PascalSharp.Internal.SemanticTree;
 using PascalSharp.Internal.SyntaxTree;
-using PascalSharp.Internal.TreeConverter;
 using PascalSharp.Internal.TreeConverter.SymbolTable;
-using PascalSharp.Internal.TreeConverter.TreeConversion;
+using PascalSharp.Internal.TreeConverter.SystemLib;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 
 namespace PascalSharp.Internal.TreeConverter.TreeRealization
@@ -214,7 +211,7 @@ namespace PascalSharp.Internal.TreeConverter.TreeRealization
 
         public static Hashtable generic_instances = new Hashtable();
 
-        public static syntax_tree_visitor visitor;
+        public static TreeConversion.syntax_tree_visitor visitor;
 
         public static List<generic_type_instance_info> get_type_instances(type_node original_generic_type)
         {

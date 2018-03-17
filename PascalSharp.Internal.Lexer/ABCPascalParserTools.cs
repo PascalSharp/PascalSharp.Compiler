@@ -5,7 +5,7 @@ using System.Linq;
 using System.Collections.Generic;
 using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.Errors;
-using PascalSharp.Internal.Errors;
+using PascalSharp.Internal.ParserTools;
 using QUT.Gppg;
 
 namespace PascalSharp.Internal.Lexer

@@ -4,6 +4,7 @@
 using System;
 using PascalSharp.Compiler;
 using PascalSharp.Compiler.SemanticTreeConverters;
+using PascalSharp.Internal.SemanticTree;
 
 namespace PascalSharp.Internal.Optimizer
 {

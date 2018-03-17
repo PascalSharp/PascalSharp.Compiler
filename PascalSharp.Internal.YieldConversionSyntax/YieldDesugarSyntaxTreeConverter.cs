@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using PascalABCCompiler.SyntaxTree;
+﻿using PascalSharp.Internal.SyntaxTree;
 using PascalSharp.Internal.SyntaxTree.Converters;
-using SyntaxVisitors;
+using PascalSharp.Internal.SyntaxTree.Visitors.YieldVisitors;
 
-namespace YieldDesugarSyntaxTreeConverter
+namespace PascalSharp.Internal.YieldConversionSyntax
 {
     // Он перестал быть нужен, поскольку код YieldDesugarSyntaxTreeConverter.Convert был явно добавлен в StandardSyntaxTreeConverter.Convert
     // Со временем этот проект надо исключить из решения, а YieldConversionSyntax.dll - исключить из инсталлята

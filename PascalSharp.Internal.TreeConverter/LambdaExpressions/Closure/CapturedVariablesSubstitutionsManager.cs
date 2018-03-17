@@ -1,15 +1,16 @@
 ﻿// Copyright (c) Ivan Bondarev, Stanislav Mihalkovich (for details please see \doc\copyright.txt)
 // This code is distributed under the GNU LGPL (for details please see \doc\license.txt)
+
 using System.Linq;
-using PascalABCCompiler.SyntaxTree;
-using PascalSharp.Internal.TreeConverter;
+using PascalSharp.Internal.SyntaxTree;
+using PascalSharp.Internal.TreeConverter.SymbolTable;
 using PascalSharp.Internal.TreeConverter.TreeConversion;
 
-namespace TreeConverter.LambdaExpressions.Closure
+namespace PascalSharp.Internal.TreeConverter.LambdaExpressions.Closure
 {
     class CapturedVariablesSubstitutionsManager
     {
-        public static void Substitute(syntax_tree_visitor _visitor, declarations decls, statement_list _statementList)
+        public static void Substitute(TreeConversion.syntax_tree_visitor _visitor, declarations decls, statement_list _statementList)
         {
             var tree = new CapturedVariablesTreeBuilder(_visitor).BuildTree(_statementList);
             var substs = new CapturedVariablesSubstitutionClassGenerator(tree.RootNode).GenerateSubstitutions();
